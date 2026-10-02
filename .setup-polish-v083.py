@@ -405,7 +405,8 @@ def test_tts_language_is_dropdown_from_engine_capabilities() -> None:
         flow.index("async def async_step_tts"):
         flow.index("async def async_step_snapcast")
     ]
-    language_pos=tts_block.index("CONF_TTS_LANGUAGE")
+    marker="_optional_marker(\n                    CONF_TTS_LANGUAGE"
+    language_pos=tts_block.index(marker)
     block=tts_block[language_pos:language_pos+900]
     assert "selector.SelectSelector(" in block
     assert "selector.TextSelector()" not in block
