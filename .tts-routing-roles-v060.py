@@ -41,8 +41,8 @@ p.write_text(text.replace(anchor,helper+anchor,1),encoding="utf-8")
 # config_flow.py
 p=C/"config_flow.py"
 rep(p,
-'    CONF_TTS_MEDIA_PLAYER,\n',
-'    CONF_TTS_MEDIA_PLAYER,\n    CONF_TTS_ROOM_PLAYERS,\n'
+'    CONF_TTS_LANGUAGE,\n    CONF_TTS_MEDIA_PLAYER,\n    CONF_TTS_MIN_LEVEL,\n',
+'    CONF_TTS_LANGUAGE,\n    CONF_TTS_MEDIA_PLAYER,\n    CONF_TTS_ROOM_PLAYERS,\n    CONF_TTS_MIN_LEVEL,\n'
 )
 
 # Move Snapcast output selection out of generic Outputs page.
