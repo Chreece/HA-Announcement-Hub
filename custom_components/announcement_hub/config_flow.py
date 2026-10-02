@@ -21,10 +21,16 @@ from .const import (
     CONF_DEFAULT_TITLE,
     CONF_DISPATCH_ORDER,
     CONF_FALLBACK_CHECK_DOOR,
+    CONF_FALLBACK_DOOR_LABEL,
     CONF_FALLBACK_ROOM,
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
     CONF_NOTIFY_POLICIES,
+    CONF_NOTIFY_ROOM_OUTPUTS,
+    CONF_NOTIFY_INFO_OUTPUTS,
+    CONF_NOTIFY_WARNING_OUTPUTS,
+    CONF_NOTIFY_ERROR_OUTPUTS,
+    CONF_NOTIFY_CRITICAL_OUTPUTS,
     CONF_NOTIFY_PROFILES,
     CONF_OCCUPANCY_ATTRIBUTE,
     CONF_OCCUPANCY_SENSOR,
@@ -44,6 +50,8 @@ from .const import (
     CONF_TTS_LANGUAGE,
     CONF_TTS_MEDIA_PLAYER,
     CONF_TTS_ROOM_PLAYERS,
+    CONF_TTS_AREA_PLAYERS,
+    CONF_TTS_PLAYER_POLICIES,
     CONF_TTS_MIN_LEVEL,
     CONF_TTS_OPTIONS,
     DEFAULT_COMPANION_TTS_MEDIA_STREAM,
@@ -107,12 +115,16 @@ from .message_parts import (
 )
 from .outputs import (
     companion_tts_output_options,
+    entity_area_id,
     expand_notify_output_tokens,
+    expand_snapcast_output_tokens,
     notify_output_options,
     area_name,
     resolve_notify_outputs,
     snapcast_output_options,
+    tts_default_engine,
     tts_engine_options,
+    tts_media_player_options,
 )
 
 
@@ -130,6 +142,19 @@ def _multi_select(
             options=options,
             multiple=True,
             custom_value=True,
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
+    )
+
+
+def _known_multi_select(
+    options: list[dict[str, str]],
+) -> selector.SelectSelector:
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=options,
+            multiple=True,
+            custom_value=False,
             mode=selector.SelectSelectorMode.DROPDOWN,
         )
     )
@@ -162,44 +187,126 @@ class _AnnouncementFlowMixin:
     async def async_step_outputs(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Select physical visual, Snapcast, and Companion outputs."""
-        if user_input is not None:
-            self._store_step(
-                user_input,
-                {
-                    CONF_NOTIFY_OUTPUTS: [],
-                    CONF_COMPANION_TTS_OUTPUTS: [],
-                    CONF_DEFAULT_TITLE: DEFAULT_TITLE,
-                    CONF_CRITICAL_NOTIFY_DATA: {},
-                },
+        """Step 1: discover and configure notification outputs."""
+        options = notify_output_options(self.hass)
+        known = [str(item["value"]) for item in options]
+        initial = CONF_NOTIFY_OUTPUTS not in self._working
+        selected_default = (
+            known
+            if initial
+            else [value for value in self._value(CONF_NOTIFY_OUTPUTS, []) if value in known]
+        )
+
+        records = {
+            output.ref: output
+            for output in resolve_notify_outputs(self.hass, known)
+        }
+        policies = self._working.get(CONF_NOTIFY_POLICIES, {})
+        if not isinstance(policies, dict):
+            policies = {}
+
+        room_default: list[str] = []
+        levels: dict[str, list[str]] = {
+            "info": [], "warning": [], "error": [], "critical": []
+        }
+        for ref in selected_default:
+            output = records.get(ref)
+            policy = policies.get(ref, {})
+            if not isinstance(policy, dict):
+                policy = {}
+            scope = str(
+                policy.get(
+                    NOTIFY_POLICY_SCOPE,
+                    NOTIFY_SCOPE_ROOM if output and output.area_id else NOTIFY_SCOPE_GENERAL,
+                )
             )
-            self._prepare_notify_routing_steps()
-            return await self.async_step_notification_routing()
+            if scope == NOTIFY_SCOPE_ROOM:
+                room_default.append(ref)
+            minimum = str(
+                policy.get(NOTIFY_POLICY_MIN_LEVEL, DEFAULT_NOTIFY_MIN_LEVEL)
+            )
+            if minimum in levels:
+                levels[minimum].append(ref)
+
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            selected = [
+                value for value in user_input.get(CONF_NOTIFY_OUTPUTS, [])
+                if value in known
+            ]
+            selected_set = set(selected)
+            room = set(user_input.get(CONF_NOTIFY_ROOM_OUTPUTS, [])) & selected_set
+            level_sets = {
+                "info": set(user_input.get(CONF_NOTIFY_INFO_OUTPUTS, [])) & selected_set,
+                "warning": set(user_input.get(CONF_NOTIFY_WARNING_OUTPUTS, [])) & selected_set,
+                "error": set(user_input.get(CONF_NOTIFY_ERROR_OUTPUTS, [])) & selected_set,
+                "critical": set(user_input.get(CONF_NOTIFY_CRITICAL_OUTPUTS, [])) & selected_set,
+            }
+            assigned: set[str] = set()
+            duplicate = False
+            for values in level_sets.values():
+                if assigned & values:
+                    duplicate = True
+                assigned |= values
+            no_area = [
+                ref for ref in room
+                if (records.get(ref) is None or records[ref].area_id is None)
+            ]
+            if duplicate:
+                errors["base"] = "notify_level_overlap"
+            elif no_area:
+                errors["base"] = "room_notify_area_required"
+            else:
+                new_policies: dict[str, dict[str, str]] = {}
+                for ref in selected:
+                    minimum = DEFAULT_NOTIFY_MIN_LEVEL
+                    for candidate in ("info", "warning", "error", "critical"):
+                        if ref in level_sets[candidate]:
+                            minimum = candidate
+                            break
+                    new_policies[ref] = {
+                        NOTIFY_POLICY_SCOPE: (
+                            NOTIFY_SCOPE_ROOM if ref in room else NOTIFY_SCOPE_GENERAL
+                        ),
+                        NOTIFY_POLICY_MIN_LEVEL: minimum,
+                    }
+                self._working[CONF_NOTIFY_OUTPUTS] = selected
+                self._working[CONF_NOTIFY_POLICIES] = new_policies
+                return await self.async_step_tts()
 
         schema = probatio.Schema(
             {
                 probatio.Optional(
                     CONF_NOTIFY_OUTPUTS,
-                    default=self._value(CONF_NOTIFY_OUTPUTS, []),
-                ): _multi_select(notify_output_options(self.hass)),
+                    default=selected_default,
+                ): _known_multi_select(options),
                 probatio.Optional(
-                    CONF_COMPANION_TTS_OUTPUTS,
-                    default=self._value(CONF_COMPANION_TTS_OUTPUTS, []),
-                ): _multi_select(companion_tts_output_options(self.hass)),
-                probatio.Required(
-                    CONF_DEFAULT_TITLE,
-                    default=self._value(CONF_DEFAULT_TITLE, DEFAULT_TITLE),
-                ): selector.TextSelector(),
+                    CONF_NOTIFY_ROOM_OUTPUTS,
+                    default=room_default,
+                ): _known_multi_select(options),
                 probatio.Optional(
-                    CONF_CRITICAL_NOTIFY_DATA,
-                    default=self._value(
-                        CONF_CRITICAL_NOTIFY_DATA,
-                        DEFAULT_CRITICAL_NOTIFY_DATA,
-                    ),
-                ): selector.ObjectSelector(),
+                    CONF_NOTIFY_INFO_OUTPUTS,
+                    default=levels["info"],
+                ): _known_multi_select(options),
+                probatio.Optional(
+                    CONF_NOTIFY_WARNING_OUTPUTS,
+                    default=levels["warning"],
+                ): _known_multi_select(options),
+                probatio.Optional(
+                    CONF_NOTIFY_ERROR_OUTPUTS,
+                    default=levels["error"],
+                ): _known_multi_select(options),
+                probatio.Optional(
+                    CONF_NOTIFY_CRITICAL_OUTPUTS,
+                    default=levels["critical"],
+                ): _known_multi_select(options),
             }
         )
-        return self.async_show_form(step_id="outputs", data_schema=schema)
+        return self.async_show_form(
+            step_id="outputs",
+            data_schema=schema,
+            errors=errors,
+        )
 
 
     def _prepare_notify_routing_steps(self) -> None:
@@ -329,12 +436,59 @@ class _AnnouncementFlowMixin:
     ) -> ConfigFlowResult:
         """Configure splitting, read timing, and native provider options."""
         if self._notify_profile_index >= len(self._notify_profile_domains):
-            return await self.async_step_tts()
+            return await self.async_step_queue()
 
         integration = self._notify_profile_domains[self._notify_profile_index]
         profiles = dict(self._working.get(CONF_NOTIFY_PROFILES, {}) or {})
         current = resolve_notify_profile(profiles, integration)
         errors: dict[str, str] = {}
+
+        if integration == "snapcast":
+            if user_input is not None:
+                self._store_step(
+                    user_input,
+                    {
+                        CONF_SNAPCAST_SOURCE: DEFAULT_SNAPCAST_SOURCE,
+                        CONF_SNAPCAST_ONLY_SOURCE: DEFAULT_SNAPCAST_ONLY_SOURCE,
+                        CONF_SNAPCAST_SETTLE_DELAY: DEFAULT_SNAPCAST_SETTLE_DELAY,
+                        CONF_SNAPCAST_VERIFY_TIMEOUT: DEFAULT_SNAPCAST_VERIFY_TIMEOUT,
+                        CONF_SNAPCAST_RESTORE: DEFAULT_SNAPCAST_RESTORE,
+                    },
+                )
+                self._notify_profile_index += 1
+                return await self.async_step_notification_profile()
+            return self.async_show_form(
+                step_id="notification_profile",
+                data_schema=probatio.Schema(
+                    {
+                        probatio.Required(
+                            CONF_SNAPCAST_SOURCE,
+                            default=self._value(CONF_SNAPCAST_SOURCE, DEFAULT_SNAPCAST_SOURCE),
+                        ): selector.TextSelector(),
+                        probatio.Required(
+                            CONF_SNAPCAST_ONLY_SOURCE,
+                            default=self._value(CONF_SNAPCAST_ONLY_SOURCE, DEFAULT_SNAPCAST_ONLY_SOURCE),
+                        ): selector.BooleanSelector(),
+                        probatio.Required(
+                            CONF_SNAPCAST_SETTLE_DELAY,
+                            default=self._value(CONF_SNAPCAST_SETTLE_DELAY, DEFAULT_SNAPCAST_SETTLE_DELAY),
+                        ): selector.NumberSelector(
+                            selector.NumberSelectorConfig(min=0, max=10, step=0.05, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
+                        ),
+                        probatio.Required(
+                            CONF_SNAPCAST_VERIFY_TIMEOUT,
+                            default=self._value(CONF_SNAPCAST_VERIFY_TIMEOUT, DEFAULT_SNAPCAST_VERIFY_TIMEOUT),
+                        ): selector.NumberSelector(
+                            selector.NumberSelectorConfig(min=0.5, max=30, step=0.5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
+                        ),
+                        probatio.Required(
+                            CONF_SNAPCAST_RESTORE,
+                            default=self._value(CONF_SNAPCAST_RESTORE, DEFAULT_SNAPCAST_RESTORE),
+                        ): selector.BooleanSelector(),
+                    }
+                ),
+                description_placeholders={"integration": "Snapcast"},
+            )
 
         if user_input is not None:
             minimum = float(user_input.get(PROFILE_MIN_DISPLAY, 0))
@@ -501,69 +655,141 @@ class _AnnouncementFlowMixin:
     async def async_step_tts(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Configure speech generation and the shared playback path."""
+        """Step 2: configure TTS engines and physical output roles."""
         errors: dict[str, str] = {}
+        engine_options = tts_engine_options(self.hass)
+        engine_ids = [str(item["value"]) for item in engine_options]
+        if CONF_TTS_ENGINES in self._working:
+            engine_default = [
+                value for value in self._value(CONF_TTS_ENGINES, []) if value in engine_ids
+            ]
+        else:
+            default_engine = tts_default_engine(self.hass)
+            engine_default = [default_engine] if default_engine in engine_ids else []
+
+        direct_options = tts_media_player_options(self.hass)
+        direct_ids = [str(item["value"]) for item in direct_options]
+        direct_default = [
+            value for value in self._value(CONF_TTS_ROOM_PLAYERS, [])
+            if value in direct_ids
+        ]
+        policies = self._working.get(CONF_TTS_PLAYER_POLICIES, {})
+        if not isinstance(policies, dict):
+            policies = {}
+        area_default = []
+        for entity_id in direct_default:
+            policy = policies.get(entity_id, {})
+            scope = (
+                str(policy.get(NOTIFY_POLICY_SCOPE))
+                if isinstance(policy, dict) and policy.get(NOTIFY_POLICY_SCOPE)
+                else (
+                    NOTIFY_SCOPE_ROOM
+                    if entity_area_id(self.hass, entity_id)
+                    else NOTIFY_SCOPE_GENERAL
+                )
+            )
+            if scope == NOTIFY_SCOPE_ROOM:
+                area_default.append(entity_id)
+
+        snap_options = snapcast_output_options(self.hass)
+        snap_ids = [
+            str(item["value"]).removeprefix("entity:")
+            for item in snap_options
+        ]
+        snap_default = [
+            value for value in expand_snapcast_output_tokens(
+                self.hass, self._value(CONF_SNAPCAST_OUTPUTS, [])
+            )
+            if value in snap_ids
+        ]
+
         if user_input is not None:
-            engines = list(user_input.get(CONF_TTS_ENGINES, []))
-            room_players = list(user_input.get(CONF_TTS_ROOM_PLAYERS, []))
-            player = user_input.get(CONF_TTS_MEDIA_PLAYER)
-            snapcast = list(user_input.get(CONF_SNAPCAST_OUTPUTS, []))
-            if engines and not (room_players or player):
-                errors["base"] = "tts_player_required"
-            elif (room_players or player or snapcast) and not engines:
+            engines = [v for v in user_input.get(CONF_TTS_ENGINES, []) if v in engine_ids]
+            direct = [v for v in user_input.get(CONF_TTS_ROOM_PLAYERS, []) if v in direct_ids]
+            area_players = set(user_input.get(CONF_TTS_AREA_PLAYERS, [])) & set(direct)
+            snapcast_refs = list(user_input.get(CONF_SNAPCAST_OUTPUTS, []))
+            snapcast = list(expand_snapcast_output_tokens(self.hass, snapcast_refs))
+            shared_player = user_input.get(CONF_TTS_MEDIA_PLAYER)
+            if (direct or snapcast) and not engines:
                 errors["base"] = "tts_engine_required"
-            elif snapcast and not player:
+            elif snapcast and not shared_player:
                 errors["base"] = "snapcast_tts_path_required"
             else:
-                self._store_step(
-                    user_input,
-                    {
-                        CONF_TTS_ENGINES: [],
-                        CONF_TTS_ROOM_PLAYERS: [],
-                        CONF_TTS_MEDIA_PLAYER: None,
-                        CONF_SNAPCAST_OUTPUTS: [],
-                        CONF_TTS_MIN_LEVEL: DEFAULT_TTS_MIN_LEVEL,
-                        CONF_TTS_CACHE: DEFAULT_TTS_CACHE,
-                        CONF_TTS_LANGUAGE: DEFAULT_TTS_LANGUAGE,
-                        CONF_TTS_OPTIONS: {},
-                        CONF_COMPANION_TTS_MEDIA_STREAM: (
-                            DEFAULT_COMPANION_TTS_MEDIA_STREAM
-                        ),
-                        CONF_COMPANION_TTS_WPM: DEFAULT_COMPANION_TTS_WPM,
-                    },
-                )
-                return await self.async_step_snapcast()
+                no_area = [
+                    entity_id for entity_id in area_players
+                    if entity_area_id(self.hass, entity_id) is None
+                ]
+                if no_area:
+                    errors["base"] = "room_tts_area_required"
+                else:
+                    self._working[CONF_TTS_ENGINES] = engines
+                    self._working[CONF_TTS_ROOM_PLAYERS] = direct
+                    self._working[CONF_TTS_PLAYER_POLICIES] = {
+                        entity_id: {
+                            NOTIFY_POLICY_SCOPE: (
+                                NOTIFY_SCOPE_ROOM
+                                if entity_id in area_players
+                                else NOTIFY_SCOPE_GENERAL
+                            )
+                        }
+                        for entity_id in direct
+                    }
+                    self._working[CONF_SNAPCAST_OUTPUTS] = snapcast_refs
+                    self._working[CONF_TTS_MEDIA_PLAYER] = shared_player
+                    for key in (
+                        CONF_TTS_MIN_LEVEL,
+                        CONF_TTS_CACHE,
+                        CONF_TTS_LANGUAGE,
+                        CONF_TTS_OPTIONS,
+                        CONF_COMPANION_TTS_OUTPUTS,
+                        CONF_COMPANION_TTS_MEDIA_STREAM,
+                        CONF_COMPANION_TTS_WPM,
+                    ):
+                        if key in user_input:
+                            self._working[key] = user_input[key]
+                    self._prepare_notify_profile_steps()
+                    if snapcast:
+                        self._notify_profile_domains.append("snapcast")
+                    return await self.async_step_notification_profile()
 
-        schema = probatio.Schema(
-            {
+        fields: dict[probatio.Marker, Any] = {
+            probatio.Optional(
+                CONF_TTS_ENGINES,
+                default=engine_default,
+            ): _known_multi_select(engine_options),
+            probatio.Optional(
+                CONF_TTS_ROOM_PLAYERS,
+                default=direct_default,
+            ): _known_multi_select(direct_options),
+            probatio.Optional(
+                CONF_TTS_AREA_PLAYERS,
+                default=area_default,
+            ): _known_multi_select(direct_options),
+        }
+
+        if snap_options:
+            fields[
                 probatio.Optional(
-                    CONF_TTS_ENGINES,
-                    default=self._value(CONF_TTS_ENGINES, []),
-                ): _multi_select(tts_engine_options(self.hass)),
-                probatio.Optional(
-                    CONF_TTS_ROOM_PLAYERS,
-                    default=self._value(CONF_TTS_ROOM_PLAYERS, []),
-                ): selector.EntitySelector(
-                    selector.EntitySelectorConfig(
-                        domain="media_player",
-                        multiple=True,
-                    )
-                ),
+                    CONF_SNAPCAST_OUTPUTS,
+                    default=[
+                        f"entity:{entity_id}" for entity_id in snap_default
+                    ],
+                )
+            ] = _known_multi_select(snap_options)
+            fields[
                 _optional_marker(
                     CONF_TTS_MEDIA_PLAYER,
                     self._value(CONF_TTS_MEDIA_PLAYER, None),
-                ): selector.EntitySelector(
-                    selector.EntitySelectorConfig(domain="media_player")
-                ),
-                probatio.Optional(
-                    CONF_SNAPCAST_OUTPUTS,
-                    default=self._value(CONF_SNAPCAST_OUTPUTS, []),
-                ): _multi_select(snapcast_output_options(self.hass)),
+                )
+            ] = selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="media_player")
+            )
+
+        fields.update(
+            {
                 probatio.Required(
                     CONF_TTS_MIN_LEVEL,
-                    default=self._value(
-                        CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL
-                    ),
+                    default=self._value(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL),
                 ): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=list(TTS_MIN_LEVELS),
@@ -583,6 +809,10 @@ class _AnnouncementFlowMixin:
                     CONF_TTS_OPTIONS,
                     default=self._value(CONF_TTS_OPTIONS, DEFAULT_TTS_OPTIONS),
                 ): selector.ObjectSelector(),
+                probatio.Optional(
+                    CONF_COMPANION_TTS_OUTPUTS,
+                    default=self._value(CONF_COMPANION_TTS_OUTPUTS, []),
+                ): _multi_select(companion_tts_output_options(self.hass)),
                 probatio.Required(
                     CONF_COMPANION_TTS_MEDIA_STREAM,
                     default=self._value(
@@ -613,9 +843,7 @@ class _AnnouncementFlowMixin:
                 ),
             }
         )
-        return self.async_show_form(
-            step_id="tts", data_schema=schema, errors=errors
-        )
+        return self.async_show_form(step_id="tts", data_schema=probatio.Schema(fields), errors=errors)
 
     async def async_step_snapcast(
         self, user_input: dict[str, Any] | None = None
@@ -779,28 +1007,46 @@ class _AnnouncementFlowMixin:
     async def async_step_queue(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Configure serialization and availability/playback timeouts."""
+        """Step 4: general routing, presence, fallback, and queue options."""
         errors: dict[str, str] = {}
         if user_input is not None:
-            self._store_step(
-                user_input,
-                {
-                    CONF_DISPATCH_ORDER: DEFAULT_DISPATCH_ORDER,
-                    CONF_QUEUE_MAX: DEFAULT_QUEUE_MAX,
-                    CONF_OUTPUT_AVAILABILITY_TIMEOUT: (
-                        DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT
-                    ),
-                    CONF_IDLE_TIMEOUT: DEFAULT_IDLE_TIMEOUT,
-                    CONF_START_TIMEOUT: DEFAULT_START_TIMEOUT,
-                    CONF_PLAYBACK_TIMEOUT: DEFAULT_PLAYBACK_TIMEOUT,
-                    CONF_POST_PLAY_DELAY: DEFAULT_POST_PLAY_DELAY,
-                },
-            )
+            incoming_sensor = user_input.get(CONF_OCCUPANCY_SENSOR)
+            had_source_field = CONF_OCCUPANCY_ATTRIBUTE in user_input
+            for key, default in (
+                (CONF_DEFAULT_TITLE, DEFAULT_TITLE),
+                (CONF_CRITICAL_NOTIFY_DATA, {}),
+                (CONF_OCCUPANCY_SENSOR, None),
+                (CONF_FALLBACK_ROOM, None),
+                (CONF_FALLBACK_CHECK_DOOR, DEFAULT_FALLBACK_CHECK_DOOR),
+                (CONF_FALLBACK_DOOR_LABEL, None),
+                (CONF_DISPATCH_ORDER, DEFAULT_DISPATCH_ORDER),
+                (CONF_QUEUE_MAX, DEFAULT_QUEUE_MAX),
+                (CONF_OUTPUT_AVAILABILITY_TIMEOUT, DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT),
+                (CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT),
+                (CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT),
+                (CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT),
+                (CONF_POST_PLAY_DELAY, DEFAULT_POST_PLAY_DELAY),
+            ):
+                self._working[key] = user_input.get(key, default)
+
+            if incoming_sensor:
+                if not had_source_field:
+                    return await self.async_step_queue()
+                source = str(user_input.get(CONF_OCCUPANCY_ATTRIBUTE, "__state__"))
+                self._working[CONF_OCCUPANCY_ATTRIBUTE] = (
+                    "" if source == "__state__" else source
+                )
+            else:
+                self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
+
             has_tts = bool(
                 self._working.get(CONF_TTS_ENGINES)
                 and (
-                    self._working.get(CONF_TTS_MEDIA_PLAYER)
-                    or self._working.get(CONF_TTS_ROOM_PLAYERS)
+                    self._working.get(CONF_TTS_ROOM_PLAYERS)
+                    or (
+                        self._working.get(CONF_TTS_MEDIA_PLAYER)
+                        and self._working.get(CONF_SNAPCAST_OUTPUTS)
+                    )
                 )
             )
             if not (
@@ -812,13 +1058,66 @@ class _AnnouncementFlowMixin:
             else:
                 return await self._async_finish()
 
-        schema = probatio.Schema(
+        sensor = str(self._value(CONF_OCCUPANCY_SENSOR, "") or "").strip()
+        fields: dict[probatio.Marker, Any] = {
+            probatio.Required(
+                CONF_DEFAULT_TITLE,
+                default=self._value(CONF_DEFAULT_TITLE, DEFAULT_TITLE),
+            ): selector.TextSelector(),
+            probatio.Optional(
+                CONF_CRITICAL_NOTIFY_DATA,
+                default=self._value(CONF_CRITICAL_NOTIFY_DATA, {}),
+            ): selector.ObjectSelector(),
+            _optional_marker(
+                CONF_OCCUPANCY_SENSOR,
+                self._value(CONF_OCCUPANCY_SENSOR, None),
+            ): selector.EntitySelector(),
+        }
+
+        if sensor:
+            state = self.hass.states.get(sensor)
+            attributes = sorted(str(key) for key in (state.attributes if state else {}))
+            options = [
+                selector.SelectOptionDict(value="__state__", label="State"),
+                *[
+                    selector.SelectOptionDict(value=key, label=key)
+                    for key in attributes
+                ],
+            ]
+            current = str(self._value(CONF_OCCUPANCY_ATTRIBUTE, "") or "")
+            values = {item["value"] for item in options}
+            fields[
+                probatio.Required(
+                    CONF_OCCUPANCY_ATTRIBUTE,
+                    default=current if current in values else "__state__",
+                )
+            ] = selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=options,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            )
+
+        fields.update(
             {
+                _optional_marker(
+                    CONF_FALLBACK_ROOM,
+                    self._value(CONF_FALLBACK_ROOM, None),
+                ): selector.AreaSelector(),
+                probatio.Required(
+                    CONF_FALLBACK_CHECK_DOOR,
+                    default=self._value(
+                        CONF_FALLBACK_CHECK_DOOR,
+                        DEFAULT_FALLBACK_CHECK_DOOR,
+                    ),
+                ): selector.BooleanSelector(),
+                _optional_marker(
+                    CONF_FALLBACK_DOOR_LABEL,
+                    self._value(CONF_FALLBACK_DOOR_LABEL, None),
+                ): selector.LabelSelector(),
                 probatio.Required(
                     CONF_DISPATCH_ORDER,
-                    default=self._value(
-                        CONF_DISPATCH_ORDER, DEFAULT_DISPATCH_ORDER
-                    ),
+                    default=self._value(CONF_DISPATCH_ORDER, DEFAULT_DISPATCH_ORDER),
                 ): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=list(DISPATCH_ORDERS),
@@ -830,89 +1129,47 @@ class _AnnouncementFlowMixin:
                     CONF_QUEUE_MAX,
                     default=self._value(CONF_QUEUE_MAX, DEFAULT_QUEUE_MAX),
                 ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=1,
-                        max=1000,
-                        step=1,
-                        mode=selector.NumberSelectorMode.BOX,
-                    )
+                    selector.NumberSelectorConfig(min=1, max=1000, step=1, mode=selector.NumberSelectorMode.BOX)
                 ),
                 probatio.Required(
                     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
-                    default=self._value(
-                        CONF_OUTPUT_AVAILABILITY_TIMEOUT,
-                        DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
-                    ),
+                    default=self._value(CONF_OUTPUT_AVAILABILITY_TIMEOUT, DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT),
                 ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=0,
-                        max=300,
-                        step=0.5,
-                        mode=selector.NumberSelectorMode.BOX,
-                        unit_of_measurement="s",
-                    )
+                    selector.NumberSelectorConfig(min=0, max=300, step=0.5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
                 ),
                 probatio.Required(
                     CONF_IDLE_TIMEOUT,
-                    default=self._value(
-                        CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT
-                    ),
+                    default=self._value(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT),
                 ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=1,
-                        max=1800,
-                        step=1,
-                        mode=selector.NumberSelectorMode.BOX,
-                        unit_of_measurement="s",
-                    )
+                    selector.NumberSelectorConfig(min=1, max=1800, step=1, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
                 ),
                 probatio.Required(
                     CONF_START_TIMEOUT,
-                    default=self._value(
-                        CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT
-                    ),
+                    default=self._value(CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT),
                 ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=1,
-                        max=120,
-                        step=1,
-                        mode=selector.NumberSelectorMode.BOX,
-                        unit_of_measurement="s",
-                    )
+                    selector.NumberSelectorConfig(min=1, max=120, step=1, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
                 ),
                 probatio.Required(
                     CONF_PLAYBACK_TIMEOUT,
-                    default=self._value(
-                        CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT
-                    ),
+                    default=self._value(CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT),
                 ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=5,
-                        max=3600,
-                        step=5,
-                        mode=selector.NumberSelectorMode.BOX,
-                        unit_of_measurement="s",
-                    )
+                    selector.NumberSelectorConfig(min=5, max=3600, step=5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
                 ),
                 probatio.Required(
                     CONF_POST_PLAY_DELAY,
-                    default=self._value(
-                        CONF_POST_PLAY_DELAY, DEFAULT_POST_PLAY_DELAY
-                    ),
+                    default=self._value(CONF_POST_PLAY_DELAY, DEFAULT_POST_PLAY_DELAY),
                 ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=0,
-                        max=10,
-                        step=0.05,
-                        mode=selector.NumberSelectorMode.BOX,
-                        unit_of_measurement="s",
-                    )
+                    selector.NumberSelectorConfig(min=0, max=10, step=0.05, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
                 ),
             }
         )
         return self.async_show_form(
-            step_id="queue", data_schema=schema, errors=errors
+            step_id="queue",
+            data_schema=probatio.Schema(fields),
+            errors=errors,
         )
+
+
 
 
 class AnnouncementHubConfigFlow(

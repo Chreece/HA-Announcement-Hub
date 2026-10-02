@@ -3,35 +3,41 @@
   "config": {
     "step": {
       "outputs": {
-        "title": "Έξοδοι",
-        "description": "Επίλεξε ενσωματώσεις, συγκεκριμένες καταχωρίσεις ή οντότητες ως οπτικές εξόδους, εξόδους Snapcast ή εξόδους Companion App. Η περιοχή τους λαμβάνεται αυτόματα από το Home Assistant.",
+        "title": "1. Έξοδοι ειδοποιήσεων",
+        "description": "Όλες οι αναγνωρισμένες οντότητες ειδοποιήσεων επιλέγονται αυτόματα. Αποεπίλεξε ό,τι δεν χρειάζεσαι, όρισε ποιες είναι ανά δωμάτιο και βάλε υψηλότερο ελάχιστο επίπεδο όπου θέλεις. Όσες δεν μπουν σε υψηλότερη βαθμίδα χρησιμοποιούν Debug.",
         "data": {
-          "notify_outputs": "Οπτικές έξοδοι ειδοποιήσεων",
-          "companion_tts_outputs": "Έξοδοι TTS Companion App",
-          "default_title": "Προεπιλεγμένος τίτλος",
-          "critical_notify_data": "Δεδομένα κρίσιμων ειδοποιήσεων"
+          "notify_outputs": "Συσκευές ειδοποιήσεων",
+          "notify_room_outputs": "Συσκευές ειδοποιήσεων ανά δωμάτιο",
+          "notify_info_outputs": "Ελάχιστο Πληροφορία / Επιτυχία",
+          "notify_warning_outputs": "Ελάχιστο Προειδοποίηση",
+          "notify_error_outputs": "Ελάχιστο Σφάλμα",
+          "notify_critical_outputs": "Ελάχιστο Κρίσιμο"
         },
         "data_description": {
-          "notify_outputs": "Notifications for Android TV, Companion App και άλλες έξοδοι notify. Η επιλογή ενσωμάτωσης ή καταχώρισης περιλαμβάνει αυτόματα τις οντότητές της. Οι χειροκίνητες legacy υπηρεσίες θεωρούνται καθολικές.",
-          "companion_tts_outputs": "Προαιρετικό. Επίλεξε τις συσκευές Android Companion App που επιτρέπεται να χρησιμοποιούνται για push TTS. Οι κανονικές κλήσεις χρειάζονται επίσης την επιλογή Companion App TTS στην ενέργεια· οι κρίσιμες κλήσεις χρησιμοποιούν όλες τις αντίστοιχες ρυθμισμένες εξόδους.",
-          "default_title": "Προαιρετικός τίτλος για τις οπτικές ειδοποιήσεις.",
-          "critical_notify_data": "Προαιρετικά δεδομένα ειδικά για την ενσωμάτωση, τα οποία συγχωνεύονται στις κρίσιμες οπτικές ειδοποιήσεις."
+          "notify_outputs": "Συσκευές ειδοποιήσεων",
+          "notify_room_outputs": "Συσκευές ειδοποιήσεων ανά δωμάτιο",
+          "notify_info_outputs": "Ελάχιστο Πληροφορία / Επιτυχία",
+          "notify_warning_outputs": "Ελάχιστο Προειδοποίηση",
+          "notify_error_outputs": "Ελάχιστο Σφάλμα",
+          "notify_critical_outputs": "Ελάχιστο Κρίσιμο"
         }
       },
       "tts": {
-        "title": "Δρομολόγηση μετατροπής κειμένου σε ομιλία",
-        "description": "Επίλεξε τη μηχανή TTS και κράτησε ξεχωριστή την άμεση αναπαραγωγή ανά δωμάτιο από την κοινή συγχρονισμένη διαδρομή server.",
+        "title": "2. Έξοδοι TTS",
+        "description": "Επίλεξε μηχανές TTS, άμεσους media players και—όταν υπάρχει Snapcast—τους συγχρονισμένους clients ανά δωμάτιο μαζί με τον κοινό media player που τους τροφοδοτεί.",
         "data": {
-          "tts_engines": "Μηχανές TTS",
-          "tts_room_players": "Άμεσοι media players TTS ανά δωμάτιο",
-          "tts_media_player": "Media player TTS",
-          "snapcast_outputs": "Συγχρονισμένοι room routing players (Snapcast)",
+          "tts_engines": "Μηχανές TTS (φαίνονται οι γλώσσες· * = προεπιλογή μηχανής)",
+          "tts_room_players": "Άμεσοι media players TTS",
+          "tts_media_player": "Κοινός media player που τροφοδοτεί το Snapcast",
+          "snapcast_outputs": "Snapcast clients ανά δωμάτιο",
           "tts_min_level": "Χρήση TTS από επίπεδο",
           "tts_cache": "Προδημιουργία και προσωρινή αποθήκευση ομιλίας",
           "tts_language": "Προεπιλεγμένη γλώσσα",
           "tts_options": "Προεπιλεγμένες επιλογές TTS",
           "companion_tts_media_stream": "Ροή ήχου Companion App",
-          "companion_tts_words_per_minute": "Εκτιμώμενη ταχύτητα ομιλίας"
+          "companion_tts_words_per_minute": "Εκτιμώμενη ταχύτητα ομιλίας",
+          "tts_area_players": "Άμεσοι TTS players ανά δωμάτιο",
+          "companion_tts_outputs": "Έξοδοι TTS Companion App"
         },
         "data_description": {
           "tts_engines": "Επίλεξε ενσωμάτωση, καταχώριση ή συγκεκριμένες οντότητες TTS. Χρησιμοποιούνται ως αλυσίδα εφεδρείας· μιλά η πρώτη που επιτυγχάνει.",
@@ -43,52 +49,13 @@
           "companion_tts_media_stream": "Προαιρετική ροή ήχου Android για TTS μέσω Companion App.",
           "companion_tts_words_per_minute": "Επειδή το push TTS δεν αναφέρει πότε τελείωσε, η ουρά δεσμεύει χρόνο από αυτή την εκτίμηση ώστε να μην επικαλύπτονται ανακοινώσεις.",
           "tts_room_players": "Media players δεμένοι σε περιοχή (π.χ. voice assistants/ηχεία) που λαμβάνουν απευθείας το παραγόμενο TTS. Η παρουσία τους φιλτράρει σύμφωνα με την περιοχή Home Assistant.",
-          "snapcast_outputs": "Snapcast clients δεμένοι σε περιοχή και τροφοδοτούμενοι από τον κοινό server player. Το Announcement Hub δεν στέλνει TTS απευθείας σε αυτούς· διαχειρίζεται μόνο mute/routing."
-        }
-      },
-      "snapcast": {
-        "title": "Δρομολόγηση δωματίων Snapcast",
-        "description": "Οι επιλεγμένοι Snapcast clients δρομολογούνται αμέσως πριν από κάθε ομιλία και επανέρχονται μετά.",
-        "data": {
-          "snapcast_source": "Όνομα πηγής ανακοινώσεων",
-          "snapcast_only_source": "Διαχείριση μόνο clients σε αυτή την πηγή",
-          "snapcast_settle_delay": "Καθυστέρηση σταθεροποίησης",
-          "snapcast_verify_timeout": "Χρονικό όριο επιβεβαίωσης δρομολόγησης",
-          "snapcast_restore": "Επαναφορά προηγούμενης σίγασης"
-        },
-        "data_description": {
-          "snapcast_source": "Όνομα πηγής ανακοινώσεων",
-          "snapcast_only_source": "Διαχείριση μόνο clients σε αυτή την πηγή",
-          "snapcast_settle_delay": "Καθυστέρηση σταθεροποίησης",
-          "snapcast_verify_timeout": "Χρονικό όριο επιβεβαίωσης δρομολόγησης",
-          "snapcast_restore": "Επαναφορά προηγούμενης σίγασης"
-        }
-      },
-      "queue": {
-        "title": "Ουρά και χρονικά όρια",
-        "description": "Οι ανακοινώσεις και οι έξοδοί τους εκτελούνται σειριακά. Οι διαθέσιμες έξοδοι εκτελούνται άμεσα· οι μη διαθέσιμες ή προσωρινά αποτυχημένες μοιράζονται ένα παράθυρο επανάληψης.",
-        "data": {
-          "dispatch_order": "Σειρά καναλιών",
-          "queue_max": "Μέγιστο μήκος ουράς",
-          "output_availability_timeout": "Αναμονή μη διαθέσιμων εξόδων",
-          "idle_timeout": "Αναμονή μέχρι να ελευθερωθεί η ηχητική διαδρομή",
-          "start_timeout": "Χρονικό όριο έναρξης αναπαραγωγής",
-          "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
-          "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων"
-        },
-        "data_description": {
-          "dispatch_order": "Σειρά καναλιών",
-          "queue_max": "Μέγιστο μήκος ουράς",
-          "output_availability_timeout": "Οι διαθέσιμες έξοδοι εκτελούνται άμεσα. Οι μη διαθέσιμες ή αποτυχημένες δοκιμάζονται ξανά μέσα σε αυτό το διάστημα και μετά καταγράφονται με το τελευταίο σφάλμα.",
-          "idle_timeout": "Αναμονή μέχρι να ελευθερωθεί η ηχητική διαδρομή",
-          "start_timeout": "Χρονικό όριο έναρξης αναπαραγωγής",
-          "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
-          "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων"
+          "snapcast_outputs": "Snapcast clients δεμένοι σε περιοχή και τροφοδοτούμενοι από τον κοινό server player. Το Announcement Hub δεν στέλνει TTS απευθείας σε αυτούς· διαχειρίζεται μόνο mute/routing.",
+          "companion_tts_outputs": "Προαιρετικό. Επίλεξε τις συσκευές Android Companion App που επιτρέπεται να χρησιμοποιούνται για push TTS. Οι κανονικές κλήσεις χρειάζονται επίσης την επιλογή Companion App TTS στην ενέργεια· οι κρίσιμες κλήσεις χρησιμοποιούν όλες τις αντίστοιχες ρυθμισμένες εξόδους."
         }
       },
       "notification_profile": {
-        "title": "Οπτική συμπεριφορά: {integration}",
-        "description": "Ρυθμίζει τον διαχωρισμό, τον χρόνο ανάγνωσης και τις εγγενείς επιλογές του {integration}. Το προφίλ κάθε συγκεκριμένης εξόδου παγώνει όταν η εργασία μπει στην ουρά.",
+        "title": "3. Επιλογές ενσωμάτωσης: {integration}",
+        "description": "Επιλογές που παρέχει η επιλεγμένη ενσωμάτωση.",
         "data": {
           "max_length": "Μέγιστοι χαρακτήρες ανά τμήμα",
           "reading_words_per_minute": "Ταχύτητα ανάγνωσης",
@@ -103,7 +70,12 @@
           "fontsize": "Μέγεθος γραμματοσειράς",
           "color": "Χρώμα φόντου",
           "transparency": "Διαφάνεια φόντου",
-          "interrupt": "Διαδραστική ειδοποίηση"
+          "interrupt": "Διαδραστική ειδοποίηση",
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
         },
         "data_description": {
           "max_length": "Το 0 απενεργοποιεί τον διαχωρισμό. Το μεγάλο κείμενο χωρίζεται πρώτα σε τέλος πρότασης, μετά σε κόμμα ή δευτερεύουσα φράση και τέλος σε κενό. Λέξη κόβεται μόνο όταν η ίδια ξεπερνά το όριο.",
@@ -119,43 +91,48 @@
           "fontsize": "Μέγεθος κειμένου της επικάλυψης.",
           "color": "Χρώμα φόντου της επικάλυψης.",
           "transparency": "Διαφάνεια φόντου της επικάλυψης.",
-          "interrupt": "Κάνει την ειδοποίηση TV διαδραστική και μπορεί να διακόψει την τρέχουσα εφαρμογή."
+          "interrupt": "Κάνει την ειδοποίηση TV διαδραστική και μπορεί να διακόψει την τρέχουσα εφαρμογή.",
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
         }
       },
-      "occupancy": {
-        "title": "Δρομολόγηση βάσει παρουσίας",
-        "description": "Προαιρετικά περιόρισε τις ανακοινώσεις στις κατειλημμένες περιοχές του Home Assistant και ρύθμισε την εφεδρική περιοχή όταν δεν υπάρχουν candidates.",
+      "queue": {
+        "title": "4. Γενικές επιλογές",
+        "description": "Παρουσία δωματίων, fallback, προαιρετικό label για αισθητήρες πόρτας, προεπιλογές ειδοποιήσεων και queue/timeouts.",
         "data": {
-          "occupancy_sensor": "Οντότητα κατειλημμένων περιοχών",
+          "dispatch_order": "Σειρά καναλιών",
+          "queue_max": "Μέγιστο μήκος ουράς",
+          "output_availability_timeout": "Αναμονή μη διαθέσιμων εξόδων",
+          "idle_timeout": "Αναμονή μέχρι να ελευθερωθεί η ηχητική διαδρομή",
+          "start_timeout": "Χρονικό όριο έναρξης αναπαραγωγής",
+          "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
+          "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων",
+          "default_title": "Προεπιλεγμένος τίτλος",
+          "critical_notify_data": "Δεδομένα κρίσιμων ειδοποιήσεων",
+          "occupancy_sensor": "Οντότητα παρουσίας δωματίων",
+          "occupancy_attribute": "Ανάγνωση κατειλημμένων δωματίων από",
           "fallback_room": "Εφεδρική περιοχή",
-          "fallback_check_door": "Έλεγχος πόρτας πριν την εφεδρική δρομολόγηση"
+          "fallback_check_door": "Έλεγχος πόρτας πριν το fallback",
+          "fallback_door_label": "Label οντότητας πόρτας (προαιρετικό)"
         },
         "data_description": {
-          "occupancy_sensor": "Επίλεξε τον αισθητήρα/οντότητα που αναφέρει τις κατειλημμένες περιοχές. Στο επόμενο βήμα επιλέγεις την κατάσταση ή ένα από τα τρέχοντα attributes του.",
-          "fallback_room": "Προαιρετική περιοχή που χρησιμοποιείται μόνο όταν η δρομολόγηση βάσει παρουσίας δεν αφήνει κανένα ρυθμισμένο candidate.",
-          "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν μία κατειλημμένη περιοχή-στόχος έχει ανοιχτό binary sensor πόρτας."
-        }
-      },
-      "occupancy_source": {
-        "title": "Τιμή κατειλημμένων περιοχών",
-        "description": "Επίλεξε την κατάσταση ή ένα τρέχον attribute του {entity} που περιέχει τα ονόματα/ID των κατειλημμένων περιοχών.",
-        "data": {
-          "occupancy_attribute": "Ανάγνωση κατειλημμένων περιοχών από"
-        },
-        "data_description": {
-          "occupancy_attribute": "Η Κατάσταση χρησιμοποιεί την ίδια την κατάσταση της οντότητας. Τα attributes διαβάζονται ζωντανά από την επιλεγμένη οντότητα."
-        }
-      },
-      "notification_routing": {
-        "title": "Δρομολόγηση ειδοποιήσεων: {output}",
-        "description": "Επίλεξε αν το {output} ακολουθεί την παρουσία του δωματίου ({area}) ή είναι γενική/κινητή συσκευή και όρισε το ελάχιστο επίπεδο ανακοινώσεων που θα λαμβάνει.",
-        "data": {
-          "scope": "Εμβέλεια συσκευής",
-          "min_level": "Ελάχιστο επίπεδο ειδοποίησης"
-        },
-        "data_description": {
-          "scope": "Εμβέλεια συσκευής",
-          "min_level": "Ελάχιστο επίπεδο ειδοποίησης"
+          "dispatch_order": "Σειρά καναλιών",
+          "queue_max": "Μέγιστο μήκος ουράς",
+          "output_availability_timeout": "Οι διαθέσιμες έξοδοι εκτελούνται άμεσα. Οι μη διαθέσιμες ή αποτυχημένες δοκιμάζονται ξανά μέσα σε αυτό το διάστημα και μετά καταγράφονται με το τελευταίο σφάλμα.",
+          "idle_timeout": "Αναμονή μέχρι να ελευθερωθεί η ηχητική διαδρομή",
+          "start_timeout": "Χρονικό όριο έναρξης αναπαραγωγής",
+          "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
+          "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων",
+          "default_title": "Προαιρετικός τίτλος για τις οπτικές ειδοποιήσεις.",
+          "critical_notify_data": "Προαιρετικά δεδομένα ειδικά για την ενσωμάτωση, τα οποία συγχωνεύονται στις κρίσιμες οπτικές ειδοποιήσεις.",
+          "occupancy_sensor": "Οντότητα παρουσίας δωματίων",
+          "occupancy_attribute": "Ανάγνωση κατειλημμένων δωματίων από",
+          "fallback_room": "Εφεδρική περιοχή",
+          "fallback_check_door": "Έλεγχος πόρτας πριν το fallback",
+          "fallback_door_label": "Label οντότητας πόρτας (προαιρετικό)"
         }
       }
     },
@@ -165,7 +142,9 @@
       "snapcast_tts_path_required": "Οι έξοδοι Snapcast απαιτούν τουλάχιστον μία μηχανή TTS και media player TTS.",
       "output_required": "Επίλεξε τουλάχιστον μία οπτική έξοδο, έξοδο TTS του server ή έξοδο TTS Companion App.",
       "display_time_order": "Ο μέγιστος χρόνος εμφάνισης πρέπει να είναι μεγαλύτερος ή ίσος με τον ελάχιστο.",
-      "room_notify_area_required": "Μια ειδοποίηση ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant. Ανάθεσε περιοχή στη συσκευή/οντότητα ή επίλεξε Γενική / κινητή."
+      "room_notify_area_required": "Μια συσκευή ειδοποίησης ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant.",
+      "notify_level_overlap": "Μια συσκευή ειδοποίησης μπορεί να ανήκει μόνο σε ένα ελάχιστο επίπεδο.",
+      "room_tts_area_required": "Ένας άμεσος TTS media player ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant."
     },
     "abort": {
       "single_instance_allowed": "Το Κέντρο Ανακοινώσεων έχει ήδη ρυθμιστεί."
@@ -174,35 +153,41 @@
   "options": {
     "step": {
       "outputs": {
-        "title": "Έξοδοι",
-        "description": "Επίλεξε ενσωματώσεις, συγκεκριμένες καταχωρίσεις ή οντότητες ως οπτικές εξόδους, εξόδους Snapcast ή εξόδους Companion App. Η περιοχή τους λαμβάνεται αυτόματα από το Home Assistant.",
+        "title": "1. Έξοδοι ειδοποιήσεων",
+        "description": "Όλες οι αναγνωρισμένες οντότητες ειδοποιήσεων επιλέγονται αυτόματα. Αποεπίλεξε ό,τι δεν χρειάζεσαι, όρισε ποιες είναι ανά δωμάτιο και βάλε υψηλότερο ελάχιστο επίπεδο όπου θέλεις. Όσες δεν μπουν σε υψηλότερη βαθμίδα χρησιμοποιούν Debug.",
         "data": {
-          "notify_outputs": "Οπτικές έξοδοι ειδοποιήσεων",
-          "companion_tts_outputs": "Έξοδοι TTS Companion App",
-          "default_title": "Προεπιλεγμένος τίτλος",
-          "critical_notify_data": "Δεδομένα κρίσιμων ειδοποιήσεων"
+          "notify_outputs": "Συσκευές ειδοποιήσεων",
+          "notify_room_outputs": "Συσκευές ειδοποιήσεων ανά δωμάτιο",
+          "notify_info_outputs": "Ελάχιστο Πληροφορία / Επιτυχία",
+          "notify_warning_outputs": "Ελάχιστο Προειδοποίηση",
+          "notify_error_outputs": "Ελάχιστο Σφάλμα",
+          "notify_critical_outputs": "Ελάχιστο Κρίσιμο"
         },
         "data_description": {
-          "notify_outputs": "Notifications for Android TV, Companion App και άλλες έξοδοι notify. Η επιλογή ενσωμάτωσης ή καταχώρισης περιλαμβάνει αυτόματα τις οντότητές της. Οι χειροκίνητες legacy υπηρεσίες θεωρούνται καθολικές.",
-          "companion_tts_outputs": "Προαιρετικό. Επίλεξε τις συσκευές Android Companion App που επιτρέπεται να χρησιμοποιούνται για push TTS. Οι κανονικές κλήσεις χρειάζονται επίσης την επιλογή Companion App TTS στην ενέργεια· οι κρίσιμες κλήσεις χρησιμοποιούν όλες τις αντίστοιχες ρυθμισμένες εξόδους.",
-          "default_title": "Προαιρετικός τίτλος για τις οπτικές ειδοποιήσεις.",
-          "critical_notify_data": "Προαιρετικά δεδομένα ειδικά για την ενσωμάτωση, τα οποία συγχωνεύονται στις κρίσιμες οπτικές ειδοποιήσεις."
+          "notify_outputs": "Συσκευές ειδοποιήσεων",
+          "notify_room_outputs": "Συσκευές ειδοποιήσεων ανά δωμάτιο",
+          "notify_info_outputs": "Ελάχιστο Πληροφορία / Επιτυχία",
+          "notify_warning_outputs": "Ελάχιστο Προειδοποίηση",
+          "notify_error_outputs": "Ελάχιστο Σφάλμα",
+          "notify_critical_outputs": "Ελάχιστο Κρίσιμο"
         }
       },
       "tts": {
-        "title": "Δρομολόγηση μετατροπής κειμένου σε ομιλία",
-        "description": "Επίλεξε τη μηχανή TTS και κράτησε ξεχωριστή την άμεση αναπαραγωγή ανά δωμάτιο από την κοινή συγχρονισμένη διαδρομή server.",
+        "title": "2. Έξοδοι TTS",
+        "description": "Επίλεξε μηχανές TTS, άμεσους media players και—όταν υπάρχει Snapcast—τους συγχρονισμένους clients ανά δωμάτιο μαζί με τον κοινό media player που τους τροφοδοτεί.",
         "data": {
-          "tts_engines": "Μηχανές TTS",
-          "tts_room_players": "Άμεσοι media players TTS ανά δωμάτιο",
-          "tts_media_player": "Media player TTS",
-          "snapcast_outputs": "Συγχρονισμένοι room routing players (Snapcast)",
+          "tts_engines": "Μηχανές TTS (φαίνονται οι γλώσσες· * = προεπιλογή μηχανής)",
+          "tts_room_players": "Άμεσοι media players TTS",
+          "tts_media_player": "Κοινός media player που τροφοδοτεί το Snapcast",
+          "snapcast_outputs": "Snapcast clients ανά δωμάτιο",
           "tts_min_level": "Χρήση TTS από επίπεδο",
           "tts_cache": "Προδημιουργία και προσωρινή αποθήκευση ομιλίας",
           "tts_language": "Προεπιλεγμένη γλώσσα",
           "tts_options": "Προεπιλεγμένες επιλογές TTS",
           "companion_tts_media_stream": "Ροή ήχου Companion App",
-          "companion_tts_words_per_minute": "Εκτιμώμενη ταχύτητα ομιλίας"
+          "companion_tts_words_per_minute": "Εκτιμώμενη ταχύτητα ομιλίας",
+          "tts_area_players": "Άμεσοι TTS players ανά δωμάτιο",
+          "companion_tts_outputs": "Έξοδοι TTS Companion App"
         },
         "data_description": {
           "tts_engines": "Επίλεξε ενσωμάτωση, καταχώριση ή συγκεκριμένες οντότητες TTS. Χρησιμοποιούνται ως αλυσίδα εφεδρείας· μιλά η πρώτη που επιτυγχάνει.",
@@ -214,52 +199,13 @@
           "companion_tts_media_stream": "Προαιρετική ροή ήχου Android για TTS μέσω Companion App.",
           "companion_tts_words_per_minute": "Επειδή το push TTS δεν αναφέρει πότε τελείωσε, η ουρά δεσμεύει χρόνο από αυτή την εκτίμηση ώστε να μην επικαλύπτονται ανακοινώσεις.",
           "tts_room_players": "Media players δεμένοι σε περιοχή (π.χ. voice assistants/ηχεία) που λαμβάνουν απευθείας το παραγόμενο TTS. Η παρουσία τους φιλτράρει σύμφωνα με την περιοχή Home Assistant.",
-          "snapcast_outputs": "Snapcast clients δεμένοι σε περιοχή και τροφοδοτούμενοι από τον κοινό server player. Το Announcement Hub δεν στέλνει TTS απευθείας σε αυτούς· διαχειρίζεται μόνο mute/routing."
-        }
-      },
-      "snapcast": {
-        "title": "Δρομολόγηση δωματίων Snapcast",
-        "description": "Οι επιλεγμένοι Snapcast clients δρομολογούνται αμέσως πριν από κάθε ομιλία και επανέρχονται μετά.",
-        "data": {
-          "snapcast_source": "Όνομα πηγής ανακοινώσεων",
-          "snapcast_only_source": "Διαχείριση μόνο clients σε αυτή την πηγή",
-          "snapcast_settle_delay": "Καθυστέρηση σταθεροποίησης",
-          "snapcast_verify_timeout": "Χρονικό όριο επιβεβαίωσης δρομολόγησης",
-          "snapcast_restore": "Επαναφορά προηγούμενης σίγασης"
-        },
-        "data_description": {
-          "snapcast_source": "Όνομα πηγής ανακοινώσεων",
-          "snapcast_only_source": "Διαχείριση μόνο clients σε αυτή την πηγή",
-          "snapcast_settle_delay": "Καθυστέρηση σταθεροποίησης",
-          "snapcast_verify_timeout": "Χρονικό όριο επιβεβαίωσης δρομολόγησης",
-          "snapcast_restore": "Επαναφορά προηγούμενης σίγασης"
-        }
-      },
-      "queue": {
-        "title": "Ουρά και χρονικά όρια",
-        "description": "Οι ανακοινώσεις και οι έξοδοί τους εκτελούνται σειριακά. Οι διαθέσιμες έξοδοι εκτελούνται άμεσα· οι μη διαθέσιμες ή προσωρινά αποτυχημένες μοιράζονται ένα παράθυρο επανάληψης.",
-        "data": {
-          "dispatch_order": "Σειρά καναλιών",
-          "queue_max": "Μέγιστο μήκος ουράς",
-          "output_availability_timeout": "Αναμονή μη διαθέσιμων εξόδων",
-          "idle_timeout": "Αναμονή μέχρι να ελευθερωθεί η ηχητική διαδρομή",
-          "start_timeout": "Χρονικό όριο έναρξης αναπαραγωγής",
-          "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
-          "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων"
-        },
-        "data_description": {
-          "dispatch_order": "Σειρά καναλιών",
-          "queue_max": "Μέγιστο μήκος ουράς",
-          "output_availability_timeout": "Οι διαθέσιμες έξοδοι εκτελούνται άμεσα. Οι μη διαθέσιμες ή αποτυχημένες δοκιμάζονται ξανά μέσα σε αυτό το διάστημα και μετά καταγράφονται με το τελευταίο σφάλμα.",
-          "idle_timeout": "Αναμονή μέχρι να ελευθερωθεί η ηχητική διαδρομή",
-          "start_timeout": "Χρονικό όριο έναρξης αναπαραγωγής",
-          "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
-          "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων"
+          "snapcast_outputs": "Snapcast clients δεμένοι σε περιοχή και τροφοδοτούμενοι από τον κοινό server player. Το Announcement Hub δεν στέλνει TTS απευθείας σε αυτούς· διαχειρίζεται μόνο mute/routing.",
+          "companion_tts_outputs": "Προαιρετικό. Επίλεξε τις συσκευές Android Companion App που επιτρέπεται να χρησιμοποιούνται για push TTS. Οι κανονικές κλήσεις χρειάζονται επίσης την επιλογή Companion App TTS στην ενέργεια· οι κρίσιμες κλήσεις χρησιμοποιούν όλες τις αντίστοιχες ρυθμισμένες εξόδους."
         }
       },
       "notification_profile": {
-        "title": "Οπτική συμπεριφορά: {integration}",
-        "description": "Ρυθμίζει τον διαχωρισμό, τον χρόνο ανάγνωσης και τις εγγενείς επιλογές του {integration}. Το προφίλ κάθε συγκεκριμένης εξόδου παγώνει όταν η εργασία μπει στην ουρά.",
+        "title": "3. Επιλογές ενσωμάτωσης: {integration}",
+        "description": "Επιλογές που παρέχει η επιλεγμένη ενσωμάτωση.",
         "data": {
           "max_length": "Μέγιστοι χαρακτήρες ανά τμήμα",
           "reading_words_per_minute": "Ταχύτητα ανάγνωσης",
@@ -274,7 +220,12 @@
           "fontsize": "Μέγεθος γραμματοσειράς",
           "color": "Χρώμα φόντου",
           "transparency": "Διαφάνεια φόντου",
-          "interrupt": "Διαδραστική ειδοποίηση"
+          "interrupt": "Διαδραστική ειδοποίηση",
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
         },
         "data_description": {
           "max_length": "Το 0 απενεργοποιεί τον διαχωρισμό. Το μεγάλο κείμενο χωρίζεται πρώτα σε τέλος πρότασης, μετά σε κόμμα ή δευτερεύουσα φράση και τέλος σε κενό. Λέξη κόβεται μόνο όταν η ίδια ξεπερνά το όριο.",
@@ -290,43 +241,48 @@
           "fontsize": "Μέγεθος κειμένου της επικάλυψης.",
           "color": "Χρώμα φόντου της επικάλυψης.",
           "transparency": "Διαφάνεια φόντου της επικάλυψης.",
-          "interrupt": "Κάνει την ειδοποίηση TV διαδραστική και μπορεί να διακόψει την τρέχουσα εφαρμογή."
+          "interrupt": "Κάνει την ειδοποίηση TV διαδραστική και μπορεί να διακόψει την τρέχουσα εφαρμογή.",
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
         }
       },
-      "occupancy": {
-        "title": "Δρομολόγηση βάσει παρουσίας",
-        "description": "Προαιρετικά περιόρισε τις ανακοινώσεις στις κατειλημμένες περιοχές του Home Assistant και ρύθμισε την εφεδρική περιοχή όταν δεν υπάρχουν candidates.",
+      "queue": {
+        "title": "4. Γενικές επιλογές",
+        "description": "Παρουσία δωματίων, fallback, προαιρετικό label για αισθητήρες πόρτας, προεπιλογές ειδοποιήσεων και queue/timeouts.",
         "data": {
-          "occupancy_sensor": "Οντότητα κατειλημμένων περιοχών",
+          "dispatch_order": "Σειρά καναλιών",
+          "queue_max": "Μέγιστο μήκος ουράς",
+          "output_availability_timeout": "Αναμονή μη διαθέσιμων εξόδων",
+          "idle_timeout": "Αναμονή μέχρι να ελευθερωθεί η ηχητική διαδρομή",
+          "start_timeout": "Χρονικό όριο έναρξης αναπαραγωγής",
+          "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
+          "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων",
+          "default_title": "Προεπιλεγμένος τίτλος",
+          "critical_notify_data": "Δεδομένα κρίσιμων ειδοποιήσεων",
+          "occupancy_sensor": "Οντότητα παρουσίας δωματίων",
+          "occupancy_attribute": "Ανάγνωση κατειλημμένων δωματίων από",
           "fallback_room": "Εφεδρική περιοχή",
-          "fallback_check_door": "Έλεγχος πόρτας πριν την εφεδρική δρομολόγηση"
+          "fallback_check_door": "Έλεγχος πόρτας πριν το fallback",
+          "fallback_door_label": "Label οντότητας πόρτας (προαιρετικό)"
         },
         "data_description": {
-          "occupancy_sensor": "Επίλεξε τον αισθητήρα/οντότητα που αναφέρει τις κατειλημμένες περιοχές. Στο επόμενο βήμα επιλέγεις την κατάσταση ή ένα από τα τρέχοντα attributes του.",
-          "fallback_room": "Προαιρετική περιοχή που χρησιμοποιείται μόνο όταν η δρομολόγηση βάσει παρουσίας δεν αφήνει κανένα ρυθμισμένο candidate.",
-          "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν μία κατειλημμένη περιοχή-στόχος έχει ανοιχτό binary sensor πόρτας."
-        }
-      },
-      "occupancy_source": {
-        "title": "Τιμή κατειλημμένων περιοχών",
-        "description": "Επίλεξε την κατάσταση ή ένα τρέχον attribute του {entity} που περιέχει τα ονόματα/ID των κατειλημμένων περιοχών.",
-        "data": {
-          "occupancy_attribute": "Ανάγνωση κατειλημμένων περιοχών από"
-        },
-        "data_description": {
-          "occupancy_attribute": "Η Κατάσταση χρησιμοποιεί την ίδια την κατάσταση της οντότητας. Τα attributes διαβάζονται ζωντανά από την επιλεγμένη οντότητα."
-        }
-      },
-      "notification_routing": {
-        "title": "Δρομολόγηση ειδοποιήσεων: {output}",
-        "description": "Επίλεξε αν το {output} ακολουθεί την παρουσία του δωματίου ({area}) ή είναι γενική/κινητή συσκευή και όρισε το ελάχιστο επίπεδο ανακοινώσεων που θα λαμβάνει.",
-        "data": {
-          "scope": "Εμβέλεια συσκευής",
-          "min_level": "Ελάχιστο επίπεδο ειδοποίησης"
-        },
-        "data_description": {
-          "scope": "Εμβέλεια συσκευής",
-          "min_level": "Ελάχιστο επίπεδο ειδοποίησης"
+          "dispatch_order": "Σειρά καναλιών",
+          "queue_max": "Μέγιστο μήκος ουράς",
+          "output_availability_timeout": "Οι διαθέσιμες έξοδοι εκτελούνται άμεσα. Οι μη διαθέσιμες ή αποτυχημένες δοκιμάζονται ξανά μέσα σε αυτό το διάστημα και μετά καταγράφονται με το τελευταίο σφάλμα.",
+          "idle_timeout": "Αναμονή μέχρι να ελευθερωθεί η ηχητική διαδρομή",
+          "start_timeout": "Χρονικό όριο έναρξης αναπαραγωγής",
+          "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
+          "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων",
+          "default_title": "Προαιρετικός τίτλος για τις οπτικές ειδοποιήσεις.",
+          "critical_notify_data": "Προαιρετικά δεδομένα ειδικά για την ενσωμάτωση, τα οποία συγχωνεύονται στις κρίσιμες οπτικές ειδοποιήσεις.",
+          "occupancy_sensor": "Οντότητα παρουσίας δωματίων",
+          "occupancy_attribute": "Ανάγνωση κατειλημμένων δωματίων από",
+          "fallback_room": "Εφεδρική περιοχή",
+          "fallback_check_door": "Έλεγχος πόρτας πριν το fallback",
+          "fallback_door_label": "Label οντότητας πόρτας (προαιρετικό)"
         }
       }
     },
@@ -336,7 +292,9 @@
       "snapcast_tts_path_required": "Οι έξοδοι Snapcast απαιτούν τουλάχιστον μία μηχανή TTS και media player TTS.",
       "output_required": "Επίλεξε τουλάχιστον μία οπτική έξοδο, έξοδο TTS του server ή έξοδο TTS Companion App.",
       "display_time_order": "Ο μέγιστος χρόνος εμφάνισης πρέπει να είναι μεγαλύτερος ή ίσος με τον ελάχιστο.",
-      "room_notify_area_required": "Μια ειδοποίηση ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant. Ανάθεσε περιοχή στη συσκευή/οντότητα ή επίλεξε Γενική / κινητή."
+      "room_notify_area_required": "Μια συσκευή ειδοποίησης ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant.",
+      "notify_level_overlap": "Μια συσκευή ειδοποίησης μπορεί να ανήκει μόνο σε ένα ελάχιστο επίπεδο.",
+      "room_tts_area_required": "Ένας άμεσος TTS media player ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant."
     }
   },
   "selector": {

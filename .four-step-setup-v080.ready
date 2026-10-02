@@ -1,8 +1,0 @@
-version=0.8.0
-purpose=four-step auto-discovery setup
-
-retry=2
-
-retry=3
-
-retry=4

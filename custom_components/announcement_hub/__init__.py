@@ -38,6 +38,7 @@ from .const import (
     CONF_NOTIFY_OUTPUTS,
     CONF_NOTIFY_POLICIES,
     CONF_NOTIFY_PROFILES,
+    CONF_TTS_PLAYER_POLICIES,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_SNAPCAST_OUTPUTS,
     CONF_TTS_ENGINES,
@@ -209,6 +210,7 @@ def _migrate_v1_settings(settings: dict[str, Any]) -> dict[str, Any]:
     migrated.setdefault(CONF_TTS_ROOM_PLAYERS, [])
     migrated.setdefault(CONF_NOTIFY_POLICIES, {})
     migrated.setdefault(CONF_NOTIFY_PROFILES, {})
+    migrated.setdefault(CONF_TTS_PLAYER_POLICIES, {})
     migrated.setdefault(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
     migrated.setdefault(
         CONF_OUTPUT_AVAILABILITY_TIMEOUT,
@@ -343,6 +345,7 @@ async def async_migrate_entry(
         )
         migrated.setdefault(CONF_NOTIFY_POLICIES, {})
         migrated.setdefault(CONF_NOTIFY_PROFILES, {})
+        migrated.setdefault(CONF_TTS_PLAYER_POLICIES, {})
         hass.config_entries.async_update_entry(
             entry,
             data=migrated,

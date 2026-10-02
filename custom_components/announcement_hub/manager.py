@@ -35,6 +35,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
 
@@ -47,6 +48,7 @@ from .const import (
     CONF_DEFAULT_TITLE,
     CONF_DISPATCH_ORDER,
     CONF_FALLBACK_CHECK_DOOR,
+    CONF_FALLBACK_DOOR_LABEL,
     CONF_FALLBACK_ROOM,
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
@@ -70,6 +72,7 @@ from .const import (
     CONF_TTS_LANGUAGE,
     CONF_TTS_MEDIA_PLAYER,
     CONF_TTS_ROOM_PLAYERS,
+    CONF_TTS_PLAYER_POLICIES,
     CONF_TTS_MIN_LEVEL,
     CONF_TTS_OPTIONS,
     DEFAULT_COMPANION_TTS_MEDIA_STREAM,
@@ -649,6 +652,22 @@ class AnnouncementManager:
             tuple(dict.fromkeys(selected_companion)),
         )
 
+    def _tts_player_scope(self, entity_id: str) -> str:
+        """Return room/general scope for one direct TTS media player."""
+        configured = self.settings.get(CONF_TTS_PLAYER_POLICIES, {})
+        if isinstance(configured, Mapping):
+            policy = configured.get(entity_id, {})
+            if isinstance(policy, Mapping):
+                scope = str(policy.get(NOTIFY_POLICY_SCOPE, ""))
+                if scope in {NOTIFY_SCOPE_ROOM, NOTIFY_SCOPE_GENERAL}:
+                    return scope
+        return (
+            NOTIFY_SCOPE_ROOM
+            if entity_area_id(self.hass, entity_id)
+            else NOTIFY_SCOPE_GENERAL
+        )
+
+
     def _notify_policy(
         self,
         output: NotifyOutput,
@@ -811,9 +830,13 @@ class AnnouncementManager:
                     entity_id
                     for entity_id in all_room_tts_players
                     if (
-                        area_id := entity_area_id(self.hass, entity_id)
-                    ) is not None
-                    and area_id in effective_areas
+                        self._tts_player_scope(entity_id) == NOTIFY_SCOPE_GENERAL
+                        or (
+                            (area_id := entity_area_id(self.hass, entity_id))
+                            is not None
+                            and area_id in effective_areas
+                        )
+                    )
                 )
                 routed_snapcast = tuple(
                     entity_id
@@ -914,7 +937,11 @@ class AnnouncementManager:
             for output in notify_records
         }
         room_tts_player_areas = {
-            entity_id: entity_area_id(self.hass, entity_id)
+            entity_id: (
+                None
+                if self._tts_player_scope(entity_id) == NOTIFY_SCOPE_GENERAL
+                else entity_area_id(self.hass, entity_id)
+            )
             for entity_id in selected[2]
         }
         snapcast_client_areas = {
@@ -1166,7 +1193,11 @@ class AnnouncementManager:
             area_id = job.room_tts_player_areas.get(
                 player, entity_area_id(self.hass, player)
             )
-            if job.outputs and area_id not in set(job.outputs):
+            if (
+                job.outputs
+                and area_id is not None
+                and area_id not in set(job.outputs)
+            ):
                 continue
             state = self.hass.states.get(player)
             if state is not None and state.state not in {
@@ -1645,11 +1676,17 @@ class AnnouncementManager:
         players = [
             player
             for player in job.room_tts_players
-            if not job.outputs
-            or job.room_tts_player_areas.get(
-                player, entity_area_id(self.hass, player)
+            if (
+                not job.outputs
+                or job.room_tts_player_areas.get(
+                    player, entity_area_id(self.hass, player)
+                )
+                is None
+                or job.room_tts_player_areas.get(
+                    player, entity_area_id(self.hass, player)
+                )
+                in set(job.outputs)
             )
-            in set(job.outputs)
         ]
         if not players:
             return
@@ -2403,9 +2440,20 @@ class AnnouncementManager:
             return False
 
         found_door = False
+        required_label = str(
+            self.settings.get(CONF_FALLBACK_DOOR_LABEL, "") or ""
+        ).strip()
+        entity_registry = er.async_get(self.hass)
         for state in self.hass.states.async_all("binary_sensor"):
             if state.attributes.get("device_class") != "door":
                 continue
+            if required_label:
+                reg_entry = entity_registry.async_get(state.entity_id)
+                if (
+                    reg_entry is None
+                    or required_label not in getattr(reg_entry, "labels", set())
+                ):
+                    continue
             if entity_area_id(self.hass, state.entity_id) not in occupied:
                 continue
             found_door = True

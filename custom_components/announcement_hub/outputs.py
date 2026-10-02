@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import Any
 
+from homeassistant.components import tts
+from homeassistant.components.media_player import MediaPlayerEntityFeature
 from homeassistant.const import STATE_OFF, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import area_registry as ar
@@ -164,6 +167,81 @@ def area_name(hass: HomeAssistant, area_id: str | None) -> str:
     return area_id
 
 
+def entity_device_name(hass: HomeAssistant, entity_id: str) -> str:
+    """Return the device/config-entry name behind an entity."""
+    reg_entry = er.async_get(hass).async_get(entity_id)
+    if reg_entry is None:
+        return "No device"
+    if device_id := getattr(reg_entry, "device_id", None):
+        if device := dr.async_get(hass).async_get(device_id):
+            return str(
+                getattr(device, "name_by_user", None)
+                or getattr(device, "name", None)
+                or entity_id
+            )
+    if entry := _entry(hass, _entity_config_entry_id(reg_entry)):
+        return str(entry.title)
+    return "No device"
+
+
+def concrete_entity_options(
+    hass: HomeAssistant,
+    *,
+    entity_domain: str,
+    integration: str | None = None,
+) -> list[SelectOption]:
+    """Return only concrete supported entities with integration/device/entity labels."""
+    options: list[SelectOption] = []
+    for item in _enabled_registry_entries(
+        hass, entity_domain=entity_domain, integration=integration
+    ):
+        entity_id = item.entity_id
+        owner = _integration_for_registry_entry(hass, item) or "unknown"
+        options.append(
+            SelectOption(
+                f"{TARGET_ENTITY_PREFIX}{entity_id}",
+                f"{owner.replace('_', ' ').title()} · "
+                f"{entity_device_name(hass, entity_id)} · "
+                f"{entity_name(hass, entity_id)}",
+            )
+        )
+    return sorted(options, key=lambda item: item.label.casefold())
+
+
+def tts_default_engine(hass: HomeAssistant) -> str | None:
+    """Return Home Assistant's preferred/default concrete TTS entity."""
+    try:
+        engine = tts.async_default_engine(hass)
+    except (KeyError, AttributeError):
+        return None
+    return str(engine) if engine and str(engine).startswith("tts.") else None
+
+
+def tts_media_player_options(hass: HomeAssistant) -> list[dict[str, str]]:
+    """Return non-Snapcast media players capable of direct play-media TTS."""
+    result: list[SelectOption] = []
+    for item in _enabled_registry_entries(hass, entity_domain="media_player"):
+        if _integration_for_registry_entry(hass, item) == "snapcast":
+            continue
+        state = hass.states.get(item.entity_id)
+        if state is None:
+            continue
+        features = int(state.attributes.get("supported_features", 0) or 0)
+        if not features & int(MediaPlayerEntityFeature.PLAY_MEDIA):
+            continue
+        owner = _integration_for_registry_entry(hass, item) or "unknown"
+        result.append(
+            SelectOption(
+                item.entity_id,
+                f"{owner.replace('_', ' ').title()} · "
+                f"{entity_device_name(hass, item.entity_id)} · "
+                f"{entity_name(hass, item.entity_id)} · "
+                f"{area_name(hass, entity_area_id(hass, item.entity_id))}",
+            )
+        )
+    return [item.as_dict() for item in sorted(result, key=lambda x: x.label.casefold())]
+
+
 def entity_name(hass: HomeAssistant, entity_id: str) -> str:
     """Return a stable friendly entity label."""
     if state := hass.states.get(entity_id):
@@ -265,39 +343,26 @@ def _options_for_entities(
 
 
 def notify_output_options(hass: HomeAssistant) -> list[dict[str, str]]:
-    """Return integration, entry, entity, and legacy-service notify choices."""
-    options = {
-        option.value: option
-        for option in _options_for_entities(hass, entity_domain="notify")
-    }
-    services = hass.services.async_services().get("notify", {})
-    for service in sorted(services):
-        if service in _NOTIFY_BASE_SERVICES:
-            continue
-        full_service = f"notify.{service}"
-        value = f"{TARGET_SERVICE_PREFIX}{full_service}"
-        options[value] = SelectOption(
-            value, f"Service · {full_service} · Global / no area"
-        )
+    """Return concrete recognised notification entities only."""
     return [
         option.as_dict()
-        for option in sorted(
-            options.values(), key=lambda item: item.label.casefold()
-        )
+        for option in concrete_entity_options(hass, entity_domain="notify")
     ]
 
 
+
 def snapcast_output_options(hass: HomeAssistant) -> list[dict[str, str]]:
-    """Return integration, entry, and entity Snapcast client choices."""
+    """Return concrete Snapcast client entities only."""
     return [
         option.as_dict()
-        for option in _options_for_entities(
+        for option in concrete_entity_options(
             hass,
             entity_domain="media_player",
             integration="snapcast",
         )
-        if "group" not in option.value.casefold()
+        if "group" not in option["value"].casefold()
     ]
+
 
 
 def companion_tts_output_options(
@@ -361,11 +426,36 @@ def companion_tts_output_options(
 
 
 def tts_engine_options(hass: HomeAssistant) -> list[dict[str, str]]:
-    """Return integration, entry, and entity TTS engine choices."""
-    return [
-        option.as_dict()
-        for option in _options_for_entities(hass, entity_domain="tts")
-    ]
+    """Return concrete TTS engines with their advertised languages."""
+    component = hass.data.get(getattr(tts, "DATA_COMPONENT", "tts_entity_component"))
+    options: list[SelectOption] = []
+    for item in _enabled_registry_entries(hass, entity_domain="tts"):
+        entity_id = item.entity_id
+        owner = _integration_for_registry_entry(hass, item) or "unknown"
+        languages: list[str] = []
+        default_language: str | None = None
+        entity = component.get_entity(entity_id) if component is not None else None
+        if entity is not None:
+            with suppress(Exception):
+                languages = list(entity.supported_languages or [])
+            with suppress(Exception):
+                default_language = str(entity.default_language or "") or None
+        language_label = ""
+        if languages:
+            shown = [
+                f"{lang}*" if lang == default_language else str(lang)
+                for lang in languages
+            ]
+            language_label = " · " + ", ".join(shown)
+        options.append(
+            SelectOption(
+                entity_id,
+                f"{owner.replace('_', ' ').title()} · "
+                f"{entity_name(hass, entity_id)}{language_label}",
+            )
+        )
+    return [item.as_dict() for item in sorted(options, key=lambda x: x.label.casefold())]
+
 
 
 def _expand_entity_tokens(

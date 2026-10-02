@@ -3,35 +3,41 @@
   "config": {
     "step": {
       "outputs": {
-        "title": "Ausgänge",
-        "description": "Wähle Integrationen, Konfigurationseinträge oder einzelne Entitäten als optische, Snapcast- oder Companion-App-Ausgänge. Die Bereichszuordnung wird automatisch aus Home Assistant übernommen.",
+        "title": "1. Benachrichtigungsausgänge",
+        "description": "Alle erkannten Benachrichtigungsentitäten sind automatisch ausgewählt. Nicht benötigte Geräte abwählen, raumgebundene Geräte markieren und bei Bedarf höhere Mindeststufen zuweisen. Nicht höher zugewiesene Geräte verwenden Debug.",
         "data": {
-          "notify_outputs": "Optische Benachrichtigungsausgänge",
-          "companion_tts_outputs": "Companion-App-TTS-Ausgänge",
-          "default_title": "Standardtitel",
-          "critical_notify_data": "Daten für kritische Benachrichtigungen"
+          "notify_outputs": "Benachrichtigungsgeräte",
+          "notify_room_outputs": "Raumgebundene Benachrichtigungsgeräte",
+          "notify_info_outputs": "Mindestens Info / Erfolg",
+          "notify_warning_outputs": "Mindestens Warnung",
+          "notify_error_outputs": "Mindestens Fehler",
+          "notify_critical_outputs": "Mindestens Kritisch"
         },
         "data_description": {
-          "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
-          "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben.",
-          "default_title": "Optionaler Titel für optische Benachrichtigungen.",
-          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden."
+          "notify_outputs": "Benachrichtigungsgeräte",
+          "notify_room_outputs": "Raumgebundene Benachrichtigungsgeräte",
+          "notify_info_outputs": "Mindestens Info / Erfolg",
+          "notify_warning_outputs": "Mindestens Warnung",
+          "notify_error_outputs": "Mindestens Fehler",
+          "notify_critical_outputs": "Mindestens Kritisch"
         }
       },
       "tts": {
-        "title": "Text-zu-Sprache-Routing",
-        "description": "Wähle die TTS-Engine und trenne direkte Raumausgabe vom gemeinsamen synchronisierten Serverpfad.",
+        "title": "2. TTS-Ausgänge",
+        "description": "TTS-Engines, direkte Mediaplayer-Ausgänge und – wenn Snapcast verfügbar ist – synchronisierte Raum-Clients samt gemeinsamem steuernden Mediaplayer auswählen.",
         "data": {
-          "tts_engines": "TTS-Engines",
-          "tts_room_players": "Direkte TTS-Mediaplayer pro Raum",
-          "tts_media_player": "TTS-Mediaplayer",
-          "snapcast_outputs": "Synchronisierte Raum-Routing-Player (Snapcast)",
+          "tts_engines": "TTS-Engines (Sprachen angezeigt; * = Engine-Standard)",
+          "tts_room_players": "Direkte TTS-Mediaplayer",
+          "tts_media_player": "Gemeinsamer Mediaplayer für Snapcast",
+          "snapcast_outputs": "Snapcast-Raumclients",
           "tts_min_level": "TTS erst ab Stufe",
           "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
           "tts_language": "Standardsprache",
           "tts_options": "Standard-TTS-Optionen",
           "companion_tts_media_stream": "Companion-App-Audiostream",
-          "companion_tts_words_per_minute": "Geschätzte Sprechgeschwindigkeit"
+          "companion_tts_words_per_minute": "Geschätzte Sprechgeschwindigkeit",
+          "tts_area_players": "Raumgebundene direkte TTS-Player",
+          "companion_tts_outputs": "Companion-App-TTS-Ausgänge"
         },
         "data_description": {
           "tts_engines": "Wähle eine Integration, einen Eintrag oder einzelne TTS-Entitäten. Sie werden als Ausweichkette verwendet; die erste erfolgreiche Engine spricht.",
@@ -43,52 +49,13 @@
           "companion_tts_media_stream": "Optionaler Android-Audiostream für Companion-App-TTS.",
           "companion_tts_words_per_minute": "Da Push-TTS kein Wiedergabeende meldet, reserviert die Warteschlange anhand dieses Werts genügend Zeit und verhindert Überlappungen.",
           "tts_room_players": "Bereichsgebundene Mediaplayer (z. B. Sprachassistenten/Lautsprecher), die das erzeugte TTS direkt wiedergeben. Die Belegung filtert diese Player nach ihrem Home-Assistant-Bereich.",
-          "snapcast_outputs": "Bereichsgebundene Snapcast-Clients, die vom gemeinsamen Server-Player gespeist werden. Announcement Hub spielt TTS nicht direkt auf ihnen ab, sondern verwaltet nur Mute/Routing."
-        }
-      },
-      "snapcast": {
-        "title": "Snapcast-Raumsteuerung",
-        "description": "Die ausgewählten Snapcast-Clients werden unmittelbar vor jeder Sprachausgabe geroutet und danach wiederhergestellt.",
-        "data": {
-          "snapcast_source": "Name der Ankündigungsquelle",
-          "snapcast_only_source": "Nur Clients auf dieser Quelle verwalten",
-          "snapcast_settle_delay": "Stabilisierungsverzögerung",
-          "snapcast_verify_timeout": "Zeitlimit zur Routing-Prüfung",
-          "snapcast_restore": "Vorherige Stummschaltung wiederherstellen"
-        },
-        "data_description": {
-          "snapcast_source": "Name der Ankündigungsquelle",
-          "snapcast_only_source": "Nur Clients auf dieser Quelle verwalten",
-          "snapcast_settle_delay": "Stabilisierungsverzögerung",
-          "snapcast_verify_timeout": "Zeitlimit zur Routing-Prüfung",
-          "snapcast_restore": "Vorherige Stummschaltung wiederherstellen"
-        }
-      },
-      "queue": {
-        "title": "Warteschlange und Zeitlimits",
-        "description": "Ankündigungen und ihre Ausgaben laufen nacheinander. Verfügbare Ausgaben starten sofort; nicht verfügbare oder vorübergehend fehlerhafte Ausgaben teilen sich ein Wiederholungsfenster.",
-        "data": {
-          "dispatch_order": "Kanalreihenfolge",
-          "queue_max": "Maximale Warteschlangenlänge",
-          "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
-          "idle_timeout": "Auf freien Audiopfad warten",
-          "start_timeout": "Zeitlimit für Wiedergabestart",
-          "playback_timeout": "Maximale Wiedergabedauer",
-          "post_play_delay": "Pause zwischen hörbaren Ausgaben"
-        },
-        "data_description": {
-          "dispatch_order": "Kanalreihenfolge",
-          "queue_max": "Maximale Warteschlangenlänge",
-          "output_availability_timeout": "Verfügbare Ausgaben werden sofort bedient. Nicht verfügbare oder fehlgeschlagene Ausgaben werden während dieses Fensters erneut versucht und danach mit dem letzten Fehler protokolliert.",
-          "idle_timeout": "Auf freien Audiopfad warten",
-          "start_timeout": "Zeitlimit für Wiedergabestart",
-          "playback_timeout": "Maximale Wiedergabedauer",
-          "post_play_delay": "Pause zwischen hörbaren Ausgaben"
+          "snapcast_outputs": "Bereichsgebundene Snapcast-Clients, die vom gemeinsamen Server-Player gespeist werden. Announcement Hub spielt TTS nicht direkt auf ihnen ab, sondern verwaltet nur Mute/Routing.",
+          "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben."
         }
       },
       "notification_profile": {
-        "title": "Visuelles Verhalten: {integration}",
-        "description": "Konfiguriert Aufteilung, Lesezeit und die nativen Optionen von {integration}. Beim Einreihen wird das Profil für jeden konkreten Ausgang fest gespeichert.",
+        "title": "3. Integrationsoptionen: {integration}",
+        "description": "Optionen der ausgewählten Integration.",
         "data": {
           "max_length": "Maximale Zeichen pro Teil",
           "reading_words_per_minute": "Lesegeschwindigkeit",
@@ -103,7 +70,12 @@
           "fontsize": "Schriftgröße",
           "color": "Hintergrundfarbe",
           "transparency": "Hintergrundtransparenz",
-          "interrupt": "Interaktive Benachrichtigung"
+          "interrupt": "Interaktive Benachrichtigung",
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
         },
         "data_description": {
           "max_length": "0 deaktiviert die Aufteilung. Langer Text wird bevorzugt nach Satzende, danach Komma oder Teilsatz und zuletzt an Leerzeichen getrennt. Nur ein einzelnes zu langes Wort wird hart getrennt.",
@@ -119,43 +91,48 @@
           "fontsize": "Schriftgröße der Einblendung.",
           "color": "Hintergrundfarbe der Einblendung.",
           "transparency": "Hintergrundtransparenz der Einblendung.",
-          "interrupt": "Macht die TV-Benachrichtigung interaktiv und kann die laufende App unterbrechen."
+          "interrupt": "Macht die TV-Benachrichtigung interaktiv und kann die laufende App unterbrechen.",
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
         }
       },
-      "occupancy": {
-        "title": "Belegungsabhängige Ausgabe",
-        "description": "Beschränke Ankündigungen optional auf belegte Home-Assistant-Bereiche und konfiguriere den Fallback ohne Kandidaten.",
+      "queue": {
+        "title": "4. Allgemeine Optionen",
+        "description": "Anwesenheitsrouting, Fallback, optionaler Tür-Label-Filter, Benachrichtigungsstandards und Queue/Timeouts.",
         "data": {
-          "occupancy_sensor": "Entität für belegte Bereiche",
+          "dispatch_order": "Kanalreihenfolge",
+          "queue_max": "Maximale Warteschlangenlänge",
+          "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
+          "idle_timeout": "Auf freien Audiopfad warten",
+          "start_timeout": "Zeitlimit für Wiedergabestart",
+          "playback_timeout": "Maximale Wiedergabedauer",
+          "post_play_delay": "Pause zwischen hörbaren Ausgaben",
+          "default_title": "Standardtitel",
+          "critical_notify_data": "Daten für kritische Benachrichtigungen",
+          "occupancy_sensor": "Entität für Raumbelegung",
+          "occupancy_attribute": "Belegte Räume lesen aus",
           "fallback_room": "Fallback-Bereich",
-          "fallback_check_door": "Tür des belegten Bereichs vor Fallback prüfen"
+          "fallback_check_door": "Tür des belegten Bereichs vor Fallback prüfen",
+          "fallback_door_label": "Label der Türentität (optional)"
         },
         "data_description": {
-          "occupancy_sensor": "Wähle den Sensor/die Entität, die belegte Bereiche meldet. Im nächsten Schritt kannst du den Zustand oder eines der aktuellen Attribute auswählen.",
-          "fallback_room": "Optionaler Bereich, der nur verwendet wird, wenn die Belegungsfilterung keine konfigurierten Kandidaten ergibt.",
-          "fallback_check_door": "Wenn aktiviert, ist der Fallback nur erlaubt, wenn in einem belegten Zielbereich ein offener binärer Türsensor vorhanden ist."
-        }
-      },
-      "occupancy_source": {
-        "title": "Wert für belegte Bereiche",
-        "description": "Wähle den Zustand oder ein aktuelles Attribut von {entity}, das die Namen/IDs der belegten Bereiche enthält.",
-        "data": {
-          "occupancy_attribute": "Belegte Bereiche lesen aus"
-        },
-        "data_description": {
-          "occupancy_attribute": "Zustand verwendet den Entitätszustand selbst. Die Attribute werden live aus der ausgewählten Entität gelesen."
-        }
-      },
-      "notification_routing": {
-        "title": "Benachrichtigungsrouting: {output}",
-        "description": "Lege fest, ob {output} der Raumbelegung ({area}) folgt oder ein allgemeines mobiles Gerät ist, und ab welcher Meldungsstufe es Benachrichtigungen erhält.",
-        "data": {
-          "scope": "Gerätebereich",
-          "min_level": "Minimale Benachrichtigungsstufe"
-        },
-        "data_description": {
-          "scope": "Gerätebereich",
-          "min_level": "Minimale Benachrichtigungsstufe"
+          "dispatch_order": "Kanalreihenfolge",
+          "queue_max": "Maximale Warteschlangenlänge",
+          "output_availability_timeout": "Verfügbare Ausgaben werden sofort bedient. Nicht verfügbare oder fehlgeschlagene Ausgaben werden während dieses Fensters erneut versucht und danach mit dem letzten Fehler protokolliert.",
+          "idle_timeout": "Auf freien Audiopfad warten",
+          "start_timeout": "Zeitlimit für Wiedergabestart",
+          "playback_timeout": "Maximale Wiedergabedauer",
+          "post_play_delay": "Pause zwischen hörbaren Ausgaben",
+          "default_title": "Optionaler Titel für optische Benachrichtigungen.",
+          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden.",
+          "occupancy_sensor": "Entität für Raumbelegung",
+          "occupancy_attribute": "Belegte Räume lesen aus",
+          "fallback_room": "Fallback-Bereich",
+          "fallback_check_door": "Tür des belegten Bereichs vor Fallback prüfen",
+          "fallback_door_label": "Label der Türentität (optional)"
         }
       }
     },
@@ -165,7 +142,9 @@
       "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
       "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang.",
       "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein.",
-      "room_notify_area_required": "Ein raumgebundener Benachrichtigungsausgang benötigt einen Home-Assistant-Bereich. Weise dem Gerät/der Entität einen Bereich zu oder wähle Allgemein / mobil."
+      "room_notify_area_required": "Ein raumgebundenes Benachrichtigungsgerät benötigt einen Home-Assistant-Bereich.",
+      "notify_level_overlap": "Ein Benachrichtigungsgerät darf nur einer Mindeststufe zugeordnet sein.",
+      "room_tts_area_required": "Ein raumgebundener direkter TTS-Mediaplayer benötigt einen Home-Assistant-Bereich."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub ist bereits eingerichtet."
@@ -174,35 +153,41 @@
   "options": {
     "step": {
       "outputs": {
-        "title": "Ausgänge",
-        "description": "Wähle Integrationen, Konfigurationseinträge oder einzelne Entitäten als optische, Snapcast- oder Companion-App-Ausgänge. Die Bereichszuordnung wird automatisch aus Home Assistant übernommen.",
+        "title": "1. Benachrichtigungsausgänge",
+        "description": "Alle erkannten Benachrichtigungsentitäten sind automatisch ausgewählt. Nicht benötigte Geräte abwählen, raumgebundene Geräte markieren und bei Bedarf höhere Mindeststufen zuweisen. Nicht höher zugewiesene Geräte verwenden Debug.",
         "data": {
-          "notify_outputs": "Optische Benachrichtigungsausgänge",
-          "companion_tts_outputs": "Companion-App-TTS-Ausgänge",
-          "default_title": "Standardtitel",
-          "critical_notify_data": "Daten für kritische Benachrichtigungen"
+          "notify_outputs": "Benachrichtigungsgeräte",
+          "notify_room_outputs": "Raumgebundene Benachrichtigungsgeräte",
+          "notify_info_outputs": "Mindestens Info / Erfolg",
+          "notify_warning_outputs": "Mindestens Warnung",
+          "notify_error_outputs": "Mindestens Fehler",
+          "notify_critical_outputs": "Mindestens Kritisch"
         },
         "data_description": {
-          "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
-          "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben.",
-          "default_title": "Optionaler Titel für optische Benachrichtigungen.",
-          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden."
+          "notify_outputs": "Benachrichtigungsgeräte",
+          "notify_room_outputs": "Raumgebundene Benachrichtigungsgeräte",
+          "notify_info_outputs": "Mindestens Info / Erfolg",
+          "notify_warning_outputs": "Mindestens Warnung",
+          "notify_error_outputs": "Mindestens Fehler",
+          "notify_critical_outputs": "Mindestens Kritisch"
         }
       },
       "tts": {
-        "title": "Text-zu-Sprache-Routing",
-        "description": "Wähle die TTS-Engine und trenne direkte Raumausgabe vom gemeinsamen synchronisierten Serverpfad.",
+        "title": "2. TTS-Ausgänge",
+        "description": "TTS-Engines, direkte Mediaplayer-Ausgänge und – wenn Snapcast verfügbar ist – synchronisierte Raum-Clients samt gemeinsamem steuernden Mediaplayer auswählen.",
         "data": {
-          "tts_engines": "TTS-Engines",
-          "tts_room_players": "Direkte TTS-Mediaplayer pro Raum",
-          "tts_media_player": "TTS-Mediaplayer",
-          "snapcast_outputs": "Synchronisierte Raum-Routing-Player (Snapcast)",
+          "tts_engines": "TTS-Engines (Sprachen angezeigt; * = Engine-Standard)",
+          "tts_room_players": "Direkte TTS-Mediaplayer",
+          "tts_media_player": "Gemeinsamer Mediaplayer für Snapcast",
+          "snapcast_outputs": "Snapcast-Raumclients",
           "tts_min_level": "TTS erst ab Stufe",
           "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
           "tts_language": "Standardsprache",
           "tts_options": "Standard-TTS-Optionen",
           "companion_tts_media_stream": "Companion-App-Audiostream",
-          "companion_tts_words_per_minute": "Geschätzte Sprechgeschwindigkeit"
+          "companion_tts_words_per_minute": "Geschätzte Sprechgeschwindigkeit",
+          "tts_area_players": "Raumgebundene direkte TTS-Player",
+          "companion_tts_outputs": "Companion-App-TTS-Ausgänge"
         },
         "data_description": {
           "tts_engines": "Wähle eine Integration, einen Eintrag oder einzelne TTS-Entitäten. Sie werden als Ausweichkette verwendet; die erste erfolgreiche Engine spricht.",
@@ -214,52 +199,13 @@
           "companion_tts_media_stream": "Optionaler Android-Audiostream für Companion-App-TTS.",
           "companion_tts_words_per_minute": "Da Push-TTS kein Wiedergabeende meldet, reserviert die Warteschlange anhand dieses Werts genügend Zeit und verhindert Überlappungen.",
           "tts_room_players": "Bereichsgebundene Mediaplayer (z. B. Sprachassistenten/Lautsprecher), die das erzeugte TTS direkt wiedergeben. Die Belegung filtert diese Player nach ihrem Home-Assistant-Bereich.",
-          "snapcast_outputs": "Bereichsgebundene Snapcast-Clients, die vom gemeinsamen Server-Player gespeist werden. Announcement Hub spielt TTS nicht direkt auf ihnen ab, sondern verwaltet nur Mute/Routing."
-        }
-      },
-      "snapcast": {
-        "title": "Snapcast-Raumsteuerung",
-        "description": "Die ausgewählten Snapcast-Clients werden unmittelbar vor jeder Sprachausgabe geroutet und danach wiederhergestellt.",
-        "data": {
-          "snapcast_source": "Name der Ankündigungsquelle",
-          "snapcast_only_source": "Nur Clients auf dieser Quelle verwalten",
-          "snapcast_settle_delay": "Stabilisierungsverzögerung",
-          "snapcast_verify_timeout": "Zeitlimit zur Routing-Prüfung",
-          "snapcast_restore": "Vorherige Stummschaltung wiederherstellen"
-        },
-        "data_description": {
-          "snapcast_source": "Name der Ankündigungsquelle",
-          "snapcast_only_source": "Nur Clients auf dieser Quelle verwalten",
-          "snapcast_settle_delay": "Stabilisierungsverzögerung",
-          "snapcast_verify_timeout": "Zeitlimit zur Routing-Prüfung",
-          "snapcast_restore": "Vorherige Stummschaltung wiederherstellen"
-        }
-      },
-      "queue": {
-        "title": "Warteschlange und Zeitlimits",
-        "description": "Ankündigungen und ihre Ausgaben laufen nacheinander. Verfügbare Ausgaben starten sofort; nicht verfügbare oder vorübergehend fehlerhafte Ausgaben teilen sich ein Wiederholungsfenster.",
-        "data": {
-          "dispatch_order": "Kanalreihenfolge",
-          "queue_max": "Maximale Warteschlangenlänge",
-          "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
-          "idle_timeout": "Auf freien Audiopfad warten",
-          "start_timeout": "Zeitlimit für Wiedergabestart",
-          "playback_timeout": "Maximale Wiedergabedauer",
-          "post_play_delay": "Pause zwischen hörbaren Ausgaben"
-        },
-        "data_description": {
-          "dispatch_order": "Kanalreihenfolge",
-          "queue_max": "Maximale Warteschlangenlänge",
-          "output_availability_timeout": "Verfügbare Ausgaben werden sofort bedient. Nicht verfügbare oder fehlgeschlagene Ausgaben werden während dieses Fensters erneut versucht und danach mit dem letzten Fehler protokolliert.",
-          "idle_timeout": "Auf freien Audiopfad warten",
-          "start_timeout": "Zeitlimit für Wiedergabestart",
-          "playback_timeout": "Maximale Wiedergabedauer",
-          "post_play_delay": "Pause zwischen hörbaren Ausgaben"
+          "snapcast_outputs": "Bereichsgebundene Snapcast-Clients, die vom gemeinsamen Server-Player gespeist werden. Announcement Hub spielt TTS nicht direkt auf ihnen ab, sondern verwaltet nur Mute/Routing.",
+          "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben."
         }
       },
       "notification_profile": {
-        "title": "Visuelles Verhalten: {integration}",
-        "description": "Konfiguriert Aufteilung, Lesezeit und die nativen Optionen von {integration}. Beim Einreihen wird das Profil für jeden konkreten Ausgang fest gespeichert.",
+        "title": "3. Integrationsoptionen: {integration}",
+        "description": "Optionen der ausgewählten Integration.",
         "data": {
           "max_length": "Maximale Zeichen pro Teil",
           "reading_words_per_minute": "Lesegeschwindigkeit",
@@ -274,7 +220,12 @@
           "fontsize": "Schriftgröße",
           "color": "Hintergrundfarbe",
           "transparency": "Hintergrundtransparenz",
-          "interrupt": "Interaktive Benachrichtigung"
+          "interrupt": "Interaktive Benachrichtigung",
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
         },
         "data_description": {
           "max_length": "0 deaktiviert die Aufteilung. Langer Text wird bevorzugt nach Satzende, danach Komma oder Teilsatz und zuletzt an Leerzeichen getrennt. Nur ein einzelnes zu langes Wort wird hart getrennt.",
@@ -290,43 +241,48 @@
           "fontsize": "Schriftgröße der Einblendung.",
           "color": "Hintergrundfarbe der Einblendung.",
           "transparency": "Hintergrundtransparenz der Einblendung.",
-          "interrupt": "Macht die TV-Benachrichtigung interaktiv und kann die laufende App unterbrechen."
+          "interrupt": "Macht die TV-Benachrichtigung interaktiv und kann die laufende App unterbrechen.",
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
         }
       },
-      "occupancy": {
-        "title": "Belegungsabhängige Ausgabe",
-        "description": "Beschränke Ankündigungen optional auf belegte Home-Assistant-Bereiche und konfiguriere den Fallback ohne Kandidaten.",
+      "queue": {
+        "title": "4. Allgemeine Optionen",
+        "description": "Anwesenheitsrouting, Fallback, optionaler Tür-Label-Filter, Benachrichtigungsstandards und Queue/Timeouts.",
         "data": {
-          "occupancy_sensor": "Entität für belegte Bereiche",
+          "dispatch_order": "Kanalreihenfolge",
+          "queue_max": "Maximale Warteschlangenlänge",
+          "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
+          "idle_timeout": "Auf freien Audiopfad warten",
+          "start_timeout": "Zeitlimit für Wiedergabestart",
+          "playback_timeout": "Maximale Wiedergabedauer",
+          "post_play_delay": "Pause zwischen hörbaren Ausgaben",
+          "default_title": "Standardtitel",
+          "critical_notify_data": "Daten für kritische Benachrichtigungen",
+          "occupancy_sensor": "Entität für Raumbelegung",
+          "occupancy_attribute": "Belegte Räume lesen aus",
           "fallback_room": "Fallback-Bereich",
-          "fallback_check_door": "Tür des belegten Bereichs vor Fallback prüfen"
+          "fallback_check_door": "Tür des belegten Bereichs vor Fallback prüfen",
+          "fallback_door_label": "Label der Türentität (optional)"
         },
         "data_description": {
-          "occupancy_sensor": "Wähle den Sensor/die Entität, die belegte Bereiche meldet. Im nächsten Schritt kannst du den Zustand oder eines der aktuellen Attribute auswählen.",
-          "fallback_room": "Optionaler Bereich, der nur verwendet wird, wenn die Belegungsfilterung keine konfigurierten Kandidaten ergibt.",
-          "fallback_check_door": "Wenn aktiviert, ist der Fallback nur erlaubt, wenn in einem belegten Zielbereich ein offener binärer Türsensor vorhanden ist."
-        }
-      },
-      "occupancy_source": {
-        "title": "Wert für belegte Bereiche",
-        "description": "Wähle den Zustand oder ein aktuelles Attribut von {entity}, das die Namen/IDs der belegten Bereiche enthält.",
-        "data": {
-          "occupancy_attribute": "Belegte Bereiche lesen aus"
-        },
-        "data_description": {
-          "occupancy_attribute": "Zustand verwendet den Entitätszustand selbst. Die Attribute werden live aus der ausgewählten Entität gelesen."
-        }
-      },
-      "notification_routing": {
-        "title": "Benachrichtigungsrouting: {output}",
-        "description": "Lege fest, ob {output} der Raumbelegung ({area}) folgt oder ein allgemeines mobiles Gerät ist, und ab welcher Meldungsstufe es Benachrichtigungen erhält.",
-        "data": {
-          "scope": "Gerätebereich",
-          "min_level": "Minimale Benachrichtigungsstufe"
-        },
-        "data_description": {
-          "scope": "Gerätebereich",
-          "min_level": "Minimale Benachrichtigungsstufe"
+          "dispatch_order": "Kanalreihenfolge",
+          "queue_max": "Maximale Warteschlangenlänge",
+          "output_availability_timeout": "Verfügbare Ausgaben werden sofort bedient. Nicht verfügbare oder fehlgeschlagene Ausgaben werden während dieses Fensters erneut versucht und danach mit dem letzten Fehler protokolliert.",
+          "idle_timeout": "Auf freien Audiopfad warten",
+          "start_timeout": "Zeitlimit für Wiedergabestart",
+          "playback_timeout": "Maximale Wiedergabedauer",
+          "post_play_delay": "Pause zwischen hörbaren Ausgaben",
+          "default_title": "Optionaler Titel für optische Benachrichtigungen.",
+          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden.",
+          "occupancy_sensor": "Entität für Raumbelegung",
+          "occupancy_attribute": "Belegte Räume lesen aus",
+          "fallback_room": "Fallback-Bereich",
+          "fallback_check_door": "Tür des belegten Bereichs vor Fallback prüfen",
+          "fallback_door_label": "Label der Türentität (optional)"
         }
       }
     },
@@ -336,7 +292,9 @@
       "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
       "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang.",
       "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein.",
-      "room_notify_area_required": "Ein raumgebundener Benachrichtigungsausgang benötigt einen Home-Assistant-Bereich. Weise dem Gerät/der Entität einen Bereich zu oder wähle Allgemein / mobil."
+      "room_notify_area_required": "Ein raumgebundenes Benachrichtigungsgerät benötigt einen Home-Assistant-Bereich.",
+      "notify_level_overlap": "Ein Benachrichtigungsgerät darf nur einer Mindeststufe zugeordnet sein.",
+      "room_tts_area_required": "Ein raumgebundener direkter TTS-Mediaplayer benötigt einen Home-Assistant-Bereich."
     }
   },
   "selector": {

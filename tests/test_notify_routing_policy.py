@@ -42,8 +42,9 @@ def test_existing_outputs_have_backward_compatible_policy_defaults() -> None:
 def test_translations_expose_scope_and_level_choices() -> None:
     strings=json.loads((C/"strings.json").read_text())
     for section in ("config","options"):
-        assert "notification_routing" in strings[section]["step"]
-    assert set(strings["selector"]["notify_scope"]["options"])=={"room","general"}
-    assert set(strings["selector"]["notify_level"]["options"])=={
-        "debug","info","warning","error","critical"
-    }
+        outputs = strings[section]["step"]["outputs"]["data"]
+        assert "notify_room_outputs" in outputs
+        assert "notify_info_outputs" in outputs
+        assert "notify_warning_outputs" in outputs
+        assert "notify_error_outputs" in outputs
+        assert "notify_critical_outputs" in outputs

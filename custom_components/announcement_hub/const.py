@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.7.0"
+VERSION: Final = "0.8.0"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -80,6 +80,8 @@ CONF_COMPANION_TTS_OUTPUTS: Final = "companion_tts_outputs"
 CONF_TTS_ENGINES: Final = "tts_engines"
 CONF_TTS_MEDIA_PLAYER: Final = "tts_media_player"
 CONF_TTS_ROOM_PLAYERS: Final = "tts_room_players"
+CONF_TTS_AREA_PLAYERS: Final = "tts_area_players"
+CONF_TTS_PLAYER_POLICIES: Final = "tts_player_policies"
 CONF_TTS_CACHE: Final = "tts_cache"
 CONF_TTS_LANGUAGE: Final = "tts_language"
 CONF_TTS_OPTIONS: Final = "tts_options"
@@ -90,10 +92,16 @@ CONF_DEFAULT_TITLE: Final = "default_title"
 CONF_CRITICAL_NOTIFY_DATA: Final = "critical_notify_data"
 CONF_NOTIFY_PROFILES: Final = "notify_profiles"
 CONF_NOTIFY_POLICIES: Final = "notify_policies"
+CONF_NOTIFY_ROOM_OUTPUTS: Final = "notify_room_outputs"
+CONF_NOTIFY_INFO_OUTPUTS: Final = "notify_info_outputs"
+CONF_NOTIFY_WARNING_OUTPUTS: Final = "notify_warning_outputs"
+CONF_NOTIFY_ERROR_OUTPUTS: Final = "notify_error_outputs"
+CONF_NOTIFY_CRITICAL_OUTPUTS: Final = "notify_critical_outputs"
 CONF_OCCUPANCY_SENSOR: Final = "occupancy_sensor"
 CONF_OCCUPANCY_ATTRIBUTE: Final = "occupancy_attribute"
 CONF_FALLBACK_ROOM: Final = "fallback_room"
 CONF_FALLBACK_CHECK_DOOR: Final = "fallback_check_door"
+CONF_FALLBACK_DOOR_LABEL: Final = "fallback_door_label"
 
 # Per-integration visual output profile fields. Profiles are keyed by the
 # integration domain that owns the concrete notify output.

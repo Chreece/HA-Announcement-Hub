@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.8.0 - 2026-10-02
+
+- Reworked setup into four conceptual stages: Notification outputs, TTS outputs,
+  per-integration options, and General options.
+- Notification discovery now lists concrete supported entities as
+  Integration · Device · Entity and selects all recognised outputs by default on
+  first setup. Room/movable scope and minimum notification level are configured
+  on the same page through grouped multi-selects.
+- TTS discovery now lists concrete TTS engines with advertised languages and
+  automatically selects Home Assistant's default engine when available.
+- When Snapcast clients are discovered, the TTS page offers those room clients
+  plus the shared media player that drives their synchronized stream.
+- Non-Snapcast media players with play-media support are offered as direct TTS
+  outputs. Area-bound players default to Room scope; area-less players default
+  to General scope.
+- TTS keeps one global minimum level.
+- Integration-specific visual options and Snapcast routing behavior are grouped
+  under the third setup stage.
+- General options now combine queue/timeouts, room-presence entity and
+  state/attribute source, fallback room, door checking, and an optional Home
+  Assistant label that restricts which door entities may authorize fallback.
+- General direct TTS outputs bypass occupancy filtering; Room outputs continue
+  to follow occupied/fallback areas.
+
 ## 0.7.0 - 2026-10-02
 
 - Added per-device visual notification routing policies in setup.
