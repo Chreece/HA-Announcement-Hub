@@ -67,6 +67,24 @@ for relative in ("strings.json","translations/en.json","translations/de.json","t
             if not str(step["data"][key]).strip() or step["data"][key]==key:
                 raise SystemExit(f"{relative}/{section}: raw/empty label for {key}")
 
+# Update the old notification-routing regression to the new grouped Step 1.
+legacy=ROOT/"tests"/"test_notify_routing_policy.py"
+text=legacy.read_text(encoding="utf-8")
+start=text.index("def test_setup_has_per_concrete_output_notification_routing_step()")
+end=text.index("\ndef test_runtime_filters_level_and_only_room_scope_by_occupancy()", start)
+replacement='''def test_setup_groups_scope_and_level_on_notification_page() -> None:
+    flow=(C/"config_flow.py").read_text()
+    assert "CONF_NOTIFY_POLICIES" in flow
+    assert "CONF_NOTIFY_ROOM_OUTPUTS" in flow
+    assert "CONF_NOTIFY_INFO_OUTPUTS" in flow
+    assert "CONF_NOTIFY_WARNING_OUTPUTS" in flow
+    assert "CONF_NOTIFY_ERROR_OUTPUTS" in flow
+    assert "CONF_NOTIFY_CRITICAL_OUTPUTS" in flow
+    assert "async_step_notification_routing" not in flow
+
+'''
+legacy.write_text(text[:start]+replacement+text[end+1:],encoding="utf-8")
+
 # Update existing test and add a resource contract.
 tests=ROOT/"tests"/"test_four_step_setup.py"
 text=tests.read_text(encoding="utf-8")
