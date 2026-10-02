@@ -417,8 +417,20 @@ rep(p,
             selected_room_tts.extend(room_tts_players)
             selected_snapcast.extend(snapcast_clients)
 ''')
-rep(p,'                select_server_tts()\n','                select_tts_outputs()\n')
-rep(p,'                select_server_tts()\n','                select_tts_outputs()\n')
+text=p.read_text(encoding="utf-8")
+if text.count('                select_server_tts()\n') != 2:
+    raise SystemExit(
+        f"{p}: expected two select_server_tts calls, found "
+        f"{text.count('                select_server_tts()\\n')}"
+    )
+p.write_text(
+    text.replace(
+        '                select_server_tts()\n',
+        '                select_tts_outputs()\n',
+        2,
+    ),
+    encoding="utf-8",
+)
 rep(p,
 '''            if canonical_entity in configured_notify:
                 selected_notify.append(canonical_entity)
