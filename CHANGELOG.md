@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.2 - 2026-10-02
+
+- Fixed the TTS setup crash when Snapcast is installed.
+- Snapcast discovery now filters SelectOption objects through their value
+  attribute before serializing them to Home Assistant selector dictionaries.
+- Added a regression test for the exact object/dict mismatch that produced
+  "TypeError: 'SelectOption' object is not subscriptable".
+
 ## 0.8.1 - 2026-10-02
 
 - Notification setup now preselects every currently recognised supported notify

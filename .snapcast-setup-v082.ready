@@ -1,2 +1,0 @@
-version=0.8.2
-purpose=fix SelectOption subscript crash in Snapcast setup discovery

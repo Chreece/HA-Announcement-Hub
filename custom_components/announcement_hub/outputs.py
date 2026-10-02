@@ -360,7 +360,7 @@ def snapcast_output_options(hass: HomeAssistant) -> list[dict[str, str]]:
             entity_domain="media_player",
             integration="snapcast",
         )
-        if "group" not in option["value"].casefold()
+        if "group" not in option.value.casefold()
     ]
 
 
