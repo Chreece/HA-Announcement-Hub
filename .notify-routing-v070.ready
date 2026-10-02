@@ -4,3 +4,5 @@ purpose=per-device notification room/general scope plus minimum level
 retry=2
 
 retry=3
+
+retry=4
