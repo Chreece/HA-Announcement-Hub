@@ -52,3 +52,34 @@ def test_fallback_does_not_regress_background_task_lifecycle() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     assert "self.hass.async_create_task(" not in manager
     assert manager.count("self.entry.async_create_background_task(") == 2
+
+
+
+def test_occupancy_ui_uses_live_dropdown_not_free_text() -> None:
+    flow = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
+    assert "async def async_step_occupancy(" in flow
+    assert "async def async_step_occupancy_source(" in flow
+    assert 'return ["__state__", *attributes]' in flow
+    assert 'translation_key="occupancy_source"' in flow
+    source_block = flow[
+        flow.index("async def async_step_occupancy_source"):
+        flow.index("async def async_step_queue")
+    ]
+    assert "selector.SelectSelector(" in source_block
+    assert "selector.TextSelector()" not in source_block
+
+
+def test_occupancy_and_fallback_are_not_on_generic_outputs_page() -> None:
+    import json
+
+    strings = json.loads((COMPONENT / "strings.json").read_text(encoding="utf-8"))
+    for section in ("config", "options"):
+        outputs = strings[section]["step"]["outputs"]["data"]
+        assert "occupancy_sensor" not in outputs
+        assert "occupancy_attribute" not in outputs
+        assert "fallback_room" not in outputs
+        assert "fallback_check_door" not in outputs
+        occupancy = strings[section]["step"]["occupancy"]["data"]
+        assert {"occupancy_sensor", "fallback_room", "fallback_check_door"} <= set(occupancy)
+        source = strings[section]["step"]["occupancy_source"]["data"]
+        assert set(source) == {"occupancy_attribute"}

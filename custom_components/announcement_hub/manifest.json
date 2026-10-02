@@ -16,7 +16,7 @@
     "nfandroidtv"
   ],
   "integration_type": "service",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "documentation": "https://github.com/Chreece/HA-Announcement-Hub",
   "issue_tracker": "https://github.com/Chreece/HA-Announcement-Hub/issues"
 }

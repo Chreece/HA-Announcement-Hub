@@ -10,22 +10,14 @@
           "snapcast_outputs": "Snapcast audio outputs",
           "companion_tts_outputs": "Companion App TTS outputs",
           "default_title": "Default title",
-          "critical_notify_data": "Critical notification data",
-          "occupancy_sensor": "Occupied-areas sensor",
-          "occupancy_attribute": "Occupied-areas attribute",
-          "fallback_room": "Fallback room",
-          "fallback_check_door": "Check occupied-room door before fallback"
+          "critical_notify_data": "Critical notification data"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
           "snapcast_outputs": "Select Snapcast clients by integration, entry, or entity. Their Home Assistant areas determine room routing; selecting them enables automatic mute/unmute routing.",
           "companion_tts_outputs": "Optional. Select the Android Companion App devices that may be used for push TTS. Ordinary calls still require the Companion App TTS service option; critical calls use every configured matching output.",
           "default_title": "Optional title for visual notifications.",
-          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications.",
-          "occupancy_sensor": "Optional sensor whose state contains occupied Home Assistant area names/IDs, for example Wohnzimmer,Gästezimmer. When configured, occupied-only delivery can automatically restrict outputs to those areas.",
-          "occupancy_attribute": "Optional attribute on the occupied-areas sensor that contains the area list. Leave empty to use the sensor state itself.",
-          "fallback_room": "Optional Home Assistant area used only when occupancy filtering leaves the announcement with zero candidates.",
-          "fallback_check_door": "When enabled, fallback is allowed only if at least one occupied target area has a binary_sensor with device_class door that is open. Closed, unknown, unavailable, or missing door sensors block fallback."
+          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications."
         }
       },
       "tts": {
@@ -127,6 +119,30 @@
           "transparency": "Overlay background transparency.",
           "interrupt": "Makes the TV notification interactive. This may interrupt the app currently playing on the TV."
         }
+      },
+      "occupancy": {
+        "title": "Occupancy routing",
+        "description": "Optionally restrict announcements to occupied Home Assistant areas and configure the zero-candidate fallback.",
+        "data": {
+          "occupancy_sensor": "Occupied-areas entity",
+          "fallback_room": "Fallback room",
+          "fallback_check_door": "Check occupied-room door before fallback"
+        },
+        "data_description": {
+          "occupancy_sensor": "Select the sensor/entity that reports occupied areas. After this step you can choose its state or one of its current attributes.",
+          "fallback_room": "Optional area used only when occupancy routing has zero configured candidates.",
+          "fallback_check_door": "When enabled, fallback is allowed only when an occupied target room has an open binary door sensor."
+        }
+      },
+      "occupancy_source": {
+        "title": "Occupied-areas value",
+        "description": "Choose the state or one current attribute of {entity} that contains the occupied area names/IDs.",
+        "data": {
+          "occupancy_attribute": "Read occupied areas from"
+        },
+        "data_description": {
+          "occupancy_attribute": "State uses the entity state itself. Attribute choices are read live from the selected entity."
+        }
       }
     },
     "error": {
@@ -150,22 +166,14 @@
           "snapcast_outputs": "Snapcast audio outputs",
           "companion_tts_outputs": "Companion App TTS outputs",
           "default_title": "Default title",
-          "critical_notify_data": "Critical notification data",
-          "occupancy_sensor": "Occupied-areas sensor",
-          "occupancy_attribute": "Occupied-areas attribute",
-          "fallback_room": "Fallback room",
-          "fallback_check_door": "Check occupied-room door before fallback"
+          "critical_notify_data": "Critical notification data"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
           "snapcast_outputs": "Select Snapcast clients by integration, entry, or entity. Their Home Assistant areas determine room routing; selecting them enables automatic mute/unmute routing.",
           "companion_tts_outputs": "Optional. Select the Android Companion App devices that may be used for push TTS. Ordinary calls still require the Companion App TTS service option; critical calls use every configured matching output.",
           "default_title": "Optional title for visual notifications.",
-          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications.",
-          "occupancy_sensor": "Optional sensor whose state contains occupied Home Assistant area names/IDs, for example Wohnzimmer,Gästezimmer. When configured, occupied-only delivery can automatically restrict outputs to those areas.",
-          "occupancy_attribute": "Optional attribute on the occupied-areas sensor that contains the area list. Leave empty to use the sensor state itself.",
-          "fallback_room": "Optional Home Assistant area used only when occupancy filtering leaves the announcement with zero candidates.",
-          "fallback_check_door": "When enabled, fallback is allowed only if at least one occupied target area has a binary_sensor with device_class door that is open. Closed, unknown, unavailable, or missing door sensors block fallback."
+          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications."
         }
       },
       "tts": {
@@ -267,6 +275,30 @@
           "transparency": "Overlay background transparency.",
           "interrupt": "Makes the TV notification interactive. This may interrupt the app currently playing on the TV."
         }
+      },
+      "occupancy": {
+        "title": "Occupancy routing",
+        "description": "Optionally restrict announcements to occupied Home Assistant areas and configure the zero-candidate fallback.",
+        "data": {
+          "occupancy_sensor": "Occupied-areas entity",
+          "fallback_room": "Fallback room",
+          "fallback_check_door": "Check occupied-room door before fallback"
+        },
+        "data_description": {
+          "occupancy_sensor": "Select the sensor/entity that reports occupied areas. After this step you can choose its state or one of its current attributes.",
+          "fallback_room": "Optional area used only when occupancy routing has zero configured candidates.",
+          "fallback_check_door": "When enabled, fallback is allowed only when an occupied target room has an open binary door sensor."
+        }
+      },
+      "occupancy_source": {
+        "title": "Occupied-areas value",
+        "description": "Choose the state or one current attribute of {entity} that contains the occupied area names/IDs.",
+        "data": {
+          "occupancy_attribute": "Read occupied areas from"
+        },
+        "data_description": {
+          "occupancy_attribute": "State uses the entity state itself. Attribute choices are read live from the selected entity."
+        }
       }
     },
     "error": {
@@ -350,6 +382,11 @@
         "50%": "50%",
         "75%": "75%",
         "100%": "100%"
+      }
+    },
+    "occupancy_source": {
+      "options": {
+        "__state__": "State"
       }
     }
   },

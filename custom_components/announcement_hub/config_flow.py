@@ -160,10 +160,6 @@ class _AnnouncementFlowMixin:
                     CONF_COMPANION_TTS_OUTPUTS: [],
                     CONF_DEFAULT_TITLE: DEFAULT_TITLE,
                     CONF_CRITICAL_NOTIFY_DATA: {},
-                    CONF_OCCUPANCY_SENSOR: None,
-                    CONF_OCCUPANCY_ATTRIBUTE: "",
-                    CONF_FALLBACK_ROOM: None,
-                    CONF_FALLBACK_CHECK_DOOR: DEFAULT_FALLBACK_CHECK_DOOR,
                 },
             )
             self._prepare_notify_profile_steps()
@@ -194,27 +190,6 @@ class _AnnouncementFlowMixin:
                         DEFAULT_CRITICAL_NOTIFY_DATA,
                     ),
                 ): selector.ObjectSelector(),
-                _optional_marker(
-                    CONF_OCCUPANCY_SENSOR,
-                    self._value(CONF_OCCUPANCY_SENSOR, None),
-                ): selector.EntitySelector(
-                    selector.EntitySelectorConfig(domain="sensor")
-                ),
-                _optional_marker(
-                    CONF_OCCUPANCY_ATTRIBUTE,
-                    self._value(CONF_OCCUPANCY_ATTRIBUTE, ""),
-                ): selector.TextSelector(),
-                _optional_marker(
-                    CONF_FALLBACK_ROOM,
-                    self._value(CONF_FALLBACK_ROOM, None),
-                ): selector.AreaSelector(),
-                probatio.Required(
-                    CONF_FALLBACK_CHECK_DOOR,
-                    default=self._value(
-                        CONF_FALLBACK_CHECK_DOOR,
-                        DEFAULT_FALLBACK_CHECK_DOOR,
-                    ),
-                ): selector.BooleanSelector(),
             }
         )
         return self.async_show_form(step_id="outputs", data_schema=schema)
@@ -535,7 +510,7 @@ class _AnnouncementFlowMixin:
                     CONF_SNAPCAST_RESTORE: DEFAULT_SNAPCAST_RESTORE,
                 },
             )
-            return await self.async_step_queue()
+            return await self.async_step_occupancy()
 
         schema = probatio.Schema(
             {
@@ -591,6 +566,93 @@ class _AnnouncementFlowMixin:
             }
         )
         return self.async_show_form(step_id="snapcast", data_schema=schema)
+
+    def _occupancy_attribute_options(self) -> list[str]:
+        """Return State plus live attributes for the selected occupancy entity."""
+        sensor = str(self._working.get(CONF_OCCUPANCY_SENSOR, "") or "").strip()
+        state = self.hass.states.get(sensor) if sensor else None
+        attributes = sorted(str(key) for key in (state.attributes if state else {}))
+        return ["__state__", *attributes]
+
+    async def async_step_occupancy(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Configure occupancy-aware routing and optional fallback."""
+        if user_input is not None:
+            self._store_step(
+                user_input,
+                {
+                    CONF_OCCUPANCY_SENSOR: None,
+                    CONF_FALLBACK_ROOM: None,
+                    CONF_FALLBACK_CHECK_DOOR: DEFAULT_FALLBACK_CHECK_DOOR,
+                },
+            )
+            if self._working.get(CONF_OCCUPANCY_SENSOR):
+                return await self.async_step_occupancy_source()
+            self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
+            return await self.async_step_queue()
+
+        schema = probatio.Schema(
+            {
+                _optional_marker(
+                    CONF_OCCUPANCY_SENSOR,
+                    self._value(CONF_OCCUPANCY_SENSOR, None),
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor")
+                ),
+                _optional_marker(
+                    CONF_FALLBACK_ROOM,
+                    self._value(CONF_FALLBACK_ROOM, None),
+                ): selector.AreaSelector(),
+                probatio.Required(
+                    CONF_FALLBACK_CHECK_DOOR,
+                    default=self._value(
+                        CONF_FALLBACK_CHECK_DOOR,
+                        DEFAULT_FALLBACK_CHECK_DOOR,
+                    ),
+                ): selector.BooleanSelector(),
+            }
+        )
+        return self.async_show_form(step_id="occupancy", data_schema=schema)
+
+    async def async_step_occupancy_source(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose whether occupied areas come from state or one live attribute."""
+        sensor = str(self._working.get(CONF_OCCUPANCY_SENSOR, "") or "").strip()
+        if not sensor:
+            self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
+            return await self.async_step_queue()
+
+        options = self._occupancy_attribute_options()
+        if user_input is not None:
+            source = str(user_input.get(CONF_OCCUPANCY_ATTRIBUTE, "__state__"))
+            self._working[CONF_OCCUPANCY_ATTRIBUTE] = (
+                "" if source == "__state__" else source
+            )
+            return await self.async_step_queue()
+
+        current = str(self._working.get(CONF_OCCUPANCY_ATTRIBUTE, "") or "")
+        default = current if current in options else "__state__"
+        schema = probatio.Schema(
+            {
+                probatio.Required(
+                    CONF_OCCUPANCY_ATTRIBUTE,
+                    default=default,
+                ): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=options,
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                        translation_key="occupancy_source",
+                    )
+                )
+            }
+        )
+        return self.async_show_form(
+            step_id="occupancy_source",
+            data_schema=schema,
+            description_placeholders={"entity": sensor},
+        )
 
     async def async_step_queue(
         self, user_input: dict[str, Any] | None = None

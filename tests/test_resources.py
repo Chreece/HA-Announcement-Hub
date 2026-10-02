@@ -46,7 +46,7 @@ def test_service_fields_sections_and_translations_match() -> None:
 
 def test_config_and_options_steps_match_flow_contract() -> None:
     strings = json.loads((COMPONENT / "strings.json").read_text())
-    expected_steps = {"outputs", "notification_profile", "tts", "snapcast", "queue"}
+    expected_steps = {"outputs", "notification_profile", "tts", "snapcast", "occupancy", "occupancy_source", "queue"}
     assert set(strings["config"]["step"]) == expected_steps
     assert set(strings["options"]["step"]) == expected_steps
 
@@ -135,7 +135,7 @@ def test_manifest_and_hacs_identity() -> None:
     hacs = json.loads((ROOT / "hacs.json").read_text())
     assert manifest["domain"] == "announcement_hub"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "0.5.0"
+    assert manifest["version"] == "0.5.1"
     assert hacs["name"] == manifest["name"]
 
 

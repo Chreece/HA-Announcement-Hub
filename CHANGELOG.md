@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.1 - 2026-10-02
+
+- Moved occupancy and fallback settings out of the generic Outputs page into a
+  dedicated translated Occupancy routing step.
+- Replaced the free-text occupancy attribute field with a live dropdown built
+  from the selected entity's current attributes.
+- Added State as an explicit translated dropdown choice; internally it keeps the
+  existing empty-attribute representation, so routing behavior is unchanged.
+- The occupancy entity is selected first, then the source dropdown is generated
+  from that exact entity.
+- No queue, routing, availability-timeout, or background-task lifecycle behavior
+  changed.
+
 ## 0.5.0 - 2026-10-02
 
 - Added an optional fallback room for occupancy-aware routing.
