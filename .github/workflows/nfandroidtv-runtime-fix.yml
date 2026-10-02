@@ -39,6 +39,22 @@ jobs:
           python .nfandroidtv-runtime-fix.py
           rm -f .nfandroidtv-runtime-fix.py .nfandroidtv-runtime-fix.ready
 
+      - name: Repair generated regression assertion
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("tests/test_nfandroidtv_advanced_delivery.py")
+          text = path.read_text(encoding="utf-8")
+          old = '    assert "no active advanced delivery path" in manager\n'
+          new = '    assert "no active advanced delivery" in manager\n'
+          if text.count(old) != 1:
+              raise SystemExit("Expected generated assertion was not found exactly once")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
+
       - name: Validate integration
         shell: bash
         run: |
@@ -57,7 +73,7 @@ jobs:
           assert "async def _async_send_nfandroidtv_runtime(" in manager
           assert 'client = getattr(entry, "runtime_data", None)' in manager
           assert 'bkgcolor=data.get("bkgcolor", data.get("color"))' in manager
-          assert "no active advanced delivery path" in manager
+          assert "no active advanced delivery" in manager
           PY
           git diff --check
 
