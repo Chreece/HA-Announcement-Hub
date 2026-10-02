@@ -1,0 +1,313 @@
+{
+  "title": "Announcement Hub",
+  "config": {
+    "step": {
+      "outputs": {
+        "title": "Outputs",
+        "description": "Select integrations, specific config entries, or individual entities as visual, Snapcast, or Companion App outputs. Their Home Assistant area is detected automatically.",
+        "data": {
+          "notify_outputs": "Visual notification outputs",
+          "snapcast_outputs": "Snapcast audio outputs",
+          "companion_tts_outputs": "Companion App TTS outputs",
+          "default_title": "Default title",
+          "critical_notify_data": "Critical notification data"
+        },
+        "data_description": {
+          "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
+          "snapcast_outputs": "Select Snapcast clients by integration, entry, or entity. Their Home Assistant areas determine room routing; selecting them enables automatic mute/unmute routing.",
+          "companion_tts_outputs": "Optional. Select the Android Companion App devices that may be used for push TTS. Ordinary calls still require the Companion App TTS service option; critical calls use every configured matching output.",
+          "default_title": "Optional title for visual notifications.",
+          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications."
+        }
+      },
+      "tts": {
+        "title": "Text-to-speech",
+        "description": "Configure the shared server TTS path and the minimum level for audible announcements.",
+        "data": {
+          "tts_engines": "TTS engines",
+          "tts_media_player": "TTS media player",
+          "tts_min_level": "Use TTS from level",
+          "tts_cache": "Pre-generate and cache speech",
+          "tts_language": "Default language",
+          "tts_options": "Default TTS options",
+          "companion_tts_media_stream": "Companion App audio stream",
+          "companion_tts_words_per_minute": "Estimated speech speed"
+        },
+        "data_description": {
+          "tts_engines": "Select an integration, entry, or individual TTS entities. They are a fallback chain: the first engine that succeeds speaks the message.",
+          "tts_media_player": "The shared player for server TTS, normally media_player.mpd. Snapcast outputs use this audio path.",
+          "tts_min_level": "Below this level, TTS stays muted. Spoken-only text is sent to visual outputs instead. Critical announcements always remain audible.",
+          "tts_cache": "Pre-generate and cache speech",
+          "tts_language": "Optional language override for this job.",
+          "tts_options": "Optional voice or engine options for this job.",
+          "companion_tts_media_stream": "Optional Android audio stream for Companion App TTS.",
+          "companion_tts_words_per_minute": "Push TTS does not report playback completion, so the queue reserves time using this estimate to prevent overlap."
+        }
+      },
+      "snapcast": {
+        "title": "Snapcast room routing",
+        "description": "Selected Snapcast clients are routed immediately before each spoken message and restored afterward.",
+        "data": {
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
+        },
+        "data_description": {
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
+        }
+      },
+      "queue": {
+        "title": "Queue and timeouts",
+        "description": "Announcements and their outputs run sequentially. Available outputs run immediately; unavailable or transiently failing outputs share one retry window.",
+        "data": {
+          "dispatch_order": "Channel order",
+          "queue_max": "Maximum queue length",
+          "output_availability_timeout": "Unavailable-output wait",
+          "idle_timeout": "Wait for audio path to become idle",
+          "start_timeout": "Playback start timeout",
+          "playback_timeout": "Maximum playback time",
+          "post_play_delay": "Gap between audible outputs"
+        },
+        "data_description": {
+          "dispatch_order": "Channel order",
+          "queue_max": "Maximum queue length",
+          "output_availability_timeout": "Available outputs are delivered immediately. Unavailable or failed outputs are retried during this window and recorded with their final error afterward.",
+          "idle_timeout": "Wait for audio path to become idle",
+          "start_timeout": "Playback start timeout",
+          "playback_timeout": "Maximum playback time",
+          "post_play_delay": "Gap between audible outputs"
+        }
+      }
+    },
+    "error": {
+      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
+      "tts_engine_required": "Select at least one TTS engine when a TTS media player is selected.",
+      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
+      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output."
+    },
+    "abort": {
+      "single_instance_allowed": "Announcement Hub is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "outputs": {
+        "title": "Outputs",
+        "description": "Select integrations, specific config entries, or individual entities as visual, Snapcast, or Companion App outputs. Their Home Assistant area is detected automatically.",
+        "data": {
+          "notify_outputs": "Visual notification outputs",
+          "snapcast_outputs": "Snapcast audio outputs",
+          "companion_tts_outputs": "Companion App TTS outputs",
+          "default_title": "Default title",
+          "critical_notify_data": "Critical notification data"
+        },
+        "data_description": {
+          "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
+          "snapcast_outputs": "Select Snapcast clients by integration, entry, or entity. Their Home Assistant areas determine room routing; selecting them enables automatic mute/unmute routing.",
+          "companion_tts_outputs": "Optional. Select the Android Companion App devices that may be used for push TTS. Ordinary calls still require the Companion App TTS service option; critical calls use every configured matching output.",
+          "default_title": "Optional title for visual notifications.",
+          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications."
+        }
+      },
+      "tts": {
+        "title": "Text-to-speech",
+        "description": "Configure the shared server TTS path and the minimum level for audible announcements.",
+        "data": {
+          "tts_engines": "TTS engines",
+          "tts_media_player": "TTS media player",
+          "tts_min_level": "Use TTS from level",
+          "tts_cache": "Pre-generate and cache speech",
+          "tts_language": "Default language",
+          "tts_options": "Default TTS options",
+          "companion_tts_media_stream": "Companion App audio stream",
+          "companion_tts_words_per_minute": "Estimated speech speed"
+        },
+        "data_description": {
+          "tts_engines": "Select an integration, entry, or individual TTS entities. They are a fallback chain: the first engine that succeeds speaks the message.",
+          "tts_media_player": "The shared player for server TTS, normally media_player.mpd. Snapcast outputs use this audio path.",
+          "tts_min_level": "Below this level, TTS stays muted. Spoken-only text is sent to visual outputs instead. Critical announcements always remain audible.",
+          "tts_cache": "Pre-generate and cache speech",
+          "tts_language": "Optional language override for this job.",
+          "tts_options": "Optional voice or engine options for this job.",
+          "companion_tts_media_stream": "Optional Android audio stream for Companion App TTS.",
+          "companion_tts_words_per_minute": "Push TTS does not report playback completion, so the queue reserves time using this estimate to prevent overlap."
+        }
+      },
+      "snapcast": {
+        "title": "Snapcast room routing",
+        "description": "Selected Snapcast clients are routed immediately before each spoken message and restored afterward.",
+        "data": {
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
+        },
+        "data_description": {
+          "snapcast_source": "Announcement source name",
+          "snapcast_only_source": "Manage only clients on this source",
+          "snapcast_settle_delay": "Routing settle delay",
+          "snapcast_verify_timeout": "Routing verification timeout",
+          "snapcast_restore": "Restore previous mute states"
+        }
+      },
+      "queue": {
+        "title": "Queue and timeouts",
+        "description": "Announcements and their outputs run sequentially. Available outputs run immediately; unavailable or transiently failing outputs share one retry window.",
+        "data": {
+          "dispatch_order": "Channel order",
+          "queue_max": "Maximum queue length",
+          "output_availability_timeout": "Unavailable-output wait",
+          "idle_timeout": "Wait for audio path to become idle",
+          "start_timeout": "Playback start timeout",
+          "playback_timeout": "Maximum playback time",
+          "post_play_delay": "Gap between audible outputs"
+        },
+        "data_description": {
+          "dispatch_order": "Channel order",
+          "queue_max": "Maximum queue length",
+          "output_availability_timeout": "Available outputs are delivered immediately. Unavailable or failed outputs are retried during this window and recorded with their final error afterward.",
+          "idle_timeout": "Wait for audio path to become idle",
+          "start_timeout": "Playback start timeout",
+          "playback_timeout": "Maximum playback time",
+          "post_play_delay": "Gap between audible outputs"
+        }
+      }
+    },
+    "error": {
+      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
+      "tts_engine_required": "Select at least one TTS engine when a TTS media player is selected.",
+      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
+      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output."
+    }
+  },
+  "selector": {
+    "dispatch_order": {
+      "options": {
+        "notify_then_tts": "Visual notifications first, then speech",
+        "tts_then_notify": "Speech first, then visual notifications"
+      }
+    },
+    "tts_min_level": {
+      "options": {
+        "critical": "Critical",
+        "error": "Error",
+        "warning": "Warning",
+        "info": "Information",
+        "success": "Success",
+        "debug": "Debug",
+        "never": "Never"
+      }
+    },
+    "companion_tts_media_stream": {
+      "options": {
+        "default": "App default",
+        "music_stream": "Music stream",
+        "alarm_stream": "Alarm stream",
+        "alarm_stream_max": "Alarm stream at maximum volume"
+      }
+    },
+    "level": {
+      "options": {
+        "critical": "Critical",
+        "error": "Error",
+        "warning": "Warning",
+        "info": "Information",
+        "success": "Success",
+        "debug": "Debug"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "queue": {
+        "name": "Queue"
+      }
+    }
+  },
+  "services": {
+    "send": {
+      "name": "Send announcement",
+      "description": "Queues a spoken and/or visual announcement with optional room and output selection. Jobs and audible outputs are serialized.",
+      "sections": {
+        "content": {
+          "name": "Content"
+        },
+        "routing": {
+          "name": "Rooms and outputs"
+        },
+        "advanced": {
+          "name": "Advanced"
+        }
+      },
+      "fields": {
+        "text_tts": {
+          "name": "Spoken text",
+          "description": "Text for audible outputs. At least spoken or visual text is required."
+        },
+        "text_notify": {
+          "name": "Visual notification text",
+          "description": "Text shown by visual notification outputs. At least spoken or visual text is required."
+        },
+        "title": {
+          "name": "Notification title",
+          "description": "Optional title for visual notifications."
+        },
+        "level": {
+          "name": "Level",
+          "description": "Controls the minimum TTS level. Critical uses every configured matching output and always remains audible."
+        },
+        "output": {
+          "name": "Output areas",
+          "description": "Optional. Empty means every configured output. With areas, only matching or global outputs are used."
+        },
+        "service": {
+          "name": "Specific outputs",
+          "description": "Optional restriction to an integration, entry, entity, service, or alias, such as mobile_app, entry:ID, entity:notify.tv, service:notify.name, tts, notify, snapcast, companion_tts, or all."
+        },
+        "notify_data": {
+          "name": "Notification data",
+          "description": "Optional integration-specific data for this visual notification."
+        },
+        "language": {
+          "name": "TTS language",
+          "description": "Optional language override for this job."
+        },
+        "tts_options": {
+          "name": "TTS options",
+          "description": "Optional voice or engine options for this job."
+        },
+        "companion_tts": {
+          "name": "Use Companion App TTS",
+          "description": "Also send spoken text to the configured Android Companion App TTS outputs. Off by default; the dedicated companion_tts/all service alias and critical level also enable it."
+        }
+      }
+    },
+    "clear_queue": {
+      "name": "Clear announcement queue",
+      "description": "Cancels all waiting jobs and can also stop the active announcement.",
+      "fields": {
+        "include_current": {
+          "name": "Include active announcement",
+          "description": "Also requests cancellation of the job currently running."
+        }
+      }
+    },
+    "cancel": {
+      "name": "Cancel announcement",
+      "description": "Cancels one waiting or active job by its ID.",
+      "fields": {
+        "job_id": {
+          "name": "Job ID",
+          "description": "The job ID returned by announcement_hub.send."
+        }
+      }
+    }
+  }
+}

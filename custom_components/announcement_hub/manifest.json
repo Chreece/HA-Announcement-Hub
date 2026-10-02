@@ -1,0 +1,22 @@
+{
+  "domain": "announcement_hub",
+  "name": "Announcement Hub",
+  "codeowners": [
+    "@Chreece"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "media_player",
+    "tts"
+  ],
+  "after_dependencies": [
+    "notify",
+    "snapcast",
+    "mobile_app",
+    "nfandroidtv"
+  ],
+  "integration_type": "service",
+  "version": "0.2.0",
+  "documentation": "https://github.com/Chreece/HA-Announcement-Hub",
+  "issue_tracker": "https://github.com/Chreece/HA-Announcement-Hub/issues"
+}

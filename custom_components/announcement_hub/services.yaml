@@ -1,0 +1,74 @@
+send:
+  fields:
+    content:
+      fields:
+        text_tts:
+          example: The washing machine has finished.
+          selector:
+            text:
+              multiline: true
+        text_notify:
+          example: Washing machine finished
+          selector:
+            text:
+              multiline: true
+        title:
+          selector:
+            text:
+        level:
+          default: info
+          selector:
+            select:
+              options:
+                - critical
+                - error
+                - warning
+                - info
+                - success
+                - debug
+              translation_key: level
+    routing:
+      fields:
+        output:
+          selector:
+            area:
+              multiple: true
+        service:
+          example:
+            - mobile_app
+            - entry:0123456789abcdef
+            - entity:notify.living_room_tv
+            - snapcast
+          selector:
+            text:
+              multiple: true
+        companion_tts:
+          default: false
+          selector:
+            boolean:
+    advanced:
+      collapsed: true
+      fields:
+        notify_data:
+          selector:
+            object:
+        language:
+          selector:
+            text:
+        tts_options:
+          selector:
+            object:
+
+clear_queue:
+  fields:
+    include_current:
+      default: false
+      selector:
+        boolean:
+
+cancel:
+  fields:
+    job_id:
+      required: true
+      selector:
+        text:

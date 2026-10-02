@@ -1,0 +1,25 @@
+{
+  "services": {
+    "send": {
+      "service": "mdi:bullhorn-outline",
+      "sections": {
+        "content": "mdi:text-box-outline",
+        "routing": "mdi:map-marker-radius",
+        "advanced": "mdi:tune-variant"
+      }
+    },
+    "clear_queue": {
+      "service": "mdi:playlist-remove"
+    },
+    "cancel": {
+      "service": "mdi:cancel"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "queue": {
+        "default": "mdi:message-processing-outline"
+      }
+    }
+  }
+}

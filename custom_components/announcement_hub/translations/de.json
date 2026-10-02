@@ -1,0 +1,313 @@
+{
+  "title": "Announcement Hub",
+  "config": {
+    "step": {
+      "outputs": {
+        "title": "Ausgänge",
+        "description": "Wähle Integrationen, Konfigurationseinträge oder einzelne Entitäten als optische, Snapcast- oder Companion-App-Ausgänge. Die Bereichszuordnung wird automatisch aus Home Assistant übernommen.",
+        "data": {
+          "notify_outputs": "Optische Benachrichtigungsausgänge",
+          "snapcast_outputs": "Snapcast-Audioausgänge",
+          "companion_tts_outputs": "Companion-App-TTS-Ausgänge",
+          "default_title": "Standardtitel",
+          "critical_notify_data": "Daten für kritische Benachrichtigungen"
+        },
+        "data_description": {
+          "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
+          "snapcast_outputs": "Wähle Snapcast-Clients nach Integration, Eintrag oder Entität. Ihre Home-Assistant-Bereiche bestimmen die Raumzuordnung; die Auswahl aktiviert die automatische Stumm-/Lautschaltung.",
+          "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben.",
+          "default_title": "Optionaler Titel für optische Benachrichtigungen.",
+          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden."
+        }
+      },
+      "tts": {
+        "title": "Sprachausgabe",
+        "description": "Konfiguriere die gemeinsame Server-TTS-Wiedergabe und die Mindeststufe für hörbare Meldungen.",
+        "data": {
+          "tts_engines": "TTS-Engines",
+          "tts_media_player": "TTS-Mediaplayer",
+          "tts_min_level": "TTS erst ab Stufe",
+          "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
+          "tts_language": "Standardsprache",
+          "tts_options": "Standard-TTS-Optionen",
+          "companion_tts_media_stream": "Companion-App-Audiostream",
+          "companion_tts_words_per_minute": "Geschätzte Sprechgeschwindigkeit"
+        },
+        "data_description": {
+          "tts_engines": "Wähle eine Integration, einen Eintrag oder einzelne TTS-Entitäten. Sie werden als Ausweichkette verwendet; die erste erfolgreiche Engine spricht.",
+          "tts_media_player": "Der gemeinsame Player für Server-TTS, normalerweise media_player.mpd. Snapcast-Ausgänge verwenden diesen Audiopfad.",
+          "tts_min_level": "Unterhalb dieser Stufe bleibt TTS stumm. Reiner Sprachtext wird stattdessen an optische Ausgänge gesendet. Kritische Meldungen bleiben immer hörbar.",
+          "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
+          "tts_language": "Optionale Sprachüberschreibung für diesen Auftrag.",
+          "tts_options": "Optionale Stimmen- oder Engine-Optionen für diesen Auftrag.",
+          "companion_tts_media_stream": "Optionaler Android-Audiostream für Companion-App-TTS.",
+          "companion_tts_words_per_minute": "Da Push-TTS kein Wiedergabeende meldet, reserviert die Warteschlange anhand dieses Werts genügend Zeit und verhindert Überlappungen."
+        }
+      },
+      "snapcast": {
+        "title": "Snapcast-Raumsteuerung",
+        "description": "Die ausgewählten Snapcast-Clients werden unmittelbar vor jeder Sprachausgabe geroutet und danach wiederhergestellt.",
+        "data": {
+          "snapcast_source": "Name der Ankündigungsquelle",
+          "snapcast_only_source": "Nur Clients auf dieser Quelle verwalten",
+          "snapcast_settle_delay": "Stabilisierungsverzögerung",
+          "snapcast_verify_timeout": "Zeitlimit zur Routing-Prüfung",
+          "snapcast_restore": "Vorherige Stummschaltung wiederherstellen"
+        },
+        "data_description": {
+          "snapcast_source": "Name der Ankündigungsquelle",
+          "snapcast_only_source": "Nur Clients auf dieser Quelle verwalten",
+          "snapcast_settle_delay": "Stabilisierungsverzögerung",
+          "snapcast_verify_timeout": "Zeitlimit zur Routing-Prüfung",
+          "snapcast_restore": "Vorherige Stummschaltung wiederherstellen"
+        }
+      },
+      "queue": {
+        "title": "Warteschlange und Zeitlimits",
+        "description": "Ankündigungen und ihre Ausgaben laufen nacheinander. Verfügbare Ausgaben starten sofort; nicht verfügbare oder vorübergehend fehlerhafte Ausgaben teilen sich ein Wiederholungsfenster.",
+        "data": {
+          "dispatch_order": "Kanalreihenfolge",
+          "queue_max": "Maximale Warteschlangenlänge",
+          "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
+          "idle_timeout": "Auf freien Audiopfad warten",
+          "start_timeout": "Zeitlimit für Wiedergabestart",
+          "playback_timeout": "Maximale Wiedergabedauer",
+          "post_play_delay": "Pause zwischen hörbaren Ausgaben"
+        },
+        "data_description": {
+          "dispatch_order": "Kanalreihenfolge",
+          "queue_max": "Maximale Warteschlangenlänge",
+          "output_availability_timeout": "Verfügbare Ausgaben werden sofort bedient. Nicht verfügbare oder fehlgeschlagene Ausgaben werden während dieses Fensters erneut versucht und danach mit dem letzten Fehler protokolliert.",
+          "idle_timeout": "Auf freien Audiopfad warten",
+          "start_timeout": "Zeitlimit für Wiedergabestart",
+          "playback_timeout": "Maximale Wiedergabedauer",
+          "post_play_delay": "Pause zwischen hörbaren Ausgaben"
+        }
+      }
+    },
+    "error": {
+      "tts_player_required": "Wähle einen TTS-Mediaplayer, wenn TTS-Engines ausgewählt sind.",
+      "tts_engine_required": "Wähle mindestens eine TTS-Engine, wenn ein TTS-Mediaplayer ausgewählt ist.",
+      "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
+      "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang."
+    },
+    "abort": {
+      "single_instance_allowed": "Announcement Hub ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "outputs": {
+        "title": "Ausgänge",
+        "description": "Wähle Integrationen, Konfigurationseinträge oder einzelne Entitäten als optische, Snapcast- oder Companion-App-Ausgänge. Die Bereichszuordnung wird automatisch aus Home Assistant übernommen.",
+        "data": {
+          "notify_outputs": "Optische Benachrichtigungsausgänge",
+          "snapcast_outputs": "Snapcast-Audioausgänge",
+          "companion_tts_outputs": "Companion-App-TTS-Ausgänge",
+          "default_title": "Standardtitel",
+          "critical_notify_data": "Daten für kritische Benachrichtigungen"
+        },
+        "data_description": {
+          "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
+          "snapcast_outputs": "Wähle Snapcast-Clients nach Integration, Eintrag oder Entität. Ihre Home-Assistant-Bereiche bestimmen die Raumzuordnung; die Auswahl aktiviert die automatische Stumm-/Lautschaltung.",
+          "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben.",
+          "default_title": "Optionaler Titel für optische Benachrichtigungen.",
+          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden."
+        }
+      },
+      "tts": {
+        "title": "Sprachausgabe",
+        "description": "Konfiguriere die gemeinsame Server-TTS-Wiedergabe und die Mindeststufe für hörbare Meldungen.",
+        "data": {
+          "tts_engines": "TTS-Engines",
+          "tts_media_player": "TTS-Mediaplayer",
+          "tts_min_level": "TTS erst ab Stufe",
+          "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
+          "tts_language": "Standardsprache",
+          "tts_options": "Standard-TTS-Optionen",
+          "companion_tts_media_stream": "Companion-App-Audiostream",
+          "companion_tts_words_per_minute": "Geschätzte Sprechgeschwindigkeit"
+        },
+        "data_description": {
+          "tts_engines": "Wähle eine Integration, einen Eintrag oder einzelne TTS-Entitäten. Sie werden als Ausweichkette verwendet; die erste erfolgreiche Engine spricht.",
+          "tts_media_player": "Der gemeinsame Player für Server-TTS, normalerweise media_player.mpd. Snapcast-Ausgänge verwenden diesen Audiopfad.",
+          "tts_min_level": "Unterhalb dieser Stufe bleibt TTS stumm. Reiner Sprachtext wird stattdessen an optische Ausgänge gesendet. Kritische Meldungen bleiben immer hörbar.",
+          "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
+          "tts_language": "Optionale Sprachüberschreibung für diesen Auftrag.",
+          "tts_options": "Optionale Stimmen- oder Engine-Optionen für diesen Auftrag.",
+          "companion_tts_media_stream": "Optionaler Android-Audiostream für Companion-App-TTS.",
+          "companion_tts_words_per_minute": "Da Push-TTS kein Wiedergabeende meldet, reserviert die Warteschlange anhand dieses Werts genügend Zeit und verhindert Überlappungen."
+        }
+      },
+      "snapcast": {
+        "title": "Snapcast-Raumsteuerung",
+        "description": "Die ausgewählten Snapcast-Clients werden unmittelbar vor jeder Sprachausgabe geroutet und danach wiederhergestellt.",
+        "data": {
+          "snapcast_source": "Name der Ankündigungsquelle",
+          "snapcast_only_source": "Nur Clients auf dieser Quelle verwalten",
+          "snapcast_settle_delay": "Stabilisierungsverzögerung",
+          "snapcast_verify_timeout": "Zeitlimit zur Routing-Prüfung",
+          "snapcast_restore": "Vorherige Stummschaltung wiederherstellen"
+        },
+        "data_description": {
+          "snapcast_source": "Name der Ankündigungsquelle",
+          "snapcast_only_source": "Nur Clients auf dieser Quelle verwalten",
+          "snapcast_settle_delay": "Stabilisierungsverzögerung",
+          "snapcast_verify_timeout": "Zeitlimit zur Routing-Prüfung",
+          "snapcast_restore": "Vorherige Stummschaltung wiederherstellen"
+        }
+      },
+      "queue": {
+        "title": "Warteschlange und Zeitlimits",
+        "description": "Ankündigungen und ihre Ausgaben laufen nacheinander. Verfügbare Ausgaben starten sofort; nicht verfügbare oder vorübergehend fehlerhafte Ausgaben teilen sich ein Wiederholungsfenster.",
+        "data": {
+          "dispatch_order": "Kanalreihenfolge",
+          "queue_max": "Maximale Warteschlangenlänge",
+          "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
+          "idle_timeout": "Auf freien Audiopfad warten",
+          "start_timeout": "Zeitlimit für Wiedergabestart",
+          "playback_timeout": "Maximale Wiedergabedauer",
+          "post_play_delay": "Pause zwischen hörbaren Ausgaben"
+        },
+        "data_description": {
+          "dispatch_order": "Kanalreihenfolge",
+          "queue_max": "Maximale Warteschlangenlänge",
+          "output_availability_timeout": "Verfügbare Ausgaben werden sofort bedient. Nicht verfügbare oder fehlgeschlagene Ausgaben werden während dieses Fensters erneut versucht und danach mit dem letzten Fehler protokolliert.",
+          "idle_timeout": "Auf freien Audiopfad warten",
+          "start_timeout": "Zeitlimit für Wiedergabestart",
+          "playback_timeout": "Maximale Wiedergabedauer",
+          "post_play_delay": "Pause zwischen hörbaren Ausgaben"
+        }
+      }
+    },
+    "error": {
+      "tts_player_required": "Wähle einen TTS-Mediaplayer, wenn TTS-Engines ausgewählt sind.",
+      "tts_engine_required": "Wähle mindestens eine TTS-Engine, wenn ein TTS-Mediaplayer ausgewählt ist.",
+      "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
+      "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang."
+    }
+  },
+  "selector": {
+    "dispatch_order": {
+      "options": {
+        "notify_then_tts": "Zuerst optisch, dann Sprache",
+        "tts_then_notify": "Zuerst Sprache, dann optisch"
+      }
+    },
+    "tts_min_level": {
+      "options": {
+        "critical": "Kritisch",
+        "error": "Fehler",
+        "warning": "Warnung",
+        "info": "Information",
+        "success": "Erfolg",
+        "debug": "Debug",
+        "never": "Nie"
+      }
+    },
+    "companion_tts_media_stream": {
+      "options": {
+        "default": "App-Standard",
+        "music_stream": "Musikstream",
+        "alarm_stream": "Alarmstream",
+        "alarm_stream_max": "Alarmstream mit maximaler Lautstärke"
+      }
+    },
+    "level": {
+      "options": {
+        "critical": "Kritisch",
+        "error": "Fehler",
+        "warning": "Warnung",
+        "info": "Information",
+        "success": "Erfolg",
+        "debug": "Debug"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "queue": {
+        "name": "Warteschlange"
+      }
+    }
+  },
+  "services": {
+    "send": {
+      "name": "Ankündigung senden",
+      "description": "Stellt eine gesprochene und/oder optische Meldung mit optionaler Raum- und Ausgangsauswahl in die serialisierte Warteschlange.",
+      "sections": {
+        "content": {
+          "name": "Inhalt"
+        },
+        "routing": {
+          "name": "Räume und Ausgänge"
+        },
+        "advanced": {
+          "name": "Erweitert"
+        }
+      },
+      "fields": {
+        "text_tts": {
+          "name": "Gesprochener Text",
+          "description": "Text für hörbare Ausgänge. Mindestens gesprochener oder optischer Text ist erforderlich."
+        },
+        "text_notify": {
+          "name": "Optischer Benachrichtigungstext",
+          "description": "Text für sichtbare Benachrichtigungsausgänge. Mindestens gesprochener oder optischer Text ist erforderlich."
+        },
+        "title": {
+          "name": "Benachrichtigungstitel",
+          "description": "Optionaler Titel für optische Benachrichtigungen."
+        },
+        "level": {
+          "name": "Stufe",
+          "description": "Steuert die TTS-Mindeststufe. Kritisch verwendet alle konfigurierten passenden Ausgänge und bleibt hörbar."
+        },
+        "output": {
+          "name": "Ausgabebereiche",
+          "description": "Optional. Leer bedeutet alle konfigurierten Ausgänge. Mit Bereichen werden nur passende oder globale Ausgänge verwendet."
+        },
+        "service": {
+          "name": "Bestimmte Ausgänge",
+          "description": "Optional: Integration, Eintrag, Entität, Dienst oder Alias einschränken, z. B. mobile_app, entry:ID, entity:notify.tv, service:notify.name, tts, notify, snapcast, companion_tts oder all."
+        },
+        "notify_data": {
+          "name": "Benachrichtigungsdaten",
+          "description": "Optionale integrationsspezifische Daten für diese optische Benachrichtigung."
+        },
+        "language": {
+          "name": "TTS-Sprache",
+          "description": "Optionale Sprachüberschreibung für diesen Auftrag."
+        },
+        "tts_options": {
+          "name": "TTS-Optionen",
+          "description": "Optionale Stimmen- oder Engine-Optionen für diesen Auftrag."
+        },
+        "companion_tts": {
+          "name": "Companion-App-TTS verwenden",
+          "description": "Sendet den gesprochenen Text zusätzlich an die konfigurierten Android-Companion-App-TTS-Ausgaben. Standardmäßig aus; die speziellen Aliase companion_tts/all und die Stufe „kritisch“ aktivieren sie ebenfalls."
+        }
+      }
+    },
+    "clear_queue": {
+      "name": "Ankündigungswarteschlange leeren",
+      "description": "Bricht alle wartenden Aufträge ab und kann auch die aktive Ankündigung stoppen.",
+      "fields": {
+        "include_current": {
+          "name": "Aktive Ankündigung einschließen",
+          "description": "Fordert zusätzlich den Abbruch des aktuell laufenden Auftrags an."
+        }
+      }
+    },
+    "cancel": {
+      "name": "Ankündigung abbrechen",
+      "description": "Bricht einen wartenden oder aktiven Auftrag anhand seiner ID ab.",
+      "fields": {
+        "job_id": {
+          "name": "Auftrags-ID",
+          "description": "Die von announcement_hub.send zurückgegebene Auftrags-ID."
+        }
+      }
+    }
+  }
+}
