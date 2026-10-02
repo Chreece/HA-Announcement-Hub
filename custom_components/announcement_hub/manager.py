@@ -236,6 +236,9 @@ class AnnouncementManager:
                 for job_id, task in self._prefetch_tasks.items()
                 if not task.done()
             ),
+            "worker_alive": bool(
+                self._worker_task is not None and not self._worker_task.done()
+            ),
         }
 
     async def async_start(self) -> None:
@@ -306,16 +309,48 @@ class AnnouncementManager:
                 self._last = AnnouncementJob.from_dict(raw_last)
 
         self._running = True
-        self._worker_task = self.entry.async_create_background_task(
-            self.hass,
-            self._async_worker(),
-            f"{DOMAIN} worker",
-        )
+        self._ensure_worker()
         for job in self._queue:
             self._schedule_prefetch(job)
         if self._queue:
             self._wake.set()
         self._notify_update()
+
+    def _ensure_worker(self) -> None:
+        """Ensure exactly one live queue worker exists while the manager runs."""
+        if not self._running:
+            return
+        if self._worker_task is not None and not self._worker_task.done():
+            return
+
+        task = self.entry.async_create_background_task(
+            self.hass,
+            self._async_worker(),
+            f"{DOMAIN} worker",
+        )
+        self._worker_task = task
+
+        def _worker_done(done_task: asyncio.Task[None]) -> None:
+            if self._worker_task is done_task:
+                self._worker_task = None
+            if done_task.cancelled():
+                return
+            error = done_task.exception()
+            if error is not None:
+                _LOGGER.error(
+                    "Announcement Hub queue worker stopped unexpectedly",
+                    exc_info=(type(error), error, error.__traceback__),
+                )
+            if self._running:
+                # A permanent worker must never leave accepted jobs stranded.
+                # Restart on the next loop turn so an unexpected worker failure
+                # cannot recurse synchronously.
+                self.hass.loop.call_soon(self._ensure_worker)
+                if self._queue:
+                    self._wake.set()
+            self._notify_update()
+
+        task.add_done_callback(_worker_done)
 
     async def async_stop(self) -> None:
         """Stop all integration-owned tasks and persist the queue exactly once."""
@@ -364,6 +399,11 @@ class AnnouncementManager:
             self._notify_update()
 
     async def async_update_config(self) -> None:
+        # Options changes must not leave a dead worker behind. This is cheap
+        # when the worker is healthy and self-heals a previously stopped task.
+        self._ensure_worker()
+        if self._queue:
+            self._wake.set()
         self._notify_update()
 
     def _configured_outputs(
@@ -833,6 +873,7 @@ class AnnouncementManager:
         self._queue.append(job)
         self._schedule_prefetch(job)
         self._schedule_save()
+        self._ensure_worker()
         self._wake.set()
         self._fire_event(EVENT_QUEUED, job)
         self._notify_update()

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.2 - 2026-10-02
+
+- Added supervision for the permanent serialized queue worker.
+- Every accepted announcement now verifies that a live worker exists before the
+  wake event is signalled.
+- An unexpectedly stopped worker is logged with its real exception and restarted
+  automatically on the next event-loop turn.
+- Options updates also verify worker health and wake pending work.
+- Exposed worker_alive in diagnostics/status data.
+- The worker remains a ConfigEntry background task; no normal Home Assistant
+  startup-blocking task was introduced.
+
 ## 0.5.1 - 2026-10-02
 
 - Moved occupancy and fallback settings out of the generic Outputs page into a
