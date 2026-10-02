@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - .announcement_hub_source_v0.2.0.tar.gz.b64
+      - .announcement_hub_source_v0.2.0.ready
   workflow_dispatch:
 
 permissions:
@@ -28,8 +28,12 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          test -f .announcement_hub_source_v0.2.0.tar.gz.b64
-          base64 --decode .announcement_hub_source_v0.2.0.tar.gz.b64 > /tmp/announcement_hub_source.tar.gz
+          test -f .announcement_hub_source_v0.2.0.ready
+          shopt -s nullglob
+          parts=(.announcement_hub_source_v0.2.0.tar.gz.b64.part-*)
+          test "${#parts[@]}" -gt 0
+          cat "${parts[@]}" > /tmp/announcement_hub_source.tar.gz.b64
+          base64 --decode /tmp/announcement_hub_source.tar.gz.b64 > /tmp/announcement_hub_source.tar.gz
           echo "d7832e33336574734e00fdf87752d9aa42117ab96f79d32ae58049bef1f2c3e0  /tmp/announcement_hub_source.tar.gz" | sha256sum --check --strict
 
       - name: Materialize repository files
@@ -37,7 +41,8 @@ jobs:
         run: |
           set -Eeuo pipefail
           tar -xzf /tmp/announcement_hub_source.tar.gz -C .
-          rm .announcement_hub_source_v0.2.0.tar.gz.b64
+          rm -f .announcement_hub_source_v0.2.0.ready
+          rm -f .announcement_hub_source_v0.2.0.tar.gz.b64.part-*
 
       - name: Validate source
         shell: bash
