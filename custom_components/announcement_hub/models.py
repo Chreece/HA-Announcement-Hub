@@ -47,6 +47,7 @@ class DeliveryPlan:
 
     tts_engines: tuple[str, ...] = ()
     notify_outputs: tuple[str, ...] = ()
+    room_tts_players: tuple[str, ...] = ()
     snapcast_clients: tuple[str, ...] = ()
     companion_tts_entries: tuple[str, ...] = ()
     tts_text: str | None = None
@@ -63,7 +64,8 @@ class DeliveryPlan:
         if not self.tts_text:
             return False
         return bool(
-            (self.server_tts_enabled and self.tts_engines)
+            self.room_tts_players
+            or (self.server_tts_enabled and self.tts_engines)
             or self.companion_tts_entries
         )
 
@@ -80,6 +82,7 @@ def build_delivery_plan(
     minimum_tts_level: str,
     tts_engines: Sequence[str],
     notify_outputs: Sequence[str],
+    room_tts_players: Sequence[str] = (),
     snapcast_clients: Sequence[str],
     companion_tts_entries: Sequence[str],
     server_tts_enabled: bool,
@@ -102,6 +105,7 @@ def build_delivery_plan(
     return DeliveryPlan(
         tts_engines=_unique(tuple(tts_engines)),
         notify_outputs=_unique(tuple(notify_outputs)),
+        room_tts_players=_unique(tuple(room_tts_players)),
         snapcast_clients=_unique(tuple(snapcast_clients)),
         companion_tts_entries=_unique(tuple(companion_tts_entries)),
         tts_text=tts_text,
@@ -129,6 +133,7 @@ class AnnouncementJob:
     tts_cache: bool
     tts_engines: tuple[str, ...]
     notify_outputs: tuple[str, ...]
+    room_tts_players: tuple[str, ...]
     snapcast_clients: tuple[str, ...]
     companion_tts_entries: tuple[str, ...]
     tts_text: str | None
@@ -136,6 +141,7 @@ class AnnouncementJob:
     server_tts_enabled: bool
     tts_media_player: str | None = None
     tts_player_area: str | None = None
+    room_tts_player_areas: dict[str, str | None] = field(default_factory=dict)
     notify_output_areas: dict[str, str | None] = field(default_factory=dict)
     notify_output_profiles: dict[str, dict[str, Any]] = field(default_factory=dict)
     snapcast_client_areas: dict[str, str | None] = field(default_factory=dict)
@@ -169,6 +175,7 @@ class AnnouncementJob:
         plan: DeliveryPlan,
         tts_media_player: str | None = None,
         tts_player_area: str | None = None,
+        room_tts_player_areas: Mapping[str, str | None] | None = None,
         notify_output_areas: Mapping[str, str | None] | None = None,
         notify_output_profiles: Mapping[str, Mapping[str, Any]] | None = None,
         snapcast_client_areas: Mapping[str, str | None] | None = None,
@@ -191,6 +198,7 @@ class AnnouncementJob:
             tts_cache=bool(tts_cache),
             tts_engines=plan.tts_engines,
             notify_outputs=plan.notify_outputs,
+            room_tts_players=plan.room_tts_players,
             snapcast_clients=plan.snapcast_clients,
             companion_tts_entries=plan.companion_tts_entries,
             tts_text=plan.tts_text,
@@ -198,6 +206,7 @@ class AnnouncementJob:
             server_tts_enabled=plan.server_tts_enabled,
             tts_media_player=tts_media_player or None,
             tts_player_area=tts_player_area or None,
+            room_tts_player_areas=dict(room_tts_player_areas or {}),
             notify_output_areas=dict(notify_output_areas or {}),
             notify_output_profiles={
                 str(key): dict(value)
@@ -219,6 +228,7 @@ class AnnouncementJob:
             "requested_services",
             "tts_engines",
             "notify_outputs",
+            "room_tts_players",
             "snapcast_clients",
             "companion_tts_entries",
         ):
@@ -242,11 +252,13 @@ class AnnouncementJob:
                 for service in payload.pop("notify_services", [])
             ]
             payload["notify_outputs"] = [*entities, *services]
+        payload.setdefault("room_tts_players", [])
         payload.setdefault("snapcast_clients", [])
         payload.setdefault("companion_tts_entries", [])
         payload.setdefault("server_tts_enabled", bool(payload.get("tts_engines")))
         payload.setdefault("tts_media_player", None)
         payload.setdefault("tts_player_area", None)
+        payload.setdefault("room_tts_player_areas", {})
         payload.setdefault("notify_output_areas", {})
         payload.setdefault("notify_output_profiles", {})
         payload.setdefault("snapcast_client_areas", {})
@@ -260,6 +272,7 @@ class AnnouncementJob:
             "requested_services",
             "tts_engines",
             "notify_outputs",
+            "room_tts_players",
             "snapcast_clients",
             "companion_tts_entries",
         ):
@@ -287,10 +300,12 @@ class AnnouncementJob:
             "requested_services": list(self.requested_services),
             "tts_engines": list(self.tts_engines),
             "notify_outputs": list(self.notify_outputs),
+            "room_tts_players": list(self.room_tts_players),
             "snapcast_clients": list(self.snapcast_clients),
             "companion_tts_entries": list(self.companion_tts_entries),
             "tts_media_player": self.tts_media_player,
             "output_area_bindings": {
+                "room_tts": dict(self.room_tts_player_areas),
                 "notify": dict(self.notify_output_areas),
                 "snapcast": dict(self.snapcast_client_areas),
                 "companion_tts": dict(self.companion_tts_entry_areas),

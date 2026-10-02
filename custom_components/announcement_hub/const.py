@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.5.4"
+VERSION: Final = "0.6.0"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -79,6 +79,7 @@ CONF_SNAPCAST_OUTPUTS: Final = "snapcast_outputs"
 CONF_COMPANION_TTS_OUTPUTS: Final = "companion_tts_outputs"
 CONF_TTS_ENGINES: Final = "tts_engines"
 CONF_TTS_MEDIA_PLAYER: Final = "tts_media_player"
+CONF_TTS_ROOM_PLAYERS: Final = "tts_room_players"
 CONF_TTS_CACHE: Final = "tts_cache"
 CONF_TTS_LANGUAGE: Final = "tts_language"
 CONF_TTS_OPTIONS: Final = "tts_options"

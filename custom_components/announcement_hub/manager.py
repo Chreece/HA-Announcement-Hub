@@ -68,6 +68,7 @@ from .const import (
     CONF_TTS_ENGINES,
     CONF_TTS_LANGUAGE,
     CONF_TTS_MEDIA_PLAYER,
+    CONF_TTS_ROOM_PLAYERS,
     CONF_TTS_MIN_LEVEL,
     CONF_TTS_OPTIONS,
     DEFAULT_COMPANION_TTS_MEDIA_STREAM,
@@ -153,6 +154,7 @@ from .outputs import (
     entity_area_id,
     expand_companion_tts_tokens,
     expand_notify_output_tokens,
+    expand_media_player_tokens,
     expand_snapcast_output_tokens,
     expand_tts_engine_tokens,
     mobile_app_webhook_id,
@@ -273,6 +275,11 @@ class AnnouncementManager:
             resolved_notify_outputs = resolve_notify_outputs(
                 self.hass, job.notify_outputs
             )
+            if not job.room_tts_player_areas:
+                job.room_tts_player_areas = {
+                    entity_id: entity_area_id(self.hass, entity_id)
+                    for entity_id in job.room_tts_players
+                }
             if not job.notify_output_areas:
                 job.notify_output_areas = {
                     output.ref: output.area_id
@@ -409,7 +416,13 @@ class AnnouncementManager:
 
     def _configured_outputs(
         self,
-    ) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...], tuple[str, ...]]:
+    ) -> tuple[
+        tuple[str, ...],
+        tuple[str, ...],
+        tuple[str, ...],
+        tuple[str, ...],
+        tuple[str, ...],
+    ]:
         return (
             expand_tts_engine_tokens(
                 self.hass,
@@ -418,6 +431,10 @@ class AnnouncementManager:
             expand_notify_output_tokens(
                 self.hass,
                 self._ensure_list(self.settings.get(CONF_NOTIFY_OUTPUTS, [])),
+            ),
+            expand_media_player_tokens(
+                self.hass,
+                self._ensure_list(self.settings.get(CONF_TTS_ROOM_PLAYERS, [])),
             ),
             expand_snapcast_output_tokens(
                 self.hass,
@@ -438,15 +455,23 @@ class AnnouncementManager:
         level: str,
         tts_engines: Sequence[str],
         notify_outputs: Sequence[str],
+        room_tts_players: Sequence[str],
         snapcast_clients: Sequence[str],
         companion_entries: Sequence[str],
         companion_tts: bool,
-    ) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...], tuple[str, ...]]:
+    ) -> tuple[
+        tuple[str, ...],
+        tuple[str, ...],
+        tuple[str, ...],
+        tuple[str, ...],
+        tuple[str, ...],
+    ]:
         """Resolve optional per-call provider/output restrictions."""
         if level == LEVEL_CRITICAL:
             return (
                 tuple(tts_engines),
                 tuple(notify_outputs),
+                tuple(room_tts_players),
                 tuple(snapcast_clients),
                 tuple(companion_entries),
             )
@@ -454,22 +479,26 @@ class AnnouncementManager:
             return (
                 tuple(tts_engines),
                 tuple(notify_outputs),
+                tuple(room_tts_players),
                 tuple(snapcast_clients),
                 tuple(companion_entries) if companion_tts else (),
             )
 
         configured_tts = set(tts_engines)
         configured_notify = set(notify_outputs)
+        configured_room_tts = set(room_tts_players)
         configured_snapcast = set(snapcast_clients)
         configured_companion = set(companion_entries)
         selected_tts: list[str] = []
         selected_notify: list[str] = []
+        selected_room_tts: list[str] = []
         selected_snapcast: list[str] = []
         selected_companion: list[str] = []
         invalid: list[str] = []
 
-        def select_server_tts() -> None:
+        def select_tts_outputs() -> None:
             selected_tts.extend(tts_engines)
+            selected_room_tts.extend(room_tts_players)
             selected_snapcast.extend(snapcast_clients)
 
         for raw in requested:
@@ -477,12 +506,12 @@ class AnnouncementManager:
             if not token:
                 continue
             if token == PROVIDER_ALL_ALIAS:
-                select_server_tts()
+                select_tts_outputs()
                 selected_notify.extend(notify_outputs)
                 selected_companion.extend(companion_entries)
                 continue
             if token == PROVIDER_TTS_ALIAS:
-                select_server_tts()
+                select_tts_outputs()
                 continue
             if token == PROVIDER_NOTIFY_ALIAS:
                 selected_notify.extend(notify_outputs)
@@ -515,6 +544,10 @@ class AnnouncementManager:
             if canonical_entity in configured_notify:
                 selected_notify.append(canonical_entity)
                 matched = True
+            if raw_entity in configured_room_tts:
+                selected_room_tts.append(raw_entity)
+                selected_tts.extend(tts_engines)
+                matched = True
             if canonical_service in configured_notify:
                 selected_notify.append(canonical_service)
                 matched = True
@@ -546,6 +579,9 @@ class AnnouncementManager:
             expanded_notify = set(
                 expand_notify_output_tokens(self.hass, [selector_token])
             ) & configured_notify
+            expanded_room_tts = set(
+                expand_media_player_tokens(self.hass, [selector_token])
+            ) & configured_room_tts
             expanded_snapcast = set(
                 expand_snapcast_output_tokens(self.hass, [selector_token])
             ) & configured_snapcast
@@ -557,6 +593,10 @@ class AnnouncementManager:
                 matched = True
             if expanded_notify:
                 selected_notify.extend(sorted(expanded_notify))
+                matched = True
+            if expanded_room_tts:
+                selected_room_tts.extend(sorted(expanded_room_tts))
+                selected_tts.extend(tts_engines)
                 matched = True
             if expanded_snapcast:
                 selected_snapcast.extend(sorted(expanded_snapcast))
@@ -588,12 +628,14 @@ class AnnouncementManager:
         # Selecting a server TTS engine chooses the voice/provider, not a room.
         # Preserve the configured Snapcast physical outputs unless the call also
         # narrowed them to one or more concrete clients/entries.
-        if selected_tts and not selected_snapcast:
+        if selected_tts and not selected_room_tts and not selected_snapcast:
+            selected_room_tts.extend(room_tts_players)
             selected_snapcast.extend(snapcast_clients)
 
         return (
             tuple(dict.fromkeys(selected_tts)),
             tuple(dict.fromkeys(selected_notify)),
+            tuple(dict.fromkeys(selected_room_tts)),
             tuple(dict.fromkeys(selected_snapcast)),
             tuple(dict.fromkeys(selected_companion)),
         )
@@ -654,8 +696,9 @@ class AnnouncementManager:
             level=level,
             tts_engines=configured[0],
             notify_outputs=configured[1],
-            snapcast_clients=configured[2],
-            companion_entries=configured[3],
+            room_tts_players=configured[2],
+            snapcast_clients=configured[3],
+            companion_entries=configured[4],
             companion_tts=bool(companion_tts),
         )
         minimum_tts_level = str(
@@ -669,14 +712,21 @@ class AnnouncementManager:
             # A caller may explicitly request an audible path, but the configured
             # level policy wins. Fall back to the configured visual outputs rather
             # than rejecting or silently dropping the announcement.
-            selected = (selected[0], configured[1], selected[2], selected[3])
+            selected = (
+                selected[0],
+                configured[1],
+                selected[2],
+                selected[3],
+                selected[4],
+            )
 
         player_value = self.settings.get(CONF_TTS_MEDIA_PLAYER)
         player = str(player_value) if player_value else None
         base_selected = selected
         all_notify_records = resolve_notify_outputs(self.hass, base_selected[1])
+        all_room_tts_players = tuple(base_selected[2])
         all_companion_records = resolve_companion_tts_outputs(
-            self.hass, base_selected[3]
+            self.hass, base_selected[4]
         )
 
         def routed_plan(
@@ -684,7 +734,13 @@ class AnnouncementManager:
             *,
             filter_by_area: bool,
         ) -> tuple[
-            tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...], tuple[str, ...]],
+            tuple[
+                tuple[str, ...],
+                tuple[str, ...],
+                tuple[str, ...],
+                tuple[str, ...],
+                tuple[str, ...],
+            ],
             tuple[NotifyOutput, ...],
             tuple[CompanionTTSOutput, ...],
             Any,
@@ -697,9 +753,17 @@ class AnnouncementManager:
                     if output.area_id is not None
                     and output.area_id in effective_areas
                 )
+                routed_room_tts = tuple(
+                    entity_id
+                    for entity_id in all_room_tts_players
+                    if (
+                        area_id := entity_area_id(self.hass, entity_id)
+                    ) is not None
+                    and area_id in effective_areas
+                )
                 routed_snapcast = tuple(
                     entity_id
-                    for entity_id in base_selected[2]
+                    for entity_id in base_selected[3]
                     if (
                         area_id := entity_area_id(self.hass, entity_id)
                     ) is not None
@@ -714,6 +778,7 @@ class AnnouncementManager:
                 routed_selected = (
                     base_selected[0],
                     tuple(output.ref for output in routed_notify),
+                    routed_room_tts,
                     routed_snapcast,
                     tuple(output.entry_id for output in routed_companion),
                 )
@@ -722,18 +787,12 @@ class AnnouncementManager:
                 routed_companion = all_companion_records
                 routed_selected = base_selected
 
+            # The shared server player is global infrastructure. In
+            # occupancy-aware mode its physical room candidates are the routing
+            # clients, never the shared player itself.
             server_tts_enabled = bool(player and routed_selected[0])
             if filter_by_area and server_tts_enabled:
-                if configured[2]:
-                    server_tts_enabled = bool(routed_selected[2])
-                else:
-                    player_area = (
-                        entity_area_id(self.hass, player) if player else None
-                    )
-                    server_tts_enabled = (
-                        player_area is not None
-                        and player_area in set(area_ids)
-                    )
+                server_tts_enabled = bool(routed_selected[3])
 
             route_plan = build_delivery_plan(
                 text_tts=text_tts,
@@ -742,8 +801,9 @@ class AnnouncementManager:
                 minimum_tts_level=minimum_tts_level,
                 tts_engines=routed_selected[0],
                 notify_outputs=routed_selected[1],
-                snapcast_clients=routed_selected[2],
-                companion_tts_entries=routed_selected[3],
+                room_tts_players=routed_selected[2],
+                snapcast_clients=routed_selected[3],
+                companion_tts_entries=routed_selected[4],
                 server_tts_enabled=server_tts_enabled,
             )
             return (
@@ -794,9 +854,13 @@ class AnnouncementManager:
             )
             for output in notify_records
         }
-        snapcast_client_areas = {
+        room_tts_player_areas = {
             entity_id: entity_area_id(self.hass, entity_id)
             for entity_id in selected[2]
+        }
+        snapcast_client_areas = {
+            entity_id: entity_area_id(self.hass, entity_id)
+            for entity_id in selected[3]
         }
         companion_tts_entry_areas = {
             output.entry_id: output.area_id for output in companion_records
@@ -852,9 +916,8 @@ class AnnouncementManager:
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
             tts_media_player=player,
-            tts_player_area=(
-                entity_area_id(self.hass, player) if player else None
-            ),
+            tts_player_area=None,
+            room_tts_player_areas=room_tts_player_areas,
             notify_output_areas=notify_output_areas,
             notify_output_profiles=notify_output_profiles,
             snapcast_client_areas=snapcast_client_areas,
@@ -1031,6 +1094,29 @@ class AnnouncementManager:
             )
         )
 
+    def _job_has_ready_room_tts(self, job: AnnouncementJob) -> bool:
+        """Return whether an area-bound direct TTS player can run now."""
+        if not job.tts_text or not job.room_tts_players:
+            return False
+        if not any(
+            tts_engine_available(self.hass, engine)
+            for engine in job.tts_engines
+        ):
+            return False
+        for player in job.room_tts_players:
+            area_id = job.room_tts_player_areas.get(
+                player, entity_area_id(self.hass, player)
+            )
+            if job.outputs and area_id not in set(job.outputs):
+                continue
+            state = self.hass.states.get(player)
+            if state is not None and state.state not in {
+                STATE_UNAVAILABLE,
+                STATE_UNKNOWN,
+            }:
+                return True
+        return False
+
     def _job_has_ready_server_tts(self, job: AnnouncementJob) -> bool:
         """Check global TTS infrastructure plus area-bound physical outputs.
 
@@ -1068,6 +1154,7 @@ class AnnouncementManager:
         """Return whether at least one frozen delivery channel can run now."""
         return (
             self._job_has_ready_visual_output(job)
+            or self._job_has_ready_room_tts(job)
             or self._job_has_ready_server_tts(job)
             or self._job_has_ready_companion_tts(job)
         )
@@ -1476,6 +1563,9 @@ class AnnouncementManager:
         if not job.tts_text:
             return
 
+        if job.room_tts_players and job.tts_engines:
+            await self._async_send_room_tts(job)
+
         if job.server_tts_enabled and job.tts_engines:
             try:
                 await self._async_send_server_tts(job)
@@ -1490,6 +1580,106 @@ class AnnouncementManager:
 
         if job.companion_tts_entries:
             await self._async_send_companion_tts(job)
+
+    async def _async_send_room_tts(self, job: AnnouncementJob) -> None:
+        """Speak directly on area-bound media players using the TTS engine chain."""
+        players = [
+            player
+            for player in job.room_tts_players
+            if not job.outputs
+            or job.room_tts_player_areas.get(
+                player, entity_area_id(self.hass, player)
+            )
+            in set(job.outputs)
+        ]
+        if not players:
+            return
+
+        async def available(player: str) -> bool:
+            state = self.hass.states.get(player)
+            return state is not None and state.state not in {
+                STATE_UNAVAILABLE,
+                STATE_UNKNOWN,
+            }
+
+        async def deliver(player: str) -> None:
+            self._active_tts_player = player
+            await self._await_prefetch(job)
+            idle_timeout = float(
+                self.settings.get(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT)
+            )
+            await self._wait_audio_path_idle(player, idle_timeout, job)
+            engines = await self._async_available_tts_engines(job)
+            if not engines:
+                return
+            errors: list[str] = []
+            for engine in engines:
+                channel = f"room_tts:{player}:{engine}"
+                self._fire_channel_event(EVENT_CHANNEL_STARTED, job, channel)
+                try:
+                    media_source_id = job.media_source_ids.get(engine)
+                    if not media_source_id:
+                        media_source_id = self._build_media_source_id(job, engine)
+                        job.media_source_ids[engine] = media_source_id
+                    await self._async_play_media_source(
+                        job, player, media_source_id, ()
+                    )
+                except JobCancelled:
+                    raise
+                except asyncio.CancelledError:
+                    raise
+                except Exception as err:  # noqa: BLE001
+                    errors.append(f"{engine}: {err}")
+                    await self._async_stop_player(player)
+                    self._record_channel_failure(job, channel, err)
+                    continue
+                self._record_channel_success(job, channel)
+                return
+            raise HomeAssistantError(
+                f"Every selected TTS engine failed on {player}: "
+                + "; ".join(errors)
+            )
+
+        pending = list(players)
+        timeout = self._availability_timeout
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timeout
+        while pending:
+            self._raise_if_cancelled(job)
+            ready = [
+                player
+                for player in pending
+                if (
+                    (state := self.hass.states.get(player)) is not None
+                    and state.state not in {STATE_UNAVAILABLE, STATE_UNKNOWN}
+                )
+            ]
+            for player in ready:
+                try:
+                    await deliver(player)
+                except JobCancelled:
+                    raise
+                except asyncio.CancelledError:
+                    raise
+                except Exception as err:  # noqa: BLE001
+                    _LOGGER.debug(
+                        "Direct room TTS output %s failed during availability window: %s",
+                        player,
+                        err,
+                    )
+                    continue
+                pending.remove(player)
+            if not pending or timeout <= 0 or loop.time() >= deadline:
+                break
+            await asyncio.sleep(min(0.1, max(0.0, deadline - loop.time())))
+
+        if pending:
+            _LOGGER.debug(
+                "Announcement %s skipped unavailable direct TTS player(s) after %ss: %s",
+                job.job_id,
+                f"{timeout:g}",
+                pending,
+            )
 
     async def _async_send_server_tts(self, job: AnnouncementJob) -> None:
         player = job.tts_media_player
@@ -1519,16 +1709,6 @@ class AnnouncementManager:
             return
 
         if not job.snapcast_clients:
-            player_area = job.tts_player_area
-            if job.outputs and player_area is not None and player_area not in set(
-                job.outputs
-            ):
-                self._record_channel_failure(
-                    job,
-                    f"player:{player}",
-                    "The TTS media player does not belong to the requested area",
-                )
-                return
             if not await self._async_wait_player_available(player, job):
                 return
             await self._async_play_server_round(
@@ -2072,7 +2252,11 @@ class AnnouncementManager:
             )
 
     def _schedule_prefetch(self, job: AnnouncementJob) -> None:
-        if not job.tts_text or not job.server_tts_enabled or not job.tts_engines:
+        if (
+            not job.tts_text
+            or not job.tts_engines
+            or not (job.server_tts_enabled or job.room_tts_players)
+        ):
             return
         if not job.tts_cache or job.job_id in self._prefetch_tasks:
             return

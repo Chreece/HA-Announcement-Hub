@@ -42,6 +42,7 @@ from .const import (
     CONF_TTS_ENGINES,
     CONF_TTS_LANGUAGE,
     CONF_TTS_MEDIA_PLAYER,
+    CONF_TTS_ROOM_PLAYERS,
     CONF_TTS_MIN_LEVEL,
     CONF_TTS_OPTIONS,
     DEFAULT_COMPANION_TTS_MEDIA_STREAM,
@@ -156,7 +157,6 @@ class _AnnouncementFlowMixin:
                 user_input,
                 {
                     CONF_NOTIFY_OUTPUTS: [],
-                    CONF_SNAPCAST_OUTPUTS: [],
                     CONF_COMPANION_TTS_OUTPUTS: [],
                     CONF_DEFAULT_TITLE: DEFAULT_TITLE,
                     CONF_CRITICAL_NOTIFY_DATA: {},
@@ -171,10 +171,6 @@ class _AnnouncementFlowMixin:
                     CONF_NOTIFY_OUTPUTS,
                     default=self._value(CONF_NOTIFY_OUTPUTS, []),
                 ): _multi_select(notify_output_options(self.hass)),
-                probatio.Optional(
-                    CONF_SNAPCAST_OUTPUTS,
-                    default=self._value(CONF_SNAPCAST_OUTPUTS, []),
-                ): _multi_select(snapcast_output_options(self.hass)),
                 probatio.Optional(
                     CONF_COMPANION_TTS_OUTPUTS,
                     default=self._value(CONF_COMPANION_TTS_OUTPUTS, []),
@@ -399,20 +395,23 @@ class _AnnouncementFlowMixin:
         errors: dict[str, str] = {}
         if user_input is not None:
             engines = list(user_input.get(CONF_TTS_ENGINES, []))
+            room_players = list(user_input.get(CONF_TTS_ROOM_PLAYERS, []))
             player = user_input.get(CONF_TTS_MEDIA_PLAYER)
-            snapcast = list(self._working.get(CONF_SNAPCAST_OUTPUTS, []))
-            if engines and not player:
+            snapcast = list(user_input.get(CONF_SNAPCAST_OUTPUTS, []))
+            if engines and not (room_players or player):
                 errors["base"] = "tts_player_required"
-            elif player and not engines:
+            elif (room_players or player or snapcast) and not engines:
                 errors["base"] = "tts_engine_required"
-            elif snapcast and (not engines or not player):
+            elif snapcast and not player:
                 errors["base"] = "snapcast_tts_path_required"
             else:
                 self._store_step(
                     user_input,
                     {
                         CONF_TTS_ENGINES: [],
+                        CONF_TTS_ROOM_PLAYERS: [],
                         CONF_TTS_MEDIA_PLAYER: None,
+                        CONF_SNAPCAST_OUTPUTS: [],
                         CONF_TTS_MIN_LEVEL: DEFAULT_TTS_MIN_LEVEL,
                         CONF_TTS_CACHE: DEFAULT_TTS_CACHE,
                         CONF_TTS_LANGUAGE: DEFAULT_TTS_LANGUAGE,
@@ -431,12 +430,25 @@ class _AnnouncementFlowMixin:
                     CONF_TTS_ENGINES,
                     default=self._value(CONF_TTS_ENGINES, []),
                 ): _multi_select(tts_engine_options(self.hass)),
+                probatio.Optional(
+                    CONF_TTS_ROOM_PLAYERS,
+                    default=self._value(CONF_TTS_ROOM_PLAYERS, []),
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain="media_player",
+                        multiple=True,
+                    )
+                ),
                 _optional_marker(
                     CONF_TTS_MEDIA_PLAYER,
                     self._value(CONF_TTS_MEDIA_PLAYER, None),
                 ): selector.EntitySelector(
                     selector.EntitySelectorConfig(domain="media_player")
                 ),
+                probatio.Optional(
+                    CONF_SNAPCAST_OUTPUTS,
+                    default=self._value(CONF_SNAPCAST_OUTPUTS, []),
+                ): _multi_select(snapcast_output_options(self.hass)),
                 probatio.Required(
                     CONF_TTS_MIN_LEVEL,
                     default=self._value(

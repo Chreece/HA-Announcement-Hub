@@ -41,6 +41,7 @@ from .const import (
     CONF_SNAPCAST_OUTPUTS,
     CONF_TTS_ENGINES,
     CONF_TTS_MIN_LEVEL,
+    CONF_TTS_ROOM_PLAYERS,
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_OCCUPIED_ONLY,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
@@ -204,6 +205,7 @@ def _migrate_v1_settings(settings: dict[str, Any]) -> dict[str, Any]:
     ]
     migrated[CONF_SNAPCAST_OUTPUTS] = _entity_refs(snapcast_entities)
     migrated.setdefault(CONF_COMPANION_TTS_OUTPUTS, [])
+    migrated.setdefault(CONF_TTS_ROOM_PLAYERS, [])
     migrated.setdefault(CONF_NOTIFY_PROFILES, {})
     migrated.setdefault(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
     migrated.setdefault(
@@ -267,6 +269,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             "outputs": list(job.outputs),
             "tts_engines": list(job.tts_engines),
             "notify_outputs": list(job.notify_outputs),
+            "room_tts_players": list(job.room_tts_players),
             "snapcast_clients": list(job.snapcast_clients),
             "companion_tts_entries": list(job.companion_tts_entries),
             "tts_suppressed_by_level": job.tts_suppressed_by_level,

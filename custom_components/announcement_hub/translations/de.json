@@ -7,25 +7,25 @@
         "description": "Wähle Integrationen, Konfigurationseinträge oder einzelne Entitäten als optische, Snapcast- oder Companion-App-Ausgänge. Die Bereichszuordnung wird automatisch aus Home Assistant übernommen.",
         "data": {
           "notify_outputs": "Optische Benachrichtigungsausgänge",
-          "snapcast_outputs": "Snapcast-Audioausgänge",
           "companion_tts_outputs": "Companion-App-TTS-Ausgänge",
           "default_title": "Standardtitel",
           "critical_notify_data": "Daten für kritische Benachrichtigungen"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
-          "snapcast_outputs": "Wähle Snapcast-Clients nach Integration, Eintrag oder Entität. Ihre Home-Assistant-Bereiche bestimmen die Raumzuordnung; die Auswahl aktiviert die automatische Stumm-/Lautschaltung.",
           "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben.",
           "default_title": "Optionaler Titel für optische Benachrichtigungen.",
           "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden."
         }
       },
       "tts": {
-        "title": "Sprachausgabe",
-        "description": "Konfiguriere die gemeinsame Server-TTS-Wiedergabe und die Mindeststufe für hörbare Meldungen.",
+        "title": "Text-zu-Sprache-Routing",
+        "description": "Wähle die TTS-Engine und trenne direkte Raumausgabe vom gemeinsamen synchronisierten Serverpfad.",
         "data": {
           "tts_engines": "TTS-Engines",
+          "tts_room_players": "Direkte TTS-Mediaplayer pro Raum",
           "tts_media_player": "TTS-Mediaplayer",
+          "snapcast_outputs": "Synchronisierte Raum-Routing-Player (Snapcast)",
           "tts_min_level": "TTS erst ab Stufe",
           "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
           "tts_language": "Standardsprache",
@@ -35,13 +35,15 @@
         },
         "data_description": {
           "tts_engines": "Wähle eine Integration, einen Eintrag oder einzelne TTS-Entitäten. Sie werden als Ausweichkette verwendet; die erste erfolgreiche Engine spricht.",
-          "tts_media_player": "Der gemeinsame Player für Server-TTS, normalerweise media_player.mpd. Snapcast-Ausgänge verwenden diesen Audiopfad.",
+          "tts_media_player": "Globaler Transport-Player wie MPD. Er speist den synchronisierten Audioserver und wird niemals nach Bereich gefiltert.",
           "tts_min_level": "Unterhalb dieser Stufe bleibt TTS stumm. Reiner Sprachtext wird stattdessen an optische Ausgänge gesendet. Kritische Meldungen bleiben immer hörbar.",
           "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
           "tts_language": "Optionale Sprachüberschreibung für diesen Auftrag.",
           "tts_options": "Optionale Stimmen- oder Engine-Optionen für diesen Auftrag.",
           "companion_tts_media_stream": "Optionaler Android-Audiostream für Companion-App-TTS.",
-          "companion_tts_words_per_minute": "Da Push-TTS kein Wiedergabeende meldet, reserviert die Warteschlange anhand dieses Werts genügend Zeit und verhindert Überlappungen."
+          "companion_tts_words_per_minute": "Da Push-TTS kein Wiedergabeende meldet, reserviert die Warteschlange anhand dieses Werts genügend Zeit und verhindert Überlappungen.",
+          "tts_room_players": "Bereichsgebundene Mediaplayer (z. B. Sprachassistenten/Lautsprecher), die das erzeugte TTS direkt wiedergeben. Die Belegung filtert diese Player nach ihrem Home-Assistant-Bereich.",
+          "snapcast_outputs": "Bereichsgebundene Snapcast-Clients, die vom gemeinsamen Server-Player gespeist werden. Announcement Hub spielt TTS nicht direkt auf ihnen ab, sondern verwaltet nur Mute/Routing."
         }
       },
       "snapcast": {
@@ -163,25 +165,25 @@
         "description": "Wähle Integrationen, Konfigurationseinträge oder einzelne Entitäten als optische, Snapcast- oder Companion-App-Ausgänge. Die Bereichszuordnung wird automatisch aus Home Assistant übernommen.",
         "data": {
           "notify_outputs": "Optische Benachrichtigungsausgänge",
-          "snapcast_outputs": "Snapcast-Audioausgänge",
           "companion_tts_outputs": "Companion-App-TTS-Ausgänge",
           "default_title": "Standardtitel",
           "critical_notify_data": "Daten für kritische Benachrichtigungen"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
-          "snapcast_outputs": "Wähle Snapcast-Clients nach Integration, Eintrag oder Entität. Ihre Home-Assistant-Bereiche bestimmen die Raumzuordnung; die Auswahl aktiviert die automatische Stumm-/Lautschaltung.",
           "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben.",
           "default_title": "Optionaler Titel für optische Benachrichtigungen.",
           "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden."
         }
       },
       "tts": {
-        "title": "Sprachausgabe",
-        "description": "Konfiguriere die gemeinsame Server-TTS-Wiedergabe und die Mindeststufe für hörbare Meldungen.",
+        "title": "Text-zu-Sprache-Routing",
+        "description": "Wähle die TTS-Engine und trenne direkte Raumausgabe vom gemeinsamen synchronisierten Serverpfad.",
         "data": {
           "tts_engines": "TTS-Engines",
+          "tts_room_players": "Direkte TTS-Mediaplayer pro Raum",
           "tts_media_player": "TTS-Mediaplayer",
+          "snapcast_outputs": "Synchronisierte Raum-Routing-Player (Snapcast)",
           "tts_min_level": "TTS erst ab Stufe",
           "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
           "tts_language": "Standardsprache",
@@ -191,13 +193,15 @@
         },
         "data_description": {
           "tts_engines": "Wähle eine Integration, einen Eintrag oder einzelne TTS-Entitäten. Sie werden als Ausweichkette verwendet; die erste erfolgreiche Engine spricht.",
-          "tts_media_player": "Der gemeinsame Player für Server-TTS, normalerweise media_player.mpd. Snapcast-Ausgänge verwenden diesen Audiopfad.",
+          "tts_media_player": "Globaler Transport-Player wie MPD. Er speist den synchronisierten Audioserver und wird niemals nach Bereich gefiltert.",
           "tts_min_level": "Unterhalb dieser Stufe bleibt TTS stumm. Reiner Sprachtext wird stattdessen an optische Ausgänge gesendet. Kritische Meldungen bleiben immer hörbar.",
           "tts_cache": "Sprache vorab erzeugen und zwischenspeichern",
           "tts_language": "Optionale Sprachüberschreibung für diesen Auftrag.",
           "tts_options": "Optionale Stimmen- oder Engine-Optionen für diesen Auftrag.",
           "companion_tts_media_stream": "Optionaler Android-Audiostream für Companion-App-TTS.",
-          "companion_tts_words_per_minute": "Da Push-TTS kein Wiedergabeende meldet, reserviert die Warteschlange anhand dieses Werts genügend Zeit und verhindert Überlappungen."
+          "companion_tts_words_per_minute": "Da Push-TTS kein Wiedergabeende meldet, reserviert die Warteschlange anhand dieses Werts genügend Zeit und verhindert Überlappungen.",
+          "tts_room_players": "Bereichsgebundene Mediaplayer (z. B. Sprachassistenten/Lautsprecher), die das erzeugte TTS direkt wiedergeben. Die Belegung filtert diese Player nach ihrem Home-Assistant-Bereich.",
+          "snapcast_outputs": "Bereichsgebundene Snapcast-Clients, die vom gemeinsamen Server-Player gespeist werden. Announcement Hub spielt TTS nicht direkt auf ihnen ab, sondern verwaltet nur Mute/Routing."
         }
       },
       "snapcast": {

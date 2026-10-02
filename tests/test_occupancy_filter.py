@@ -21,7 +21,7 @@ def test_occupancy_filter_is_applied_before_job_is_frozen() -> None:
     assert "occupancy_filter_active = occupied_area_ids is not None" in manager
     assert "output.area_id is not None" in manager
     assert "output.area_id in effective_areas" in manager
-    assert "server_tts_enabled = bool(routed_selected[2])" in manager
+    assert "server_tts_enabled = bool(routed_selected[3])" in manager
     assert "if not plan.has_output and not occupancy_filter_active:" in manager
 
 

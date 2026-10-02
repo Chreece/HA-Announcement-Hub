@@ -421,6 +421,13 @@ def expand_tts_engine_tokens(
     return _expand_entity_tokens(hass, tokens, entity_domain="tts")
 
 
+def expand_media_player_tokens(
+    hass: HomeAssistant, tokens: Sequence[str]
+) -> tuple[str, ...]:
+    """Expand integration/entry/entity selectors to media-player entities."""
+    return _expand_entity_tokens(hass, tokens, entity_domain="media_player")
+
+
 def expand_snapcast_output_tokens(
     hass: HomeAssistant, tokens: Sequence[str]
 ) -> tuple[str, ...]:

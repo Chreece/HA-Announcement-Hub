@@ -7,25 +7,25 @@
         "description": "Select integrations, specific config entries, or individual entities as visual, Snapcast, or Companion App outputs. Their Home Assistant area is detected automatically.",
         "data": {
           "notify_outputs": "Visual notification outputs",
-          "snapcast_outputs": "Snapcast audio outputs",
           "companion_tts_outputs": "Companion App TTS outputs",
           "default_title": "Default title",
           "critical_notify_data": "Critical notification data"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
-          "snapcast_outputs": "Select Snapcast clients by integration, entry, or entity. Their Home Assistant areas determine room routing; selecting them enables automatic mute/unmute routing.",
           "companion_tts_outputs": "Optional. Select the Android Companion App devices that may be used for push TTS. Ordinary calls still require the Companion App TTS service option; critical calls use every configured matching output.",
           "default_title": "Optional title for visual notifications.",
           "critical_notify_data": "Optional integration-specific data merged into critical visual notifications."
         }
       },
       "tts": {
-        "title": "Text-to-speech",
-        "description": "Configure the shared server TTS path and the minimum level for audible announcements.",
+        "title": "Text-to-speech routing",
+        "description": "Choose the TTS engine and keep direct room playback separate from the shared synchronized-server path.",
         "data": {
           "tts_engines": "TTS engines",
+          "tts_room_players": "Direct room TTS media players",
           "tts_media_player": "TTS media player",
+          "snapcast_outputs": "Synchronized room routing players (Snapcast)",
           "tts_min_level": "Use TTS from level",
           "tts_cache": "Pre-generate and cache speech",
           "tts_language": "Default language",
@@ -35,13 +35,15 @@
         },
         "data_description": {
           "tts_engines": "Select an integration, entry, or individual TTS entities. They are a fallback chain: the first engine that succeeds speaks the message.",
-          "tts_media_player": "The shared player for server TTS, normally media_player.mpd. Snapcast outputs use this audio path.",
+          "tts_media_player": "Global transport player such as MPD. It feeds the synchronized audio server and is never area-filtered.",
           "tts_min_level": "Below this level, TTS stays muted. Spoken-only text is sent to visual outputs instead. Critical announcements always remain audible.",
           "tts_cache": "Pre-generate and cache speech",
           "tts_language": "Optional language override for this job.",
           "tts_options": "Optional voice or engine options for this job.",
           "companion_tts_media_stream": "Optional Android audio stream for Companion App TTS.",
-          "companion_tts_words_per_minute": "Push TTS does not report playback completion, so the queue reserves time using this estimate to prevent overlap."
+          "companion_tts_words_per_minute": "Push TTS does not report playback completion, so the queue reserves time using this estimate to prevent overlap.",
+          "tts_room_players": "Area-bound media players (for example voice assistants/speakers) that receive the generated TTS directly. Occupancy filters these players by their Home Assistant area.",
+          "snapcast_outputs": "Area-bound Snapcast clients fed by the shared server player. Announcement Hub does not play TTS directly on them; it only manages their mute/routing state."
         }
       },
       "snapcast": {
@@ -163,25 +165,25 @@
         "description": "Select integrations, specific config entries, or individual entities as visual, Snapcast, or Companion App outputs. Their Home Assistant area is detected automatically.",
         "data": {
           "notify_outputs": "Visual notification outputs",
-          "snapcast_outputs": "Snapcast audio outputs",
           "companion_tts_outputs": "Companion App TTS outputs",
           "default_title": "Default title",
           "critical_notify_data": "Critical notification data"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
-          "snapcast_outputs": "Select Snapcast clients by integration, entry, or entity. Their Home Assistant areas determine room routing; selecting them enables automatic mute/unmute routing.",
           "companion_tts_outputs": "Optional. Select the Android Companion App devices that may be used for push TTS. Ordinary calls still require the Companion App TTS service option; critical calls use every configured matching output.",
           "default_title": "Optional title for visual notifications.",
           "critical_notify_data": "Optional integration-specific data merged into critical visual notifications."
         }
       },
       "tts": {
-        "title": "Text-to-speech",
-        "description": "Configure the shared server TTS path and the minimum level for audible announcements.",
+        "title": "Text-to-speech routing",
+        "description": "Choose the TTS engine and keep direct room playback separate from the shared synchronized-server path.",
         "data": {
           "tts_engines": "TTS engines",
+          "tts_room_players": "Direct room TTS media players",
           "tts_media_player": "TTS media player",
+          "snapcast_outputs": "Synchronized room routing players (Snapcast)",
           "tts_min_level": "Use TTS from level",
           "tts_cache": "Pre-generate and cache speech",
           "tts_language": "Default language",
@@ -191,13 +193,15 @@
         },
         "data_description": {
           "tts_engines": "Select an integration, entry, or individual TTS entities. They are a fallback chain: the first engine that succeeds speaks the message.",
-          "tts_media_player": "The shared player for server TTS, normally media_player.mpd. Snapcast outputs use this audio path.",
+          "tts_media_player": "Global transport player such as MPD. It feeds the synchronized audio server and is never area-filtered.",
           "tts_min_level": "Below this level, TTS stays muted. Spoken-only text is sent to visual outputs instead. Critical announcements always remain audible.",
           "tts_cache": "Pre-generate and cache speech",
           "tts_language": "Optional language override for this job.",
           "tts_options": "Optional voice or engine options for this job.",
           "companion_tts_media_stream": "Optional Android audio stream for Companion App TTS.",
-          "companion_tts_words_per_minute": "Push TTS does not report playback completion, so the queue reserves time using this estimate to prevent overlap."
+          "companion_tts_words_per_minute": "Push TTS does not report playback completion, so the queue reserves time using this estimate to prevent overlap.",
+          "tts_room_players": "Area-bound media players (for example voice assistants/speakers) that receive the generated TTS directly. Occupancy filters these players by their Home Assistant area.",
+          "snapcast_outputs": "Area-bound Snapcast clients fed by the shared server player. Announcement Hub does not play TTS directly on them; it only manages their mute/routing state."
         }
       },
       "snapcast": {

@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.6.0 - 2026-10-02
+
+- Split server/direct TTS setup into three explicit roles.
+- Added area-bound direct room TTS media players for voice assistants and
+  speakers that should receive generated TTS directly.
+- Renamed the existing TTS media-player concept in the UI to the shared TTS
+  server media player. It is global infrastructure (for example MPD feeding a
+  Snapserver stream) and is never area-filtered.
+- Moved Snapcast client selection into the TTS routing page and labelled those
+  clients as synchronized room-routing players. They remain physical room
+  candidates, but Announcement Hub sends no TTS/play-media command to them;
+  it manages only mute/routing while the shared player feeds the stream.
+- Direct room TTS players are frozen with their Home Assistant areas in each
+  queued job and participate in occupancy/readiness scheduling.
+- Existing MPD + Snapcast configurations remain compatible.
+- No new long-lived tasks were introduced.
+
 ## 0.5.4 - 2026-10-02
 
 - Fixed first-use server-TTS readiness deadlock.
