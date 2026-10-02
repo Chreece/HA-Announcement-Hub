@@ -303,6 +303,67 @@ for rel,spec in locales.items():
         # title is no longer visual/optical.
     path.write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
 
+# Enrich every provider-specific visual field with concrete runtime help.
+extra_help = {
+    "strings.json": {
+        "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
+        "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
+        "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
+        "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
+        "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
+        "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
+        "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
+        "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
+        "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
+        "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
+        "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
+        "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
+        "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
+        "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
+    },
+    "translations/en.json": {},
+    "translations/de.json": {
+        "max_length": "Maximale Zeichenzahl pro visueller Benachrichtigung. Längerer Text wird an natürlichen Grenzen geteilt; 0 deaktiviert die Aufteilung.",
+        "reading_words_per_minute": "Lesegeschwindigkeit zur Berechnung, wie lange jeder Teil einer visuellen Benachrichtigung angezeigt bleibt.",
+        "minimum_display_seconds": "Untergrenze für die berechnete Anzeigedauer jedes Benachrichtigungsteils, auch bei sehr kurzem Text.",
+        "maximum_display_seconds": "Obergrenze für die berechnete Anzeigedauer, damit lange Meldungen die Queue nicht unbegrenzt blockieren.",
+        "display_buffer_seconds": "Zusätzliche Sekunden, die bei jedem Benachrichtigungsteil zur berechneten Lesezeit addiert werden.",
+        "part_gap_seconds": "Pause zwischen geteilten Benachrichtigungsteilen, damit der vorherige Teil sauber verschwinden kann.",
+        "show_part_number": "Fügt bei geteilten Meldungen Zähler wie 1/3 und 2/3 zum Benachrichtigungstitel hinzu.",
+        "integration_data": "Optionale providerspezifische Nutzdaten für jede visuelle Benachrichtigung dieser Integration. notify_data des Aufrufs überschreibt gleiche Schlüssel.",
+        "replace_parts": "Bei geteilten Companion-App-Meldungen wird derselbe Tag verwendet, sodass jeder neue Teil den vorherigen ersetzt.",
+        "position": "Bildschirmposition der Einblendung von Notifications for Android TV / Fire TV.",
+        "fontsize": "Textgröße der Einblendung von Notifications for Android TV / Fire TV.",
+        "color": "Hintergrundfarbe der Einblendung von Notifications for Android TV / Fire TV.",
+        "transparency": "Hintergrundtransparenz der Einblendung von Notifications for Android TV / Fire TV.",
+        "interrupt": "Macht die Android-TV-Benachrichtigung interaktiv und kann der aktuell laufenden TV-App den Fokus nehmen.",
+    },
+    "translations/el.json": {
+        "max_length": "Μέγιστος αριθμός χαρακτήρων σε ένα τμήμα οπτικής ειδοποίησης. Μεγαλύτερο κείμενο χωρίζεται σε φυσικά σημεία· το 0 απενεργοποιεί τον διαχωρισμό.",
+        "reading_words_per_minute": "Ταχύτητα ανάγνωσης που χρησιμοποιείται για να υπολογιστεί πόσο θα παραμένει ορατό κάθε τμήμα πριν σταλεί το επόμενο.",
+        "minimum_display_seconds": "Κατώτερο όριο του χρόνου εμφάνισης κάθε τμήματος, ακόμη και όταν το κείμενο είναι πολύ μικρό.",
+        "maximum_display_seconds": "Ανώτερο όριο του χρόνου εμφάνισης ώστε μεγάλα μηνύματα να μη δεσμεύουν την queue επ' αόριστον.",
+        "display_buffer_seconds": "Επιπλέον δευτερόλεπτα που προστίθενται στην εκτιμώμενη διάρκεια ανάγνωσης κάθε τμήματος.",
+        "part_gap_seconds": "Παύση ανάμεσα σε διαδοχικά τμήματα ώστε το προηγούμενο να προλάβει να καθαρίσει πριν εμφανιστεί το επόμενο.",
+        "show_part_number": "Προσθέτει αρίθμηση όπως 1/3 και 2/3 στον τίτλο όταν ένα μήνυμα έχει χωριστεί σε τμήματα.",
+        "integration_data": "Προαιρετικό provider-specific payload που συγχωνεύεται σε κάθε οπτική ειδοποίηση της integration. Το notify_data της κλήσης υπερισχύει στα ίδια keys.",
+        "replace_parts": "Στα split μηνύματα Companion App χρησιμοποιεί κοινό tag ώστε κάθε νέο τμήμα να αντικαθιστά το προηγούμενο αντί να δημιουργεί νέα ειδοποίηση.",
+        "position": "Θέση στην οθόνη όπου το Notifications for Android TV / Fire TV εμφανίζει το overlay της ειδοποίησης.",
+        "fontsize": "Μέγεθος κειμένου που χρησιμοποιεί το Notifications for Android TV / Fire TV στο overlay της ειδοποίησης.",
+        "color": "Χρώμα φόντου που χρησιμοποιεί το Notifications for Android TV / Fire TV στο overlay της ειδοποίησης.",
+        "transparency": "Διαφάνεια φόντου που χρησιμοποιεί το Notifications for Android TV / Fire TV στο overlay της ειδοποίησης.",
+        "interrupt": "Όταν ενεργοποιηθεί, η ειδοποίηση Android TV γίνεται interactive και μπορεί να πάρει focus από την εφαρμογή που παίζει στην TV.",
+    },
+}
+extra_help["translations/en.json"] = dict(extra_help["strings.json"])
+for rel, descriptions in extra_help.items():
+    path=C/rel
+    data=json.loads(path.read_text(encoding="utf-8"))
+    for section in ("config","options"):
+        step=data[section]["step"]["notification_profile"]
+        step.setdefault("data_description",{}).update(descriptions)
+    path.write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+
 # More accurate non-English integration-profile page descriptions.
 for rel,title,desc in (
     ("translations/de.json","3. Integrationsoptionen: {integration}","Konfiguriert das Verhalten der ausgewählten Integration. Jede Option unten beschreibt separat, was sie bei der Zustellung oder beim Routing verändert."),
@@ -340,7 +401,12 @@ def test_tts_language_is_dropdown_from_engine_capabilities() -> None:
     outputs=(C/"outputs.py").read_text(encoding="utf-8")
     assert "tts_engine_languages(self.hass" in flow
     assert "tts_default_language(self.hass" in flow
-    block=flow[flow.index("CONF_TTS_LANGUAGE"):flow.index("CONF_TTS_OPTIONS",flow.index("CONF_TTS_LANGUAGE"))]
+    tts_block=flow[
+        flow.index("async def async_step_tts"):
+        flow.index("async def async_step_snapcast")
+    ]
+    language_pos=tts_block.index("CONF_TTS_LANGUAGE")
+    block=tts_block[language_pos:language_pos+900]
     assert "selector.SelectSelector(" in block
     assert "selector.TextSelector()" not in block
     assert "supported_languages" in outputs
