@@ -35,7 +35,8 @@ replace_once(
 path = COMPONENT / "config_flow.py"
 replace_once(
     path,
-    '    CONF_IDLE_TIMEOUT,\n',
+    '    CONF_DISPATCH_ORDER,\n    CONF_IDLE_TIMEOUT,\n',
+    '    CONF_DISPATCH_ORDER,\n'
     '    CONF_FALLBACK_CHECK_DOOR,\n'
     '    CONF_FALLBACK_ROOM,\n'
     '    CONF_IDLE_TIMEOUT,\n',
