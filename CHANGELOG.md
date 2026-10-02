@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.3 - 2026-10-02
+
+- Fixed Notifications for Android TV / Fire TV disappearing entirely when the
+  advanced legacy `notify.<name>` action is absent or registered under another
+  name.
+- Added an executor-safe fallback through the integration config entry's live
+  `Notifications` runtime client, preserving position, duration, font, colour,
+  transparency, and interrupt.
+- Kept the provider action as the first choice where available so image/icon
+  loading remains supported.
+
 ## 0.3.2 - 2026-10-02
 
 - Fixed Notifications for Android TV / Fire TV placement and styling being

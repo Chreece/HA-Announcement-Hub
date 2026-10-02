@@ -7,6 +7,7 @@ from collections import deque
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
 from copy import deepcopy
+from functools import partial
 import logging
 import math
 from typing import Any
@@ -973,22 +974,29 @@ class AnnouncementManager:
 
         legacy_service = notify_output_legacy_service(self.hass, output)
         if output.integration == INTEGRATION_NFANDROIDTV:
-            # Never silently fall back to notify.send_message here. That modern
-            # action discards NFAndroidTV's position, duration, font, colour,
-            # transparency, and interrupt options. Raising lets the normal
-            # availability retry window wait for the legacy action to appear.
-            if not legacy_service:
-                raise HomeAssistantError(
-                    "Notifications for Android TV advanced notify action is not "
-                    "available; position/style data cannot be applied"
+            # Prefer Home Assistant's provider action when it exists because it
+            # also supports image/icon loading. Modern config-entry installs can
+            # expose only the NotifyEntity, though, so use the integration's
+            # already-connected runtime client as the advanced fallback.
+            if legacy_service:
+                await self._async_call_legacy_notify(
+                    legacy_service,
+                    message=message,
+                    title=title,
+                    data=provider_data,
                 )
-            await self._async_call_legacy_notify(
-                legacy_service,
+                return
+            if await self._async_send_nfandroidtv_runtime(
+                output,
                 message=message,
                 title=title,
                 data=provider_data,
+            ):
+                return
+            raise HomeAssistantError(
+                "Notifications for Android TV has no active advanced delivery "
+                "path; position/style data cannot be applied"
             )
-            return
 
         if output.service:
             await self._async_call_legacy_notify(
@@ -1041,6 +1049,42 @@ class AnnouncementManager:
         await self.hass.services.async_call(
             "notify", "send_message", data, blocking=True
         )
+
+    async def _async_send_nfandroidtv_runtime(
+        self,
+        output: NotifyOutput,
+        *,
+        message: str,
+        title: str | None,
+        data: Mapping[str, Any],
+    ) -> bool:
+        "Send through NFAndroidTV's live config-entry client."
+        if not output.config_entry_id:
+            return False
+        entry = self.hass.config_entries.async_get_entry(output.config_entry_id)
+        if entry is None or entry.domain != INTEGRATION_NFANDROIDTV:
+            return False
+        client = getattr(entry, "runtime_data", None)
+        send = getattr(client, "send", None)
+        if not callable(send):
+            return False
+
+        duration_value = data.get("duration")
+        duration = int(duration_value) if duration_value is not None else None
+        await self.hass.async_add_executor_job(
+            partial(
+                send,
+                message,
+                title=title,
+                duration=duration,
+                fontsize=data.get("fontsize"),
+                position=data.get("position"),
+                bkgcolor=data.get("bkgcolor", data.get("color")),
+                transparency=data.get("transparency"),
+                interrupt=bool(data.get("interrupt", False)),
+            )
+        )
+        return True
 
     async def _async_call_legacy_notify(
         self,

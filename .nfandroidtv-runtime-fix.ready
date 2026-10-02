@@ -1,3 +1,0 @@
-version=0.3.3
-purpose=use NFAndroidTV config-entry runtime client when advanced notify service is absent
-retry=2

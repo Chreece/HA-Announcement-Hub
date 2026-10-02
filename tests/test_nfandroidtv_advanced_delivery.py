@@ -1,4 +1,4 @@
-"""Regression contracts for NFAndroidTV advanced notification delivery."""
+# Regression contracts for NFAndroidTV advanced notification delivery.
 
 from pathlib import Path
 
@@ -13,12 +13,20 @@ def test_legacy_service_resolution_uses_config_entry_title() -> None:
     assert 'hass.services.has_service("notify", service_name)' in outputs
 
 
-def test_nfandroidtv_never_drops_advanced_options_into_generic_notify() -> None:
+def test_nfandroidtv_uses_runtime_client_when_legacy_action_is_missing() -> None:
+    manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
+    assert "async def _async_send_nfandroidtv_runtime(" in manager
+    assert "entry.domain != INTEGRATION_NFANDROIDTV" in manager
+    assert 'client = getattr(entry, "runtime_data", None)' in manager
+    assert "self.hass.async_add_executor_job(" in manager
+    assert 'bkgcolor=data.get("bkgcolor", data.get("color"))' in manager
+
+
+def test_nfandroidtv_never_drops_position_into_generic_notify() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     assert "if output.integration == INTEGRATION_NFANDROIDTV:" in manager
-    assert "if not legacy_service:" in manager
-    assert "position/style data cannot be applied" in manager
-    assert "Never silently fall back to notify.send_message" in manager
+    assert "no active advanced delivery" in manager
+    assert "if await self._async_send_nfandroidtv_runtime(" in manager
 
 
 def test_direct_legacy_service_keeps_integration_and_area_binding() -> None:
