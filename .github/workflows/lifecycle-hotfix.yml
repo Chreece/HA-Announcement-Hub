@@ -1,0 +1,80 @@
+name: Apply Announcement Hub lifecycle hotfix
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .lifecycle-hotfix.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: announcement-hub-lifecycle-hotfix
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Apply lifecycle fix
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f .lifecycle-hotfix.ready
+          test -f .lifecycle-hotfix.py
+          python -m py_compile .lifecycle-hotfix.py
+          python .lifecycle-hotfix.py
+          rm -f .lifecycle-hotfix.py .lifecycle-hotfix.ready
+
+      - name: Validate integration
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python -m pip install --disable-pip-version-check --quiet pytest pyyaml
+          python -m compileall -q custom_components tests
+          python -m pytest -q
+          python - <<'PY'
+          import ast
+          import json
+          from pathlib import Path
+
+          manager = Path("custom_components/announcement_hub/manager.py")
+          init = Path("custom_components/announcement_hub/__init__.py")
+          manifest = json.loads(Path("custom_components/announcement_hub/manifest.json").read_text())
+          assert manifest["version"] == "0.3.1"
+          manager_text = manager.read_text()
+          init_text = init.read_text()
+          ast.parse(manager_text)
+          ast.parse(init_text)
+          assert "self.hass.async_create_task(" not in manager_text
+          assert manager_text.count("self.entry.async_create_background_task(") == 2
+          assert "hass.async_add_shutdown_job(" in init_text
+          assert "HassJob(manager.async_stop" in init_text
+          PY
+          git diff --check
+
+      - name: Commit hotfix
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          find . -type d -name .pytest_cache -prune -exec rm -rf {} +
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix Announcement Hub task lifecycle"
+          git push origin HEAD:main
