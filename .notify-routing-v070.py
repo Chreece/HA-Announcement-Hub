@@ -520,10 +520,10 @@ def test_runtime_filters_level_and_only_room_scope_by_occupancy() -> None:
 
 def test_general_outputs_freeze_without_area_binding() -> None:
     manager=(C/"manager.py").read_text()
-    assert "None" in manager[
-        manager.index("notify_output_areas = {"):
-        manager.index("configured_profiles =", manager.index("notify_output_areas = {"))
-    ]
+    start=manager.index("notify_output_areas = {", manager.index("selected, notify_records"))
+    block=manager[start:manager.index("configured_profiles =", start)]
+    assert "NOTIFY_SCOPE_GENERAL" in block
+    assert "None" in block
 
 
 def test_existing_outputs_have_backward_compatible_policy_defaults() -> None:
