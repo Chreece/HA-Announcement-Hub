@@ -1,0 +1,64 @@
+name: Apply global TTS readiness fix
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .tts-global-readiness-v054.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Apply patch
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f .tts-global-readiness-v054.ready
+          test -f .tts-global-readiness-v054.py
+          python -m py_compile .tts-global-readiness-v054.py
+          python .tts-global-readiness-v054.py
+          rm -f .tts-global-readiness-v054.py .tts-global-readiness-v054.ready
+      - name: Validate
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python -m pip install --disable-pip-version-check --quiet pytest pyyaml
+          python -m compileall -q custom_components tests
+          python -m pytest -q
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=Path("custom_components/announcement_hub")
+          o=(c/"outputs.py").read_text()
+          m=(c/"manager.py").read_text()
+          assert json.loads((c/"manifest.json").read_text())["version"]=="0.5.4"
+          assert "state is None or state.state != STATE_UNAVAILABLE" in o
+          assert "entity_area_id(self.hass, job.tts_media_player)" not in m[m.index("def _job_has_ready_server_tts"):m.index("def _job_runnable_now")]
+          assert "self.hass.async_create_task(" not in m
+          assert m.count("self.entry.async_create_background_task(")==2
+          PY
+          git diff --check
+      - name: Commit
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          find . -type d -name .pytest_cache -prune -exec rm -rf {} +
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+Chreece@users.noreply.github.com"
+          git add --all
+          git diff --cached --quiet && exit 0
+          git commit -m "Treat server TTS infrastructure as global"
+          git push origin HEAD:main
