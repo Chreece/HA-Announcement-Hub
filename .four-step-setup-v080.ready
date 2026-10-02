@@ -4,3 +4,5 @@ purpose=four-step auto-discovery setup
 retry=2
 
 retry=3
+
+retry=4
