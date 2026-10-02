@@ -1179,6 +1179,12 @@ for rel, L in locales.items():
         tts_step["data"]["tts_area_players"] = L["direct_room"]
         tts_step["data"]["tts_media_player"] = L["shared"]
         tts_step["data"]["snapcast_outputs"] = L["snap"]
+        tts_step["data"]["companion_tts_outputs"] = old["outputs"]["data"].get(
+            "companion_tts_outputs", "Companion App TTS outputs"
+        )
+        tts_step["data_description"]["companion_tts_outputs"] = old["outputs"][
+            "data_description"
+        ].get("companion_tts_outputs", "")
 
         queue = old["queue"]
         queue["title"] = L["s4_title"]
