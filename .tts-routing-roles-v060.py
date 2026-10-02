@@ -201,12 +201,26 @@ rep(p,
             notify_output_areas=dict(notify_output_areas or {}),
 ''')
 rep(p,
-'''            "notify_outputs",
+'''        for key in (
+            "outputs",
+            "requested_services",
+            "tts_engines",
+            "notify_outputs",
             "snapcast_clients",
+            "companion_tts_entries",
+        ):
+            data[key] = list(data[key])
 ''',
-'''            "notify_outputs",
+'''        for key in (
+            "outputs",
+            "requested_services",
+            "tts_engines",
+            "notify_outputs",
             "room_tts_players",
             "snapcast_clients",
+            "companion_tts_entries",
+        ):
+            data[key] = list(data[key])
 ''')
 rep(p,
 '''        payload.setdefault("snapcast_clients", [])
