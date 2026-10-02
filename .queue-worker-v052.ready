@@ -1,2 +1,4 @@
 version=0.5.2
 purpose=self-healing serialized queue worker
+
+retry=2
