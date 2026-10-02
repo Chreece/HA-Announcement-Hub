@@ -149,7 +149,7 @@ rep(p,
     snapcast_clients: Sequence[str],
 ''',
 '''    notify_outputs: Sequence[str],
-    room_tts_players: Sequence[str],
+    room_tts_players: Sequence[str] = (),
     snapcast_clients: Sequence[str],
 ''')
 rep(p,
@@ -945,6 +945,14 @@ j["version"]="0.6.0"
 manifest.write_text(json.dumps(j,indent=2)+"\n",encoding="utf-8")
 
 # Tests.
+occ=ROOT/"tests"/"test_occupancy_filter.py"
+text=occ.read_text(encoding="utf-8")
+text=text.replace(
+    '    assert "server_tts_enabled = bool(routed_selected[2])" in manager\n',
+    '    assert "server_tts_enabled = bool(routed_selected[3])" in manager\n',
+)
+occ.write_text(text,encoding="utf-8")
+
 res=ROOT/"tests"/"test_resources.py"
 text=res.read_text(encoding="utf-8")
 text=text.replace('assert manifest["version"] == "0.5.4"','assert manifest["version"] == "0.6.0"')
