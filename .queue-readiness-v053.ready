@@ -1,0 +1,2 @@
+version=0.5.3
+purpose=non-blocking readiness scheduler for pending announcements
