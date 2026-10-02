@@ -35,7 +35,7 @@ jobs:
           set -Eeuo pipefail
           test -f .silent-unavailable-fix.ready
           test -f .silent-unavailable-fix.py
-          echo "33df766450302daaaf716d6ed70b63d939292ccaff37e9f584b123ac484f482f  .silent-unavailable-fix.py" | sha256sum --check --strict
+          echo "b5f7c367bc46a97c84bb3dee17ccadf87c4191d4f334ec489848bd5f6a300f46  .silent-unavailable-fix.py" | sha256sum --check --strict
           python -m py_compile .silent-unavailable-fix.py
           python .silent-unavailable-fix.py
           rm -f .silent-unavailable-fix.py .silent-unavailable-fix.ready
