@@ -1,0 +1,61 @@
+name: Apply notification setup UI fixes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .notify-ui-v081.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Apply patch
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f .notify-ui-v081.ready
+          test -f .notify-ui-v081.py
+          python -m py_compile .notify-ui-v081.py
+          python .notify-ui-v081.py
+          rm -f .notify-ui-v081.py .notify-ui-v081.ready
+      - name: Validate
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python -m pip install --disable-pip-version-check --quiet pytest pyyaml
+          python -m compileall -q custom_components tests
+          python -m pytest -q
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=Path("custom_components/announcement_hub")
+          f=(c/"config_flow.py").read_text()
+          assert json.loads((c/"manifest.json").read_text())["version"]=="0.8.1"
+          assert "selected_default = list(known)" in f
+          assert "async_step_notification_routing" not in f
+          PY
+          git diff --check
+      - name: Commit
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          find . -type d -name .pytest_cache -prune -exec rm -rf {} +
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+Chreece@users.noreply.github.com"
+          git add --all
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix notification setup defaults and labels"
+          git push origin HEAD:main
