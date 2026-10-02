@@ -2,3 +2,5 @@ version=0.8.3
 purpose=labels help text snapcast naming and TTS language selector
 
 retry=2
+
+retry=3
