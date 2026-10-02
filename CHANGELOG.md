@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.1 - 2026-10-02
+
+- Notification setup now preselects every currently recognised supported notify
+  entity whenever the page opens; users deselect outputs they do not want.
+- Added resource contracts requiring translated labels for every notification
+  grouping field in English, German, and Greek.
+- Removed the obsolete per-output notification-routing config-flow methods left
+  behind by the four-step setup redesign.
+- No notification delivery or queue semantics changed.
+
 ## 0.8.0 - 2026-10-02
 
 - Reworked setup into four conceptual stages: Notification outputs, TTS outputs,

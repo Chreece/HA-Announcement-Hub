@@ -17,8 +17,7 @@ def test_only_four_visible_setup_steps_remain() -> None:
 def test_notify_step_auto_discovers_concrete_entities_and_groups_policies() -> None:
     flow = (C / "config_flow.py").read_text()
     outputs = (C / "outputs.py").read_text()
-    assert "selected_default = (" in flow
-    assert "if initial" in flow
+    assert "selected_default = list(known)" in flow
     assert "CONF_NOTIFY_ROOM_OUTPUTS" in flow
     assert "CONF_NOTIFY_INFO_OUTPUTS" in flow
     assert "concrete recognised notification entities only" in outputs

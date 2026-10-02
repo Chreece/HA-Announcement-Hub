@@ -7,14 +7,15 @@ ROOT=Path(__file__).resolve().parents[1]
 C=ROOT/"custom_components"/"announcement_hub"
 
 
-def test_setup_has_per_concrete_output_notification_routing_step() -> None:
+def test_setup_groups_scope_and_level_on_notification_page() -> None:
     flow=(C/"config_flow.py").read_text()
-    assert "def _prepare_notify_routing_steps(" in flow
-    assert "async def async_step_notification_routing(" in flow
     assert "CONF_NOTIFY_POLICIES" in flow
-    assert 'translation_key="notify_scope"' in flow
-    assert 'translation_key="notify_level"' in flow
-
+    assert "CONF_NOTIFY_ROOM_OUTPUTS" in flow
+    assert "CONF_NOTIFY_INFO_OUTPUTS" in flow
+    assert "CONF_NOTIFY_WARNING_OUTPUTS" in flow
+    assert "CONF_NOTIFY_ERROR_OUTPUTS" in flow
+    assert "CONF_NOTIFY_CRITICAL_OUTPUTS" in flow
+    assert "async_step_notification_routing" not in flow
 
 def test_runtime_filters_level_and_only_room_scope_by_occupancy() -> None:
     manager=(C/"manager.py").read_text()

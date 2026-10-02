@@ -190,12 +190,10 @@ class _AnnouncementFlowMixin:
         """Step 1: discover and configure notification outputs."""
         options = notify_output_options(self.hass)
         known = [str(item["value"]) for item in options]
-        initial = CONF_NOTIFY_OUTPUTS not in self._working
-        selected_default = (
-            known
-            if initial
-            else [value for value in self._value(CONF_NOTIFY_OUTPUTS, []) if value in known]
-        )
+        # Discovery is authoritative for the setup UI: every currently
+        # supported notify entity is preselected whenever this page opens.
+        # The user can deselect unwanted outputs before submitting.
+        selected_default = list(known)
 
         records = {
             output.ref: output
@@ -308,105 +306,6 @@ class _AnnouncementFlowMixin:
             errors=errors,
         )
 
-
-    def _prepare_notify_routing_steps(self) -> None:
-        refs = expand_notify_output_tokens(
-            self.hass,
-            list(self._working.get(CONF_NOTIFY_OUTPUTS, [])),
-        )
-        self._notify_route_outputs = sorted(
-            resolve_notify_outputs(self.hass, refs),
-            key=lambda output: (
-                output.entity_id or output.service or output.ref
-            ).casefold(),
-        )
-        configured = self._working.get(CONF_NOTIFY_POLICIES, {})
-        if not isinstance(configured, dict):
-            configured = {}
-        active_refs = {output.ref for output in self._notify_route_outputs}
-        self._working[CONF_NOTIFY_POLICIES] = {
-            ref: dict(policy)
-            for ref, policy in configured.items()
-            if ref in active_refs and isinstance(policy, dict)
-        }
-        self._notify_route_index = 0
-
-    async def async_step_notification_routing(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        """Configure room/general scope and minimum level per notify device."""
-        if self._notify_route_index >= len(self._notify_route_outputs):
-            self._prepare_notify_profile_steps()
-            return await self.async_step_notification_profile()
-
-        output = self._notify_route_outputs[self._notify_route_index]
-        policies = dict(self._working.get(CONF_NOTIFY_POLICIES, {}) or {})
-        saved = policies.get(output.ref, {})
-        if not isinstance(saved, dict):
-            saved = {}
-
-        default_scope = (
-            NOTIFY_SCOPE_ROOM if output.area_id else NOTIFY_SCOPE_GENERAL
-        )
-        current_scope = str(
-            saved.get(NOTIFY_POLICY_SCOPE, default_scope)
-        )
-        if current_scope not in NOTIFY_SCOPES:
-            current_scope = default_scope
-        current_level = str(
-            saved.get(NOTIFY_POLICY_MIN_LEVEL, DEFAULT_NOTIFY_MIN_LEVEL)
-        )
-        if current_level not in NOTIFY_MIN_LEVELS:
-            current_level = DEFAULT_NOTIFY_MIN_LEVEL
-
-        errors: dict[str, str] = {}
-        if user_input is not None:
-            scope = str(user_input[NOTIFY_POLICY_SCOPE])
-            minimum_level = str(user_input[NOTIFY_POLICY_MIN_LEVEL])
-            if scope == NOTIFY_SCOPE_ROOM and output.area_id is None:
-                errors["base"] = "room_notify_area_required"
-            else:
-                policies[output.ref] = {
-                    NOTIFY_POLICY_SCOPE: scope,
-                    NOTIFY_POLICY_MIN_LEVEL: minimum_level,
-                }
-                self._working[CONF_NOTIFY_POLICIES] = policies
-                self._notify_route_index += 1
-                return await self.async_step_notification_routing()
-
-        label = output.entity_id or output.service or output.ref
-        return self.async_show_form(
-            step_id="notification_routing",
-            data_schema=probatio.Schema(
-                {
-                    probatio.Required(
-                        NOTIFY_POLICY_SCOPE,
-                        default=current_scope,
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=list(NOTIFY_SCOPES),
-                            mode=selector.SelectSelectorMode.DROPDOWN,
-                            translation_key="notify_scope",
-                        )
-                    ),
-                    probatio.Required(
-                        NOTIFY_POLICY_MIN_LEVEL,
-                        default=current_level,
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=list(NOTIFY_MIN_LEVELS),
-                            mode=selector.SelectSelectorMode.DROPDOWN,
-                            translation_key="notify_level",
-                        )
-                    ),
-                }
-            ),
-            errors=errors,
-            description_placeholders={
-                "output": label,
-                "area": area_name(self.hass, output.area_id),
-            },
-        )
 
     def _prepare_notify_profile_steps(self) -> None:
         refs = expand_notify_output_tokens(
