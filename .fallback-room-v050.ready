@@ -1,0 +1,2 @@
+version=0.5.0
+purpose=fallback room when occupied routing has zero candidates, optionally gated by occupied-room door state
