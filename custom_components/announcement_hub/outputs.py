@@ -208,6 +208,54 @@ def concrete_entity_options(
     return sorted(options, key=lambda item: item.label.casefold())
 
 
+def tts_engine_languages(
+    hass: HomeAssistant,
+    engine_ids: Sequence[str] | None = None,
+) -> tuple[str, ...]:
+    """Return languages advertised by concrete TTS entities."""
+    component = hass.data.get(getattr(tts, "DATA_COMPONENT", "tts_entity_component"))
+    wanted = set(engine_ids or ())
+    languages: list[str] = []
+    for item in _enabled_registry_entries(hass, entity_domain="tts"):
+        entity_id = item.entity_id
+        if wanted and entity_id not in wanted:
+            continue
+        entity = component.get_entity(entity_id) if component is not None else None
+        if entity is None:
+            continue
+        with suppress(Exception):
+            languages.extend(str(value) for value in (entity.supported_languages or []))
+    return tuple(dict.fromkeys(languages))
+
+
+def tts_default_language(
+    hass: HomeAssistant,
+    engine_ids: Sequence[str] | None = None,
+) -> str | None:
+    """Return a compatible preferred/default TTS language."""
+    component = hass.data.get(getattr(tts, "DATA_COMPONENT", "tts_entity_component"))
+    ids = tuple(engine_ids or ())
+    default_engine = tts_default_engine(hass)
+    ordered = (
+        ((default_engine,) if default_engine else ())
+        + tuple(entity_id for entity_id in ids if entity_id != default_engine)
+    )
+    for entity_id in ordered:
+        if not entity_id:
+            continue
+        entity = component.get_entity(entity_id) if component is not None else None
+        if entity is None:
+            continue
+        with suppress(Exception):
+            language = str(entity.default_language or "")
+            if language:
+                return language
+    available = tts_engine_languages(hass, ids)
+    if hass.config.language in available:
+        return str(hass.config.language)
+    return available[0] if available else None
+
+
 def tts_default_engine(hass: HomeAssistant) -> str | None:
     """Return Home Assistant's preferred/default concrete TTS entity."""
     try:

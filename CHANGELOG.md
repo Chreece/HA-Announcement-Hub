@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.8.3 - 2026-10-02
+
+- Replaced free-text TTS language entry with a dropdown populated from the
+  languages currently advertised by available TTS engines.
+- Automatically chooses a compatible preferred/default TTS language when one
+  exists.
+- Reworked labels and per-field help text across all four setup stages in
+  English, German, and Greek.
+- Every visible setup field now explains separately what it controls and how
+  Announcement Hub uses it at runtime.
+- Renamed the integration-options page so Snapcast is no longer presented as
+  visual/optical behavior.
+- Added regression tests that reject raw field keys, missing help text, and a
+  free-text TTS language selector.
+
 ## 0.8.2 - 2026-10-02
 
 - Fixed the TTS setup crash when Snapcast is installed.

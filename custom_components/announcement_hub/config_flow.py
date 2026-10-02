@@ -123,6 +123,8 @@ from .outputs import (
     resolve_notify_outputs,
     snapcast_output_options,
     tts_default_engine,
+    tts_default_language,
+    tts_engine_languages,
     tts_engine_options,
     tts_media_player_options,
 )
@@ -386,7 +388,10 @@ class _AnnouncementFlowMixin:
                         ): selector.BooleanSelector(),
                     }
                 ),
-                description_placeholders={"integration": "Snapcast"},
+                description_placeholders={
+                    "integration": "Snapcast",
+                    "integration_purpose": "Snapcast audio routing",
+                },
             )
 
         if user_input is not None:
@@ -566,6 +571,19 @@ class _AnnouncementFlowMixin:
             default_engine = tts_default_engine(self.hass)
             engine_default = [default_engine] if default_engine in engine_ids else []
 
+        language_engines = engine_default or engine_ids
+        language_values = list(tts_engine_languages(self.hass, language_engines))
+        configured_language = str(
+            self._value(CONF_TTS_LANGUAGE, DEFAULT_TTS_LANGUAGE) or ""
+        )
+        if configured_language in language_values:
+            language_default = configured_language
+        else:
+            preferred_language = tts_default_language(self.hass, language_engines)
+            language_default = (
+                preferred_language if preferred_language in language_values else None
+            )
+
         direct_options = tts_media_player_options(self.hass)
         direct_ids = [str(item["value"]) for item in direct_options]
         direct_default = [
@@ -702,8 +720,13 @@ class _AnnouncementFlowMixin:
                 ): selector.BooleanSelector(),
                 _optional_marker(
                     CONF_TTS_LANGUAGE,
-                    self._value(CONF_TTS_LANGUAGE, DEFAULT_TTS_LANGUAGE),
-                ): selector.TextSelector(),
+                    language_default,
+                ): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=language_values,
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                ),
                 probatio.Optional(
                     CONF_TTS_OPTIONS,
                     default=self._value(CONF_TTS_OPTIONS, DEFAULT_TTS_OPTIONS),
