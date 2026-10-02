@@ -1,0 +1,2 @@
+version=0.6.0
+purpose=three explicit TTS playback roles: direct room, shared server, synchronized routing clients
