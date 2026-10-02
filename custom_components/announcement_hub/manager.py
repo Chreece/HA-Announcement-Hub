@@ -834,7 +834,10 @@ class AnnouncementManager:
             await self._async_send_notifications(job)
 
         self._raise_if_cancelled(job)
-        if not job.successful_channels:
+        # A job whose configured outputs all stayed unavailable is a valid
+        # no-op after the availability window. Only actual recorded channel
+        # errors can turn a no-delivery job into a failure.
+        if not job.successful_channels and job.channel_errors:
             detail = "; ".join(
                 f"{channel}: {error}"
                 for channel, error in job.channel_errors.items()
@@ -1128,7 +1131,7 @@ class AnnouncementManager:
         channel: Callable[[Any], str],
         parallel: bool = False,
     ) -> None:
-        """Deliver ready outputs and retry unavailable/failed outputs in one window."""
+        """Deliver ready outputs, wait once, then silently skip unavailable ones."""
         pending = list(items)
         last_errors: dict[str, str] = {}
 
@@ -1177,16 +1180,20 @@ class AnnouncementManager:
                     tuple(item for item in pending if is_available(item))
                 )
 
-        for item in pending:
-            channel_name = channel(item)
-            if last_error := last_errors.get(channel_name):
-                error = (
-                    f"Delivery did not succeed within {timeout:g}s; "
-                    f"last error: {last_error}"
-                )
-            else:
-                error = f"Output remained unavailable for {timeout:g}s"
-            self._record_channel_failure(job, channel_name, error)
+        # Remaining items are unavailable outputs, not announcement errors.
+        # Keep this at debug level for diagnostics without creating Repairs/log
+        # warnings or marking the job completed_with_errors.
+        if pending:
+            skipped = {
+                channel(item): last_errors.get(channel(item), "unavailable")
+                for item in pending
+            }
+            _LOGGER.debug(
+                "Announcement %s skipped unavailable output(s) after %ss: %s",
+                job.job_id,
+                f"{timeout:g}",
+                skipped,
+            )
 
     async def _async_send_tts(self, job: AnnouncementJob) -> None:
         if not job.tts_text:
@@ -1246,11 +1253,6 @@ class AnnouncementManager:
                 )
                 return
             if not await self._async_wait_player_available(player, job):
-                self._record_channel_failure(
-                    job,
-                    f"player:{player}",
-                    f"Output remained unavailable for {self._availability_timeout:g}s",
-                )
                 return
             await self._async_play_server_round(
                 job, player, selected_clients=(), target_clients=()
@@ -1297,11 +1299,12 @@ class AnnouncementManager:
                 if pending:
                     await asyncio.sleep(min(0.1, max(0.0, deadline - loop.time())))
 
-        for entity_id in pending:
-            self._record_channel_failure(
-                job,
-                f"snapcast:{entity_id}",
-                f"Output remained unavailable for {timeout:g}s",
+        if pending:
+            _LOGGER.debug(
+                "Announcement %s skipped unavailable Snapcast output(s) after %ss: %s",
+                job.job_id,
+                f"{timeout:g}",
+                pending,
             )
 
     async def _async_play_server_round(
@@ -1314,10 +1317,7 @@ class AnnouncementManager:
     ) -> None:
         self._raise_if_cancelled(job)
         if not await self._async_wait_player_available(player, job):
-            raise HomeAssistantError(
-                f"TTS media player {player} remained unavailable for "
-                f"{self._availability_timeout:g}s"
-            )
+            return
 
         idle_timeout = float(
             self.settings.get(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT)
@@ -1338,7 +1338,7 @@ class AnnouncementManager:
         try:
             engines = await self._async_available_tts_engines(job)
             if not engines:
-                raise HomeAssistantError("No selected TTS engine is available")
+                return
             errors: list[str] = []
             for engine in engines:
                 channel = f"server_tts:{engine}"

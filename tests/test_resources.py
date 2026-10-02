@@ -92,7 +92,7 @@ def test_source_contains_output_centric_features() -> None:
     assert "selected_companion.extend(companion_entries)" in manager
     assert "CONF_TTS_MIN_LEVEL" in manager
     assert "CONF_OUTPUT_AVAILABILITY_TIMEOUT" in manager
-    assert "Delivery did not succeed within" in manager
+    assert "skipped unavailable output(s)" in manager
     assert "last_errors" in manager
     assert "companion_tts_output_options" in config_flow
     outputs = (COMPONENT / "outputs.py").read_text()
@@ -128,7 +128,7 @@ def test_manifest_and_hacs_identity() -> None:
     hacs = json.loads((ROOT / "hacs.json").read_text())
     assert manifest["domain"] == "announcement_hub"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "0.3.3"
+    assert manifest["version"] == "0.3.4"
     assert hacs["name"] == manifest["name"]
 
 

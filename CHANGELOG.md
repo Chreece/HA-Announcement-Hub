@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.4 - 2026-10-02
+
+- Treat outputs that remain unavailable after the configured wait window as
+  skipped outputs instead of delivery errors.
+- Stop emitting warning logs, channel-failed events, and
+  `completed_with_errors` solely because a TV, phone, Snapcast client, media
+  player, or TTS engine is offline.
+- Let an announcement complete as a successful no-op when every matching output
+  stays unavailable; actual configuration and processing errors still fail.
+- Preserve the config-entry background-task lifecycle fix so this behavior does
+  not participate in Home Assistant startup.
+
 ## 0.3.3 - 2026-10-02
 
 - Fixed Notifications for Android TV / Fire TV disappearing entirely when the
