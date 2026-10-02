@@ -40,6 +40,22 @@ jobs:
           python .nfandroidtv-position-fix.py
           rm -f .nfandroidtv-position-fix.py .nfandroidtv-position-fix.ready
 
+      - name: Repair generated regression-test quoting
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("tests/test_nfandroidtv_advanced_delivery.py")
+          text = path.read_text(encoding="utf-8")
+          old = '    assert "hass.services.has_service("notify", service_name)" in outputs\n'
+          new = '    assert \'hass.services.has_service("notify", service_name)\' in outputs\n'
+          if text.count(old) != 1:
+              raise SystemExit("Expected generated assertion was not found exactly once")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
+
       - name: Validate integration
         shell: bash
         run: |
