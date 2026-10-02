@@ -301,7 +301,7 @@ for rel,spec in locales.items():
                 profile.setdefault("data_description",{})[key]=desc
         # Snapcast-specific explanation is exposed via the same step's field help;
         # title is no longer visual/optical.
-    path.write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\\n",encoding="utf-8")
+    path.write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
 
 # More accurate non-English integration-profile page descriptions.
 for rel,title,desc in (
@@ -314,7 +314,7 @@ for rel,title,desc in (
         step=data[section]["step"]["notification_profile"]
         step["title"]=title
         step["description"]=desc
-    path.write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\\n",encoding="utf-8")
+    path.write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
 
 # version
 rep(C/"const.py",'VERSION: Final = "0.8.2"','VERSION: Final = "0.8.3"')
@@ -323,7 +323,7 @@ j=json.loads(manifest.read_text(encoding="utf-8"))
 if j.get("version")!="0.8.2":
     raise SystemExit(f"unexpected manifest version {j.get('version')}")
 j["version"]="0.8.3"
-manifest.write_text(json.dumps(j,indent=2)+"\\n",encoding="utf-8")
+manifest.write_text(json.dumps(j,indent=2)+"\n",encoding="utf-8")
 
 # Tests
 (ROOT/"tests"/"test_setup_help_and_language.py").write_text('''"""UI contracts for setup labels, help text, and TTS language selection."""
@@ -380,7 +380,7 @@ res.write_text(text,encoding="utf-8")
 
 ch=ROOT/"CHANGELOG.md"
 text=ch.read_text(encoding="utf-8")
-head="# Changelog\\n\\n"
+head="# Changelog\n\n"
 entry='''## 0.8.3 - 2026-10-02
 
 - Replaced free-text TTS language entry with a dropdown populated from the
