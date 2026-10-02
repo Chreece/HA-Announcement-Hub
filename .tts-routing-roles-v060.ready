@@ -4,3 +4,5 @@ purpose=three explicit TTS playback roles: direct room, shared server, synchroni
 retry=2
 
 retry=3
+
+retry=4
