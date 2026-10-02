@@ -427,6 +427,10 @@ text = text.replace(
     '    assert "output.area_id is not None" in manager\n'
     '    assert "output.area_id in effective_areas" in manager\n',
 )
+text = text.replace(
+    '    assert "server_tts_enabled = bool(selected[2])" in manager\n',
+    '    assert "server_tts_enabled = bool(routed_selected[2])" in manager\n',
+)
 text += '''
 
 
