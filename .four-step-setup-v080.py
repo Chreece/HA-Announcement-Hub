@@ -1243,6 +1243,106 @@ for rel, L in locales.items():
     data["options"]["error"]["room_tts_area_required"] = L["room_tts_area"]
     q.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
+
+# Update superseded regression contracts to the four-step UI.
+p = ROOT / "tests" / "test_notify_routing_policy.py"
+text = p.read_text(encoding="utf-8")
+text = text.replace(
+'''def test_translations_expose_scope_and_level_choices() -> None:
+    strings=json.loads((C/"strings.json").read_text())
+    for section in ("config","options"):
+        assert "notification_routing" in strings[section]["step"]
+    assert set(strings["selector"]["notify_scope"]["options"])=={"room","general"}
+    assert set(strings["selector"]["notify_level"]["options"])=={
+        "debug","info","warning","error","critical"
+    }
+''',
+'''def test_translations_expose_scope_and_level_choices() -> None:
+    strings=json.loads((C/"strings.json").read_text())
+    for section in ("config","options"):
+        outputs = strings[section]["step"]["outputs"]["data"]
+        assert "notify_room_outputs" in outputs
+        assert "notify_info_outputs" in outputs
+        assert "notify_warning_outputs" in outputs
+        assert "notify_error_outputs" in outputs
+        assert "notify_critical_outputs" in outputs
+''',
+)
+p.write_text(text, encoding="utf-8")
+
+p = ROOT / "tests" / "test_occupancy_filter.py"
+text = p.read_text(encoding="utf-8")
+start = text.index("def test_occupancy_ui_uses_live_dropdown_not_free_text()")
+text = text[:start] + '''def test_occupancy_ui_uses_live_dropdown_not_free_text() -> None:
+    flow = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
+    queue_block = flow[
+        flow.index("async def async_step_queue"):
+        flow.index("class AnnouncementHubConfigFlow")
+    ]
+    assert "CONF_OCCUPANCY_SENSOR" in queue_block
+    assert "CONF_OCCUPANCY_ATTRIBUTE" in queue_block
+    assert 'value="__state__"' in queue_block
+    assert "selector.SelectSelector(" in queue_block
+
+
+def test_occupancy_and_fallback_live_on_general_options_page() -> None:
+    import json
+
+    strings = json.loads((COMPONENT / "strings.json").read_text(encoding="utf-8"))
+    for section in ("config", "options"):
+        outputs = strings[section]["step"]["outputs"]["data"]
+        assert "occupancy_sensor" not in outputs
+        queue = strings[section]["step"]["queue"]["data"]
+        assert {
+            "occupancy_sensor",
+            "occupancy_attribute",
+            "fallback_room",
+            "fallback_check_door",
+            "fallback_door_label",
+        } <= set(queue)
+'''
+p.write_text(text, encoding="utf-8")
+
+p = ROOT / "tests" / "test_resources.py"
+text = p.read_text(encoding="utf-8")
+text = text.replace(
+    'expected_steps = {"outputs", "notification_routing", "notification_profile", "tts", "snapcast", "occupancy", "occupancy_source", "queue"}',
+    'expected_steps = {"outputs", "tts", "notification_profile", "queue"}',
+)
+text = text.replace('assert manifest["version"] == "0.7.0"', 'assert manifest["version"] == "0.8.0"')
+text = text.replace(
+'''        "notify_outputs",
+        "snapcast_outputs",
+        "companion_tts_outputs",
+        "tts_engines",
+        "tts_room_players",
+        "tts_min_level",
+''',
+'''        "notify_outputs",
+        "notify_room_outputs",
+        "notify_info_outputs",
+        "notify_warning_outputs",
+        "notify_error_outputs",
+        "notify_critical_outputs",
+        "snapcast_outputs",
+        "companion_tts_outputs",
+        "tts_engines",
+        "tts_room_players",
+        "tts_area_players",
+        "tts_min_level",
+''',
+)
+text = text.replace(
+'''        "fallback_check_door",
+        "max_length",
+''',
+'''        "fallback_check_door",
+        "fallback_door_label",
+        "max_length",
+''',
+)
+p.write_text(text, encoding="utf-8")
+
 # ---------------------------------------------------------------------------
 # Manifest / tests / changelog
 # ---------------------------------------------------------------------------
@@ -1285,7 +1385,8 @@ def test_only_four_visible_setup_steps_remain() -> None:
 def test_notify_step_auto_discovers_concrete_entities_and_groups_policies() -> None:
     flow = (C / "config_flow.py").read_text()
     outputs = (C / "outputs.py").read_text()
-    assert "known if initial" in flow
+    assert "selected_default = (" in flow
+    assert "if initial" in flow
     assert "CONF_NOTIFY_ROOM_OUTPUTS" in flow
     assert "CONF_NOTIFY_INFO_OUTPUTS" in flow
     assert "concrete recognised notification entities only" in outputs
