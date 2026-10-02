@@ -24,6 +24,7 @@ from .const import (
     CONF_FALLBACK_ROOM,
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
+    CONF_NOTIFY_POLICIES,
     CONF_NOTIFY_PROFILES,
     CONF_OCCUPANCY_ATTRIBUTE,
     CONF_OCCUPANCY_SENSOR,
@@ -51,6 +52,7 @@ from .const import (
     DEFAULT_DISPATCH_ORDER,
     DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_IDLE_TIMEOUT,
+    DEFAULT_NOTIFY_MIN_LEVEL,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
     DEFAULT_PLAYBACK_TIMEOUT,
     DEFAULT_POST_PLAY_DELAY,
@@ -90,6 +92,12 @@ from .const import (
     PROFILE_SHOW_PART_NUMBER,
     DOMAIN,
     NAME,
+    NOTIFY_MIN_LEVELS,
+    NOTIFY_POLICY_MIN_LEVEL,
+    NOTIFY_POLICY_SCOPE,
+    NOTIFY_SCOPES,
+    NOTIFY_SCOPE_GENERAL,
+    NOTIFY_SCOPE_ROOM,
     TTS_MIN_LEVELS,
 )
 from .message_parts import (
@@ -101,6 +109,7 @@ from .outputs import (
     companion_tts_output_options,
     expand_notify_output_tokens,
     notify_output_options,
+    area_name,
     resolve_notify_outputs,
     snapcast_output_options,
     tts_engine_options,
@@ -130,6 +139,8 @@ class _AnnouncementFlowMixin:
     """Shared multi-page setup for config and options flows."""
 
     _working: dict[str, Any]
+    _notify_route_outputs: list[Any]
+    _notify_route_index: int
     _notify_profile_domains: list[str]
     _notify_profile_index: int
 
@@ -162,8 +173,8 @@ class _AnnouncementFlowMixin:
                     CONF_CRITICAL_NOTIFY_DATA: {},
                 },
             )
-            self._prepare_notify_profile_steps()
-            return await self.async_step_notification_profile()
+            self._prepare_notify_routing_steps()
+            return await self.async_step_notification_routing()
 
         schema = probatio.Schema(
             {
@@ -190,6 +201,105 @@ class _AnnouncementFlowMixin:
         )
         return self.async_show_form(step_id="outputs", data_schema=schema)
 
+
+    def _prepare_notify_routing_steps(self) -> None:
+        refs = expand_notify_output_tokens(
+            self.hass,
+            list(self._working.get(CONF_NOTIFY_OUTPUTS, [])),
+        )
+        self._notify_route_outputs = sorted(
+            resolve_notify_outputs(self.hass, refs),
+            key=lambda output: (
+                output.entity_id or output.service or output.ref
+            ).casefold(),
+        )
+        configured = self._working.get(CONF_NOTIFY_POLICIES, {})
+        if not isinstance(configured, dict):
+            configured = {}
+        active_refs = {output.ref for output in self._notify_route_outputs}
+        self._working[CONF_NOTIFY_POLICIES] = {
+            ref: dict(policy)
+            for ref, policy in configured.items()
+            if ref in active_refs and isinstance(policy, dict)
+        }
+        self._notify_route_index = 0
+
+    async def async_step_notification_routing(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Configure room/general scope and minimum level per notify device."""
+        if self._notify_route_index >= len(self._notify_route_outputs):
+            self._prepare_notify_profile_steps()
+            return await self.async_step_notification_profile()
+
+        output = self._notify_route_outputs[self._notify_route_index]
+        policies = dict(self._working.get(CONF_NOTIFY_POLICIES, {}) or {})
+        saved = policies.get(output.ref, {})
+        if not isinstance(saved, dict):
+            saved = {}
+
+        default_scope = (
+            NOTIFY_SCOPE_ROOM if output.area_id else NOTIFY_SCOPE_GENERAL
+        )
+        current_scope = str(
+            saved.get(NOTIFY_POLICY_SCOPE, default_scope)
+        )
+        if current_scope not in NOTIFY_SCOPES:
+            current_scope = default_scope
+        current_level = str(
+            saved.get(NOTIFY_POLICY_MIN_LEVEL, DEFAULT_NOTIFY_MIN_LEVEL)
+        )
+        if current_level not in NOTIFY_MIN_LEVELS:
+            current_level = DEFAULT_NOTIFY_MIN_LEVEL
+
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            scope = str(user_input[NOTIFY_POLICY_SCOPE])
+            minimum_level = str(user_input[NOTIFY_POLICY_MIN_LEVEL])
+            if scope == NOTIFY_SCOPE_ROOM and output.area_id is None:
+                errors["base"] = "room_notify_area_required"
+            else:
+                policies[output.ref] = {
+                    NOTIFY_POLICY_SCOPE: scope,
+                    NOTIFY_POLICY_MIN_LEVEL: minimum_level,
+                }
+                self._working[CONF_NOTIFY_POLICIES] = policies
+                self._notify_route_index += 1
+                return await self.async_step_notification_routing()
+
+        label = output.entity_id or output.service or output.ref
+        return self.async_show_form(
+            step_id="notification_routing",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Required(
+                        NOTIFY_POLICY_SCOPE,
+                        default=current_scope,
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=list(NOTIFY_SCOPES),
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                            translation_key="notify_scope",
+                        )
+                    ),
+                    probatio.Required(
+                        NOTIFY_POLICY_MIN_LEVEL,
+                        default=current_level,
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=list(NOTIFY_MIN_LEVELS),
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                            translation_key="notify_level",
+                        )
+                    ),
+                }
+            ),
+            errors=errors,
+            description_placeholders={
+                "output": label,
+                "area": area_name(self.hass, output.area_id),
+            },
+        )
 
     def _prepare_notify_profile_steps(self) -> None:
         refs = expand_notify_output_tokens(
@@ -686,14 +796,17 @@ class _AnnouncementFlowMixin:
                     CONF_POST_PLAY_DELAY: DEFAULT_POST_PLAY_DELAY,
                 },
             )
-            has_server_tts = bool(
+            has_tts = bool(
                 self._working.get(CONF_TTS_ENGINES)
-                and self._working.get(CONF_TTS_MEDIA_PLAYER)
+                and (
+                    self._working.get(CONF_TTS_MEDIA_PLAYER)
+                    or self._working.get(CONF_TTS_ROOM_PLAYERS)
+                )
             )
             if not (
                 self._working.get(CONF_NOTIFY_OUTPUTS)
                 or self._working.get(CONF_COMPANION_TTS_OUTPUTS)
-                or has_server_tts
+                or has_tts
             ):
                 errors["base"] = "output_required"
             else:
@@ -811,6 +924,8 @@ class AnnouncementHubConfigFlow(
 
     def __init__(self) -> None:
         self._working = {}
+        self._notify_route_outputs = []
+        self._notify_route_index = 0
         self._notify_profile_domains = []
         self._notify_profile_index = 0
 
@@ -837,6 +952,8 @@ class AnnouncementHubOptionsFlow(_AnnouncementFlowMixin, OptionsFlow):
 
     def __init__(self) -> None:
         self._working = {}
+        self._notify_route_outputs = []
+        self._notify_route_index = 0
         self._notify_profile_domains = []
         self._notify_profile_index = 0
 

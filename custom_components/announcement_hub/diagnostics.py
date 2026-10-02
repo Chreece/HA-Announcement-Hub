@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import (
     CONF_CRITICAL_NOTIFY_DATA,
+    CONF_NOTIFY_POLICIES,
     CONF_NOTIFY_PROFILES,
     CONF_TTS_OPTIONS,
 )
@@ -17,6 +18,7 @@ from .manager import AnnouncementManager
 
 _TO_REDACT = {
     CONF_CRITICAL_NOTIFY_DATA,
+    CONF_NOTIFY_POLICIES,
     CONF_NOTIFY_PROFILES,
     CONF_TTS_OPTIONS,
 }

@@ -145,6 +145,18 @@
         "data_description": {
           "occupancy_attribute": "Zustand verwendet den Entitätszustand selbst. Die Attribute werden live aus der ausgewählten Entität gelesen."
         }
+      },
+      "notification_routing": {
+        "title": "Benachrichtigungsrouting: {output}",
+        "description": "Lege fest, ob {output} der Raumbelegung ({area}) folgt oder ein allgemeines mobiles Gerät ist, und ab welcher Meldungsstufe es Benachrichtigungen erhält.",
+        "data": {
+          "scope": "Gerätebereich",
+          "min_level": "Minimale Benachrichtigungsstufe"
+        },
+        "data_description": {
+          "scope": "Gerätebereich",
+          "min_level": "Minimale Benachrichtigungsstufe"
+        }
       }
     },
     "error": {
@@ -152,7 +164,8 @@
       "tts_engine_required": "Wähle mindestens eine TTS-Engine, wenn ein TTS-Mediaplayer ausgewählt ist.",
       "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
       "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang.",
-      "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein."
+      "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein.",
+      "room_notify_area_required": "Ein raumgebundener Benachrichtigungsausgang benötigt einen Home-Assistant-Bereich. Weise dem Gerät/der Entität einen Bereich zu oder wähle Allgemein / mobil."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub ist bereits eingerichtet."
@@ -303,6 +316,18 @@
         "data_description": {
           "occupancy_attribute": "Zustand verwendet den Entitätszustand selbst. Die Attribute werden live aus der ausgewählten Entität gelesen."
         }
+      },
+      "notification_routing": {
+        "title": "Benachrichtigungsrouting: {output}",
+        "description": "Lege fest, ob {output} der Raumbelegung ({area}) folgt oder ein allgemeines mobiles Gerät ist, und ab welcher Meldungsstufe es Benachrichtigungen erhält.",
+        "data": {
+          "scope": "Gerätebereich",
+          "min_level": "Minimale Benachrichtigungsstufe"
+        },
+        "data_description": {
+          "scope": "Gerätebereich",
+          "min_level": "Minimale Benachrichtigungsstufe"
+        }
       }
     },
     "error": {
@@ -310,7 +335,8 @@
       "tts_engine_required": "Wähle mindestens eine TTS-Engine, wenn ein TTS-Mediaplayer ausgewählt ist.",
       "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
       "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang.",
-      "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein."
+      "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein.",
+      "room_notify_area_required": "Ein raumgebundener Benachrichtigungsausgang benötigt einen Home-Assistant-Bereich. Weise dem Gerät/der Entität einen Bereich zu oder wähle Allgemein / mobil."
     }
   },
   "selector": {
@@ -391,6 +417,21 @@
     "occupancy_source": {
       "options": {
         "__state__": "Zustand"
+      }
+    },
+    "notify_scope": {
+      "options": {
+        "room": "Raumgebunden",
+        "general": "Allgemein / mobil"
+      }
+    },
+    "notify_level": {
+      "options": {
+        "debug": "Debug",
+        "info": "Info / Erfolg",
+        "warning": "Warnung",
+        "error": "Fehler",
+        "critical": "Kritisch"
       }
     }
   },

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.7.0 - 2026-10-02
+
+- Added per-device visual notification routing policies in setup.
+- Every concrete notify output now has an explicit Room-based or General/movable
+  scope plus its own minimum announcement level.
+- Room-based outputs follow occupied-area and fallback-room routing.
+- General/movable outputs bypass occupancy area filtering and can notify
+  regardless of the currently occupied room.
+- Notification level thresholds are debug, info/success, warning, error, and
+  critical; success shares info priority.
+- Policies are applied before a job is frozen so queued jobs keep deterministic
+  output membership even if settings change later.
+- Existing outputs default to Room-based when they have an HA area and General
+  when they do not, with debug as the backward-compatible minimum level.
+
 ## 0.6.0 - 2026-10-02
 
 - Split server/direct TTS setup into three explicit roles.

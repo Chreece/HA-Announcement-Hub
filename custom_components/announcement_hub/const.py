@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.6.0"
+VERSION: Final = "0.7.0"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -89,6 +89,7 @@ CONF_COMPANION_TTS_WPM: Final = "companion_tts_words_per_minute"
 CONF_DEFAULT_TITLE: Final = "default_title"
 CONF_CRITICAL_NOTIFY_DATA: Final = "critical_notify_data"
 CONF_NOTIFY_PROFILES: Final = "notify_profiles"
+CONF_NOTIFY_POLICIES: Final = "notify_policies"
 CONF_OCCUPANCY_SENSOR: Final = "occupancy_sensor"
 CONF_OCCUPANCY_ATTRIBUTE: Final = "occupancy_attribute"
 CONF_FALLBACK_ROOM: Final = "fallback_room"
@@ -188,6 +189,19 @@ DEFAULT_NOTIFY_DISPLAY_BUFFER: Final = 1.0
 DEFAULT_NOTIFY_PART_GAP: Final = 0.15
 DEFAULT_NOTIFY_SHOW_PART_NUMBER: Final = True
 DEFAULT_NOTIFY_REPLACE_PARTS: Final = True
+NOTIFY_POLICY_SCOPE: Final = "scope"
+NOTIFY_POLICY_MIN_LEVEL: Final = "min_level"
+NOTIFY_SCOPE_ROOM: Final = "room"
+NOTIFY_SCOPE_GENERAL: Final = "general"
+NOTIFY_SCOPES: Final = (NOTIFY_SCOPE_ROOM, NOTIFY_SCOPE_GENERAL)
+NOTIFY_MIN_LEVELS: Final = (
+    LEVEL_DEBUG,
+    LEVEL_INFO,
+    LEVEL_WARNING,
+    LEVEL_ERROR,
+    LEVEL_CRITICAL,
+)
+DEFAULT_NOTIFY_MIN_LEVEL: Final = LEVEL_DEBUG
 DEFAULT_NFANDROIDTV_POSITION: Final = "bottom-right"
 DEFAULT_NFANDROIDTV_FONTSIZE: Final = "medium"
 DEFAULT_NFANDROIDTV_COLOR: Final = "grey"

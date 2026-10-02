@@ -36,6 +36,7 @@ from .const import (
     CONF_COMPANION_TTS_OUTPUTS,
     CONF_COMPANION_TTS_WPM,
     CONF_NOTIFY_OUTPUTS,
+    CONF_NOTIFY_POLICIES,
     CONF_NOTIFY_PROFILES,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_SNAPCAST_OUTPUTS,
@@ -206,6 +207,7 @@ def _migrate_v1_settings(settings: dict[str, Any]) -> dict[str, Any]:
     migrated[CONF_SNAPCAST_OUTPUTS] = _entity_refs(snapcast_entities)
     migrated.setdefault(CONF_COMPANION_TTS_OUTPUTS, [])
     migrated.setdefault(CONF_TTS_ROOM_PLAYERS, [])
+    migrated.setdefault(CONF_NOTIFY_POLICIES, {})
     migrated.setdefault(CONF_NOTIFY_PROFILES, {})
     migrated.setdefault(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
     migrated.setdefault(
@@ -339,6 +341,7 @@ async def async_migrate_entry(
             if entry.version < 2
             else dict(effective)
         )
+        migrated.setdefault(CONF_NOTIFY_POLICIES, {})
         migrated.setdefault(CONF_NOTIFY_PROFILES, {})
         hass.config_entries.async_update_entry(
             entry,

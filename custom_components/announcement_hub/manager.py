@@ -50,6 +50,7 @@ from .const import (
     CONF_FALLBACK_ROOM,
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
+    CONF_NOTIFY_POLICIES,
     CONF_NOTIFY_PROFILES,
     CONF_OCCUPANCY_ATTRIBUTE,
     CONF_OCCUPANCY_SENSOR,
@@ -77,6 +78,7 @@ from .const import (
     DEFAULT_DISPATCH_ORDER,
     DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_IDLE_TIMEOUT,
+    DEFAULT_NOTIFY_MIN_LEVEL,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
     DEFAULT_PLAYBACK_TIMEOUT,
     DEFAULT_POST_PLAY_DELAY,
@@ -104,6 +106,13 @@ from .const import (
     EVENT_QUEUED,
     EVENT_STARTED,
     LEVEL_CRITICAL,
+    LEVEL_INFO,
+    LEVEL_PRIORITY,
+    NOTIFY_MIN_LEVELS,
+    NOTIFY_POLICY_MIN_LEVEL,
+    NOTIFY_POLICY_SCOPE,
+    NOTIFY_SCOPE_GENERAL,
+    NOTIFY_SCOPE_ROOM,
     INTEGRATION_MOBILE_APP,
     INTEGRATION_NFANDROIDTV,
     PROFILE_DEFAULT,
@@ -640,6 +649,39 @@ class AnnouncementManager:
             tuple(dict.fromkeys(selected_companion)),
         )
 
+    def _notify_policy(
+        self,
+        output: NotifyOutput,
+    ) -> tuple[str, str]:
+        """Return normalized scope/minimum-level policy for one notify output."""
+        configured = self.settings.get(CONF_NOTIFY_POLICIES, {})
+        raw: Mapping[str, Any] = {}
+        if isinstance(configured, Mapping):
+            candidate = configured.get(output.ref, {})
+            if isinstance(candidate, Mapping):
+                raw = candidate
+
+        default_scope = (
+            NOTIFY_SCOPE_ROOM if output.area_id else NOTIFY_SCOPE_GENERAL
+        )
+        scope = str(raw.get(NOTIFY_POLICY_SCOPE, default_scope))
+        if scope not in {NOTIFY_SCOPE_ROOM, NOTIFY_SCOPE_GENERAL}:
+            scope = default_scope
+
+        minimum = str(
+            raw.get(NOTIFY_POLICY_MIN_LEVEL, DEFAULT_NOTIFY_MIN_LEVEL)
+        )
+        if minimum not in NOTIFY_MIN_LEVELS:
+            minimum = DEFAULT_NOTIFY_MIN_LEVEL
+        return scope, minimum
+
+    @staticmethod
+    def _notify_level_allowed(level: str, minimum: str) -> bool:
+        """Return whether this announcement reaches a notification output."""
+        return LEVEL_PRIORITY.get(level, LEVEL_PRIORITY[LEVEL_INFO]) >= (
+            LEVEL_PRIORITY.get(minimum, LEVEL_PRIORITY[DEFAULT_NOTIFY_MIN_LEVEL])
+        )
+
     async def async_enqueue(
         self,
         *,
@@ -723,7 +765,14 @@ class AnnouncementManager:
         player_value = self.settings.get(CONF_TTS_MEDIA_PLAYER)
         player = str(player_value) if player_value else None
         base_selected = selected
-        all_notify_records = resolve_notify_outputs(self.hass, base_selected[1])
+        all_notify_records = tuple(
+            output
+            for output in resolve_notify_outputs(self.hass, base_selected[1])
+            if self._notify_level_allowed(
+                level,
+                self._notify_policy(output)[1],
+            )
+        )
         all_room_tts_players = tuple(base_selected[2])
         all_companion_records = resolve_companion_tts_outputs(
             self.hass, base_selected[4]
@@ -750,8 +799,13 @@ class AnnouncementManager:
                 routed_notify = tuple(
                     output
                     for output in all_notify_records
-                    if output.area_id is not None
-                    and output.area_id in effective_areas
+                    if (
+                        self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL
+                        or (
+                            output.area_id is not None
+                            and output.area_id in effective_areas
+                        )
+                    )
                 )
                 routed_room_tts = tuple(
                     entity_id
@@ -843,7 +897,12 @@ class AnnouncementManager:
                     )
 
         notify_output_areas = {
-            output.ref: output.area_id for output in notify_records
+            output.ref: (
+                None
+                if self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL
+                else output.area_id
+            )
+            for output in notify_records
         }
         configured_profiles = self.settings.get(CONF_NOTIFY_PROFILES, {})
         if not isinstance(configured_profiles, Mapping):
