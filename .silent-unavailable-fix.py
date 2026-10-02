@@ -160,6 +160,12 @@ replace_once(
     'assert manifest["version"] == "0.3.4"',
 )
 
+replace_once(
+    ROOT / 'tests' / 'test_resources.py',
+    '    assert "Delivery did not succeed within" in manager\n',
+    '    assert "skipped unavailable output(s)" in manager\n',
+)
+
 test_path = ROOT / 'tests' / 'test_unavailable_output_policy.py'
 test_path.write_text(
     '''"""Regression contracts for silent handling of unavailable outputs."""
