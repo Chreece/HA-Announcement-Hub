@@ -80,8 +80,8 @@ replace_once(
 path = COMPONENT / "manager.py"
 replace_once(
     path,
-    '    STATE_OFF,\n',
-    '    STATE_OFF,\n    STATE_ON,\n',
+    '    ATTR_ENTITY_ID,\n    STATE_OFF,\n',
+    '    ATTR_ENTITY_ID,\n    STATE_OFF,\n    STATE_ON,\n',
 )
 replace_once(
     path,
