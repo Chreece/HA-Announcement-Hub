@@ -4,3 +4,5 @@ purpose=labels help text snapcast naming and TTS language selector
 retry=2
 
 retry=3
+
+retry=4
