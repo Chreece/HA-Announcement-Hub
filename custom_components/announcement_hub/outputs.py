@@ -658,8 +658,28 @@ def snapcast_output_available(hass: HomeAssistant, entity_id: str) -> bool:
 
 
 def tts_engine_available(hass: HomeAssistant, entity_id: str) -> bool:
+    """Return whether a configured TTS engine can be attempted.
+
+    Home Assistant TextToSpeechEntity deliberately has no meaningful state
+    before its first generated utterance. Requiring a live state here creates a
+    first-use deadlock: the scheduler refuses to run the job that would create
+    that first state. Treat registration + loaded owning config entry as
+    availability, while still respecting an explicitly unavailable state.
+    """
+    reg_entry = er.async_get(hass).async_get(entity_id)
+    if reg_entry is None or getattr(reg_entry, "disabled_by", None) is not None:
+        return False
+
+    if entry_id := _entity_config_entry_id(reg_entry):
+        entry = _entry(hass, entry_id)
+        if entry is None:
+            return False
+        entry_state = getattr(getattr(entry, "state", None), "value", None)
+        if entry_state is not None and entry_state != "loaded":
+            return False
+
     state = hass.states.get(entity_id)
-    return state is not None and state.state != STATE_UNAVAILABLE
+    return state is None or state.state != STATE_UNAVAILABLE
 
 
 def companion_output_available(

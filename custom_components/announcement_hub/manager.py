@@ -1032,6 +1032,11 @@ class AnnouncementManager:
         )
 
     def _job_has_ready_server_tts(self, job: AnnouncementJob) -> bool:
+        """Check global TTS infrastructure plus area-bound physical outputs.
+
+        TTS engines and the shared TTS media player are global infrastructure;
+        only Snapcast clients are room outputs and participate in area routing.
+        """
         if (
             not job.tts_text
             or not job.server_tts_enabled

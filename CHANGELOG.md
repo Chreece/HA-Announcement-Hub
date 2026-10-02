@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.4 - 2026-10-02
+
+- Fixed first-use server-TTS readiness deadlock.
+- TTS engines are now treated as global infrastructure and no longer require a
+  pre-existing TTS entity state before the first utterance.
+- A TTS engine is considered attemptable from its enabled entity registration
+  and loaded owning config entry; an explicit unavailable state is still
+  respected.
+- The shared server-TTS media player remains global infrastructure and is never
+  area-filtered.
+- Only Snapcast clients are physical server-TTS room outputs and participate in
+  occupied-area routing.
+- No queue worker or Home Assistant startup-task lifecycle behavior changed.
+
 ## 0.5.3 - 2026-10-02
 
 - Replaced strict FIFO dequeueing with a readiness scheduler.
