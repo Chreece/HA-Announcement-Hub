@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.3 - 2026-10-02
+
+- Replaced strict FIFO dequeueing with a readiness scheduler.
+- A pending job whose outputs are unavailable stays pending until its availability
+  timeout, but no longer blocks newer jobs that can run immediately.
+- The scheduler always picks the oldest currently runnable job, preserving order
+  among runnable work while allowing unavailable waiters to be overtaken.
+- Timed-out jobs with no runnable output complete as silent no-ops.
+- Actual announcement execution remains strictly serialized: only one job is
+  processing at a time, so announcements do not interrupt each other.
+- Readiness checks cover visual notify outputs, server TTS/Snapcast, and
+  Companion App TTS.
+- No new long-lived tasks were added; the startup-safe ConfigEntry worker
+  lifecycle remains unchanged.
+
 ## 0.5.2 - 2026-10-02
 
 - Added supervision for the permanent serialized queue worker.

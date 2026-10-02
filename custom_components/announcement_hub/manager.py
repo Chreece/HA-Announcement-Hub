@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import UTC, datetime
 from collections import deque
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
@@ -926,13 +927,16 @@ class AnnouncementManager:
 
     async def _async_worker(self) -> None:
         while self._running:
-            if not self._queue:
+            job = self._next_runnable_job()
+            if job is None:
                 self._wake.clear()
-                if not self._queue:
-                    await self._wake.wait()
+                try:
+                    await asyncio.wait_for(self._wake.wait(), timeout=0.25)
+                except TimeoutError:
+                    pass
                 continue
 
-            job = self._queue.popleft()
+            self._queue.remove(job)
             self._current = job
             job.status = "processing"
             job.started_at = utcnow_iso()
@@ -988,6 +992,109 @@ class AnnouncementManager:
                         self._fire_event(terminal_event, job)
                 self._schedule_save()
                 self._notify_update()
+
+    def _pending_age_seconds(self, job: AnnouncementJob) -> float:
+        """Return how long a pending job has been waiting."""
+        try:
+            created = datetime.fromisoformat(job.created_at)
+            if created.tzinfo is None:
+                created = created.replace(tzinfo=UTC)
+            return max(0.0, (datetime.now(UTC) - created).total_seconds())
+        except (TypeError, ValueError):
+            return 0.0
+
+    def _job_has_ready_visual_output(self, job: AnnouncementJob) -> bool:
+        if not job.notify_text or not job.notify_outputs:
+            return False
+        return any(
+            notify_output_available(self.hass, output)
+            for output in resolve_notify_outputs(self.hass, job.notify_outputs)
+            if output_matches_areas(
+                job.notify_output_areas.get(output.ref, output.area_id),
+                job.outputs,
+            )
+        )
+
+    def _job_has_ready_companion_tts(self, job: AnnouncementJob) -> bool:
+        if not job.tts_text or not job.companion_tts_entries:
+            return False
+        return any(
+            companion_output_available(self.hass, output)
+            for output in resolve_companion_tts_outputs(
+                self.hass, job.companion_tts_entries
+            )
+            if output_matches_areas(
+                job.companion_tts_entry_areas.get(
+                    output.entry_id, output.area_id
+                ),
+                job.outputs,
+            )
+        )
+
+    def _job_has_ready_server_tts(self, job: AnnouncementJob) -> bool:
+        if (
+            not job.tts_text
+            or not job.server_tts_enabled
+            or not job.tts_engines
+            or not job.tts_media_player
+        ):
+            return False
+        player = self.hass.states.get(job.tts_media_player)
+        if player is None or player.state in {STATE_UNAVAILABLE, STATE_UNKNOWN}:
+            return False
+        if not any(
+            tts_engine_available(self.hass, engine)
+            for engine in job.tts_engines
+        ):
+            return False
+        if not job.snapcast_clients:
+            return True
+        return any(
+            self._snapcast_output_available(entity_id)
+            for entity_id in job.snapcast_clients
+            if not job.outputs
+            or job.snapcast_client_areas.get(
+                entity_id, entity_area_id(self.hass, entity_id)
+            )
+            in set(job.outputs)
+        )
+
+    def _job_runnable_now(self, job: AnnouncementJob) -> bool:
+        """Return whether at least one frozen delivery channel can run now."""
+        return (
+            self._job_has_ready_visual_output(job)
+            or self._job_has_ready_server_tts(job)
+            or self._job_has_ready_companion_tts(job)
+        )
+
+    def _expire_waiting_job(self, job: AnnouncementJob) -> None:
+        """Finish a never-runnable pending job silently after its wait window."""
+        if job not in self._queue:
+            return
+        self._queue.remove(job)
+        job.status = "completed"
+        job.finished_at = utcnow_iso()
+        job.error = None
+        self._prefetch_tasks.pop(job.job_id, None)
+        self._last = job
+        self._fire_event(EVENT_FINISHED, job)
+        _LOGGER.debug(
+            "Announcement %s expired after waiting %ss for a runnable output",
+            job.job_id,
+            f"{self._availability_timeout:g}",
+        )
+        self._schedule_save()
+        self._notify_update()
+
+    def _next_runnable_job(self) -> AnnouncementJob | None:
+        """Pick the oldest runnable job without letting waiters block the queue."""
+        timeout = self._availability_timeout
+        for job in tuple(self._queue):
+            if self._job_runnable_now(job):
+                return job
+            if timeout <= 0 or self._pending_age_seconds(job) >= timeout:
+                self._expire_waiting_job(job)
+        return None
 
     async def _async_process_job(self, job: AnnouncementJob) -> None:
         order = self.settings.get(CONF_DISPATCH_ORDER, DEFAULT_DISPATCH_ORDER)
@@ -1977,6 +2084,7 @@ class AnnouncementManager:
             if error := done_task.exception():
                 _LOGGER.debug("TTS prefetch task failed: %s", error)
             self._schedule_save()
+            self._wake.set()
             self._notify_update()
 
         task.add_done_callback(_done)
