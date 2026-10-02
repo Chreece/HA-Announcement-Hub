@@ -1038,12 +1038,21 @@ rep(
 )
 rep(
     p,
+    "    migrated.setdefault(CONF_TTS_ROOM_PLAYERS, [])\n"
     "    migrated.setdefault(CONF_NOTIFY_POLICIES, {})\n"
     "    migrated.setdefault(CONF_NOTIFY_PROFILES, {})\n",
+    "    migrated.setdefault(CONF_TTS_ROOM_PLAYERS, [])\n"
     "    migrated.setdefault(CONF_NOTIFY_POLICIES, {})\n"
     "    migrated.setdefault(CONF_NOTIFY_PROFILES, {})\n"
     "    migrated.setdefault(CONF_TTS_PLAYER_POLICIES, {})\n",
-    count=2,
+)
+rep(
+    p,
+    "        migrated.setdefault(CONF_NOTIFY_POLICIES, {})\n"
+    "        migrated.setdefault(CONF_NOTIFY_PROFILES, {})\n",
+    "        migrated.setdefault(CONF_NOTIFY_POLICIES, {})\n"
+    "        migrated.setdefault(CONF_NOTIFY_PROFILES, {})\n"
+    "        migrated.setdefault(CONF_TTS_PLAYER_POLICIES, {})\n",
 )
 
 # ---------------------------------------------------------------------------
