@@ -388,8 +388,10 @@ p.write_text(
 # diagnostics: redact policy map with entity refs too.
 p=C/"diagnostics.py"
 rep(p,
-'    CONF_NOTIFY_PROFILES,\n',
-'    CONF_NOTIFY_POLICIES,\n    CONF_NOTIFY_PROFILES,\n'
+'    CONF_CRITICAL_NOTIFY_DATA,\n    CONF_NOTIFY_PROFILES,\n',
+'    CONF_CRITICAL_NOTIFY_DATA,\n'
+'    CONF_NOTIFY_POLICIES,\n'
+'    CONF_NOTIFY_PROFILES,\n'
 )
 rep(p,
 '''    CONF_NOTIFY_PROFILES,
