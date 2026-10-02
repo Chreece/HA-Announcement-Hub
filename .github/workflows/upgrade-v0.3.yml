@@ -46,13 +46,12 @@ jobs:
       - name: Apply v0.3.0 source changes
         run: python /tmp/upgrade-v0.3.py
 
-      - name: Remove temporary bootstrap files
+      - name: Remove temporary payload files
         shell: bash
         run: |
           set -Eeuo pipefail
           rm -rf .upgrade-v0.3
           rm -f .upgrade-v0.3.ready
-          rm -f .github/workflows/upgrade-v0.3.yml
 
       - name: Validate integration
         shell: bash
@@ -75,7 +74,14 @@ jobs:
           assert Path('custom_components/announcement_hub/message_parts.py').is_file()
           PY
 
-      - name: Commit v0.3.0
+      - name: Keep workflow changes outside the source commit
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          rm -f .github/workflows/validate.yml
+          git checkout -- .github/workflows/upgrade-v0.3.yml
+
+      - name: Commit v0.3.0 source
         shell: bash
         run: |
           set -Eeuo pipefail
