@@ -12,7 +12,9 @@
           "default_title": "Default title",
           "critical_notify_data": "Critical notification data",
           "occupancy_sensor": "Occupied-areas sensor",
-          "occupancy_attribute": "Occupied-areas attribute"
+          "occupancy_attribute": "Occupied-areas attribute",
+          "fallback_room": "Fallback room",
+          "fallback_check_door": "Check occupied-room door before fallback"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
@@ -21,7 +23,9 @@
           "default_title": "Optional title for visual notifications.",
           "critical_notify_data": "Optional integration-specific data merged into critical visual notifications.",
           "occupancy_sensor": "Optional sensor whose state contains occupied Home Assistant area names/IDs, for example Wohnzimmer,Gästezimmer. When configured, occupied-only delivery can automatically restrict outputs to those areas.",
-          "occupancy_attribute": "Optional attribute on the occupied-areas sensor that contains the area list. Leave empty to use the sensor state itself."
+          "occupancy_attribute": "Optional attribute on the occupied-areas sensor that contains the area list. Leave empty to use the sensor state itself.",
+          "fallback_room": "Optional Home Assistant area used only when occupancy filtering leaves the announcement with zero candidates.",
+          "fallback_check_door": "When enabled, fallback is allowed only if at least one occupied target area has a binary_sensor with device_class door that is open. Closed, unknown, unavailable, or missing door sensors block fallback."
         }
       },
       "tts": {
@@ -148,7 +152,9 @@
           "default_title": "Default title",
           "critical_notify_data": "Critical notification data",
           "occupancy_sensor": "Occupied-areas sensor",
-          "occupancy_attribute": "Occupied-areas attribute"
+          "occupancy_attribute": "Occupied-areas attribute",
+          "fallback_room": "Fallback room",
+          "fallback_check_door": "Check occupied-room door before fallback"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
@@ -157,7 +163,9 @@
           "default_title": "Optional title for visual notifications.",
           "critical_notify_data": "Optional integration-specific data merged into critical visual notifications.",
           "occupancy_sensor": "Optional sensor whose state contains occupied Home Assistant area names/IDs, for example Wohnzimmer,Gästezimmer. When configured, occupied-only delivery can automatically restrict outputs to those areas.",
-          "occupancy_attribute": "Optional attribute on the occupied-areas sensor that contains the area list. Leave empty to use the sensor state itself."
+          "occupancy_attribute": "Optional attribute on the occupied-areas sensor that contains the area list. Leave empty to use the sensor state itself.",
+          "fallback_room": "Optional Home Assistant area used only when occupancy filtering leaves the announcement with zero candidates.",
+          "fallback_check_door": "When enabled, fallback is allowed only if at least one occupied target area has a binary_sensor with device_class door that is open. Closed, unknown, unavailable, or missing door sensors block fallback."
         }
       },
       "tts": {

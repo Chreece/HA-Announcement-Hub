@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.4.0"
+VERSION: Final = "0.5.0"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -90,6 +90,8 @@ CONF_CRITICAL_NOTIFY_DATA: Final = "critical_notify_data"
 CONF_NOTIFY_PROFILES: Final = "notify_profiles"
 CONF_OCCUPANCY_SENSOR: Final = "occupancy_sensor"
 CONF_OCCUPANCY_ATTRIBUTE: Final = "occupancy_attribute"
+CONF_FALLBACK_ROOM: Final = "fallback_room"
+CONF_FALLBACK_CHECK_DOOR: Final = "fallback_check_door"
 
 # Per-integration visual output profile fields. Profiles are keyed by the
 # integration domain that owns the concrete notify output.
@@ -174,6 +176,7 @@ DEFAULT_COMPANION_TTS_WPM: Final = 150
 DEFAULT_TITLE: Final = "Notification"
 DEFAULT_CRITICAL_NOTIFY_DATA: Final = {}
 DEFAULT_OCCUPIED_ONLY: Final = True
+DEFAULT_FALLBACK_CHECK_DOOR: Final = True
 DEFAULT_NOTIFY_MAX_LENGTH: Final = 0
 DEFAULT_NFANDROIDTV_MAX_LENGTH: Final = 193
 DEFAULT_MOBILE_APP_MAX_LENGTH: Final = 500

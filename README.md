@@ -223,6 +223,24 @@ availability timeout and are silently skipped afterward.
 Use `occupied_only: false` to ignore occupancy for one call. Without a
 configured occupancy sensor, the option has no effect.
 
+### Occupancy fallback room
+
+Optionally configure a fallback Home Assistant area. The fallback is evaluated
+only when occupancy-aware routing produces zero configured delivery candidates.
+Offline candidates do not trigger fallback; they keep using the normal
+availability timeout.
+
+When **Check occupied-room door before fallback** is enabled, at least one
+occupied target room must contain a `binary_sensor` with
+`device_class: door` whose state is `on` (open). Closed (`off`), unknown,
+unavailable, or missing door sensors block fallback. Disable the checkbox to
+allow zero-candidate fallback regardless of door state.
+
+The fallback room is routed exactly like any other area: only the configured
+outputs actually assigned to that area are used, so a fallback room with only
+TTS receives TTS and one with only visual notification outputs receives only
+those notifications.
+
 ## Main action
 
 ```yaml

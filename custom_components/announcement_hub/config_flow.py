@@ -20,6 +20,8 @@ from .const import (
     CONF_CRITICAL_NOTIFY_DATA,
     CONF_DEFAULT_TITLE,
     CONF_DISPATCH_ORDER,
+    CONF_FALLBACK_CHECK_DOOR,
+    CONF_FALLBACK_ROOM,
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
     CONF_NOTIFY_PROFILES,
@@ -46,6 +48,7 @@ from .const import (
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_CRITICAL_NOTIFY_DATA,
     DEFAULT_DISPATCH_ORDER,
+    DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
     DEFAULT_PLAYBACK_TIMEOUT,
@@ -159,6 +162,8 @@ class _AnnouncementFlowMixin:
                     CONF_CRITICAL_NOTIFY_DATA: {},
                     CONF_OCCUPANCY_SENSOR: None,
                     CONF_OCCUPANCY_ATTRIBUTE: "",
+                    CONF_FALLBACK_ROOM: None,
+                    CONF_FALLBACK_CHECK_DOOR: DEFAULT_FALLBACK_CHECK_DOOR,
                 },
             )
             self._prepare_notify_profile_steps()
@@ -199,6 +204,17 @@ class _AnnouncementFlowMixin:
                     CONF_OCCUPANCY_ATTRIBUTE,
                     self._value(CONF_OCCUPANCY_ATTRIBUTE, ""),
                 ): selector.TextSelector(),
+                _optional_marker(
+                    CONF_FALLBACK_ROOM,
+                    self._value(CONF_FALLBACK_ROOM, None),
+                ): selector.AreaSelector(),
+                probatio.Required(
+                    CONF_FALLBACK_CHECK_DOOR,
+                    default=self._value(
+                        CONF_FALLBACK_CHECK_DOOR,
+                        DEFAULT_FALLBACK_CHECK_DOOR,
+                    ),
+                ): selector.BooleanSelector(),
             }
         )
         return self.async_show_form(step_id="outputs", data_schema=schema)

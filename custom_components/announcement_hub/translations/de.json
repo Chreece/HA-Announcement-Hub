@@ -12,7 +12,9 @@
           "default_title": "Standardtitel",
           "critical_notify_data": "Daten für kritische Benachrichtigungen",
           "occupancy_sensor": "Sensor für belegte Bereiche",
-          "occupancy_attribute": "Attribut für belegte Bereiche"
+          "occupancy_attribute": "Attribut für belegte Bereiche",
+          "fallback_room": "Fallback-Bereich",
+          "fallback_check_door": "Tür des belegten Bereichs vor Fallback prüfen"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
@@ -21,7 +23,9 @@
           "default_title": "Optionaler Titel für optische Benachrichtigungen.",
           "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden.",
           "occupancy_sensor": "Optionaler Sensor, dessen Zustand belegte Home-Assistant-Bereiche als Namen/IDs enthält, z. B. Wohnzimmer,Gästezimmer. Bei Konfiguration kann die Ausgabe automatisch auf diese Bereiche beschränkt werden.",
-          "occupancy_attribute": "Optionales Attribut des Belegungssensors, das die Bereichsliste enthält. Leer lassen, um den Sensorzustand selbst zu verwenden."
+          "occupancy_attribute": "Optionales Attribut des Belegungssensors, das die Bereichsliste enthält. Leer lassen, um den Sensorzustand selbst zu verwenden.",
+          "fallback_room": "Optionaler Home-Assistant-Bereich, der nur verwendet wird, wenn nach der Belegungsfilterung keine Kandidaten für die Ankündigung übrig bleiben.",
+          "fallback_check_door": "Wenn aktiviert, ist der Fallback nur erlaubt, wenn mindestens ein belegter Zielbereich einen binary_sensor mit device_class door hat, der offen ist. Geschlossene, unbekannte, nicht verfügbare oder fehlende Türsensoren blockieren den Fallback."
         }
       },
       "tts": {
@@ -148,7 +152,9 @@
           "default_title": "Standardtitel",
           "critical_notify_data": "Daten für kritische Benachrichtigungen",
           "occupancy_sensor": "Sensor für belegte Bereiche",
-          "occupancy_attribute": "Attribut für belegte Bereiche"
+          "occupancy_attribute": "Attribut für belegte Bereiche",
+          "fallback_room": "Fallback-Bereich",
+          "fallback_check_door": "Tür des belegten Bereichs vor Fallback prüfen"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
@@ -157,7 +163,9 @@
           "default_title": "Optionaler Titel für optische Benachrichtigungen.",
           "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden.",
           "occupancy_sensor": "Optionaler Sensor, dessen Zustand belegte Home-Assistant-Bereiche als Namen/IDs enthält, z. B. Wohnzimmer,Gästezimmer. Bei Konfiguration kann die Ausgabe automatisch auf diese Bereiche beschränkt werden.",
-          "occupancy_attribute": "Optionales Attribut des Belegungssensors, das die Bereichsliste enthält. Leer lassen, um den Sensorzustand selbst zu verwenden."
+          "occupancy_attribute": "Optionales Attribut des Belegungssensors, das die Bereichsliste enthält. Leer lassen, um den Sensorzustand selbst zu verwenden.",
+          "fallback_room": "Optionaler Home-Assistant-Bereich, der nur verwendet wird, wenn nach der Belegungsfilterung keine Kandidaten für die Ankündigung übrig bleiben.",
+          "fallback_check_door": "Wenn aktiviert, ist der Fallback nur erlaubt, wenn mindestens ein belegter Zielbereich einen binary_sensor mit device_class door hat, der offen ist. Geschlossene, unbekannte, nicht verfügbare oder fehlende Türsensoren blockieren den Fallback."
         }
       },
       "tts": {

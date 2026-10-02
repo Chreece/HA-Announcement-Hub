@@ -68,6 +68,8 @@ def test_config_and_options_steps_match_flow_contract() -> None:
         "output_availability_timeout",
         "occupancy_sensor",
         "occupancy_attribute",
+        "fallback_room",
+        "fallback_check_door",
         "max_length",
         "reading_words_per_minute",
         "position",
@@ -133,7 +135,7 @@ def test_manifest_and_hacs_identity() -> None:
     hacs = json.loads((ROOT / "hacs.json").read_text())
     assert manifest["domain"] == "announcement_hub"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "0.4.0"
+    assert manifest["version"] == "0.5.0"
     assert hacs["name"] == manifest["name"]
 
 

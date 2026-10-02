@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.5.0 - 2026-10-02
+
+- Added an optional fallback room for occupancy-aware routing.
+- Fallback is considered only when the occupancy-filtered announcement has zero
+  configured candidates; temporarily unavailable devices remain normal
+  candidates and continue to use the availability timeout.
+- Added an optional door gate, enabled by default. When enabled, fallback occurs
+  only if at least one occupied target area has an open binary sensor with
+  `device_class: door`.
+- Closed, unavailable, unknown, or missing door sensors block fallback.
+- Fallback uses only outputs assigned to the fallback room and preserves service
+  restrictions, TTS level policy, Companion App TTS opt-in, and availability
+  timeout behavior.
+- No new long-lived tasks were introduced; the config-entry background-task
+  lifecycle remains unchanged.
+
 ## 0.4.0 - 2026-10-02
 
 - Added an optional occupied-areas sensor with an optional attribute containing

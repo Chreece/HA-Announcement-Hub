@@ -27,6 +27,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     STATE_OFF,
+    STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
@@ -44,6 +45,8 @@ from .const import (
     CONF_CRITICAL_NOTIFY_DATA,
     CONF_DEFAULT_TITLE,
     CONF_DISPATCH_ORDER,
+    CONF_FALLBACK_CHECK_DOOR,
+    CONF_FALLBACK_ROOM,
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
     CONF_NOTIFY_PROFILES,
@@ -70,6 +73,7 @@ from .const import (
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_CRITICAL_NOTIFY_DATA,
     DEFAULT_DISPATCH_ORDER,
+    DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
     DEFAULT_PLAYBACK_TIMEOUT,
@@ -628,33 +632,114 @@ class AnnouncementManager:
 
         player_value = self.settings.get(CONF_TTS_MEDIA_PLAYER)
         player = str(player_value) if player_value else None
-        notify_records = resolve_notify_outputs(self.hass, selected[1])
-        companion_records = resolve_companion_tts_outputs(self.hass, selected[3])
+        base_selected = selected
+        all_notify_records = resolve_notify_outputs(self.hass, base_selected[1])
+        all_companion_records = resolve_companion_tts_outputs(
+            self.hass, base_selected[3]
+        )
 
-        if occupancy_filter_active:
-            effective_areas = set(output_area_ids)
-            notify_records = tuple(
-                output
-                for output in notify_records
-                if output.area_id is not None and output.area_id in effective_areas
+        def routed_plan(
+            area_ids: tuple[str, ...],
+            *,
+            filter_by_area: bool,
+        ) -> tuple[
+            tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...], tuple[str, ...]],
+            tuple[NotifyOutput, ...],
+            tuple[CompanionTTSOutput, ...],
+            Any,
+        ]:
+            if filter_by_area:
+                effective_areas = set(area_ids)
+                routed_notify = tuple(
+                    output
+                    for output in all_notify_records
+                    if output.area_id is not None
+                    and output.area_id in effective_areas
+                )
+                routed_snapcast = tuple(
+                    entity_id
+                    for entity_id in base_selected[2]
+                    if (
+                        area_id := entity_area_id(self.hass, entity_id)
+                    ) is not None
+                    and area_id in effective_areas
+                )
+                routed_companion = tuple(
+                    output
+                    for output in all_companion_records
+                    if output.area_id is not None
+                    and output.area_id in effective_areas
+                )
+                routed_selected = (
+                    base_selected[0],
+                    tuple(output.ref for output in routed_notify),
+                    routed_snapcast,
+                    tuple(output.entry_id for output in routed_companion),
+                )
+            else:
+                routed_notify = all_notify_records
+                routed_companion = all_companion_records
+                routed_selected = base_selected
+
+            server_tts_enabled = bool(player and routed_selected[0])
+            if filter_by_area and server_tts_enabled:
+                if configured[2]:
+                    server_tts_enabled = bool(routed_selected[2])
+                else:
+                    player_area = (
+                        entity_area_id(self.hass, player) if player else None
+                    )
+                    server_tts_enabled = (
+                        player_area is not None
+                        and player_area in set(area_ids)
+                    )
+
+            route_plan = build_delivery_plan(
+                text_tts=text_tts,
+                text_notify=text_notify,
+                level=level,
+                minimum_tts_level=minimum_tts_level,
+                tts_engines=routed_selected[0],
+                notify_outputs=routed_selected[1],
+                snapcast_clients=routed_selected[2],
+                companion_tts_entries=routed_selected[3],
+                server_tts_enabled=server_tts_enabled,
             )
-            snapcast_clients = tuple(
-                entity_id
-                for entity_id in selected[2]
-                if (area_id := entity_area_id(self.hass, entity_id)) is not None
-                and area_id in effective_areas
+            return (
+                routed_selected,
+                routed_notify,
+                routed_companion,
+                route_plan,
             )
-            companion_records = tuple(
-                output
-                for output in companion_records
-                if output.area_id is not None and output.area_id in effective_areas
-            )
-            selected = (
-                selected[0],
-                tuple(output.ref for output in notify_records),
-                snapcast_clients,
-                tuple(output.entry_id for output in companion_records),
-            )
+
+        selected, notify_records, companion_records, plan = routed_plan(
+            output_area_ids,
+            filter_by_area=occupancy_filter_active,
+        )
+
+        if occupancy_filter_active and not plan.has_output:
+            fallback_area_id = self._fallback_area_id()
+            if (
+                fallback_area_id
+                and self._fallback_door_allows(output_area_ids)
+            ):
+                (
+                    fallback_selected,
+                    fallback_notify_records,
+                    fallback_companion_records,
+                    fallback_plan,
+                ) = routed_plan((fallback_area_id,), filter_by_area=True)
+                if fallback_plan.has_output:
+                    output_area_ids = (fallback_area_id,)
+                    selected = fallback_selected
+                    notify_records = fallback_notify_records
+                    companion_records = fallback_companion_records
+                    plan = fallback_plan
+                    _LOGGER.debug(
+                        "Announcement routed to fallback area %s because the "
+                        "occupied area(s) had no candidates",
+                        fallback_area_id,
+                    )
 
         notify_output_areas = {
             output.ref: output.area_id for output in notify_records
@@ -675,27 +760,7 @@ class AnnouncementManager:
         companion_tts_entry_areas = {
             output.entry_id: output.area_id for output in companion_records
         }
-        server_tts_enabled = bool(player and selected[0])
-        if occupancy_filter_active and server_tts_enabled:
-            if configured[2]:
-                server_tts_enabled = bool(selected[2])
-            else:
-                player_area = entity_area_id(self.hass, player) if player else None
-                server_tts_enabled = (
-                    player_area is not None and player_area in set(output_area_ids)
-                )
 
-        plan = build_delivery_plan(
-            text_tts=text_tts,
-            text_notify=text_notify,
-            level=level,
-            minimum_tts_level=minimum_tts_level,
-            tts_engines=selected[0],
-            notify_outputs=selected[1],
-            snapcast_clients=selected[2],
-            companion_tts_entries=selected[3],
-            server_tts_enabled=server_tts_enabled,
-        )
         if not plan.has_output and not occupancy_filter_active:
             if plan.tts_suppressed_by_level:
                 raise ServiceValidationError(
@@ -1912,6 +1977,54 @@ class AnnouncementManager:
             options=job.tts_options,
             cache=job.tts_cache,
         )
+
+    def _fallback_area_id(self) -> str | None:
+        """Return the configured fallback room as an area ID."""
+        value = str(self.settings.get(CONF_FALLBACK_ROOM, "") or "").strip()
+        if not value:
+            return None
+        registry = ar.async_get(self.hass)
+        if registry.async_get_area(value):
+            return value
+        if area := registry.async_get_area_by_name(value):
+            return area.id
+        _LOGGER.debug("Configured fallback room %s is not a known area", value)
+        return None
+
+    def _fallback_door_allows(self, occupied_area_ids: Sequence[str]) -> bool:
+        """Allow fallback when door checking is disabled or an occupied door is open."""
+        if not bool(
+            self.settings.get(
+                CONF_FALLBACK_CHECK_DOOR,
+                DEFAULT_FALLBACK_CHECK_DOOR,
+            )
+        ):
+            return True
+
+        occupied = set(occupied_area_ids)
+        if not occupied:
+            return False
+
+        found_door = False
+        for state in self.hass.states.async_all("binary_sensor"):
+            if state.attributes.get("device_class") != "door":
+                continue
+            if entity_area_id(self.hass, state.entity_id) not in occupied:
+                continue
+            found_door = True
+            if state.state == STATE_ON:
+                return True
+
+        if not found_door:
+            _LOGGER.debug(
+                "Fallback blocked: no door binary sensor belongs to occupied area(s) %s",
+                sorted(occupied),
+            )
+        else:
+            _LOGGER.debug(
+                "Fallback blocked: every occupied-area door is closed or unavailable"
+            )
+        return False
 
     def _occupied_area_ids(self) -> tuple[str, ...] | None:
         """Resolve occupied areas from the configured sensor state or attribute."""
