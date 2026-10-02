@@ -369,12 +369,21 @@ rep(p,
 '    CONF_NOTIFY_POLICIES,\n'
 '    CONF_NOTIFY_PROFILES,\n'
 )
-rep(p,
-'''    migrated.setdefault(CONF_NOTIFY_PROFILES, {})
-''',
-'''    migrated.setdefault(CONF_NOTIFY_POLICIES, {})
-    migrated.setdefault(CONF_NOTIFY_PROFILES, {})
-''')
+text=p.read_text(encoding="utf-8")
+if text.count('    migrated.setdefault(CONF_NOTIFY_PROFILES, {})\n') != 2:
+    raise SystemExit(
+        f"{p}: expected two notify profile migration defaults, found "
+        f"{text.count('    migrated.setdefault(CONF_NOTIFY_PROFILES, {})\\n')}"
+    )
+p.write_text(
+    text.replace(
+        '    migrated.setdefault(CONF_NOTIFY_PROFILES, {})\n',
+        '    migrated.setdefault(CONF_NOTIFY_POLICIES, {})\n'
+        '    migrated.setdefault(CONF_NOTIFY_PROFILES, {})\n',
+        2,
+    ),
+    encoding="utf-8",
+)
 
 # diagnostics: redact policy map with entity refs too.
 p=C/"diagnostics.py"
