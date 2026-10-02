@@ -157,6 +157,53 @@ Configure:
 - audio-path idle, playback-start, and playback-duration timeouts;
 - the gap between audible outputs.
 
+## Per-integration visual profiles and multipart reading time
+
+After selecting visual notification outputs, setup opens one profile page for
+every concrete integration represented by those outputs. Profiles are frozen
+into each queued job, so changing options later cannot alter an announcement
+that is already waiting.
+
+Every profile provides:
+
+- maximum characters per displayed part (`0` disables splitting);
+- reading speed in words per minute;
+- minimum and maximum display duration;
+- an extra reading-time buffer and a gap between parts;
+- optional part numbering in the title;
+- provider-specific data merged before per-call `notify_data`.
+
+Splitting prefers a complete sentence (`.`, `!`, or `?`), then a comma or
+other clause boundary, and finally whitespace. A word is hard-cut only when
+that single word is longer than the configured maximum.
+
+Display time is calculated for every part as:
+
+```text
+words / words-per-minute × 60 + buffer
+```
+
+and then clamped to the configured minimum and maximum. Parts for one output
+remain sequential, while different visual outputs receive the same
+announcement concurrently.
+
+### Notifications for Android TV / Fire TV
+
+The native legacy notification action is used when available so each profile
+can control:
+
+- bottom-right, bottom-left, top-right, top-left, or center placement;
+- small, medium, large, or maximum font;
+- background color and transparency;
+- interactive/interrupt behavior;
+- a duration calculated from the words in the current part.
+
+### Companion App visual notifications
+
+Multipart Companion App notifications use one stable tag by default, causing
+each new part to replace the previous part instead of building a stack. This
+is independent from the optional Companion App **TTS** output.
+
 ## Main action
 
 ```yaml

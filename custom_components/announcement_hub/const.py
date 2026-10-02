@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.2.0"
+VERSION: Final = "0.3.0"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -86,6 +86,49 @@ CONF_COMPANION_TTS_MEDIA_STREAM: Final = "companion_tts_media_stream"
 CONF_COMPANION_TTS_WPM: Final = "companion_tts_words_per_minute"
 CONF_DEFAULT_TITLE: Final = "default_title"
 CONF_CRITICAL_NOTIFY_DATA: Final = "critical_notify_data"
+CONF_NOTIFY_PROFILES: Final = "notify_profiles"
+
+# Per-integration visual output profile fields. Profiles are keyed by the
+# integration domain that owns the concrete notify output.
+PROFILE_DEFAULT: Final = "default"
+PROFILE_MAX_LENGTH: Final = "max_length"
+PROFILE_READING_WPM: Final = "reading_words_per_minute"
+PROFILE_MIN_DISPLAY: Final = "minimum_display_seconds"
+PROFILE_MAX_DISPLAY: Final = "maximum_display_seconds"
+PROFILE_DISPLAY_BUFFER: Final = "display_buffer_seconds"
+PROFILE_PART_GAP: Final = "part_gap_seconds"
+PROFILE_SHOW_PART_NUMBER: Final = "show_part_number"
+PROFILE_INTEGRATION_DATA: Final = "integration_data"
+PROFILE_REPLACE_PARTS: Final = "replace_parts"
+PROFILE_NF_POSITION: Final = "position"
+PROFILE_NF_FONTSIZE: Final = "fontsize"
+PROFILE_NF_COLOR: Final = "color"
+PROFILE_NF_TRANSPARENCY: Final = "transparency"
+PROFILE_NF_INTERRUPT: Final = "interrupt"
+
+INTEGRATION_NFANDROIDTV: Final = "nfandroidtv"
+INTEGRATION_MOBILE_APP: Final = "mobile_app"
+
+NFANDROIDTV_POSITIONS: Final = (
+    "bottom-right",
+    "bottom-left",
+    "top-right",
+    "top-left",
+    "center",
+)
+NFANDROIDTV_FONTSIZES: Final = ("small", "medium", "large", "max")
+NFANDROIDTV_COLORS: Final = (
+    "grey",
+    "black",
+    "indigo",
+    "green",
+    "red",
+    "cyan",
+    "teal",
+    "amber",
+    "pink",
+)
+NFANDROIDTV_TRANSPARENCIES: Final = ("0%", "25%", "50%", "75%", "100%")
 
 CONF_SNAPCAST_SOURCE: Final = "snapcast_source"
 CONF_SNAPCAST_ONLY_SOURCE: Final = "snapcast_only_source"
@@ -127,6 +170,21 @@ DEFAULT_COMPANION_TTS_MEDIA_STREAM: Final = COMPANION_STREAM_DEFAULT
 DEFAULT_COMPANION_TTS_WPM: Final = 150
 DEFAULT_TITLE: Final = "Notification"
 DEFAULT_CRITICAL_NOTIFY_DATA: Final = {}
+DEFAULT_NOTIFY_MAX_LENGTH: Final = 0
+DEFAULT_NFANDROIDTV_MAX_LENGTH: Final = 193
+DEFAULT_MOBILE_APP_MAX_LENGTH: Final = 500
+DEFAULT_NOTIFY_READING_WPM: Final = 200
+DEFAULT_NOTIFY_MIN_DISPLAY: Final = 3.0
+DEFAULT_NOTIFY_MAX_DISPLAY: Final = 30.0
+DEFAULT_NOTIFY_DISPLAY_BUFFER: Final = 1.0
+DEFAULT_NOTIFY_PART_GAP: Final = 0.15
+DEFAULT_NOTIFY_SHOW_PART_NUMBER: Final = True
+DEFAULT_NOTIFY_REPLACE_PARTS: Final = True
+DEFAULT_NFANDROIDTV_POSITION: Final = "bottom-right"
+DEFAULT_NFANDROIDTV_FONTSIZE: Final = "medium"
+DEFAULT_NFANDROIDTV_COLOR: Final = "grey"
+DEFAULT_NFANDROIDTV_TRANSPARENCY: Final = "25%"
+DEFAULT_NFANDROIDTV_INTERRUPT: Final = False
 DEFAULT_SNAPCAST_SOURCE: Final = "TTS"
 DEFAULT_SNAPCAST_ONLY_SOURCE: Final = True
 DEFAULT_SNAPCAST_SETTLE_DELAY: Final = 0.25

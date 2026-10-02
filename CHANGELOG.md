@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0
+
+- Added one visual delivery profile per configured notify integration.
+- Added natural multipart splitting with sentence, clause, and whitespace
+  boundaries before any hard cut.
+- Added word-count reading-time calculation with minimum, maximum, and buffer
+  controls; the queue holds each part long enough before advancing.
+- Added Notifications for Android TV / Fire TV placement, font size, color,
+  transparency, interaction, and calculated duration options.
+- Added Companion App multipart replacement so consecutive parts do not stack.
+- Added provider-specific data and froze resolved profiles into persistent jobs.
+- Visual outputs for the same announcement now run concurrently while each
+  individual output's parts remain strictly ordered.
+
 ## 0.2.0 - 2026-10-02
 
 - Replaced allowed/default provider lists with output-centric integration,

@@ -83,13 +83,50 @@
           "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
           "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων"
         }
+      },
+      "notification_profile": {
+        "title": "Οπτική συμπεριφορά: {integration}",
+        "description": "Ρυθμίζει τον διαχωρισμό, τον χρόνο ανάγνωσης και τις εγγενείς επιλογές του {integration}. Το προφίλ κάθε συγκεκριμένης εξόδου παγώνει όταν η εργασία μπει στην ουρά.",
+        "data": {
+          "max_length": "Μέγιστοι χαρακτήρες ανά τμήμα",
+          "reading_words_per_minute": "Ταχύτητα ανάγνωσης",
+          "minimum_display_seconds": "Ελάχιστος χρόνος εμφάνισης",
+          "maximum_display_seconds": "Μέγιστος χρόνος εμφάνισης",
+          "display_buffer_seconds": "Επιπλέον χρόνος ανάγνωσης",
+          "part_gap_seconds": "Κενό μεταξύ τμημάτων",
+          "show_part_number": "Εμφάνιση αριθμού τμήματος στον τίτλο",
+          "integration_data": "Πρόσθετα δεδομένα ενσωμάτωσης",
+          "replace_parts": "Αντικατάσταση προηγούμενου τμήματος Companion App",
+          "position": "Θέση",
+          "fontsize": "Μέγεθος γραμματοσειράς",
+          "color": "Χρώμα φόντου",
+          "transparency": "Διαφάνεια φόντου",
+          "interrupt": "Διαδραστική ειδοποίηση"
+        },
+        "data_description": {
+          "max_length": "Το 0 απενεργοποιεί τον διαχωρισμό. Το μεγάλο κείμενο χωρίζεται πρώτα σε τέλος πρότασης, μετά σε κόμμα ή δευτερεύουσα φράση και τέλος σε κενό. Λέξη κόβεται μόνο όταν η ίδια ξεπερνά το όριο.",
+          "reading_words_per_minute": "Υπολογίζει πόσο θα παραμένει κάθε τμήμα πριν σταλεί το επόμενο.",
+          "minimum_display_seconds": "Κατώτερο όριο του υπολογισμένου χρόνου ανάγνωσης.",
+          "maximum_display_seconds": "Ανώτερο όριο του υπολογισμένου χρόνου ανάγνωσης.",
+          "display_buffer_seconds": "Επιπλέον χρόνος μετά την εκτίμηση βάσει λέξεων.",
+          "part_gap_seconds": "Μικρή παύση ανάμεσα σε δύο τμήματα.",
+          "show_part_number": "Προσθέτει 1/3, 2/3 κ.λπ. στον τίτλο.",
+          "integration_data": "Προαιρετικά δεδομένα παρόχου· τα δεδομένα της κλήσης υπερισχύουν.",
+          "replace_parts": "Χρησιμοποιεί κοινό tag ώστε κάθε νέο τμήμα Companion App να αντικαθιστά το προηγούμενο.",
+          "position": "Θέση της επικάλυψης στο Android TV / Fire TV.",
+          "fontsize": "Μέγεθος κειμένου της επικάλυψης.",
+          "color": "Χρώμα φόντου της επικάλυψης.",
+          "transparency": "Διαφάνεια φόντου της επικάλυψης.",
+          "interrupt": "Κάνει την ειδοποίηση TV διαδραστική και μπορεί να διακόψει την τρέχουσα εφαρμογή."
+        }
       }
     },
     "error": {
       "tts_player_required": "Επίλεξε media player TTS όταν έχουν επιλεγεί μηχανές TTS.",
       "tts_engine_required": "Επίλεξε τουλάχιστον μία μηχανή TTS όταν έχει επιλεγεί media player TTS.",
       "snapcast_tts_path_required": "Οι έξοδοι Snapcast απαιτούν τουλάχιστον μία μηχανή TTS και media player TTS.",
-      "output_required": "Επίλεξε τουλάχιστον μία οπτική έξοδο, έξοδο TTS του server ή έξοδο TTS Companion App."
+      "output_required": "Επίλεξε τουλάχιστον μία οπτική έξοδο, έξοδο TTS του server ή έξοδο TTS Companion App.",
+      "display_time_order": "Ο μέγιστος χρόνος εμφάνισης πρέπει να είναι μεγαλύτερος ή ίσος με τον ελάχιστο."
     },
     "abort": {
       "single_instance_allowed": "Το Κέντρο Ανακοινώσεων έχει ήδη ρυθμιστεί."
@@ -178,13 +215,50 @@
           "playback_timeout": "Μέγιστη διάρκεια αναπαραγωγής",
           "post_play_delay": "Κενό μεταξύ ηχητικών εξόδων"
         }
+      },
+      "notification_profile": {
+        "title": "Οπτική συμπεριφορά: {integration}",
+        "description": "Ρυθμίζει τον διαχωρισμό, τον χρόνο ανάγνωσης και τις εγγενείς επιλογές του {integration}. Το προφίλ κάθε συγκεκριμένης εξόδου παγώνει όταν η εργασία μπει στην ουρά.",
+        "data": {
+          "max_length": "Μέγιστοι χαρακτήρες ανά τμήμα",
+          "reading_words_per_minute": "Ταχύτητα ανάγνωσης",
+          "minimum_display_seconds": "Ελάχιστος χρόνος εμφάνισης",
+          "maximum_display_seconds": "Μέγιστος χρόνος εμφάνισης",
+          "display_buffer_seconds": "Επιπλέον χρόνος ανάγνωσης",
+          "part_gap_seconds": "Κενό μεταξύ τμημάτων",
+          "show_part_number": "Εμφάνιση αριθμού τμήματος στον τίτλο",
+          "integration_data": "Πρόσθετα δεδομένα ενσωμάτωσης",
+          "replace_parts": "Αντικατάσταση προηγούμενου τμήματος Companion App",
+          "position": "Θέση",
+          "fontsize": "Μέγεθος γραμματοσειράς",
+          "color": "Χρώμα φόντου",
+          "transparency": "Διαφάνεια φόντου",
+          "interrupt": "Διαδραστική ειδοποίηση"
+        },
+        "data_description": {
+          "max_length": "Το 0 απενεργοποιεί τον διαχωρισμό. Το μεγάλο κείμενο χωρίζεται πρώτα σε τέλος πρότασης, μετά σε κόμμα ή δευτερεύουσα φράση και τέλος σε κενό. Λέξη κόβεται μόνο όταν η ίδια ξεπερνά το όριο.",
+          "reading_words_per_minute": "Υπολογίζει πόσο θα παραμένει κάθε τμήμα πριν σταλεί το επόμενο.",
+          "minimum_display_seconds": "Κατώτερο όριο του υπολογισμένου χρόνου ανάγνωσης.",
+          "maximum_display_seconds": "Ανώτερο όριο του υπολογισμένου χρόνου ανάγνωσης.",
+          "display_buffer_seconds": "Επιπλέον χρόνος μετά την εκτίμηση βάσει λέξεων.",
+          "part_gap_seconds": "Μικρή παύση ανάμεσα σε δύο τμήματα.",
+          "show_part_number": "Προσθέτει 1/3, 2/3 κ.λπ. στον τίτλο.",
+          "integration_data": "Προαιρετικά δεδομένα παρόχου· τα δεδομένα της κλήσης υπερισχύουν.",
+          "replace_parts": "Χρησιμοποιεί κοινό tag ώστε κάθε νέο τμήμα Companion App να αντικαθιστά το προηγούμενο.",
+          "position": "Θέση της επικάλυψης στο Android TV / Fire TV.",
+          "fontsize": "Μέγεθος κειμένου της επικάλυψης.",
+          "color": "Χρώμα φόντου της επικάλυψης.",
+          "transparency": "Διαφάνεια φόντου της επικάλυψης.",
+          "interrupt": "Κάνει την ειδοποίηση TV διαδραστική και μπορεί να διακόψει την τρέχουσα εφαρμογή."
+        }
       }
     },
     "error": {
       "tts_player_required": "Επίλεξε media player TTS όταν έχουν επιλεγεί μηχανές TTS.",
       "tts_engine_required": "Επίλεξε τουλάχιστον μία μηχανή TTS όταν έχει επιλεγεί media player TTS.",
       "snapcast_tts_path_required": "Οι έξοδοι Snapcast απαιτούν τουλάχιστον μία μηχανή TTS και media player TTS.",
-      "output_required": "Επίλεξε τουλάχιστον μία οπτική έξοδο, έξοδο TTS του server ή έξοδο TTS Companion App."
+      "output_required": "Επίλεξε τουλάχιστον μία οπτική έξοδο, έξοδο TTS του server ή έξοδο TTS Companion App.",
+      "display_time_order": "Ο μέγιστος χρόνος εμφάνισης πρέπει να είναι μεγαλύτερος ή ίσος με τον ελάχιστο."
     }
   },
   "selector": {
@@ -221,6 +295,45 @@
         "info": "Πληροφορία",
         "success": "Επιτυχία",
         "debug": "Αποσφαλμάτωση"
+      }
+    },
+    "nfandroidtv_position": {
+      "options": {
+        "bottom-right": "Bottom right",
+        "bottom-left": "Bottom left",
+        "top-right": "Top right",
+        "top-left": "Top left",
+        "center": "Center"
+      }
+    },
+    "nfandroidtv_fontsize": {
+      "options": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large",
+        "max": "Maximum"
+      }
+    },
+    "nfandroidtv_color": {
+      "options": {
+        "grey": "Grey",
+        "black": "Black",
+        "indigo": "Indigo",
+        "green": "Green",
+        "red": "Red",
+        "cyan": "Cyan",
+        "teal": "Teal",
+        "amber": "Amber",
+        "pink": "Pink"
+      }
+    },
+    "nfandroidtv_transparency": {
+      "options": {
+        "0%": "0%",
+        "25%": "25%",
+        "50%": "50%",
+        "75%": "75%",
+        "100%": "100%"
       }
     }
   },

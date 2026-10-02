@@ -11,6 +11,7 @@ from .const import (
     LEVEL_CRITICAL,
     LEVEL_INFO,
     LEVEL_PRIORITY,
+    PROFILE_INTEGRATION_DATA,
     TTS_LEVEL_NEVER,
 )
 
@@ -136,6 +137,7 @@ class AnnouncementJob:
     tts_media_player: str | None = None
     tts_player_area: str | None = None
     notify_output_areas: dict[str, str | None] = field(default_factory=dict)
+    notify_output_profiles: dict[str, dict[str, Any]] = field(default_factory=dict)
     snapcast_client_areas: dict[str, str | None] = field(default_factory=dict)
     companion_tts_entry_areas: dict[str, str | None] = field(default_factory=dict)
     companion_tts_media_stream: str = "default"
@@ -168,6 +170,7 @@ class AnnouncementJob:
         tts_media_player: str | None = None,
         tts_player_area: str | None = None,
         notify_output_areas: Mapping[str, str | None] | None = None,
+        notify_output_profiles: Mapping[str, Mapping[str, Any]] | None = None,
         snapcast_client_areas: Mapping[str, str | None] | None = None,
         companion_tts_entry_areas: Mapping[str, str | None] | None = None,
         companion_tts_media_stream: str = "default",
@@ -196,6 +199,10 @@ class AnnouncementJob:
             tts_media_player=tts_media_player or None,
             tts_player_area=tts_player_area or None,
             notify_output_areas=dict(notify_output_areas or {}),
+            notify_output_profiles={
+                str(key): dict(value)
+                for key, value in (notify_output_profiles or {}).items()
+            },
             snapcast_client_areas=dict(snapcast_client_areas or {}),
             companion_tts_entry_areas=dict(companion_tts_entry_areas or {}),
             companion_tts_media_stream=companion_tts_media_stream or "default",
@@ -241,6 +248,7 @@ class AnnouncementJob:
         payload.setdefault("tts_media_player", None)
         payload.setdefault("tts_player_area", None)
         payload.setdefault("notify_output_areas", {})
+        payload.setdefault("notify_output_profiles", {})
         payload.setdefault("snapcast_client_areas", {})
         payload.setdefault("companion_tts_entry_areas", {})
         payload.setdefault("companion_tts_media_stream", "default")
@@ -286,6 +294,14 @@ class AnnouncementJob:
                 "notify": dict(self.notify_output_areas),
                 "snapcast": dict(self.snapcast_client_areas),
                 "companion_tts": dict(self.companion_tts_entry_areas),
+            },
+            "notify_output_profiles": {
+                key: {
+                    profile_key: profile_value
+                    for profile_key, profile_value in value.items()
+                    if profile_key != PROFILE_INTEGRATION_DATA
+                }
+                for key, value in self.notify_output_profiles.items()
             },
             "tts_suppressed_by_level": self.tts_suppressed_by_level,
             "started_at": self.started_at,

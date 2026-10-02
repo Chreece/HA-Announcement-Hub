@@ -46,7 +46,7 @@ def test_service_fields_sections_and_translations_match() -> None:
 
 def test_config_and_options_steps_match_flow_contract() -> None:
     strings = json.loads((COMPONENT / "strings.json").read_text())
-    expected_steps = {"outputs", "tts", "snapcast", "queue"}
+    expected_steps = {"outputs", "notification_profile", "tts", "snapcast", "queue"}
     assert set(strings["config"]["step"]) == expected_steps
     assert set(strings["options"]["step"]) == expected_steps
 
@@ -66,6 +66,9 @@ def test_config_and_options_steps_match_flow_contract() -> None:
         "tts_engines",
         "tts_min_level",
         "output_availability_timeout",
+        "max_length",
+        "reading_words_per_minute",
+        "position",
     }.issubset(all_config_fields)
 
     services = yaml.safe_load((COMPONENT / "services.yaml").read_text())
@@ -96,11 +99,21 @@ def test_source_contains_output_centric_features() -> None:
     assert "notify_entity_by_entry" in outputs
     assert "entity_area_id(hass, notify_entity)" in outputs
     assert "notify_output_areas" in manager
+    assert "notify_output_profiles" in manager
+    assert "split_message" in manager
+    assert "reading_seconds" in manager
+    assert "parallel=True" in manager
+    assert "notify_output_legacy_service" in manager
     assert "snapcast_client_areas" in manager
     assert 'f"{TARGET_INTEGRATION_PREFIX}snapcast"' in manager
     assert "unselected client cannot leak" in manager
     assert "companion_tts_entry_areas" in manager
     assert "async_migrate_entry" in init
+    assert config_flow.count("self._notify_profile_domains = []") == 2
+    diagnostics = (COMPONENT / "diagnostics.py").read_text()
+    assert "CONF_NOTIFY_PROFILES" in diagnostics
+    installer = (ROOT / "install.sh").read_text()
+    assert '"message_parts.py"' in installer
 
 
 def test_local_brand_assets_exist() -> None:
@@ -115,7 +128,7 @@ def test_manifest_and_hacs_identity() -> None:
     hacs = json.loads((ROOT / "hacs.json").read_text())
     assert manifest["domain"] == "announcement_hub"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "0.2.0"
+    assert manifest["version"] == "0.3.0"
     assert hacs["name"] == manifest["name"]
 
 

@@ -83,13 +83,50 @@
           "playback_timeout": "Maximum playback time",
           "post_play_delay": "Gap between audible outputs"
         }
+      },
+      "notification_profile": {
+        "title": "Visual behavior: {integration}",
+        "description": "Configure splitting, reading time, and the native options supported by {integration}. Each concrete output keeps this profile when a job enters the queue.",
+        "data": {
+          "max_length": "Maximum characters per part",
+          "reading_words_per_minute": "Reading speed",
+          "minimum_display_seconds": "Minimum display time",
+          "maximum_display_seconds": "Maximum display time",
+          "display_buffer_seconds": "Reading-time buffer",
+          "part_gap_seconds": "Gap between parts",
+          "show_part_number": "Show part number in the title",
+          "integration_data": "Additional integration data",
+          "replace_parts": "Replace the previous Companion App part",
+          "position": "Position",
+          "fontsize": "Font size",
+          "color": "Background color",
+          "transparency": "Background transparency",
+          "interrupt": "Interactive notification"
+        },
+        "data_description": {
+          "max_length": "0 disables splitting. Longer text is split after a sentence ending, then a comma or clause, then whitespace; words are cut only when one word itself exceeds the limit.",
+          "reading_words_per_minute": "Used to calculate how long each part remains before the next part is sent.",
+          "minimum_display_seconds": "Lower clamp for the calculated reading time.",
+          "maximum_display_seconds": "Upper clamp for the calculated reading time.",
+          "display_buffer_seconds": "Extra time added after the word-based reading estimate.",
+          "part_gap_seconds": "Small blank interval after one part finishes before the next is sent.",
+          "show_part_number": "Adds 1/3, 2/3, and so on to the notification title.",
+          "integration_data": "Optional provider-specific data merged before per-call notification data.",
+          "replace_parts": "Use one notification tag so each new Companion App part replaces the previous part instead of stacking.",
+          "position": "Where Notifications for Android TV / Fire TV places the overlay.",
+          "fontsize": "Overlay text size.",
+          "color": "Overlay background color.",
+          "transparency": "Overlay background transparency.",
+          "interrupt": "Makes the TV notification interactive. This may interrupt the app currently playing on the TV."
+        }
       }
     },
     "error": {
       "tts_player_required": "Select a TTS media player when TTS engines are selected.",
       "tts_engine_required": "Select at least one TTS engine when a TTS media player is selected.",
       "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output."
+      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
+      "display_time_order": "Maximum display time must be greater than or equal to minimum display time."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -178,13 +215,50 @@
           "playback_timeout": "Maximum playback time",
           "post_play_delay": "Gap between audible outputs"
         }
+      },
+      "notification_profile": {
+        "title": "Visual behavior: {integration}",
+        "description": "Configure splitting, reading time, and the native options supported by {integration}. Each concrete output keeps this profile when a job enters the queue.",
+        "data": {
+          "max_length": "Maximum characters per part",
+          "reading_words_per_minute": "Reading speed",
+          "minimum_display_seconds": "Minimum display time",
+          "maximum_display_seconds": "Maximum display time",
+          "display_buffer_seconds": "Reading-time buffer",
+          "part_gap_seconds": "Gap between parts",
+          "show_part_number": "Show part number in the title",
+          "integration_data": "Additional integration data",
+          "replace_parts": "Replace the previous Companion App part",
+          "position": "Position",
+          "fontsize": "Font size",
+          "color": "Background color",
+          "transparency": "Background transparency",
+          "interrupt": "Interactive notification"
+        },
+        "data_description": {
+          "max_length": "0 disables splitting. Longer text is split after a sentence ending, then a comma or clause, then whitespace; words are cut only when one word itself exceeds the limit.",
+          "reading_words_per_minute": "Used to calculate how long each part remains before the next part is sent.",
+          "minimum_display_seconds": "Lower clamp for the calculated reading time.",
+          "maximum_display_seconds": "Upper clamp for the calculated reading time.",
+          "display_buffer_seconds": "Extra time added after the word-based reading estimate.",
+          "part_gap_seconds": "Small blank interval after one part finishes before the next is sent.",
+          "show_part_number": "Adds 1/3, 2/3, and so on to the notification title.",
+          "integration_data": "Optional provider-specific data merged before per-call notification data.",
+          "replace_parts": "Use one notification tag so each new Companion App part replaces the previous part instead of stacking.",
+          "position": "Where Notifications for Android TV / Fire TV places the overlay.",
+          "fontsize": "Overlay text size.",
+          "color": "Overlay background color.",
+          "transparency": "Overlay background transparency.",
+          "interrupt": "Makes the TV notification interactive. This may interrupt the app currently playing on the TV."
+        }
       }
     },
     "error": {
       "tts_player_required": "Select a TTS media player when TTS engines are selected.",
       "tts_engine_required": "Select at least one TTS engine when a TTS media player is selected.",
       "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output."
+      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
+      "display_time_order": "Maximum display time must be greater than or equal to minimum display time."
     }
   },
   "selector": {
@@ -221,6 +295,45 @@
         "info": "Information",
         "success": "Success",
         "debug": "Debug"
+      }
+    },
+    "nfandroidtv_position": {
+      "options": {
+        "bottom-right": "Bottom right",
+        "bottom-left": "Bottom left",
+        "top-right": "Top right",
+        "top-left": "Top left",
+        "center": "Center"
+      }
+    },
+    "nfandroidtv_fontsize": {
+      "options": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large",
+        "max": "Maximum"
+      }
+    },
+    "nfandroidtv_color": {
+      "options": {
+        "grey": "Grey",
+        "black": "Black",
+        "indigo": "Indigo",
+        "green": "Green",
+        "red": "Red",
+        "cyan": "Cyan",
+        "teal": "Teal",
+        "amber": "Amber",
+        "pink": "Pink"
+      }
+    },
+    "nfandroidtv_transparency": {
+      "options": {
+        "0%": "0%",
+        "25%": "25%",
+        "50%": "50%",
+        "75%": "75%",
+        "100%": "100%"
       }
     }
   },

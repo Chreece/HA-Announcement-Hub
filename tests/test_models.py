@@ -171,6 +171,17 @@ def test_job_round_trip_preserves_output_and_room_binding() -> None:
             "entity:notify.wall_display": "living_room",
             "service:notify.mobile_app_phone": None,
         },
+        notify_output_profiles={
+            "entity:notify.wall_display": {
+                "max_length": 193,
+                "position": "bottom-left",
+                "integration_data": {"secret": "do-not-expose"},
+            },
+            "service:notify.mobile_app_phone": {
+                "max_length": 500,
+                "replace_parts": True,
+            },
+        },
         snapcast_client_areas={
             "media_player.kitchen_snapcast": "kitchen"
         },
@@ -196,6 +207,12 @@ def test_job_round_trip_preserves_output_and_room_binding() -> None:
         "entity:notify.wall_display": "living_room",
         "service:notify.mobile_app_phone": None,
     }
+    assert restored.notify_output_profiles[
+        "entity:notify.wall_display"
+    ]["position"] == "bottom-left"
+    assert restored.notify_output_profiles[
+        "service:notify.mobile_app_phone"
+    ]["replace_parts"] is True
     assert restored.snapcast_client_areas == {
         "media_player.kitchen_snapcast": "kitchen"
     }
@@ -206,6 +223,10 @@ def test_job_round_trip_preserves_output_and_room_binding() -> None:
     assert restored.companion_tts_words_per_minute == 165
     assert restored.media_source_ids == {"tts.piper": "media-source://tts/test"}
     assert restored.tts_cache is True
+    public = restored.public_dict()
+    assert "integration_data" not in public["notify_output_profiles"][
+        "entity:notify.wall_display"
+    ]
 
 
 def test_v01_stored_job_best_effort_migration() -> None:

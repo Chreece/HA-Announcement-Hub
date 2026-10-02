@@ -521,7 +521,18 @@ def resolve_notify_outputs(
         elif ref.startswith(TARGET_SERVICE_PREFIX):
             service = ref.removeprefix(TARGET_SERVICE_PREFIX)
             if service.startswith("notify."):
-                result.append(NotifyOutput(ref=ref, service=service))
+                object_id = service.partition(".")[2]
+                matching_entity = f"notify.{object_id}"
+                result.append(
+                    NotifyOutput(
+                        ref=ref,
+                        service=service,
+                        integration=entity_integration(hass, matching_entity),
+                        config_entry_id=entity_config_entry_id(
+                            hass, matching_entity
+                        ),
+                    )
+                )
     return tuple(result)
 
 
@@ -568,6 +579,25 @@ def output_matches_areas(
     return not requested_areas or output_area_id is None or output_area_id in set(
         requested_areas
     )
+
+
+def notify_output_legacy_service(
+    hass: HomeAssistant, output: NotifyOutput
+) -> str | None:
+    """Return an advanced legacy notify action when one matches the output.
+
+    Home Assistant's modern notify.send_message action intentionally accepts only
+    message and title. Integrations such as nfandroidtv expose placement, duration,
+    and styling through their legacy notify.<name> action.
+    """
+    if output.service:
+        return output.service
+    if not output.entity_id:
+        return None
+    object_id = output.entity_id.partition(".")[2]
+    if object_id and hass.services.has_service("notify", object_id):
+        return f"notify.{object_id}"
+    return None
 
 
 def notify_output_available(hass: HomeAssistant, output: NotifyOutput) -> bool:

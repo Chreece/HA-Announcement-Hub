@@ -22,6 +22,7 @@ from .const import (
     CONF_DISPATCH_ORDER,
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
+    CONF_NOTIFY_PROFILES,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -60,13 +61,41 @@ from .const import (
     DEFAULT_TTS_MIN_LEVEL,
     DEFAULT_TTS_OPTIONS,
     DISPATCH_ORDERS,
+    INTEGRATION_MOBILE_APP,
+    INTEGRATION_NFANDROIDTV,
+    NFANDROIDTV_COLORS,
+    NFANDROIDTV_FONTSIZES,
+    NFANDROIDTV_POSITIONS,
+    NFANDROIDTV_TRANSPARENCIES,
+    PROFILE_DEFAULT,
+    PROFILE_DISPLAY_BUFFER,
+    PROFILE_INTEGRATION_DATA,
+    PROFILE_MAX_DISPLAY,
+    PROFILE_MAX_LENGTH,
+    PROFILE_MIN_DISPLAY,
+    PROFILE_NF_COLOR,
+    PROFILE_NF_FONTSIZE,
+    PROFILE_NF_INTERRUPT,
+    PROFILE_NF_POSITION,
+    PROFILE_NF_TRANSPARENCY,
+    PROFILE_PART_GAP,
+    PROFILE_READING_WPM,
+    PROFILE_REPLACE_PARTS,
+    PROFILE_SHOW_PART_NUMBER,
     DOMAIN,
     NAME,
     TTS_MIN_LEVELS,
 )
+from .message_parts import (
+    integration_label,
+    normalise_notify_profile,
+    resolve_notify_profile,
+)
 from .outputs import (
     companion_tts_output_options,
+    expand_notify_output_tokens,
     notify_output_options,
+    resolve_notify_outputs,
     snapcast_output_options,
     tts_engine_options,
 )
@@ -95,6 +124,8 @@ class _AnnouncementFlowMixin:
     """Shared multi-page setup for config and options flows."""
 
     _working: dict[str, Any]
+    _notify_profile_domains: list[str]
+    _notify_profile_index: int
 
     @abstractmethod
     async def _async_finish(self) -> ConfigFlowResult:
@@ -126,7 +157,8 @@ class _AnnouncementFlowMixin:
                     CONF_CRITICAL_NOTIFY_DATA: {},
                 },
             )
-            return await self.async_step_tts()
+            self._prepare_notify_profile_steps()
+            return await self.async_step_notification_profile()
 
         schema = probatio.Schema(
             {
@@ -156,6 +188,204 @@ class _AnnouncementFlowMixin:
             }
         )
         return self.async_show_form(step_id="outputs", data_schema=schema)
+
+
+    def _prepare_notify_profile_steps(self) -> None:
+        refs = expand_notify_output_tokens(
+            self.hass,
+            list(self._working.get(CONF_NOTIFY_OUTPUTS, [])),
+        )
+        domains = {
+            output.integration or PROFILE_DEFAULT
+            for output in resolve_notify_outputs(self.hass, refs)
+        }
+        self._notify_profile_domains = sorted(
+            domains,
+            key=lambda domain: integration_label(domain).casefold(),
+        )
+        configured_profiles = self._working.get(CONF_NOTIFY_PROFILES, {})
+        if not isinstance(configured_profiles, dict):
+            configured_profiles = {}
+        self._working[CONF_NOTIFY_PROFILES] = {
+            domain: profile
+            for domain, profile in configured_profiles.items()
+            if domain in domains and isinstance(profile, dict)
+        }
+        self._notify_profile_index = 0
+
+    async def async_step_notification_profile(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Configure splitting, read timing, and native provider options."""
+        if self._notify_profile_index >= len(self._notify_profile_domains):
+            return await self.async_step_tts()
+
+        integration = self._notify_profile_domains[self._notify_profile_index]
+        profiles = dict(self._working.get(CONF_NOTIFY_PROFILES, {}) or {})
+        current = resolve_notify_profile(profiles, integration)
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            minimum = float(user_input.get(PROFILE_MIN_DISPLAY, 0))
+            maximum = float(user_input.get(PROFILE_MAX_DISPLAY, 0))
+            if maximum < minimum:
+                errors["base"] = "display_time_order"
+            else:
+                profiles[integration] = normalise_notify_profile(
+                    user_input, integration
+                )
+                self._working[CONF_NOTIFY_PROFILES] = profiles
+                self._notify_profile_index += 1
+                return await self.async_step_notification_profile()
+
+        fields: dict[probatio.Marker, Any] = {
+            probatio.Required(
+                PROFILE_MAX_LENGTH,
+                default=current[PROFILE_MAX_LENGTH],
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0,
+                    max=10000,
+                    step=1,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="characters",
+                )
+            ),
+            probatio.Required(
+                PROFILE_READING_WPM,
+                default=current[PROFILE_READING_WPM],
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=60,
+                    max=600,
+                    step=5,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="wpm",
+                )
+            ),
+            probatio.Required(
+                PROFILE_MIN_DISPLAY,
+                default=current[PROFILE_MIN_DISPLAY],
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0,
+                    max=120,
+                    step=0.5,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="s",
+                )
+            ),
+            probatio.Required(
+                PROFILE_MAX_DISPLAY,
+                default=current[PROFILE_MAX_DISPLAY],
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0.5,
+                    max=600,
+                    step=0.5,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="s",
+                )
+            ),
+            probatio.Required(
+                PROFILE_DISPLAY_BUFFER,
+                default=current[PROFILE_DISPLAY_BUFFER],
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0,
+                    max=30,
+                    step=0.25,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="s",
+                )
+            ),
+            probatio.Required(
+                PROFILE_PART_GAP,
+                default=current[PROFILE_PART_GAP],
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0,
+                    max=10,
+                    step=0.05,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="s",
+                )
+            ),
+            probatio.Required(
+                PROFILE_SHOW_PART_NUMBER,
+                default=current[PROFILE_SHOW_PART_NUMBER],
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                PROFILE_INTEGRATION_DATA,
+                default=current.get(PROFILE_INTEGRATION_DATA, {}),
+            ): selector.ObjectSelector(),
+        }
+
+        if integration == INTEGRATION_NFANDROIDTV:
+            fields.update(
+                {
+                    probatio.Required(
+                        PROFILE_NF_POSITION,
+                        default=current[PROFILE_NF_POSITION],
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=list(NFANDROIDTV_POSITIONS),
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                            translation_key="nfandroidtv_position",
+                        )
+                    ),
+                    probatio.Required(
+                        PROFILE_NF_FONTSIZE,
+                        default=current[PROFILE_NF_FONTSIZE],
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=list(NFANDROIDTV_FONTSIZES),
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                            translation_key="nfandroidtv_fontsize",
+                        )
+                    ),
+                    probatio.Required(
+                        PROFILE_NF_COLOR,
+                        default=current[PROFILE_NF_COLOR],
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=list(NFANDROIDTV_COLORS),
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                            translation_key="nfandroidtv_color",
+                        )
+                    ),
+                    probatio.Required(
+                        PROFILE_NF_TRANSPARENCY,
+                        default=current[PROFILE_NF_TRANSPARENCY],
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=list(NFANDROIDTV_TRANSPARENCIES),
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                            translation_key="nfandroidtv_transparency",
+                        )
+                    ),
+                    probatio.Required(
+                        PROFILE_NF_INTERRUPT,
+                        default=current[PROFILE_NF_INTERRUPT],
+                    ): selector.BooleanSelector(),
+                }
+            )
+        elif integration == INTEGRATION_MOBILE_APP:
+            fields[
+                probatio.Required(
+                    PROFILE_REPLACE_PARTS,
+                    default=current[PROFILE_REPLACE_PARTS],
+                )
+            ] = selector.BooleanSelector()
+
+        return self.async_show_form(
+            step_id="notification_profile",
+            data_schema=probatio.Schema(fields),
+            errors=errors,
+            description_placeholders={
+                "integration": integration_label(integration)
+            },
+        )
 
     async def async_step_tts(
         self, user_input: dict[str, Any] | None = None
@@ -473,10 +703,12 @@ class AnnouncementHubConfigFlow(
 ):
     """Create the single Announcement Hub instance."""
 
-    VERSION = 2
+    VERSION = 3
 
     def __init__(self) -> None:
         self._working = {}
+        self._notify_profile_domains = []
+        self._notify_profile_index = 0
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -501,6 +733,8 @@ class AnnouncementHubOptionsFlow(_AnnouncementFlowMixin, OptionsFlow):
 
     def __init__(self) -> None:
         self._working = {}
+        self._notify_profile_domains = []
+        self._notify_profile_index = 0
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None

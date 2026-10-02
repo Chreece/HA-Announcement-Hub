@@ -34,6 +34,7 @@ from .const import (
     CONF_COMPANION_TTS_OUTPUTS,
     CONF_COMPANION_TTS_WPM,
     CONF_NOTIFY_OUTPUTS,
+    CONF_NOTIFY_PROFILES,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_SNAPCAST_OUTPUTS,
     CONF_TTS_ENGINES,
@@ -199,6 +200,7 @@ def _migrate_v1_settings(settings: dict[str, Any]) -> dict[str, Any]:
     ]
     migrated[CONF_SNAPCAST_OUTPUTS] = _entity_refs(snapcast_entities)
     migrated.setdefault(CONF_COMPANION_TTS_OUTPUTS, [])
+    migrated.setdefault(CONF_NOTIFY_PROFILES, {})
     migrated.setdefault(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
     migrated.setdefault(
         CONF_OUTPUT_AVAILABILITY_TIMEOUT,
@@ -319,17 +321,22 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
 async def async_migrate_entry(
     hass: HomeAssistant, entry: ConfigEntry
 ) -> bool:
-    """Migrate v0.1 allowed/default settings to v0.2 output selections."""
-    if entry.version > 2:
+    """Migrate legacy provider settings and add v0.3 visual profiles."""
+    if entry.version > 3:
         return False
-    if entry.version < 2:
+    if entry.version < 3:
         effective = {**entry.data, **entry.options}
-        migrated = _migrate_v1_settings(effective)
+        migrated = (
+            _migrate_v1_settings(effective)
+            if entry.version < 2
+            else dict(effective)
+        )
+        migrated.setdefault(CONF_NOTIFY_PROFILES, {})
         hass.config_entries.async_update_entry(
             entry,
             data=migrated,
             options={},
-            version=2,
+            version=3,
         )
     return True
 

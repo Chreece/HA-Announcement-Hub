@@ -8,10 +8,18 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import CONF_CRITICAL_NOTIFY_DATA, CONF_TTS_OPTIONS
+from .const import (
+    CONF_CRITICAL_NOTIFY_DATA,
+    CONF_NOTIFY_PROFILES,
+    CONF_TTS_OPTIONS,
+)
 from .manager import AnnouncementManager
 
-_TO_REDACT = {CONF_CRITICAL_NOTIFY_DATA, CONF_TTS_OPTIONS}
+_TO_REDACT = {
+    CONF_CRITICAL_NOTIFY_DATA,
+    CONF_NOTIFY_PROFILES,
+    CONF_TTS_OPTIONS,
+}
 
 
 async def async_get_config_entry_diagnostics(

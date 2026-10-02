@@ -40,6 +40,7 @@ required = {
     "const.py",
     "manager.py",
     "manifest.json",
+    "message_parts.py",
     "models.py",
     "outputs.py",
     "sensor.py",

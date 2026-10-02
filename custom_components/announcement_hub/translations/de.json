@@ -83,13 +83,50 @@
           "playback_timeout": "Maximale Wiedergabedauer",
           "post_play_delay": "Pause zwischen hörbaren Ausgaben"
         }
+      },
+      "notification_profile": {
+        "title": "Visuelles Verhalten: {integration}",
+        "description": "Konfiguriert Aufteilung, Lesezeit und die nativen Optionen von {integration}. Beim Einreihen wird das Profil für jeden konkreten Ausgang fest gespeichert.",
+        "data": {
+          "max_length": "Maximale Zeichen pro Teil",
+          "reading_words_per_minute": "Lesegeschwindigkeit",
+          "minimum_display_seconds": "Minimale Anzeigedauer",
+          "maximum_display_seconds": "Maximale Anzeigedauer",
+          "display_buffer_seconds": "Zusätzliche Lesezeit",
+          "part_gap_seconds": "Pause zwischen Teilen",
+          "show_part_number": "Teilnummer im Titel anzeigen",
+          "integration_data": "Zusätzliche Integrationsdaten",
+          "replace_parts": "Vorherigen Companion-App-Teil ersetzen",
+          "position": "Position",
+          "fontsize": "Schriftgröße",
+          "color": "Hintergrundfarbe",
+          "transparency": "Hintergrundtransparenz",
+          "interrupt": "Interaktive Benachrichtigung"
+        },
+        "data_description": {
+          "max_length": "0 deaktiviert die Aufteilung. Langer Text wird bevorzugt nach Satzende, danach Komma oder Teilsatz und zuletzt an Leerzeichen getrennt. Nur ein einzelnes zu langes Wort wird hart getrennt.",
+          "reading_words_per_minute": "Bestimmt, wie lange jeder Teil vor dem nächsten angezeigt wird.",
+          "minimum_display_seconds": "Untergrenze der berechneten Lesezeit.",
+          "maximum_display_seconds": "Obergrenze der berechneten Lesezeit.",
+          "display_buffer_seconds": "Zusätzliche Zeit nach der wortbasierten Schätzung.",
+          "part_gap_seconds": "Kurze Pause zwischen zwei Teilen.",
+          "show_part_number": "Ergänzt 1/3, 2/3 usw. im Titel.",
+          "integration_data": "Optionale anbieterspezifische Daten; Aktionsdaten überschreiben diese.",
+          "replace_parts": "Verwendet denselben Tag, damit ein neuer Companion-App-Teil den vorherigen ersetzt.",
+          "position": "Position der Einblendung auf Android TV / Fire TV.",
+          "fontsize": "Schriftgröße der Einblendung.",
+          "color": "Hintergrundfarbe der Einblendung.",
+          "transparency": "Hintergrundtransparenz der Einblendung.",
+          "interrupt": "Macht die TV-Benachrichtigung interaktiv und kann die laufende App unterbrechen."
+        }
       }
     },
     "error": {
       "tts_player_required": "Wähle einen TTS-Mediaplayer, wenn TTS-Engines ausgewählt sind.",
       "tts_engine_required": "Wähle mindestens eine TTS-Engine, wenn ein TTS-Mediaplayer ausgewählt ist.",
       "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
-      "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang."
+      "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang.",
+      "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub ist bereits eingerichtet."
@@ -178,13 +215,50 @@
           "playback_timeout": "Maximale Wiedergabedauer",
           "post_play_delay": "Pause zwischen hörbaren Ausgaben"
         }
+      },
+      "notification_profile": {
+        "title": "Visuelles Verhalten: {integration}",
+        "description": "Konfiguriert Aufteilung, Lesezeit und die nativen Optionen von {integration}. Beim Einreihen wird das Profil für jeden konkreten Ausgang fest gespeichert.",
+        "data": {
+          "max_length": "Maximale Zeichen pro Teil",
+          "reading_words_per_minute": "Lesegeschwindigkeit",
+          "minimum_display_seconds": "Minimale Anzeigedauer",
+          "maximum_display_seconds": "Maximale Anzeigedauer",
+          "display_buffer_seconds": "Zusätzliche Lesezeit",
+          "part_gap_seconds": "Pause zwischen Teilen",
+          "show_part_number": "Teilnummer im Titel anzeigen",
+          "integration_data": "Zusätzliche Integrationsdaten",
+          "replace_parts": "Vorherigen Companion-App-Teil ersetzen",
+          "position": "Position",
+          "fontsize": "Schriftgröße",
+          "color": "Hintergrundfarbe",
+          "transparency": "Hintergrundtransparenz",
+          "interrupt": "Interaktive Benachrichtigung"
+        },
+        "data_description": {
+          "max_length": "0 deaktiviert die Aufteilung. Langer Text wird bevorzugt nach Satzende, danach Komma oder Teilsatz und zuletzt an Leerzeichen getrennt. Nur ein einzelnes zu langes Wort wird hart getrennt.",
+          "reading_words_per_minute": "Bestimmt, wie lange jeder Teil vor dem nächsten angezeigt wird.",
+          "minimum_display_seconds": "Untergrenze der berechneten Lesezeit.",
+          "maximum_display_seconds": "Obergrenze der berechneten Lesezeit.",
+          "display_buffer_seconds": "Zusätzliche Zeit nach der wortbasierten Schätzung.",
+          "part_gap_seconds": "Kurze Pause zwischen zwei Teilen.",
+          "show_part_number": "Ergänzt 1/3, 2/3 usw. im Titel.",
+          "integration_data": "Optionale anbieterspezifische Daten; Aktionsdaten überschreiben diese.",
+          "replace_parts": "Verwendet denselben Tag, damit ein neuer Companion-App-Teil den vorherigen ersetzt.",
+          "position": "Position der Einblendung auf Android TV / Fire TV.",
+          "fontsize": "Schriftgröße der Einblendung.",
+          "color": "Hintergrundfarbe der Einblendung.",
+          "transparency": "Hintergrundtransparenz der Einblendung.",
+          "interrupt": "Macht die TV-Benachrichtigung interaktiv und kann die laufende App unterbrechen."
+        }
       }
     },
     "error": {
       "tts_player_required": "Wähle einen TTS-Mediaplayer, wenn TTS-Engines ausgewählt sind.",
       "tts_engine_required": "Wähle mindestens eine TTS-Engine, wenn ein TTS-Mediaplayer ausgewählt ist.",
       "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
-      "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang."
+      "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang.",
+      "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein."
     }
   },
   "selector": {
@@ -221,6 +295,45 @@
         "info": "Information",
         "success": "Erfolg",
         "debug": "Debug"
+      }
+    },
+    "nfandroidtv_position": {
+      "options": {
+        "bottom-right": "Bottom right",
+        "bottom-left": "Bottom left",
+        "top-right": "Top right",
+        "top-left": "Top left",
+        "center": "Center"
+      }
+    },
+    "nfandroidtv_fontsize": {
+      "options": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large",
+        "max": "Maximum"
+      }
+    },
+    "nfandroidtv_color": {
+      "options": {
+        "grey": "Grey",
+        "black": "Black",
+        "indigo": "Indigo",
+        "green": "Green",
+        "red": "Red",
+        "cyan": "Cyan",
+        "teal": "Teal",
+        "amber": "Amber",
+        "pink": "Pink"
+      }
+    },
+    "nfandroidtv_transparency": {
+      "options": {
+        "0%": "0%",
+        "25%": "25%",
+        "50%": "50%",
+        "75%": "75%",
+        "100%": "100%"
       }
     }
   },

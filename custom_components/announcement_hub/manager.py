@@ -8,6 +8,7 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
 from copy import deepcopy
 import logging
+import math
 from typing import Any
 
 from homeassistant.components import tts
@@ -42,6 +43,7 @@ from .const import (
     CONF_DISPATCH_ORDER,
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
+    CONF_NOTIFY_PROFILES,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -91,6 +93,23 @@ from .const import (
     EVENT_QUEUED,
     EVENT_STARTED,
     LEVEL_CRITICAL,
+    INTEGRATION_MOBILE_APP,
+    INTEGRATION_NFANDROIDTV,
+    PROFILE_DEFAULT,
+    PROFILE_DISPLAY_BUFFER,
+    PROFILE_INTEGRATION_DATA,
+    PROFILE_MAX_DISPLAY,
+    PROFILE_MAX_LENGTH,
+    PROFILE_MIN_DISPLAY,
+    PROFILE_NF_COLOR,
+    PROFILE_NF_FONTSIZE,
+    PROFILE_NF_INTERRUPT,
+    PROFILE_NF_POSITION,
+    PROFILE_NF_TRANSPARENCY,
+    PROFILE_PART_GAP,
+    PROFILE_READING_WPM,
+    PROFILE_REPLACE_PARTS,
+    PROFILE_SHOW_PART_NUMBER,
     PROVIDER_ALL_ALIAS,
     PROVIDER_COMPANION_TTS_ALIAS,
     PROVIDER_NOTIFY_ALIAS,
@@ -103,6 +122,13 @@ from .const import (
     TARGET_ENTRY_PREFIX,
     TARGET_INTEGRATION_PREFIX,
     TARGET_SERVICE_PREFIX,
+)
+from .message_parts import (
+    format_part_title,
+    normalise_notify_profile,
+    reading_seconds,
+    resolve_notify_profile,
+    split_message,
 )
 from .models import (
     AnnouncementJob,
@@ -121,6 +147,7 @@ from .outputs import (
     expand_tts_engine_tokens,
     mobile_app_webhook_id,
     notify_output_available,
+    notify_output_legacy_service,
     output_matches_areas,
     resolve_companion_tts_outputs,
     resolve_notify_outputs,
@@ -229,12 +256,23 @@ class AnnouncementManager:
                     job.tts_player_area = entity_area_id(
                         self.hass, job.tts_media_player
                     )
+            resolved_notify_outputs = resolve_notify_outputs(
+                self.hass, job.notify_outputs
+            )
             if not job.notify_output_areas:
                 job.notify_output_areas = {
                     output.ref: output.area_id
-                    for output in resolve_notify_outputs(
-                        self.hass, job.notify_outputs
+                    for output in resolved_notify_outputs
+                }
+            if not job.notify_output_profiles:
+                configured_profiles = self.settings.get(CONF_NOTIFY_PROFILES, {})
+                if not isinstance(configured_profiles, Mapping):
+                    configured_profiles = {}
+                job.notify_output_profiles = {
+                    output.ref: resolve_notify_profile(
+                        configured_profiles, output.integration
                     )
+                    for output in resolved_notify_outputs
                 }
             if not job.snapcast_client_areas:
                 job.snapcast_client_areas = {
@@ -547,6 +585,15 @@ class AnnouncementManager:
         notify_output_areas = {
             output.ref: output.area_id for output in notify_records
         }
+        configured_profiles = self.settings.get(CONF_NOTIFY_PROFILES, {})
+        if not isinstance(configured_profiles, Mapping):
+            configured_profiles = {}
+        notify_output_profiles = {
+            output.ref: resolve_notify_profile(
+                configured_profiles, output.integration
+            )
+            for output in notify_records
+        }
         snapcast_client_areas = {
             entity_id: entity_area_id(self.hass, entity_id)
             for entity_id in selected[2]
@@ -619,6 +666,7 @@ class AnnouncementManager:
                 entity_area_id(self.hass, player) if player else None
             ),
             notify_output_areas=notify_output_areas,
+            notify_output_profiles=notify_output_profiles,
             snapcast_client_areas=snapcast_client_areas,
             companion_tts_entry_areas=companion_tts_entry_areas,
             companion_tts_media_stream=str(
@@ -805,6 +853,7 @@ class AnnouncementManager:
             is_available=lambda item: notify_output_available(self.hass, item),
             deliver=lambda item: self._async_deliver_notification(job, item),
             channel=lambda item: item.ref,
+            parallel=True,
         )
 
     async def _async_deliver_notification(
@@ -813,63 +862,184 @@ class AnnouncementManager:
         channel = output.ref
         self._raise_if_cancelled(job)
         self._fire_channel_event(EVENT_CHANNEL_STARTED, job, channel)
+        integration = output.integration or PROFILE_DEFAULT
+        profile = normalise_notify_profile(
+            job.notify_output_profiles.get(output.ref), integration
+        )
+        parts = split_message(
+            job.notify_text or "", int(profile[PROFILE_MAX_LENGTH])
+        )
+        if not parts:
+            raise HomeAssistantError("Notification text is empty after normalisation")
+
         try:
-            if output.service:
-                domain, separator, service = output.service.partition(".")
-                if not separator or not service:
-                    raise HomeAssistantError(
-                        f"Invalid notification service: {output.service}"
-                    )
-                data: dict[str, Any] = {"message": job.notify_text}
-                if job.title:
-                    data["title"] = job.title
-                if job.notify_data:
-                    data["data"] = deepcopy(job.notify_data)
-                await self.hass.services.async_call(
-                    domain, service, data, blocking=True
+            for index, part in enumerate(parts, start=1):
+                self._raise_if_cancelled(job)
+                hold_seconds = reading_seconds(
+                    part,
+                    words_per_minute=float(profile[PROFILE_READING_WPM]),
+                    minimum_seconds=float(profile[PROFILE_MIN_DISPLAY]),
+                    maximum_seconds=float(profile[PROFILE_MAX_DISPLAY]),
+                    buffer_seconds=float(profile[PROFILE_DISPLAY_BUFFER]),
                 )
-            elif output.entity_id:
-                # Mobile App's generic legacy action is used when available so
-                # integration-specific notification data is not lost.
-                if (
-                    output.integration == "mobile_app"
-                    and output.config_entry_id
-                    and self.hass.services.has_service("notify", "mobile_app")
-                    and (
-                        webhook_id := mobile_app_webhook_id(
-                            self.hass, output.config_entry_id
-                        )
-                    )
-                ):
-                    data = {
-                        "target": [webhook_id],
-                        "message": job.notify_text,
-                    }
-                    if job.title:
-                        data["title"] = job.title
-                    if job.notify_data:
-                        data["data"] = deepcopy(job.notify_data)
-                    await self.hass.services.async_call(
-                        "notify", "mobile_app", data, blocking=True
-                    )
-                else:
-                    data = {
-                        ATTR_ENTITY_ID: output.entity_id,
-                        "message": job.notify_text,
-                    }
-                    if job.title:
-                        data["title"] = job.title
-                    await self.hass.services.async_call(
-                        "notify", "send_message", data, blocking=True
-                    )
-            else:
-                raise HomeAssistantError("Notification output has no target")
+                if output.integration == INTEGRATION_NFANDROIDTV:
+                    # Android TV accepts whole-second durations. Keep the queue
+                    # locked for the same rounded-up value so adjacent parts do
+                    # not overlap at the display boundary.
+                    hold_seconds = float(max(1, math.ceil(hold_seconds)))
+                title = format_part_title(
+                    job.title,
+                    index=index,
+                    total=len(parts),
+                    show_part_number=bool(profile[PROFILE_SHOW_PART_NUMBER]),
+                )
+                await self._async_deliver_notification_part(
+                    job,
+                    output,
+                    profile=profile,
+                    message=part,
+                    title=title,
+                    hold_seconds=hold_seconds,
+                    part_index=index,
+                    part_count=len(parts),
+                )
+                await self._async_reading_hold(job, hold_seconds)
+                if index < len(parts):
+                    gap = float(profile[PROFILE_PART_GAP])
+                    if gap > 0:
+                        await self._async_reading_hold(job, gap)
         except JobCancelled:
             raise
         except asyncio.CancelledError:
             raise
         else:
             self._record_channel_success(job, channel)
+
+    async def _async_deliver_notification_part(
+        self,
+        job: AnnouncementJob,
+        output: NotifyOutput,
+        *,
+        profile: Mapping[str, Any],
+        message: str,
+        title: str | None,
+        hold_seconds: float,
+        part_index: int,
+        part_count: int,
+    ) -> None:
+        integration_data = profile.get(PROFILE_INTEGRATION_DATA, {})
+        provider_data = self._deep_merge(
+            dict(integration_data) if isinstance(integration_data, Mapping) else {},
+            job.notify_data,
+        )
+
+        if output.integration == INTEGRATION_NFANDROIDTV:
+            # The integration's advanced placement/style options are available
+            # only through its legacy notify.<name> action.
+            provider_data.update(
+                {
+                    "duration": max(1, int(hold_seconds + 0.999)),
+                    "position": profile[PROFILE_NF_POSITION],
+                    "fontsize": profile[PROFILE_NF_FONTSIZE],
+                    "color": profile[PROFILE_NF_COLOR],
+                    "transparency": profile[PROFILE_NF_TRANSPARENCY],
+                    "interrupt": bool(profile[PROFILE_NF_INTERRUPT]),
+                }
+            )
+
+        legacy_service = notify_output_legacy_service(self.hass, output)
+        if output.integration == INTEGRATION_NFANDROIDTV and legacy_service:
+            await self._async_call_legacy_notify(
+                legacy_service,
+                message=message,
+                title=title,
+                data=provider_data,
+            )
+            return
+
+        if output.service:
+            await self._async_call_legacy_notify(
+                output.service,
+                message=message,
+                title=title,
+                data=provider_data,
+            )
+            return
+
+        if not output.entity_id:
+            raise HomeAssistantError("Notification output has no target")
+
+        if (
+            output.integration == INTEGRATION_MOBILE_APP
+            and output.config_entry_id
+            and self.hass.services.has_service("notify", "mobile_app")
+            and (
+                webhook_id := mobile_app_webhook_id(
+                    self.hass, output.config_entry_id
+                )
+            )
+        ):
+            if part_count > 1 and bool(profile.get(PROFILE_REPLACE_PARTS, True)):
+                provider_data.setdefault(
+                    "tag",
+                    f"announcement_hub_{job.job_id}_{output.config_entry_id}",
+                )
+            data: dict[str, Any] = {
+                "target": [webhook_id],
+                "message": message,
+            }
+            if title:
+                data["title"] = title
+            if provider_data:
+                data["data"] = provider_data
+            await self.hass.services.async_call(
+                "notify", "mobile_app", data, blocking=True
+            )
+            return
+
+        # Modern NotifyEntity actions accept title and message. Provider-specific
+        # data is used whenever a compatible legacy action is available above.
+        data = {
+            ATTR_ENTITY_ID: output.entity_id,
+            "message": message,
+        }
+        if title:
+            data["title"] = title
+        await self.hass.services.async_call(
+            "notify", "send_message", data, blocking=True
+        )
+
+    async def _async_call_legacy_notify(
+        self,
+        service_ref: str,
+        *,
+        message: str,
+        title: str | None,
+        data: Mapping[str, Any],
+    ) -> None:
+        domain, separator, service = service_ref.partition(".")
+        if not separator or not service:
+            raise HomeAssistantError(
+                f"Invalid notification service: {service_ref}"
+            )
+        payload: dict[str, Any] = {"message": message}
+        if title:
+            payload["title"] = title
+        if data:
+            payload["data"] = deepcopy(dict(data))
+        await self.hass.services.async_call(
+            domain, service, payload, blocking=True
+        )
+
+    async def _async_reading_hold(
+        self, job: AnnouncementJob, seconds: float
+    ) -> None:
+        """Hold the queue while still reacting promptly to cancellation."""
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + max(0.0, float(seconds))
+        while loop.time() < deadline:
+            self._raise_if_cancelled(job)
+            await asyncio.sleep(min(0.25, max(0.0, deadline - loop.time())))
 
     async def _deliver_available_then_wait(
         self,
@@ -879,6 +1049,7 @@ class AnnouncementManager:
         is_available: Callable[[Any], bool],
         deliver: Callable[[Any], Awaitable[None]],
         channel: Callable[[Any], str],
+        parallel: bool = False,
     ) -> None:
         """Deliver ready outputs and retry unavailable/failed outputs in one window."""
         pending = list(items)
@@ -898,10 +1069,25 @@ class AnnouncementManager:
             last_errors.pop(channel_name, None)
             return True
 
+        async def attempt_ready(ready_items: Sequence[Any]) -> None:
+            if not ready_items:
+                return
+            if parallel:
+                results = await asyncio.gather(
+                    *(attempt(item) for item in ready_items)
+                )
+            else:
+                results = []
+                for item in ready_items:
+                    results.append(await attempt(item))
+            for item, succeeded in zip(ready_items, results, strict=True):
+                if succeeded and item in pending:
+                    pending.remove(item)
+
         # Never make an already usable output wait behind an unavailable one.
-        for item in tuple(pending):
-            if is_available(item) and await attempt(item):
-                pending.remove(item)
+        await attempt_ready(
+            tuple(item for item in pending if is_available(item))
+        )
 
         timeout = self._availability_timeout
         if pending and timeout > 0:
@@ -910,11 +1096,9 @@ class AnnouncementManager:
             while pending and loop.time() < deadline:
                 self._raise_if_cancelled(job)
                 await asyncio.sleep(min(0.5, max(0.0, deadline - loop.time())))
-                for item in tuple(pending):
-                    if not is_available(item):
-                        continue
-                    if await attempt(item):
-                        pending.remove(item)
+                await attempt_ready(
+                    tuple(item for item in pending if is_available(item))
+                )
 
         for item in pending:
             channel_name = channel(item)
