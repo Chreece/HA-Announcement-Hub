@@ -23,6 +23,8 @@ from .const import (
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
     CONF_NOTIFY_PROFILES,
+    CONF_OCCUPANCY_ATTRIBUTE,
+    CONF_OCCUPANCY_SENSOR,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -155,6 +157,8 @@ class _AnnouncementFlowMixin:
                     CONF_COMPANION_TTS_OUTPUTS: [],
                     CONF_DEFAULT_TITLE: DEFAULT_TITLE,
                     CONF_CRITICAL_NOTIFY_DATA: {},
+                    CONF_OCCUPANCY_SENSOR: None,
+                    CONF_OCCUPANCY_ATTRIBUTE: "",
                 },
             )
             self._prepare_notify_profile_steps()
@@ -185,6 +189,16 @@ class _AnnouncementFlowMixin:
                         DEFAULT_CRITICAL_NOTIFY_DATA,
                     ),
                 ): selector.ObjectSelector(),
+                _optional_marker(
+                    CONF_OCCUPANCY_SENSOR,
+                    self._value(CONF_OCCUPANCY_SENSOR, None),
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor")
+                ),
+                _optional_marker(
+                    CONF_OCCUPANCY_ATTRIBUTE,
+                    self._value(CONF_OCCUPANCY_ATTRIBUTE, ""),
+                ): selector.TextSelector(),
             }
         )
         return self.async_show_form(step_id="outputs", data_schema=schema)

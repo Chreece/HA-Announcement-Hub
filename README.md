@@ -207,6 +207,22 @@ Multipart Companion App notifications use one stable tag by default, causing
 each new part to replace the previous part instead of building a stack. This
 is independent from the optional Companion App **TTS** output.
 
+## Occupancy-aware routing
+
+Optionally configure an occupied-areas sensor. Its state can contain comma,
+semicolon, or newline-separated Home Assistant area names/IDs, or a configured
+attribute can contain a list of areas.
+
+`announcement_hub.send` defaults to `occupied_only: true`. With a configured
+occupancy sensor, omitted `output` targets the occupied areas; explicit areas
+are intersected with occupancy. Filtering is capability-neutral, so a room with
+only TTS receives speech and a room with only visual notify outputs receives only
+those notifications. Unavailable outputs still wait for the configured
+availability timeout and are silently skipped afterward.
+
+Use `occupied_only: false` to ignore occupancy for one call. Without a
+configured occupancy sensor, the option has no effect.
+
 ## Main action
 
 ```yaml

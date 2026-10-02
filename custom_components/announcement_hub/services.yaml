@@ -46,6 +46,10 @@ send:
           default: false
           selector:
             boolean:
+        occupied_only:
+          default: true
+          selector:
+            boolean:
     advanced:
       collapsed: true
       fields:

@@ -10,14 +10,18 @@
           "snapcast_outputs": "Snapcast audio outputs",
           "companion_tts_outputs": "Companion App TTS outputs",
           "default_title": "Default title",
-          "critical_notify_data": "Critical notification data"
+          "critical_notify_data": "Critical notification data",
+          "occupancy_sensor": "Occupied-areas sensor",
+          "occupancy_attribute": "Occupied-areas attribute"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
           "snapcast_outputs": "Select Snapcast clients by integration, entry, or entity. Their Home Assistant areas determine room routing; selecting them enables automatic mute/unmute routing.",
           "companion_tts_outputs": "Optional. Select the Android Companion App devices that may be used for push TTS. Ordinary calls still require the Companion App TTS service option; critical calls use every configured matching output.",
           "default_title": "Optional title for visual notifications.",
-          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications."
+          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications.",
+          "occupancy_sensor": "Optional sensor whose state contains occupied Home Assistant area names/IDs, for example Wohnzimmer,Gästezimmer. When configured, occupied-only delivery can automatically restrict outputs to those areas.",
+          "occupancy_attribute": "Optional attribute on the occupied-areas sensor that contains the area list. Leave empty to use the sensor state itself."
         }
       },
       "tts": {
@@ -77,7 +81,7 @@
         "data_description": {
           "dispatch_order": "Channel order",
           "queue_max": "Maximum queue length",
-          "output_availability_timeout": "Available outputs are delivered immediately. Unavailable or failed outputs are retried during this window and recorded with their final error afterward.",
+          "output_availability_timeout": "Available outputs are delivered immediately. Unavailable or temporarily failing outputs are retried during this window and silently skipped if they still cannot receive the announcement.",
           "idle_timeout": "Wait for audio path to become idle",
           "start_timeout": "Playback start timeout",
           "playback_timeout": "Maximum playback time",
@@ -142,14 +146,18 @@
           "snapcast_outputs": "Snapcast audio outputs",
           "companion_tts_outputs": "Companion App TTS outputs",
           "default_title": "Default title",
-          "critical_notify_data": "Critical notification data"
+          "critical_notify_data": "Critical notification data",
+          "occupancy_sensor": "Occupied-areas sensor",
+          "occupancy_attribute": "Occupied-areas attribute"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App, and other notify outputs. Selecting an integration or entry automatically includes its entities. Manually entered legacy services are global.",
           "snapcast_outputs": "Select Snapcast clients by integration, entry, or entity. Their Home Assistant areas determine room routing; selecting them enables automatic mute/unmute routing.",
           "companion_tts_outputs": "Optional. Select the Android Companion App devices that may be used for push TTS. Ordinary calls still require the Companion App TTS service option; critical calls use every configured matching output.",
           "default_title": "Optional title for visual notifications.",
-          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications."
+          "critical_notify_data": "Optional integration-specific data merged into critical visual notifications.",
+          "occupancy_sensor": "Optional sensor whose state contains occupied Home Assistant area names/IDs, for example Wohnzimmer,Gästezimmer. When configured, occupied-only delivery can automatically restrict outputs to those areas.",
+          "occupancy_attribute": "Optional attribute on the occupied-areas sensor that contains the area list. Leave empty to use the sensor state itself."
         }
       },
       "tts": {
@@ -399,6 +407,10 @@
         "companion_tts": {
           "name": "Use Companion App TTS",
           "description": "Also send spoken text to the configured Android Companion App TTS outputs. Off by default; the dedicated companion_tts/all service alias and critical level also enable it."
+        },
+        "occupied_only": {
+          "name": "Only occupied areas",
+          "description": "Default: enabled. When an occupied-areas sensor is configured, restrict this announcement to outputs belonging to the currently occupied areas. An explicit output list is intersected with occupancy. Disable to ignore occupancy for this call."
         }
       }
     },

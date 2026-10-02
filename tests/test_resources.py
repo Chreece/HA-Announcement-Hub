@@ -66,6 +66,8 @@ def test_config_and_options_steps_match_flow_contract() -> None:
         "tts_engines",
         "tts_min_level",
         "output_availability_timeout",
+        "occupancy_sensor",
+        "occupancy_attribute",
         "max_length",
         "reading_words_per_minute",
         "position",
@@ -77,6 +79,9 @@ def test_config_and_options_steps_match_flow_contract() -> None:
     ]
     assert companion_tts["default"] is False
     assert "boolean" in companion_tts["selector"]
+    occupied_only = services["send"]["fields"]["routing"]["fields"]["occupied_only"]
+    assert occupied_only["default"] is True
+    assert "boolean" in occupied_only["selector"]
 
 
 def test_source_contains_output_centric_features() -> None:
@@ -128,7 +133,7 @@ def test_manifest_and_hacs_identity() -> None:
     hacs = json.loads((ROOT / "hacs.json").read_text())
     assert manifest["domain"] == "announcement_hub"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "0.3.4"
+    assert manifest["version"] == "0.4.0"
     assert hacs["name"] == manifest["name"]
 
 

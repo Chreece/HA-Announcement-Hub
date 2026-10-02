@@ -8,8 +8,10 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
 from copy import deepcopy
 from functools import partial
+import json
 import logging
 import math
+import re
 from typing import Any
 
 from homeassistant.components import tts
@@ -45,6 +47,8 @@ from .const import (
     CONF_IDLE_TIMEOUT,
     CONF_NOTIFY_OUTPUTS,
     CONF_NOTIFY_PROFILES,
+    CONF_OCCUPANCY_ATTRIBUTE,
+    CONF_OCCUPANCY_SENSOR,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -562,6 +566,7 @@ class AnnouncementManager:
         language: str | None,
         tts_options: Mapping[str, Any] | None,
         companion_tts: bool,
+        occupied_only: bool,
     ) -> AnnouncementJob:
         text_tts = text_tts.strip() if text_tts and text_tts.strip() else None
         text_notify = (
@@ -578,7 +583,25 @@ class AnnouncementManager:
                 f"Announcement queue is full ({queue_max} items)"
             )
 
-        output_area_ids = self._resolve_area_ids(self._ensure_list(outputs))
+        requested_output_area_ids = self._resolve_area_ids(
+            self._ensure_list(outputs)
+        )
+        occupied_area_ids = self._occupied_area_ids() if occupied_only else None
+        occupancy_filter_active = occupied_area_ids is not None
+        if occupancy_filter_active:
+            occupied_set = set(occupied_area_ids)
+            output_area_ids = (
+                tuple(
+                    area_id
+                    for area_id in requested_output_area_ids
+                    if area_id in occupied_set
+                )
+                if requested_output_area_ids
+                else occupied_area_ids
+            )
+        else:
+            output_area_ids = requested_output_area_ids
+
         requested = self._ensure_list(requested_services)
         configured = self._configured_outputs()
         selected = self._select_requested_outputs(
@@ -607,6 +630,32 @@ class AnnouncementManager:
         player = str(player_value) if player_value else None
         notify_records = resolve_notify_outputs(self.hass, selected[1])
         companion_records = resolve_companion_tts_outputs(self.hass, selected[3])
+
+        if occupancy_filter_active:
+            effective_areas = set(output_area_ids)
+            notify_records = tuple(
+                output
+                for output in notify_records
+                if output.area_id is not None and output.area_id in effective_areas
+            )
+            snapcast_clients = tuple(
+                entity_id
+                for entity_id in selected[2]
+                if (area_id := entity_area_id(self.hass, entity_id)) is not None
+                and area_id in effective_areas
+            )
+            companion_records = tuple(
+                output
+                for output in companion_records
+                if output.area_id is not None and output.area_id in effective_areas
+            )
+            selected = (
+                selected[0],
+                tuple(output.ref for output in notify_records),
+                snapcast_clients,
+                tuple(output.entry_id for output in companion_records),
+            )
+
         notify_output_areas = {
             output.ref: output.area_id for output in notify_records
         }
@@ -626,6 +675,16 @@ class AnnouncementManager:
         companion_tts_entry_areas = {
             output.entry_id: output.area_id for output in companion_records
         }
+        server_tts_enabled = bool(player and selected[0])
+        if occupancy_filter_active and server_tts_enabled:
+            if configured[2]:
+                server_tts_enabled = bool(selected[2])
+            else:
+                player_area = entity_area_id(self.hass, player) if player else None
+                server_tts_enabled = (
+                    player_area is not None and player_area in set(output_area_ids)
+                )
+
         plan = build_delivery_plan(
             text_tts=text_tts,
             text_notify=text_notify,
@@ -635,9 +694,9 @@ class AnnouncementManager:
             notify_outputs=selected[1],
             snapcast_clients=selected[2],
             companion_tts_entries=selected[3],
-            server_tts_enabled=bool(player and selected[0]),
+            server_tts_enabled=server_tts_enabled,
         )
-        if not plan.has_output:
+        if not plan.has_output and not occupancy_filter_active:
             if plan.tts_suppressed_by_level:
                 raise ServiceValidationError(
                     "TTS is muted for this level and no selected visual output "
@@ -1853,6 +1912,86 @@ class AnnouncementManager:
             options=job.tts_options,
             cache=job.tts_cache,
         )
+
+    def _occupied_area_ids(self) -> tuple[str, ...] | None:
+        """Resolve occupied areas from the configured sensor state or attribute."""
+        sensor = str(self.settings.get(CONF_OCCUPANCY_SENSOR, "") or "").strip()
+        if not sensor:
+            return None
+        state = self.hass.states.get(sensor)
+        if state is None or state.state in {STATE_UNAVAILABLE, STATE_UNKNOWN}:
+            _LOGGER.debug("Occupancy sensor %s is unavailable", sensor)
+            return ()
+
+        attribute = str(
+            self.settings.get(CONF_OCCUPANCY_ATTRIBUTE, "") or ""
+        ).strip()
+        raw: Any = state.attributes.get(attribute) if attribute else state.state
+        values = self._occupancy_values(raw)
+        if not values:
+            return ()
+
+        registry = ar.async_get(self.hass)
+        areas = registry.async_list_areas()
+        by_name = {area.name.casefold(): area.id for area in areas}
+        by_alias = {
+            alias.casefold(): area.id
+            for area in areas
+            for alias in (area.aliases or set())
+        }
+        resolved: list[str] = []
+        unknown: list[str] = []
+        for value in values:
+            if registry.async_get_area(value):
+                resolved.append(value)
+                continue
+            key = value.casefold()
+            if area_id := by_name.get(key) or by_alias.get(key):
+                resolved.append(area_id)
+            else:
+                unknown.append(value)
+
+        if unknown:
+            _LOGGER.debug(
+                "Occupancy source %s reported unknown area value(s): %s",
+                sensor,
+                unknown,
+            )
+        return tuple(dict.fromkeys(resolved))
+
+    @staticmethod
+    def _occupancy_values(raw: Any) -> list[str]:
+        """Normalise a state/attribute into area names or IDs."""
+        if raw is None:
+            return []
+        if isinstance(raw, Mapping):
+            return [
+                str(key).strip()
+                for key, enabled in raw.items()
+                if enabled and str(key).strip()
+            ]
+        if isinstance(raw, (list, tuple, set)):
+            return [str(item).strip() for item in raw if str(item).strip()]
+
+        value = str(raw).strip()
+        if not value:
+            return []
+        if value.startswith("[") and value.endswith("]"):
+            try:
+                decoded = json.loads(value)
+            except (TypeError, ValueError, json.JSONDecodeError):
+                decoded = None
+            if isinstance(decoded, list):
+                return [
+                    str(item).strip()
+                    for item in decoded
+                    if str(item).strip()
+                ]
+        return [
+            part.strip().strip("'\"")
+            for part in re.split(r"[,;\n]+", value)
+            if part.strip().strip("'\"")
+        ]
 
     def _resolve_area_ids(self, values: Sequence[str]) -> tuple[str, ...]:
         if not values:

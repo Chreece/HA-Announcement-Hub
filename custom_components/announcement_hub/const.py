@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.3.4"
+VERSION: Final = "0.4.0"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -25,6 +25,7 @@ ATTR_NOTIFY_DATA: Final = "notify_data"
 ATTR_LANGUAGE: Final = "language"
 ATTR_TTS_OPTIONS: Final = "tts_options"
 ATTR_COMPANION_TTS: Final = "companion_tts"
+ATTR_OCCUPIED_ONLY: Final = "occupied_only"
 ATTR_JOB_ID: Final = "job_id"
 ATTR_INCLUDE_CURRENT: Final = "include_current"
 
@@ -87,6 +88,8 @@ CONF_COMPANION_TTS_WPM: Final = "companion_tts_words_per_minute"
 CONF_DEFAULT_TITLE: Final = "default_title"
 CONF_CRITICAL_NOTIFY_DATA: Final = "critical_notify_data"
 CONF_NOTIFY_PROFILES: Final = "notify_profiles"
+CONF_OCCUPANCY_SENSOR: Final = "occupancy_sensor"
+CONF_OCCUPANCY_ATTRIBUTE: Final = "occupancy_attribute"
 
 # Per-integration visual output profile fields. Profiles are keyed by the
 # integration domain that owns the concrete notify output.
@@ -170,6 +173,7 @@ DEFAULT_COMPANION_TTS_MEDIA_STREAM: Final = COMPANION_STREAM_DEFAULT
 DEFAULT_COMPANION_TTS_WPM: Final = 150
 DEFAULT_TITLE: Final = "Notification"
 DEFAULT_CRITICAL_NOTIFY_DATA: Final = {}
+DEFAULT_OCCUPIED_ONLY: Final = True
 DEFAULT_NOTIFY_MAX_LENGTH: Final = 0
 DEFAULT_NFANDROIDTV_MAX_LENGTH: Final = 193
 DEFAULT_MOBILE_APP_MAX_LENGTH: Final = 500

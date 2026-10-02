@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.0 - 2026-10-02
+
+- Added an optional occupied-areas sensor with an optional attribute containing
+  Home Assistant area names/IDs.
+- Added `occupied_only` to `announcement_hub.send`, enabled by default.
+  Explicit output areas are intersected with occupancy; an omitted output targets
+  the currently occupied areas.
+- Occupancy filtering is capability-neutral: each occupied area receives only
+  the configured output types actually present in that area.
+- Outputs without an area are excluded while occupied-only filtering is active.
+- An unavailable occupancy sensor or an empty occupied-area list is a silent
+  no-op, never a broadcast fallback.
+- Existing unavailable-output retry/timeout behavior and config-entry background
+  task lifecycle remain unchanged.
+
 ## 0.3.4 - 2026-10-02
 
 - Treat outputs that remain unavailable after the configured wait window as

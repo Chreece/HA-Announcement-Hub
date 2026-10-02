@@ -10,14 +10,18 @@
           "snapcast_outputs": "Snapcast-Audioausgänge",
           "companion_tts_outputs": "Companion-App-TTS-Ausgänge",
           "default_title": "Standardtitel",
-          "critical_notify_data": "Daten für kritische Benachrichtigungen"
+          "critical_notify_data": "Daten für kritische Benachrichtigungen",
+          "occupancy_sensor": "Sensor für belegte Bereiche",
+          "occupancy_attribute": "Attribut für belegte Bereiche"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
           "snapcast_outputs": "Wähle Snapcast-Clients nach Integration, Eintrag oder Entität. Ihre Home-Assistant-Bereiche bestimmen die Raumzuordnung; die Auswahl aktiviert die automatische Stumm-/Lautschaltung.",
           "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben.",
           "default_title": "Optionaler Titel für optische Benachrichtigungen.",
-          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden."
+          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden.",
+          "occupancy_sensor": "Optionaler Sensor, dessen Zustand belegte Home-Assistant-Bereiche als Namen/IDs enthält, z. B. Wohnzimmer,Gästezimmer. Bei Konfiguration kann die Ausgabe automatisch auf diese Bereiche beschränkt werden.",
+          "occupancy_attribute": "Optionales Attribut des Belegungssensors, das die Bereichsliste enthält. Leer lassen, um den Sensorzustand selbst zu verwenden."
         }
       },
       "tts": {
@@ -142,14 +146,18 @@
           "snapcast_outputs": "Snapcast-Audioausgänge",
           "companion_tts_outputs": "Companion-App-TTS-Ausgänge",
           "default_title": "Standardtitel",
-          "critical_notify_data": "Daten für kritische Benachrichtigungen"
+          "critical_notify_data": "Daten für kritische Benachrichtigungen",
+          "occupancy_sensor": "Sensor für belegte Bereiche",
+          "occupancy_attribute": "Attribut für belegte Bereiche"
         },
         "data_description": {
           "notify_outputs": "Notifications for Android TV, Companion App und andere notify-Ausgänge. Eine Integration oder ein Eintrag umfasst automatisch alle zugehörigen Entitäten. Manuell eingetragene Legacy-Dienste gelten als global.",
           "snapcast_outputs": "Wähle Snapcast-Clients nach Integration, Eintrag oder Entität. Ihre Home-Assistant-Bereiche bestimmen die Raumzuordnung; die Auswahl aktiviert die automatische Stumm-/Lautschaltung.",
           "companion_tts_outputs": "Optional. Wähle die Android-Companion-App-Geräte aus, die Push-TTS verwenden dürfen. Normale Aufrufe benötigen weiterhin die Companion-App-TTS-Option der Aktion; kritische Aufrufe nutzen alle passenden konfigurierten Ausgaben.",
           "default_title": "Optionaler Titel für optische Benachrichtigungen.",
-          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden."
+          "critical_notify_data": "Optionale integrationsspezifische Daten, die bei kritischen optischen Benachrichtigungen ergänzt werden.",
+          "occupancy_sensor": "Optionaler Sensor, dessen Zustand belegte Home-Assistant-Bereiche als Namen/IDs enthält, z. B. Wohnzimmer,Gästezimmer. Bei Konfiguration kann die Ausgabe automatisch auf diese Bereiche beschränkt werden.",
+          "occupancy_attribute": "Optionales Attribut des Belegungssensors, das die Bereichsliste enthält. Leer lassen, um den Sensorzustand selbst zu verwenden."
         }
       },
       "tts": {
@@ -399,6 +407,10 @@
         "companion_tts": {
           "name": "Companion-App-TTS verwenden",
           "description": "Sendet den gesprochenen Text zusätzlich an die konfigurierten Android-Companion-App-TTS-Ausgaben. Standardmäßig aus; die speziellen Aliase companion_tts/all und die Stufe „kritisch“ aktivieren sie ebenfalls."
+        },
+        "occupied_only": {
+          "name": "Nur belegte Bereiche",
+          "description": "Standard: aktiviert. Wenn ein Belegungssensor konfiguriert ist, wird diese Ankündigung auf Ausgaben in aktuell belegten Bereichen beschränkt. Eine explizite Bereichsauswahl wird mit der Belegung geschnitten. Deaktivieren, um die Belegung für diesen Aufruf zu ignorieren."
         }
       }
     },
