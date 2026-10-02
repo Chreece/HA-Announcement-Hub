@@ -189,6 +189,9 @@ announcement concurrently.
 
 ### Notifications for Android TV / Fire TV
 
+Placement and styling are delivered through the provider's advanced legacy notify action. Announcement Hub resolves that action from the selected output's config entry and will retry rather than silently use the generic `notify.send_message` action, which cannot carry these options.
+
+
 The native legacy notification action is used when available so each profile
 can control:
 

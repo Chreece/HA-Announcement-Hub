@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.util import slugify
 
 from .const import (
     TARGET_ENTITY_PREFIX,
@@ -523,14 +524,35 @@ def resolve_notify_outputs(
             if service.startswith("notify."):
                 object_id = service.partition(".")[2]
                 matching_entity = f"notify.{object_id}"
+                integration = entity_integration(hass, matching_entity)
+                config_entry_id = entity_config_entry_id(hass, matching_entity)
+                resolved_area = entity_area_id(hass, matching_entity)
+
+                # A legacy notify action and its modern NotifyEntity are not
+                # guaranteed to have the same object ID. NFAndroidTV names its
+                # legacy action from the config-entry title, so recover the
+                # owning entry when a user selected the service directly.
+                if config_entry_id is None:
+                    for entry in _entries(hass):
+                        if slugify(str(entry.title)) != object_id:
+                            continue
+                        if not (
+                            entry.domain == "nfandroidtv"
+                            or f"{entry.domain}.notify" in hass.config.components
+                        ):
+                            continue
+                        integration = str(entry.domain)
+                        config_entry_id = str(entry.entry_id)
+                        resolved_area = entry_area_id(hass, entry.entry_id)
+                        break
+
                 result.append(
                     NotifyOutput(
                         ref=ref,
                         service=service,
-                        integration=entity_integration(hass, matching_entity),
-                        config_entry_id=entity_config_entry_id(
-                            hass, matching_entity
-                        ),
+                        integration=integration,
+                        config_entry_id=config_entry_id,
+                        area_id=resolved_area,
                     )
                 )
     return tuple(result)
@@ -584,19 +606,29 @@ def output_matches_areas(
 def notify_output_legacy_service(
     hass: HomeAssistant, output: NotifyOutput
 ) -> str | None:
-    """Return an advanced legacy notify action when one matches the output.
+    """Return the provider's advanced legacy notify action, when available.
 
-    Home Assistant's modern notify.send_message action intentionally accepts only
-    message and title. Integrations such as nfandroidtv expose placement, duration,
-    and styling through their legacy notify.<name> action.
+    Modern ``notify.send_message`` accepts only message and title. Providers such
+    as NFAndroidTV expose placement, duration, and styling through their legacy
+    ``notify.<name>`` action. The entity object ID is not guaranteed to equal that
+    service name, so also resolve it from the owning config-entry title—the exact
+    name Home Assistant uses when registering NFAndroidTV's legacy action.
     """
     if output.service:
         return output.service
-    if not output.entity_id:
-        return None
-    object_id = output.entity_id.partition(".")[2]
-    if object_id and hass.services.has_service("notify", object_id):
-        return f"notify.{object_id}"
+
+    if output.entity_id:
+        object_id = output.entity_id.partition(".")[2]
+        if object_id and hass.services.has_service("notify", object_id):
+            return f"notify.{object_id}"
+
+    if output.config_entry_id:
+        entry = _entry(hass, output.config_entry_id)
+        if entry is not None:
+            service_name = slugify(str(entry.title))
+            if service_name and hass.services.has_service("notify", service_name):
+                return f"notify.{service_name}"
+
     return None
 
 

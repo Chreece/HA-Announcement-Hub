@@ -972,7 +972,16 @@ class AnnouncementManager:
             )
 
         legacy_service = notify_output_legacy_service(self.hass, output)
-        if output.integration == INTEGRATION_NFANDROIDTV and legacy_service:
+        if output.integration == INTEGRATION_NFANDROIDTV:
+            # Never silently fall back to notify.send_message here. That modern
+            # action discards NFAndroidTV's position, duration, font, colour,
+            # transparency, and interrupt options. Raising lets the normal
+            # availability retry window wait for the legacy action to appear.
+            if not legacy_service:
+                raise HomeAssistantError(
+                    "Notifications for Android TV advanced notify action is not "
+                    "available; position/style data cannot be applied"
+                )
             await self._async_call_legacy_notify(
                 legacy_service,
                 message=message,

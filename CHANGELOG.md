@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.2 - 2026-10-02
+
+- Fixed Notifications for Android TV / Fire TV placement and styling being
+  silently dropped when the modern notify entity ID differed from the legacy
+  notify action name.
+- Resolve the advanced Android TV notify action from the owning config-entry
+  title, matching Home Assistant's own legacy-service registration.
+- Retry while the advanced action is unavailable instead of falling back to
+  `notify.send_message`, which cannot carry position or style options.
+- Preserve integration and area discovery when a legacy notify service is
+  selected directly.
+
 ## 0.3.1 - 2026-10-02
 
 - Fixed the permanent queue worker being registered as a normal Home Assistant
