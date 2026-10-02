@@ -8,6 +8,7 @@ import probatio
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import (
+    HassJob,
     HomeAssistant,
     ServiceCall,
     ServiceResponse,
@@ -349,8 +350,24 @@ async def async_setup_entry(
     entry.runtime_data = manager
     hass.data.setdefault(DOMAIN, {})["manager"] = manager
 
-    await manager.async_start()
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    try:
+        await manager.async_start()
+
+        # Run graceful queue shutdown before Home Assistant cancels background
+        # tasks. The returned remover is tied to config-entry unload so a normal
+        # reload does not leave a stale global shutdown job behind.
+        entry.async_on_unload(
+            hass.async_add_shutdown_job(
+                HassJob(manager.async_stop, f"{DOMAIN} shutdown")
+            )
+        )
+
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    except BaseException:
+        await manager.async_stop()
+        if hass.data.get(DOMAIN, {}).get("manager") is manager:
+            hass.data[DOMAIN].pop("manager", None)
+        raise
 
     async def async_options_updated(
         hass: HomeAssistant, updated_entry: ConfigEntry

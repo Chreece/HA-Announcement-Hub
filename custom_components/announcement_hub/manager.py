@@ -190,6 +190,7 @@ class AnnouncementManager:
         self._running = False
         self._cancel_requested: set[str] = set()
         self._active_tts_player: str | None = None
+        self._stop_lock = asyncio.Lock()
 
     @property
     def settings(self) -> dict[str, Any]:
@@ -296,8 +297,10 @@ class AnnouncementManager:
                 self._last = AnnouncementJob.from_dict(raw_last)
 
         self._running = True
-        self._worker_task = self.hass.async_create_task(
-            self._async_worker(), f"{DOMAIN} worker"
+        self._worker_task = self.entry.async_create_background_task(
+            self.hass,
+            self._async_worker(),
+            f"{DOMAIN} worker",
         )
         for job in self._queue:
             self._schedule_prefetch(job)
@@ -306,29 +309,50 @@ class AnnouncementManager:
         self._notify_update()
 
     async def async_stop(self) -> None:
-        self._running = False
-        self._wake.set()
-        if self._active_tts_player:
-            await self._async_stop_player(self._active_tts_player)
-        if self._worker_task:
-            self._worker_task.cancel()
-            with suppress(asyncio.CancelledError):
-                await self._worker_task
+        """Stop all integration-owned tasks and persist the queue exactly once."""
+        async with self._stop_lock:
+            if (
+                not self._running
+                and self._worker_task is None
+                and not self._prefetch_tasks
+            ):
+                return
+
+            self._running = False
+            self._wake.set()
+
+            # The permanent queue worker is a config-entry background task so it
+            # never participates in Home Assistant's startup barrier. We still
+            # explicitly cancel and await it here for deterministic unload and
+            # shutdown ordering.
+            worker_task = self._worker_task
             self._worker_task = None
-        for task in self._prefetch_tasks.values():
-            task.cancel()
-        if self._prefetch_tasks:
-            await asyncio.gather(
-                *self._prefetch_tasks.values(), return_exceptions=True
-            )
-        self._prefetch_tasks.clear()
-        if self._current and self._current.status == "processing":
-            self._current.status = "pending"
-            self._current.started_at = None
-            self._queue.appendleft(self._current)
-            self._current = None
-        await self._store.async_save(self._serialize())
-        self._notify_update()
+            if worker_task is not None:
+                worker_task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await worker_task
+
+            # Prefetch operations are also entry-owned background tasks. Cancel
+            # and await every one before the queue snapshot is written.
+            prefetch_tasks = tuple(self._prefetch_tasks.values())
+            self._prefetch_tasks.clear()
+            for task in prefetch_tasks:
+                task.cancel()
+            if prefetch_tasks:
+                await asyncio.gather(*prefetch_tasks, return_exceptions=True)
+
+            if self._active_tts_player:
+                await self._async_stop_player(self._active_tts_player)
+            self._active_tts_player = None
+
+            if self._current and self._current.status == "processing":
+                self._current.status = "pending"
+                self._current.started_at = None
+                self._queue.appendleft(self._current)
+                self._current = None
+
+            await self._store.async_save(self._serialize())
+            self._notify_update()
 
     async def async_update_config(self) -> None:
         self._notify_update()
@@ -1722,8 +1746,10 @@ class AnnouncementManager:
             return
         if not job.tts_cache or job.job_id in self._prefetch_tasks:
             return
-        task = self.hass.async_create_task(
-            self._async_prefetch(job), f"{DOMAIN} prefetch {job.job_id}"
+        task = self.entry.async_create_background_task(
+            self.hass,
+            self._async_prefetch(job),
+            f"{DOMAIN} prefetch {job.job_id}",
         )
         self._prefetch_tasks[job.job_id] = task
 

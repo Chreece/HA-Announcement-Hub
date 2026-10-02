@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.1 - 2026-10-02
+
+- Fixed the permanent queue worker being registered as a normal Home Assistant
+  task, which made it participate in the startup barrier and survive into final
+  shutdown writes.
+- Registered the worker and TTS prefetch jobs as config-entry background tasks,
+  so they do not block startup and are automatically cancelled with the entry.
+- Added an awaited Home Assistant shutdown job plus serialized, idempotent
+  manager cleanup to cancel all tasks and persist the queue before shutdown.
+- Added lifecycle regression tests preventing normal `hass.async_create_task`
+  use from returning to the integration.
+
 ## 0.3.0
 
 - Added one visual delivery profile per configured notify integration.
