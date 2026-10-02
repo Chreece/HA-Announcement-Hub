@@ -8,7 +8,7 @@ def rep(path, old, new):
     text=path.read_text(encoding="utf-8")
     count=text.count(old)
     if count!=1:
-        raise SystemExit(f"{path}: expected one match, found {count}")
+        raise SystemExit(f"{path}: expected one match, found {count}: {old[:140]!r}")
     path.write_text(text.replace(old,new,1),encoding="utf-8")
 
 # const.py
