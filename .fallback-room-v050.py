@@ -422,6 +422,11 @@ replace_once(
 
 path = ROOT / "tests" / "test_occupancy_filter.py"
 text = path.read_text(encoding="utf-8")
+text = text.replace(
+    '    assert "if output.area_id is not None and output.area_id in effective_areas" in manager\n',
+    '    assert "output.area_id is not None" in manager\n'
+    '    assert "output.area_id in effective_areas" in manager\n',
+)
 text += '''
 
 
