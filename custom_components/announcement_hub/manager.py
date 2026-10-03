@@ -1234,6 +1234,7 @@ class AnnouncementManager:
         ) = routed_plan(
             output_area_ids,
             filter_by_area=occupancy_filter_active,
+            require_room_delivery=occupancy_filter_active,
         )
 
         if occupancy_filter_active and not occupied_room_candidate_exists:
@@ -2502,7 +2503,7 @@ class AnnouncementManager:
         return bool(stream_id and current_source == stream_id)
 
     def _snapcast_output_available(self, entity_id: str) -> bool:
-        """Return whether an explicitly selected TTS Snapcast client is usable."""
+        """Return whether a client can be routed on the configured TTS source."""
         state = self.hass.states.get(entity_id)
         if state is None or state.state in {
             STATE_OFF,
@@ -2510,7 +2511,9 @@ class AnnouncementManager:
             STATE_UNKNOWN,
         }:
             return False
-        return state.attributes.get("is_volume_muted") is not None
+        if state.attributes.get("is_volume_muted") is None:
+            return False
+        return self._snapcast_source_matches(entity_id)
 
     def _routable_snapcast_snapshot(
         self, selected_clients: Sequence[str]
@@ -2521,7 +2524,6 @@ class AnnouncementManager:
         all_snapcast_clients = expand_snapcast_output_tokens(
             self.hass, [f"{TARGET_INTEGRATION_PREFIX}snapcast"]
         )
-        selected_set = set(selected_clients)
         route_scope = tuple(
             dict.fromkeys((*selected_clients, *all_snapcast_clients))
         )
@@ -2537,10 +2539,7 @@ class AnnouncementManager:
             muted = state.attributes.get("is_volume_muted")
             if muted is None:
                 continue
-            if (
-                entity_id not in selected_set
-                and not self._snapcast_source_matches(entity_id)
-            ):
+            if not self._snapcast_source_matches(entity_id):
                 continue
             snapshot[entity_id] = bool(muted)
         return snapshot

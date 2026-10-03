@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.9.5 - 2026-10-03
+
+- Fixed the actual room-output selection bug: occupied-room routing now requires
+  an independent room-local delivery choice in addition to any General/movable
+  notifications.
+- General outputs such as laptops, phones, watches, and tablets can still receive
+  the announcement, but they can no longer suppress the best available output
+  in the occupied room.
+- If no room output normally matches the level, the occupied room now uses its
+  nearest available room-output level immediately, exactly like the fallback-room
+  pass. Example: Info + Wohnzimmer TTS at Warning -> Wohnzimmer TTS is still
+  selected while General Info/Debug notifications may also be sent.
+- If the occupied room has zero room candidates, fallback-room behavior remains:
+  the fallback room independently chooses its own best room-local output.
+- Reverted the speculative v0.9.4 behavior that bypassed Snapcast source matching
+  for explicitly selected clients. Snapcast source filtering remains strict.
+
 ## 0.9.4 - 2026-10-03
 
 - Corrected Snapcast TTS-source semantics.

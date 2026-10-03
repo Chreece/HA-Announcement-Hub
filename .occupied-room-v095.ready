@@ -1,2 +1,0 @@
-version=0.9.5
-purpose=occupied room independently selects best room-local output; general notifications cannot suppress it
