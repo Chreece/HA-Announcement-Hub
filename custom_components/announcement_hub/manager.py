@@ -1255,9 +1255,9 @@ class AnnouncementManager:
             notify_records,
             companion_records,
             plan,
-            occupied_room_candidate_exists,
+            _occupied_room_candidate_exists,
             occupied_room_candidate_available,
-            occupied_room_delivery_selected,
+            _occupied_room_delivery_selected,
         ) = routed_plan(
             output_area_ids,
             filter_by_area=occupancy_filter_active,
@@ -1272,11 +1272,11 @@ class AnnouncementManager:
             ):
                 (
                     fallback_selected,
-                    fallback_notify_records,
-                    fallback_companion_records,
+                    _fallback_notify_records,
+                    _fallback_companion_records,
                     fallback_plan,
                     fallback_room_candidate_exists,
-                    fallback_room_candidate_available,
+                    _fallback_room_candidate_available,
                     fallback_room_delivery_selected,
                 ) = routed_plan(
                     (fallback_area_id,),
