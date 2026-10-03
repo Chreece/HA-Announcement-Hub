@@ -1,0 +1,2 @@
+version=0.9.3
+purpose=resolve configured friendly Snapcast TTS source to current stream ID after area filtering
