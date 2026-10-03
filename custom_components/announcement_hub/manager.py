@@ -835,6 +835,7 @@ class AnnouncementManager:
             tuple[CompanionTTSOutput, ...],
             Any,
             bool,
+            bool,
         ]:
             if filter_by_area:
                 effective_areas = set(area_ids)
@@ -1144,6 +1145,10 @@ class AnnouncementManager:
                         for item in room_chosen
                     )
 
+            room_delivery_selected = any(
+                item["room_bound"] for item in chosen
+            )
+
             chosen_notify = {
                 item["id"] for item in chosen if item["kind"] == "notify"
             }
@@ -1215,6 +1220,7 @@ class AnnouncementManager:
                 routed_companion,
                 route_plan,
                 room_candidate_exists,
+                room_delivery_selected,
             )
 
         (
@@ -1223,6 +1229,7 @@ class AnnouncementManager:
             companion_records,
             plan,
             occupied_room_candidate_exists,
+            occupied_room_delivery_selected,
         ) = routed_plan(
             output_area_ids,
             filter_by_area=occupancy_filter_active,
@@ -1240,12 +1247,17 @@ class AnnouncementManager:
                     fallback_companion_records,
                     fallback_plan,
                     fallback_room_candidate_exists,
+                    fallback_room_delivery_selected,
                 ) = routed_plan(
                     (fallback_area_id,),
                     filter_by_area=True,
                     require_room_delivery=True,
                 )
-                if fallback_room_candidate_exists and fallback_plan.has_output:
+                if (
+                    fallback_room_candidate_exists
+                    and fallback_room_delivery_selected
+                    and fallback_plan.has_output
+                ):
                     output_area_ids = (fallback_area_id,)
                     selected = fallback_selected
                     notify_records = fallback_notify_records

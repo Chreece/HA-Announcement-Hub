@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.2 - 2026-10-03
+
+- Fixed a false-positive fallback route where General/movable outputs made the
+  fallback plan non-empty even though no fallback-room output was actually
+  selected.
+- Fallback is now committed only when a room-bound output from the configured
+  fallback area is really present in the selected delivery plan.
+- This prevents responses from claiming Flur fallback while the job contains
+  only general phone/laptop/watch notifications.
+- Removed Home Assistant internal area IDs from the normal send-action response;
+  "outputs" now exposes only friendly area names.
+
 ## 0.9.1 - 2026-10-03
 
 - Fixed room fallback being blocked by General/movable notification outputs.

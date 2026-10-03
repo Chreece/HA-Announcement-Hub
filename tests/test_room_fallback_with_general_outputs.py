@@ -32,7 +32,14 @@ def test_available_general_output_does_not_force_wait_for_unavailable_room_outpu
     assert "elif not available and room_candidates:" in manager
 
 
-def test_service_response_uses_friendly_area_names_and_keeps_ids() -> None:
+def test_service_response_uses_friendly_area_names_only() -> None:
     init=(C/"__init__.py").read_text(encoding="utf-8")
     assert '"outputs": [area_name(hass, area_id) for area_id in job.outputs]' in init
-    assert '"output_area_ids": list(job.outputs)' in init
+    assert '"output_area_ids": list(job.outputs)' not in init
+
+
+def test_fallback_is_not_committed_without_actual_room_delivery() -> None:
+    manager=(C/"manager.py").read_text(encoding="utf-8")
+    assert "room_delivery_selected = any(" in manager
+    assert "fallback_room_delivery_selected" in manager
+    assert "and fallback_room_delivery_selected" in manager
