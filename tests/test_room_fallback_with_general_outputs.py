@@ -1,4 +1,4 @@
-"""Regression contracts for room fallback alongside general outputs."""
+"""Regression contracts for fixed-room fallback alongside moveable/general outputs."""
 
 from pathlib import Path
 
@@ -6,30 +6,40 @@ ROOT=Path(__file__).resolve().parents[1]
 C=ROOT/"custom_components"/"announcement_hub"
 
 
-def test_general_outputs_do_not_satisfy_room_candidate_requirement() -> None:
+def test_moveable_outputs_do_not_satisfy_fixed_room_candidate_requirement() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
-    assert '"room_bound": (' in manager
-    assert "occupied_room_candidate_exists" in manager
-    assert "if occupancy_filter_active and not occupied_room_candidate_exists:" in manager
+    assert '"fixed_room": (' in manager
+    assert "output.integration != INTEGRATION_MOBILE_APP" in manager
+    assert '"fixed_room": False' in manager
+    assert "occupied_room_candidate_available" in manager
+    assert "if occupancy_filter_active and not occupied_room_candidate_available:" in manager
 
 
-def test_fallback_pass_requires_room_delivery() -> None:
+def test_fixed_room_selection_waits_for_unavailable_room_candidate() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
     assert "require_room_delivery=True" in manager
     assert "room_normal_available" in manager
     assert "elif room_available:" in manager
+    assert "elif room_candidates:" in manager
+    assert "moveable/general output is immediately usable" in manager
 
 
-def test_fallback_room_can_add_nearest_level_tts_beside_general_notify() -> None:
+def test_fallback_is_tts_only_and_preserves_original_visual_outputs() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
-    assert "chosen.extend(" in manager
+    assert "tts_only=True" in manager
+    assert "routed_notify = ()" in manager
+    assert "routed_companion = ()" in manager
+    assert "selected[1]," in manager
+    assert "fallback_selected[2]," in manager
+    assert "fallback_selected[3]," in manager
+    assert "fallback_plan.has_audible_output" in manager
+
+
+def test_fallback_room_can_relax_level_for_tts() -> None:
+    manager=(C/"manager.py").read_text(encoding="utf-8")
     assert "room_distance = min(" in manager
     assert "force_tts = force_tts or any(" in manager
-
-
-def test_available_general_output_does_not_force_wait_for_unavailable_room_output() -> None:
-    manager=(C/"manager.py").read_text(encoding="utf-8")
-    assert "elif not available and room_candidates:" in manager
+    assert "force_tts=fallback_plan.tts_text is not None" in manager
 
 
 def test_service_response_uses_friendly_area_names_only() -> None:
@@ -38,8 +48,9 @@ def test_service_response_uses_friendly_area_names_only() -> None:
     assert '"output_area_ids": list(job.outputs)' not in init
 
 
-def test_fallback_is_not_committed_without_actual_room_delivery() -> None:
+def test_fallback_is_not_committed_without_actual_tts_room_delivery() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
     assert "room_delivery_selected = any(" in manager
     assert "fallback_room_delivery_selected" in manager
     assert "and fallback_room_delivery_selected" in manager
+    assert "and fallback_plan.has_audible_output" in manager
