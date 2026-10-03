@@ -824,6 +824,7 @@ class AnnouncementManager:
             *,
             filter_by_area: bool,
             require_room_delivery: bool = False,
+            tts_only: bool = False,
         ) -> tuple[
             tuple[
                 tuple[str, ...],
@@ -835,6 +836,7 @@ class AnnouncementManager:
             tuple[NotifyOutput, ...],
             tuple[CompanionTTSOutput, ...],
             Any,
+            bool,
             bool,
             bool,
         ]:
@@ -877,6 +879,9 @@ class AnnouncementManager:
                     if output.area_id is not None
                     and output.area_id in effective_areas
                 )
+                if tts_only:
+                    routed_notify = ()
+                    routed_companion = ()
                 routed_selected = (
                     base_selected[0],
                     tuple(output.ref for output in routed_notify),
@@ -885,9 +890,15 @@ class AnnouncementManager:
                     tuple(output.entry_id for output in routed_companion),
                 )
             else:
-                routed_notify = all_notify_records
-                routed_companion = all_companion_records
-                routed_selected = base_selected
+                routed_notify = () if tts_only else all_notify_records
+                routed_companion = () if tts_only else all_companion_records
+                routed_selected = (
+                    base_selected[0],
+                    () if tts_only else base_selected[1],
+                    base_selected[2],
+                    base_selected[3],
+                    () if tts_only else base_selected[4],
+                )
 
             # Build all physical channel candidates first. Level policy chooses
             # among candidates that are available NOW. An unavailable preferred
@@ -913,7 +924,7 @@ class AnnouncementManager:
                 output = notify_by_ref.get(ref)
                 if output is None:
                     continue
-                minimum = self._notify_policy(output)[1]
+                policy_scope, minimum = self._notify_policy(output)
                 candidates.append(
                     {
                         "kind": "notify",
@@ -921,8 +932,10 @@ class AnnouncementManager:
                         "minimum": minimum,
                         "available": notify_output_available(self.hass, output),
                         "native_text": bool(text_notify or level == LEVEL_CRITICAL),
-                        "room_bound": (
-                            self._notify_policy(output)[0] == NOTIFY_SCOPE_ROOM
+                        "room_bound": policy_scope == NOTIFY_SCOPE_ROOM,
+                        "fixed_room": (
+                            policy_scope == NOTIFY_SCOPE_ROOM
+                            and output.integration != INTEGRATION_MOBILE_APP
                         ),
                     }
                 )
@@ -944,6 +957,10 @@ class AnnouncementManager:
                                 self._tts_player_scope(entity_id)
                                 == NOTIFY_SCOPE_ROOM
                             ),
+                            "fixed_room": (
+                                self._tts_player_scope(entity_id)
+                                == NOTIFY_SCOPE_ROOM
+                            ),
                         }
                     )
 
@@ -962,6 +979,7 @@ class AnnouncementManager:
                                 text_tts or level == LEVEL_CRITICAL
                             ),
                             "room_bound": bool(routed_selected[3]),
+                            "fixed_room": bool(routed_selected[3]),
                         }
                     )
 
@@ -981,11 +999,16 @@ class AnnouncementManager:
                                 text_tts or level == LEVEL_CRITICAL
                             ),
                             "room_bound": bool(output.area_id),
+                            "fixed_room": False,
                         }
                     )
 
-            room_candidate_exists = any(
-                item["room_bound"] for item in candidates
+            room_candidates = [
+                item for item in candidates if item["fixed_room"]
+            ]
+            room_candidate_exists = bool(room_candidates)
+            room_candidate_available = any(
+                item["available"] for item in room_candidates
             )
             available = [item for item in candidates if item["available"]]
             normal_available = [
@@ -1058,7 +1081,7 @@ class AnnouncementManager:
 
             if require_room_delivery:
                 room_candidates = [
-                    item for item in candidates if item["room_bound"]
+                    item for item in candidates if item["fixed_room"]
                 ]
                 room_available = [
                     item for item in room_candidates if item["available"]
@@ -1086,9 +1109,11 @@ class AnnouncementManager:
                         if self._level_distance(level, item["minimum"])
                         == room_distance
                     ]
-                elif not available and room_candidates:
-                    # Nothing of any class is available. Preserve the existing
-                    # timeout semantics, but make the wait target room-local.
+                elif room_candidates:
+                    # No fixed room candidate is available. Preserve the
+                    # configured fixed room candidates so the normal
+                    # availability timeout can wait for one, even when a
+                    # moveable/general output is immediately usable.
                     room_normal_configured = [
                         item
                         for item in room_candidates
@@ -1147,7 +1172,7 @@ class AnnouncementManager:
                     )
 
             room_delivery_selected = any(
-                item["room_bound"] for item in chosen
+                item["fixed_room"] for item in chosen
             )
 
             chosen_notify = {
@@ -1221,6 +1246,7 @@ class AnnouncementManager:
                 routed_companion,
                 route_plan,
                 room_candidate_exists,
+                room_candidate_available,
                 room_delivery_selected,
             )
 
@@ -1230,6 +1256,7 @@ class AnnouncementManager:
             companion_records,
             plan,
             occupied_room_candidate_exists,
+            occupied_room_candidate_available,
             occupied_room_delivery_selected,
         ) = routed_plan(
             output_area_ids,
@@ -1237,7 +1264,7 @@ class AnnouncementManager:
             require_room_delivery=occupancy_filter_active,
         )
 
-        if occupancy_filter_active and not occupied_room_candidate_exists:
+        if occupancy_filter_active and not occupied_room_candidate_available:
             fallback_area_id = self._fallback_area_id()
             if (
                 fallback_area_id
@@ -1249,25 +1276,50 @@ class AnnouncementManager:
                     fallback_companion_records,
                     fallback_plan,
                     fallback_room_candidate_exists,
+                    fallback_room_candidate_available,
                     fallback_room_delivery_selected,
                 ) = routed_plan(
                     (fallback_area_id,),
                     filter_by_area=True,
                     require_room_delivery=True,
+                    tts_only=True,
                 )
                 if (
                     fallback_room_candidate_exists
                     and fallback_room_delivery_selected
-                    and fallback_plan.has_output
+                    and fallback_plan.has_audible_output
                 ):
-                    output_area_ids = (fallback_area_id,)
-                    selected = fallback_selected
-                    notify_records = fallback_notify_records
-                    companion_records = fallback_companion_records
-                    plan = fallback_plan
+                    preserve_companion_tts = (
+                        selected[4] if plan.tts_text is not None else ()
+                    )
+                    preserve_notify_text = plan.notify_text is not None
+                    output_area_ids = tuple(
+                        dict.fromkeys((*output_area_ids, fallback_area_id))
+                    )
+                    selected = (
+                        fallback_selected[0],
+                        selected[1],
+                        fallback_selected[2],
+                        fallback_selected[3],
+                        preserve_companion_tts,
+                    )
+                    plan = build_delivery_plan(
+                        text_tts=text_tts,
+                        text_notify=text_notify,
+                        level=level,
+                        minimum_tts_level=minimum_tts_level,
+                        tts_engines=selected[0],
+                        notify_outputs=selected[1],
+                        room_tts_players=selected[2],
+                        snapcast_clients=selected[3],
+                        companion_tts_entries=selected[4],
+                        server_tts_enabled=fallback_plan.server_tts_enabled,
+                        force_tts=fallback_plan.tts_text is not None,
+                        force_notify=preserve_notify_text,
+                    )
                     _LOGGER.debug(
-                        "Announcement routed to fallback area %s because the "
-                        "occupied area(s) had no candidates",
+                        "Announcement routed TTS to fallback area %s because "
+                        "the occupied area(s) had no available fixed-room candidate",
                         fallback_area_id,
                     )
 
