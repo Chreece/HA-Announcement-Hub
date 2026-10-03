@@ -86,6 +86,8 @@ def build_delivery_plan(
     snapcast_clients: Sequence[str],
     companion_tts_entries: Sequence[str],
     server_tts_enabled: bool,
+    force_tts: bool = False,
+    force_notify: bool = False,
 ) -> DeliveryPlan:
     """Apply critical and audible-threshold semantics to selected outputs."""
     audible = tts_allowed_for_level(level, minimum_tts_level)
@@ -93,14 +95,17 @@ def build_delivery_plan(
     if level == LEVEL_CRITICAL:
         tts_text = text_tts or text_notify
         notify_text = text_notify or text_tts
-    elif audible:
-        tts_text = text_tts
-        notify_text = text_notify
     else:
-        # Below the audible threshold, spoken-only messages become visual rather
-        # than disappearing. Explicit written text still takes precedence.
-        tts_text = None
-        notify_text = text_notify or text_tts
+        tts_text = (
+            text_tts or text_notify
+            if force_tts
+            else (text_tts if audible else None)
+        )
+        notify_text = (
+            text_notify or text_tts
+            if force_notify or not audible
+            else text_notify
+        )
 
     return DeliveryPlan(
         tts_engines=_unique(tuple(tts_engines)),
@@ -111,7 +116,9 @@ def build_delivery_plan(
         tts_text=tts_text,
         notify_text=notify_text,
         server_tts_enabled=bool(server_tts_enabled),
-        tts_suppressed_by_level=bool(text_tts and not audible),
+        tts_suppressed_by_level=bool(
+            text_tts and not audible and not force_tts
+        ),
     )
 
 

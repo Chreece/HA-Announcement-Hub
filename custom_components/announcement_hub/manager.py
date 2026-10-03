@@ -145,6 +145,7 @@ from .const import (
     TARGET_ENTRY_PREFIX,
     TARGET_INTEGRATION_PREFIX,
     TARGET_SERVICE_PREFIX,
+    TTS_LEVEL_NEVER,
 )
 from .message_parts import (
     format_part_title,
@@ -701,6 +702,47 @@ class AnnouncementManager:
             LEVEL_PRIORITY.get(minimum, LEVEL_PRIORITY[DEFAULT_NOTIFY_MIN_LEVEL])
         )
 
+    @staticmethod
+    def _level_distance(level: str, minimum: str) -> int:
+        """Return severity-distance between an announcement and an output threshold."""
+        return abs(
+            LEVEL_PRIORITY.get(level, LEVEL_PRIORITY[LEVEL_INFO])
+            - LEVEL_PRIORITY.get(minimum, LEVEL_PRIORITY[LEVEL_INFO])
+        )
+
+    def _server_tts_available_now(
+        self,
+        *,
+        engines: Sequence[str],
+        player: str | None,
+        snapcast_clients: Sequence[str],
+    ) -> bool:
+        """Return whether the shared TTS path can run immediately."""
+        if not player or not engines:
+            return False
+        state = self.hass.states.get(player)
+        if state is None or state.state in {STATE_UNAVAILABLE, STATE_UNKNOWN}:
+            return False
+        if not any(tts_engine_available(self.hass, engine) for engine in engines):
+            return False
+        if not snapcast_clients:
+            return True
+        return any(
+            self._snapcast_output_available(entity_id)
+            for entity_id in snapcast_clients
+        )
+
+    def _direct_tts_available_now(
+        self,
+        entity_id: str,
+        engines: Sequence[str],
+    ) -> bool:
+        """Return whether a direct TTS media player can run immediately."""
+        state = self.hass.states.get(entity_id)
+        if state is None or state.state in {STATE_UNAVAILABLE, STATE_UNKNOWN}:
+            return False
+        return any(tts_engine_available(self.hass, engine) for engine in engines)
+
     async def async_enqueue(
         self,
         *,
@@ -765,32 +807,11 @@ class AnnouncementManager:
         minimum_tts_level = str(
             self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
         )
-        if (
-            not tts_allowed_for_level(level, minimum_tts_level)
-            and not selected[1]
-            and configured[1]
-        ):
-            # A caller may explicitly request an audible path, but the configured
-            # level policy wins. Fall back to the configured visual outputs rather
-            # than rejecting or silently dropping the announcement.
-            selected = (
-                selected[0],
-                configured[1],
-                selected[2],
-                selected[3],
-                selected[4],
-            )
-
         player_value = self.settings.get(CONF_TTS_MEDIA_PLAYER)
         player = str(player_value) if player_value else None
         base_selected = selected
         all_notify_records = tuple(
-            output
-            for output in resolve_notify_outputs(self.hass, base_selected[1])
-            if self._notify_level_allowed(
-                level,
-                self._notify_policy(output)[1],
-            )
+            resolve_notify_outputs(self.hass, base_selected[1])
         )
         all_room_tts_players = tuple(base_selected[2])
         all_companion_records = resolve_companion_tts_outputs(
@@ -864,12 +885,211 @@ class AnnouncementManager:
                 routed_companion = all_companion_records
                 routed_selected = base_selected
 
-            # The shared server player is global infrastructure. In
-            # occupancy-aware mode its physical room candidates are the routing
-            # clients, never the shared player itself.
+            # Build all physical channel candidates first. Level policy chooses
+            # among candidates that are available NOW. An unavailable preferred
+            # channel never makes an immediately usable fallback wait.
             server_tts_enabled = bool(player and routed_selected[0])
             if filter_by_area and server_tts_enabled:
                 server_tts_enabled = bool(routed_selected[3])
+
+            notify_by_ref = {output.ref: output for output in routed_notify}
+            companion_by_id = {
+                output.entry_id: output for output in routed_companion
+            }
+            actual_priority = LEVEL_PRIORITY.get(
+                level, LEVEL_PRIORITY[LEVEL_INFO]
+            )
+            tts_hard_disabled = (
+                minimum_tts_level == TTS_LEVEL_NEVER
+                and level != LEVEL_CRITICAL
+            )
+
+            candidates: list[dict[str, Any]] = []
+            for ref in routed_selected[1]:
+                output = notify_by_ref.get(ref)
+                if output is None:
+                    continue
+                minimum = self._notify_policy(output)[1]
+                candidates.append(
+                    {
+                        "kind": "notify",
+                        "id": ref,
+                        "minimum": minimum,
+                        "available": notify_output_available(self.hass, output),
+                        "native_text": bool(text_notify or level == LEVEL_CRITICAL),
+                    }
+                )
+
+            if not tts_hard_disabled:
+                for entity_id in routed_selected[2]:
+                    candidates.append(
+                        {
+                            "kind": "room_tts",
+                            "id": entity_id,
+                            "minimum": minimum_tts_level,
+                            "available": self._direct_tts_available_now(
+                                entity_id, routed_selected[0]
+                            ),
+                            "native_text": bool(
+                                text_tts or level == LEVEL_CRITICAL
+                            ),
+                        }
+                    )
+
+                if server_tts_enabled:
+                    candidates.append(
+                        {
+                            "kind": "server_tts",
+                            "id": "__server_tts__",
+                            "minimum": minimum_tts_level,
+                            "available": self._server_tts_available_now(
+                                engines=routed_selected[0],
+                                player=player,
+                                snapcast_clients=routed_selected[3],
+                            ),
+                            "native_text": bool(
+                                text_tts or level == LEVEL_CRITICAL
+                            ),
+                        }
+                    )
+
+                for entry_id in routed_selected[4]:
+                    output = companion_by_id.get(entry_id)
+                    if output is None:
+                        continue
+                    candidates.append(
+                        {
+                            "kind": "companion_tts",
+                            "id": entry_id,
+                            "minimum": minimum_tts_level,
+                            "available": companion_output_available(
+                                self.hass, output
+                            ),
+                            "native_text": bool(
+                                text_tts or level == LEVEL_CRITICAL
+                            ),
+                        }
+                    )
+
+            available = [item for item in candidates if item["available"]]
+            normal_available = [
+                item
+                for item in available
+                if item["native_text"]
+                and actual_priority
+                >= LEVEL_PRIORITY.get(
+                    item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
+                )
+            ]
+
+            force_tts = False
+            force_notify = False
+            if normal_available:
+                chosen = normal_available
+            elif available:
+                # No currently available normal-level path exists. Pick the
+                # available threshold nearest to the actual announcement level.
+                distance = min(
+                    self._level_distance(level, item["minimum"])
+                    for item in available
+                )
+                chosen = [
+                    item
+                    for item in available
+                    if self._level_distance(level, item["minimum"]) == distance
+                ]
+                force_tts = any(
+                    item["kind"] != "notify" for item in chosen
+                )
+                force_notify = any(
+                    item["kind"] == "notify" for item in chosen
+                )
+            else:
+                # Nothing can run right now. Preserve the normal configured
+                # level candidates so the existing availability timeout can
+                # wait for them. If no normal candidate exists at all, wait on
+                # the nearest configured fallback tier.
+                normal_configured = [
+                    item
+                    for item in candidates
+                    if item["native_text"]
+                    and actual_priority
+                    >= LEVEL_PRIORITY.get(
+                        item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
+                    )
+                ]
+                if normal_configured:
+                    chosen = normal_configured
+                elif candidates:
+                    distance = min(
+                        self._level_distance(level, item["minimum"])
+                        for item in candidates
+                    )
+                    chosen = [
+                        item
+                        for item in candidates
+                        if self._level_distance(level, item["minimum"])
+                        == distance
+                    ]
+                    force_tts = any(
+                        item["kind"] != "notify" for item in chosen
+                    )
+                    force_notify = any(
+                        item["kind"] == "notify" for item in chosen
+                    )
+                else:
+                    chosen = []
+
+            chosen_notify = {
+                item["id"] for item in chosen if item["kind"] == "notify"
+            }
+            chosen_room_tts = {
+                item["id"] for item in chosen if item["kind"] == "room_tts"
+            }
+            chosen_companion = {
+                item["id"]
+                for item in chosen
+                if item["kind"] == "companion_tts"
+            }
+            choose_server_tts = any(
+                item["kind"] == "server_tts" for item in chosen
+            )
+
+            # When a server-TTS path is immediately available, do not freeze
+            # unavailable Snapcast clients into the job: use the clients that
+            # can receive the shared stream right now.
+            chosen_snapcast = tuple(routed_selected[3])
+            if choose_server_tts and routed_selected[3]:
+                ready_snapcast = tuple(
+                    entity_id
+                    for entity_id in routed_selected[3]
+                    if self._snapcast_output_available(entity_id)
+                )
+                if ready_snapcast:
+                    chosen_snapcast = ready_snapcast
+
+            routed_notify = tuple(
+                output for output in routed_notify
+                if output.ref in chosen_notify
+            )
+            routed_companion = tuple(
+                output for output in routed_companion
+                if output.entry_id in chosen_companion
+            )
+            routed_selected = (
+                routed_selected[0],
+                tuple(ref for ref in routed_selected[1] if ref in chosen_notify),
+                tuple(
+                    entity_id for entity_id in routed_selected[2]
+                    if entity_id in chosen_room_tts
+                ),
+                chosen_snapcast if choose_server_tts else (),
+                tuple(
+                    entry_id for entry_id in routed_selected[4]
+                    if entry_id in chosen_companion
+                ),
+            )
+            server_tts_enabled = bool(choose_server_tts)
 
             route_plan = build_delivery_plan(
                 text_tts=text_tts,
@@ -882,6 +1102,8 @@ class AnnouncementManager:
                 snapcast_clients=routed_selected[3],
                 companion_tts_entries=routed_selected[4],
                 server_tts_enabled=server_tts_enabled,
+                force_tts=force_tts,
+                force_notify=force_notify,
             )
             return (
                 routed_selected,

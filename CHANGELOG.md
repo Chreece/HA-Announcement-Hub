@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.9.0 - 2026-10-03
+
+- Added immediate availability-aware fallback across notification and TTS output
+  classes without changing the announcement's actual severity.
+- If currently available outputs normally match the level, all such matching
+  outputs are used.
+- If no available output normally matches, Announcement Hub immediately selects
+  the currently available output tier whose configured minimum level is nearest
+  to the announcement level.
+- If only one usable output path is available, it is used immediately regardless
+  of its normal minimum level; an unavailable preferred path does not make it
+  wait.
+- Cross-channel fallback reuses the available message text: notification text can
+  be spoken by TTS, and TTS text can be shown visually when that is the selected
+  fallback path.
+- When shared TTS/Snapcast is selected as an immediate fallback, only currently
+  available matching Snapcast clients are frozen into the job so unavailable
+  clients do not delay delivery.
+- When no output of any class is currently available, the existing availability
+  timeout behavior remains: the preferred configured tier waits and other queued
+  runnable jobs may pass it.
+- TTS level "never" remains a hard disable for non-critical announcements.
+
 ## 0.8.3 - 2026-10-02
 
 - Replaced free-text TTS language entry with a dropdown populated from the
