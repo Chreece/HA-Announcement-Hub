@@ -1,0 +1,2 @@
+version=0.9.2
+purpose=require actual fallback-room output before committing fallback
