@@ -1,2 +1,4 @@
 version=0.9.1
 purpose=room fallback ignores general outputs and reports friendly area names
+
+retry=2
