@@ -21,6 +21,7 @@ from homeassistant.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
     DOMAIN as MEDIA_PLAYER_DOMAIN,
+    DATA_COMPONENT as MEDIA_PLAYER_DATA_COMPONENT,
     MediaType,
 )
 from homeassistant.components.tts.media_source import generate_media_source_id
@@ -2458,6 +2459,48 @@ class AnnouncementManager:
                 f"TTS playback exceeded {playback_timeout}s on {player}"
             )
 
+    def _snapcast_source_matches(self, entity_id: str) -> bool:
+        """Match a Snapcast client's current stream to the configured TTS source.
+
+        Home Assistant's Snapcast entity exposes source as the current Snapcast
+        stream identifier, while select_source/source_list use friendly stream
+        names. Resolve the configured friendly name through the live Snapcast
+        entity before comparing.
+        """
+        source = str(
+            self.settings.get(CONF_SNAPCAST_SOURCE, DEFAULT_SNAPCAST_SOURCE) or ""
+        )
+        source_only = bool(
+            self.settings.get(
+                CONF_SNAPCAST_ONLY_SOURCE, DEFAULT_SNAPCAST_ONLY_SOURCE
+            )
+        )
+        if not source_only or not source:
+            return True
+
+        state = self.hass.states.get(entity_id)
+        if state is None:
+            return False
+        current_source = str(state.attributes.get("source") or "")
+        if current_source == source:
+            return True
+
+        component = self.hass.data.get(MEDIA_PLAYER_DATA_COMPONENT)
+        entity = component.get_entity(entity_id) if component is not None else None
+        group = getattr(entity, "_current_group", None) if entity is not None else None
+        if group is None:
+            return False
+
+        try:
+            streams = group.streams_by_name()
+        except (AttributeError, TypeError):
+            return False
+        stream = streams.get(source)
+        if stream is None:
+            return False
+        stream_id = str(getattr(stream, "identifier", "") or "")
+        return bool(stream_id and current_source == stream_id)
+
     def _snapcast_output_available(self, entity_id: str) -> bool:
         """Return whether a client can be routed on the configured TTS source."""
         state = self.hass.states.get(entity_id)
@@ -2469,19 +2512,7 @@ class AnnouncementManager:
             return False
         if state.attributes.get("is_volume_muted") is None:
             return False
-        source = str(
-            self.settings.get(CONF_SNAPCAST_SOURCE, DEFAULT_SNAPCAST_SOURCE) or ""
-        )
-        source_only = bool(
-            self.settings.get(
-                CONF_SNAPCAST_ONLY_SOURCE, DEFAULT_SNAPCAST_ONLY_SOURCE
-            )
-        )
-        return not (
-            source_only
-            and source
-            and state.attributes.get("source") != source
-        )
+        return self._snapcast_source_matches(entity_id)
 
     def _routable_snapcast_snapshot(
         self, selected_clients: Sequence[str]
@@ -2495,14 +2526,6 @@ class AnnouncementManager:
         route_scope = tuple(
             dict.fromkeys((*selected_clients, *all_snapcast_clients))
         )
-        source = str(
-            self.settings.get(CONF_SNAPCAST_SOURCE, DEFAULT_SNAPCAST_SOURCE) or ""
-        )
-        source_only = bool(
-            self.settings.get(
-                CONF_SNAPCAST_ONLY_SOURCE, DEFAULT_SNAPCAST_ONLY_SOURCE
-            )
-        )
         snapshot: dict[str, bool] = {}
         for entity_id in route_scope:
             state = self.hass.states.get(entity_id)
@@ -2515,7 +2538,7 @@ class AnnouncementManager:
             muted = state.attributes.get("is_volume_muted")
             if muted is None:
                 continue
-            if source_only and source and state.attributes.get("source") != source:
+            if not self._snapcast_source_matches(entity_id):
                 continue
             snapshot[entity_id] = bool(muted)
         return snapshot

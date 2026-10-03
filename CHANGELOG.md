@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.3 - 2026-10-03
+
+- Fixed Snapcast TTS-room detection when Home Assistant exposes the client's
+  current source as a Snapcast stream identifier instead of the friendly stream
+  name configured in Announcement Hub.
+- Room routing remains area-first: only Snapcast clients in the occupied or
+  fallback area are considered.
+- The configured TTS source name is now resolved through the live Snapcast
+  entity's stream map and compared to the current stream identifier.
+- The same source-resolution logic is used both when deciding whether a room
+  output is currently available and later when building the mute/routing
+  snapshot, preventing inconsistent selection.
+- Source filtering remains strict; a Music client in the correct room is not
+  accepted as a TTS client merely because its area matches.
+
 ## 0.9.2 - 2026-10-03
 
 - Fixed a false-positive fallback route where General/movable outputs made the
