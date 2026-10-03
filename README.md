@@ -225,21 +225,32 @@ configured occupancy sensor, the option has no effect.
 
 ### Occupancy fallback room
 
-Optionally configure a fallback Home Assistant area. The fallback is evaluated
-only when occupancy-aware routing produces zero configured delivery candidates.
-Offline candidates do not trigger fallback; they keep using the normal
-availability timeout.
+Optionally configure a fallback Home Assistant area. Occupancy routing first
+looks for **fixed room candidates** in the occupied room. Room-scoped Android
+TV/Snapcast/direct TTS outputs count as fixed candidates. Mobile App notification
+outputs and Companion App TTS outputs are moveable and never count as proof that
+the occupied room itself has a delivery candidate.
+
+Available fixed-room candidates are filtered by the announcement level. If the
+normal threshold leaves no usable fixed-room output, Announcement Hub relaxes
+the level selection to the nearest usable room tier before considering the
+fallback room. Configured fixed-room outputs that are temporarily unavailable
+remain wait targets for the normal availability timeout.
+
+If no fixed-room candidate is currently available, the fallback room may be
+used when the occupied-room door policy allows it. **Fallback is TTS-only**:
+the original visual/general notifications stay on their original outputs, while
+only the spoken route is taken from the configured default room. The fallback
+room therefore needs a configured direct-TTS or Snapcast TTS route; visual
+outputs in the fallback room are not substituted for the occupied room.
 
 When **Check occupied-room door before fallback** is enabled, at least one
 occupied target room must contain a `binary_sensor` with
 `device_class: door` whose state is `on` (open). Closed (`off`), unknown,
-unavailable, or missing door sensors block fallback. Disable the checkbox to
-allow zero-candidate fallback regardless of door state.
-
-The fallback room is routed exactly like any other area: only the configured
-outputs actually assigned to that area are used, so a fallback room with only
-TTS receives TTS and one with only visual notification outputs receives only
-those notifications.
+unavailable, or missing door sensors block fallback. With fallback blocked,
+configured fixed-room candidates continue waiting for the normal availability
+timeout. Disable the checkbox to permit the TTS-only fallback regardless of
+door state.
 
 ## Main action
 
