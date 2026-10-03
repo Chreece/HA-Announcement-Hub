@@ -96,15 +96,16 @@ def build_delivery_plan(
         tts_text = text_tts or text_notify
         notify_text = text_notify or text_tts
     else:
-        # Channel selection has already been resolved by the manager. Keep each
-        # channel's dedicated text when present, but fall back to the other text
-        # instead of silently dropping an otherwise selected delivery path.
         tts_text = (
-            (text_tts or text_notify)
-            if (audible or force_tts)
-            else None
+            text_tts or text_notify
+            if force_tts
+            else (text_tts if audible else None)
         )
-        notify_text = text_notify or text_tts
+        notify_text = (
+            text_notify or text_tts
+            if force_notify or not audible
+            else text_notify
+        )
 
     return DeliveryPlan(
         tts_engines=_unique(tuple(tts_engines)),
