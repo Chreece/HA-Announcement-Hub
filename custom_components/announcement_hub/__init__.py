@@ -67,6 +67,7 @@ from .const import (
     TARGET_SERVICE_PREFIX,
 )
 from .manager import AnnouncementManager
+from .outputs import area_name
 
 
 def _validate_send_payload(data: dict[str, Any]) -> dict[str, Any]:
@@ -270,7 +271,8 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             "status": job.status,
             "queue_position": position,
             "queue_size": manager.queue_size,
-            "outputs": list(job.outputs),
+            "outputs": [area_name(hass, area_id) for area_id in job.outputs],
+            "output_area_ids": list(job.outputs),
             "tts_engines": list(job.tts_engines),
             "notify_outputs": list(job.notify_outputs),
             "room_tts_players": list(job.room_tts_players),

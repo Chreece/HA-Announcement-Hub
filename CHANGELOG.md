@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.9.1 - 2026-10-03
+
+- Fixed room fallback being blocked by General/movable notification outputs.
+- Occupancy fallback now asks whether the occupied room has any room-bound
+  candidate, instead of using DeliveryPlan.has_output across general and room
+  outputs together.
+- When the occupied room has zero room-bound candidates, the configured fallback
+  room is evaluated even if phones, laptops, watches, or other General outputs
+  remain available.
+- The fallback-room pass explicitly requires room-local delivery. If a fallback
+  room output is available, its normal matching level is preferred; otherwise
+  the nearest available level is used immediately. This allows an Info
+  announcement to use Warning-level Flur TTS when Küche has no room output.
+- General/movable outputs remain in the same job and may still receive the
+  announcement; they no longer suppress room fallback.
+- An available General output does not make the queue wait for an unavailable
+  fallback-room output. Waiting for the fallback room occurs only when no output
+  class is currently available.
+- Service responses now show friendly Home Assistant area names in "outputs"
+  and expose the internal stable IDs separately as "output_area_ids".
+
 ## 0.9.0 - 2026-10-03
 
 - Added immediate availability-aware fallback across notification and TTS output

@@ -822,6 +822,7 @@ class AnnouncementManager:
             area_ids: tuple[str, ...],
             *,
             filter_by_area: bool,
+            require_room_delivery: bool = False,
         ) -> tuple[
             tuple[
                 tuple[str, ...],
@@ -833,6 +834,7 @@ class AnnouncementManager:
             tuple[NotifyOutput, ...],
             tuple[CompanionTTSOutput, ...],
             Any,
+            bool,
         ]:
             if filter_by_area:
                 effective_areas = set(area_ids)
@@ -917,6 +919,9 @@ class AnnouncementManager:
                         "minimum": minimum,
                         "available": notify_output_available(self.hass, output),
                         "native_text": bool(text_notify or level == LEVEL_CRITICAL),
+                        "room_bound": (
+                            self._notify_policy(output)[0] == NOTIFY_SCOPE_ROOM
+                        ),
                     }
                 )
 
@@ -932,6 +937,10 @@ class AnnouncementManager:
                             ),
                             "native_text": bool(
                                 text_tts or level == LEVEL_CRITICAL
+                            ),
+                            "room_bound": (
+                                self._tts_player_scope(entity_id)
+                                == NOTIFY_SCOPE_ROOM
                             ),
                         }
                     )
@@ -950,6 +959,7 @@ class AnnouncementManager:
                             "native_text": bool(
                                 text_tts or level == LEVEL_CRITICAL
                             ),
+                            "room_bound": bool(routed_selected[3]),
                         }
                     )
 
@@ -968,9 +978,13 @@ class AnnouncementManager:
                             "native_text": bool(
                                 text_tts or level == LEVEL_CRITICAL
                             ),
+                            "room_bound": bool(output.area_id),
                         }
                     )
 
+            room_candidate_exists = any(
+                item["room_bound"] for item in candidates
+            )
             available = [item for item in candidates if item["available"]]
             normal_available = [
                 item
@@ -1039,6 +1053,96 @@ class AnnouncementManager:
                     )
                 else:
                     chosen = []
+
+            if require_room_delivery:
+                room_candidates = [
+                    item for item in candidates if item["room_bound"]
+                ]
+                room_available = [
+                    item for item in room_candidates if item["available"]
+                ]
+                room_normal_available = [
+                    item
+                    for item in room_available
+                    if item["native_text"]
+                    and actual_priority
+                    >= LEVEL_PRIORITY.get(
+                        item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
+                    )
+                ]
+                room_chosen: list[dict[str, Any]] = []
+                if room_normal_available:
+                    room_chosen = room_normal_available
+                elif room_available:
+                    room_distance = min(
+                        self._level_distance(level, item["minimum"])
+                        for item in room_available
+                    )
+                    room_chosen = [
+                        item
+                        for item in room_available
+                        if self._level_distance(level, item["minimum"])
+                        == room_distance
+                    ]
+                elif not available and room_candidates:
+                    # Nothing of any class is available. Preserve the existing
+                    # timeout semantics, but make the wait target room-local.
+                    room_normal_configured = [
+                        item
+                        for item in room_candidates
+                        if item["native_text"]
+                        and actual_priority
+                        >= LEVEL_PRIORITY.get(
+                            item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
+                        )
+                    ]
+                    if room_normal_configured:
+                        room_chosen = room_normal_configured
+                    else:
+                        room_distance = min(
+                            self._level_distance(level, item["minimum"])
+                            for item in room_candidates
+                        )
+                        room_chosen = [
+                            item
+                            for item in room_candidates
+                            if self._level_distance(level, item["minimum"])
+                            == room_distance
+                        ]
+
+                if room_chosen:
+                    chosen_keys = {
+                        (item["kind"], item["id"]) for item in chosen
+                    }
+                    chosen.extend(
+                        item
+                        for item in room_chosen
+                        if (item["kind"], item["id"]) not in chosen_keys
+                    )
+                    force_tts = force_tts or any(
+                        item["kind"] != "notify"
+                        and not (
+                            item["native_text"]
+                            and actual_priority
+                            >= LEVEL_PRIORITY.get(
+                                item["minimum"],
+                                LEVEL_PRIORITY[LEVEL_INFO],
+                            )
+                        )
+                        for item in room_chosen
+                    )
+                    force_notify = force_notify or any(
+                        item["kind"] == "notify"
+                        and not (
+                            item["native_text"]
+                            and actual_priority
+                            >= LEVEL_PRIORITY.get(
+                                item["minimum"],
+                                LEVEL_PRIORITY[LEVEL_INFO],
+                            )
+                        )
+                        for item in room_chosen
+                    )
 
             chosen_notify = {
                 item["id"] for item in chosen if item["kind"] == "notify"
@@ -1110,14 +1214,21 @@ class AnnouncementManager:
                 routed_notify,
                 routed_companion,
                 route_plan,
+                room_candidate_exists,
             )
 
-        selected, notify_records, companion_records, plan = routed_plan(
+        (
+            selected,
+            notify_records,
+            companion_records,
+            plan,
+            occupied_room_candidate_exists,
+        ) = routed_plan(
             output_area_ids,
             filter_by_area=occupancy_filter_active,
         )
 
-        if occupancy_filter_active and not plan.has_output:
+        if occupancy_filter_active and not occupied_room_candidate_exists:
             fallback_area_id = self._fallback_area_id()
             if (
                 fallback_area_id
@@ -1128,8 +1239,13 @@ class AnnouncementManager:
                     fallback_notify_records,
                     fallback_companion_records,
                     fallback_plan,
-                ) = routed_plan((fallback_area_id,), filter_by_area=True)
-                if fallback_plan.has_output:
+                    fallback_room_candidate_exists,
+                ) = routed_plan(
+                    (fallback_area_id,),
+                    filter_by_area=True,
+                    require_room_delivery=True,
+                )
+                if fallback_room_candidate_exists and fallback_plan.has_output:
                     output_area_ids = (fallback_area_id,)
                     selected = fallback_selected
                     notify_records = fallback_notify_records

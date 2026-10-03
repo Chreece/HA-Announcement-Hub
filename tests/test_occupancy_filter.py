@@ -38,7 +38,7 @@ def test_occupied_only_defaults_true_and_does_not_touch_task_lifecycle() -> None
 def test_fallback_requires_zero_candidates_and_optionally_open_door() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     config_flow = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
-    assert "if occupancy_filter_active and not plan.has_output:" in manager
+    assert "if occupancy_filter_active and not occupied_room_candidate_exists:" in manager
     assert "def _fallback_area_id(" in manager
     assert "def _fallback_door_allows(" in manager
     assert 'self.hass.states.async_all("binary_sensor")' in manager
