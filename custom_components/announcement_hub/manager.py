@@ -916,7 +916,7 @@ class AnnouncementManager:
                         "id": ref,
                         "minimum": minimum,
                         "available": notify_output_available(self.hass, output),
-                        "native_text": bool(text_notify or level == LEVEL_CRITICAL),
+                        "native_text": bool(text_notify or text_tts),
                     }
                 )
 
@@ -930,9 +930,7 @@ class AnnouncementManager:
                             "available": self._direct_tts_available_now(
                                 entity_id, routed_selected[0]
                             ),
-                            "native_text": bool(
-                                text_tts or level == LEVEL_CRITICAL
-                            ),
+                            "native_text": bool(text_tts or text_notify),
                         }
                     )
 
@@ -947,9 +945,7 @@ class AnnouncementManager:
                                 player=player,
                                 snapcast_clients=routed_selected[3],
                             ),
-                            "native_text": bool(
-                                text_tts or level == LEVEL_CRITICAL
-                            ),
+                            "native_text": bool(text_tts or text_notify),
                         }
                     )
 
@@ -965,9 +961,7 @@ class AnnouncementManager:
                             "available": companion_output_available(
                                 self.hass, output
                             ),
-                            "native_text": bool(
-                                text_tts or level == LEVEL_CRITICAL
-                            ),
+                            "native_text": bool(text_tts or text_notify),
                         }
                     )
 
