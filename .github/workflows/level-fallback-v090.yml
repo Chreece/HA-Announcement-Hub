@@ -1,0 +1,66 @@
+name: Apply availability-aware level fallback
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .level-fallback-v090.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Apply patch
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f .level-fallback-v090.ready
+          test -f .level-fallback-v090.py
+          python -m py_compile .level-fallback-v090.py
+          python .level-fallback-v090.py
+          rm -f .level-fallback-v090.py .level-fallback-v090.ready
+      - name: Validate
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python -m pip install --disable-pip-version-check --quiet pytest pyyaml
+          python -m compileall -q custom_components tests
+          python -m pytest -q
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=Path("custom_components/announcement_hub")
+          m=(c/"manager.py").read_text()
+          models=(c/"models.py").read_text()
+          assert json.loads((c/"manifest.json").read_text())["version"]=="0.9.0"
+          assert "normal_available" in m
+          assert "elif available:" in m
+          assert "force_tts: bool = False" in models
+          assert "force_notify: bool = False" in models
+          assert "self.hass.async_create_task(" not in m
+          assert m.count("self.entry.async_create_background_task(")==2
+          PY
+          git diff --check
+      - name: Commit
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          find . -type d -name .pytest_cache -prune -exec rm -rf {} +
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+Chreece@users.noreply.github.com"
+          git add --all
+          git diff --cached --quiet && exit 0
+          git commit -m "Add immediate level fallback across available outputs"
+          git push origin HEAD:main
