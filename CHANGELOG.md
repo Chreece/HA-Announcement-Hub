@@ -1,20 +1,5 @@
 # Changelog
 
-## 0.9.1 - 2026-10-03
-
-- Fixed selected notification outputs receiving only some announcements when the
-  caller supplied text_tts but no text_notify.
-- Visual notification candidates now remain eligible whenever either text field
-  contains content; when delivered they prefer text_notify and fall back to
-  text_tts.
-- TTS candidates now likewise remain eligible whenever either text field contains
-  content; when delivered they prefer text_tts and fall back to text_notify.
-- This keeps the v0.9 availability/level selector authoritative: once a physical
-  output is selected, it is no longer silently discarded because its dedicated
-  text field was omitted.
-- When both fields are supplied, channel-specific content is unchanged:
-  notifications use text_notify and TTS uses text_tts.
-
 ## 0.9.0 - 2026-10-03
 
 - Added immediate availability-aware fallback across notification and TTS output
