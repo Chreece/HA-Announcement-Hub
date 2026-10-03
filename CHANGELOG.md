@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.9.6 - 2026-10-03
+
+- Fixed occupied-room candidate classification so movable outputs do not count
+  as room candidates. Mobile App notification outputs and Companion App TTS can
+  still be used normally, but they cannot suppress fixed-room routing.
+- Fixed room-level selection so the occupied room first uses outputs matching
+  the announcement level and relaxes to the nearest usable room threshold when
+  the normal level filter leaves no room delivery path.
+- Made default-room fallback TTS-only. Visual/general notifications stay on
+  their original outputs instead of being rerouted to the fallback room.
+- When no fixed-room candidate is currently available, the configured fallback
+  room is used only when the occupied-room door policy allows it; otherwise the
+  normal availability timeout remains responsible for waiting on room outputs.
+- Added regression coverage for movable-output exclusion, fixed-room waiting,
+  level relaxation, and TTS-only fallback behavior.
+
 ## 0.9.5 - 2026-10-03
 
 - Fixed the actual room-output selection bug: occupied-room routing now requires
