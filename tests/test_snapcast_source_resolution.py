@@ -18,22 +18,22 @@ def test_snapcast_friendly_source_is_resolved_to_stream_identifier() -> None:
     assert "current_source == stream_id" in block
 
 
-def test_snapcast_availability_uses_authoritative_source_matcher() -> None:
+def test_snapcast_availability_trusts_explicit_selected_source_membership() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
     start=manager.index("def _snapcast_output_available")
     end=manager.index("def _routable_snapcast_snapshot", start)
     block=manager[start:end]
-    assert "return self._snapcast_source_matches(entity_id)" in block
-    assert 'state.attributes.get("source") != source' not in block
+    assert "_snapcast_source_matches" not in block
+    assert "is_volume_muted" in block
 
 
-def test_snapcast_snapshot_uses_same_source_matcher() -> None:
+def test_snapcast_snapshot_filters_source_only_for_unselected_clients() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
     start=manager.index("def _routable_snapcast_snapshot")
     end=manager.index("async def _async_apply_snapcast_route", start)
     block=manager[start:end]
-    assert "if not self._snapcast_source_matches(entity_id):" in block
-    assert 'state.attributes.get("source") != source' not in block
+    assert "entity_id not in selected_set" in block
+    assert "_snapcast_source_matches(entity_id)" in block
 
 
 def test_area_filter_still_runs_before_source_filter() -> None:

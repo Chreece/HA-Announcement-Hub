@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.9.4 - 2026-10-03
+
+- Corrected Snapcast TTS-source semantics.
+- The Snapcast entry/entities selected in Announcement Hub configuration are now
+  authoritative membership of the TTS Snapcast path.
+- Room routing first filters those selected clients by Home Assistant area, then
+  checks whether the resulting room client is connected and mute-controllable.
+- Explicitly selected TTS clients are no longer rejected merely because their
+  current Snapcast group stream/source label differs from the configured source
+  text.
+- The optional source restriction is still applied to unselected Snapcast
+  clients included in the mute snapshot, preventing unrelated Music clients from
+  being muted by announcement routing.
+- This fixes occupied rooms such as Wohnzimmer and fallback rooms such as Flur
+  returning zero snapcast_clients even though the selected TTS Snapcast entry
+  contains a client assigned to that area.
+
 ## 0.9.3 - 2026-10-03
 
 - Fixed Snapcast TTS-room detection when Home Assistant exposes the client's
