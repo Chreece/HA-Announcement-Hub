@@ -317,6 +317,24 @@ if j.get("version")!="0.9.0":
 j["version"]="0.9.1"
 manifest.write_text(json.dumps(j,indent=2)+"\n",encoding="utf-8")
 
+
+# Update regression contracts for the new room-candidate fallback semantics.
+p=ROOT/"tests"/"test_notify_routing_policy.py"
+text=p.read_text(encoding="utf-8")
+text=text.replace(
+    'start=manager.index("notify_output_areas = {", manager.index("selected, notify_records"))',
+    'start=manager.index("notify_output_areas = {", manager.index("occupied_room_candidate_exists"))',
+)
+p.write_text(text,encoding="utf-8")
+
+p=ROOT/"tests"/"test_occupancy_filter.py"
+text=p.read_text(encoding="utf-8").replace(
+    'assert "if occupancy_filter_active and not plan.has_output:" in manager',
+    'assert "if occupancy_filter_active and not occupied_room_candidate_exists:" in manager',
+)
+p.write_text(text,encoding="utf-8")
+
+
 # ---------------- tests ----------------
 (ROOT/"tests"/"test_room_fallback_with_general_outputs.py").write_text('''"""Regression contracts for room fallback alongside general outputs."""
 
