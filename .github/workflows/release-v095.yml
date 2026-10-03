@@ -1,0 +1,41 @@
+name: Release v0.9.5
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .release-v095.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate release target
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("custom_components/announcement_hub/manifest.json").read_text())
+          assert manifest["version"]=="0.9.5", manifest
+          PY
+          python -m compileall -q custom_components tests
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if gh release view v0.9.5 >/dev/null 2>&1; then
+            exit 0
+          fi
+          gh release create v0.9.5             --target "${GITHUB_SHA}"             --title "Announcement Hub v0.9.5"             --notes "Fixes occupied-room output selection. General/movable notifications are selected independently and can no longer suppress the best available room-local output. If the occupied room has no normal level match, its nearest available room level is selected immediately. Reverts the speculative v0.9.4 Snapcast source bypass; strict source matching remains."
