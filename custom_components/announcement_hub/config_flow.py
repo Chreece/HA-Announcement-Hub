@@ -761,6 +761,8 @@ class _AnnouncementFlowMixin:
                 errors["base"] = "tts_engine_required"
             elif snapcast and not shared_player:
                 errors["base"] = "snapcast_tts_path_required"
+            elif shared_player and shared_player in direct:
+                errors["base"] = "tts_player_role_overlap"
             else:
                 if submitted_language:
                     self._working[CONF_TTS_LANGUAGE] = submitted_language
