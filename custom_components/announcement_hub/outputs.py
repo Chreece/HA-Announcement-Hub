@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from contextlib import suppress
 from dataclasses import dataclass
 from typing import Any
@@ -254,6 +254,53 @@ def tts_default_language(
     if hass.config.language in available:
         return str(hass.config.language)
     return available[0] if available else None
+
+
+def tts_engine_voice_options(
+    hass: HomeAssistant,
+    engine_id: str | None,
+    language: str | None,
+) -> list[dict[str, str]]:
+    """Return voices advertised by one concrete TTS engine/language."""
+    if not engine_id or not language:
+        return []
+    component = hass.data.get(getattr(tts, "DATA_COMPONENT", "tts_entity_component"))
+    entity = component.get_entity(engine_id) if component is not None else None
+    if entity is None:
+        return []
+    with suppress(Exception):
+        voices = entity.async_get_supported_voices(language) or []
+        return [
+            SelectOption(
+                str(voice.voice_id),
+                str(voice.name or voice.voice_id),
+            ).as_dict()
+            for voice in voices
+            if str(voice.voice_id)
+        ]
+    return []
+
+
+def tts_default_voice(
+    hass: HomeAssistant,
+    engine_id: str | None,
+    language: str | None,
+) -> str | None:
+    """Return the engine's advertised default voice when it is selectable."""
+    options = tts_engine_voice_options(hass, engine_id, language)
+    if not options or not engine_id:
+        return None
+    valid = {str(option["value"]) for option in options}
+    component = hass.data.get(getattr(tts, "DATA_COMPONENT", "tts_entity_component"))
+    entity = component.get_entity(engine_id) if component is not None else None
+    if entity is not None:
+        with suppress(Exception):
+            defaults = entity.default_options or {}
+            if isinstance(defaults, Mapping):
+                voice = str(defaults.get(getattr(tts, "ATTR_VOICE", "voice"), "") or "")
+                if voice in valid:
+                    return voice
+    return str(options[0]["value"]) if len(options) == 1 else None
 
 
 def tts_default_engine(hass: HomeAssistant) -> str | None:
