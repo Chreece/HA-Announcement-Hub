@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.9.10 - 2026-10-04
+
+- Fixed Snapcast TTS tail clipping. Announcement Hub now keeps the active
+  Snapcast route open for a short drain window after Home Assistant reports the
+  source/client path idle, so buffered speech can finish before mute states are
+  restored.
+- Preserved gapless same-route handoff: when the next queued announcement is
+  already prepared and uses the exact same Snapcast route, the drain/restore
+  cycle is skipped and the route is handed directly to the next utterance.
+- Fixed explicit area routing without an occupancy sensor. Areas supplied in the
+  action's `output:` field now constrain the candidate/level planner itself,
+  not only the later delivery stage.
+- General/movable outputs intentionally remain eligible when occupancy is
+  unavailable or resolves to no occupied room; only room-bound outputs lack a
+  room target in that situation.
+- Prevented one media player from being used simultaneously as a Direct TTS
+  target and the shared Snapcast source player. Setup now rejects that overlap,
+  and runtime also filters it for older stored configurations.
+- Added regression coverage for explicit-area planning, General-output behavior,
+  TTS player role separation, and Snapcast route drain/handoff behavior.
+
 ## 0.9.9 - 2026-10-04
 
 - Changed TTS engine selection from a multi-select to exactly one active engine.
