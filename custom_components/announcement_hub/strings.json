@@ -145,7 +145,8 @@
       "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
       "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area."
+      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
+      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -296,7 +297,8 @@
       "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
       "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area."
+      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
+      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player."
     }
   },
   "selector": {
