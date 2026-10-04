@@ -183,6 +183,12 @@ from .outputs import (
 _LOGGER = logging.getLogger(__name__)
 
 _BUSY_STATES = {"playing", "buffering", "paused"}
+
+# Snapcast clients may still have buffered audio after Home Assistant reports the
+# shared player and client entities idle. Keep the routed clients audible long
+# enough for that tail to reach the speakers before restoring mute state.
+_SNAPCAST_TAIL_DRAIN_SECONDS = 1.2
+
 _TERMINAL_JOB_STATES = {
     "completed",
     "completed_with_errors",
@@ -806,6 +812,19 @@ class AnnouncementManager:
         else:
             output_area_ids = requested_output_area_ids
 
+        # Explicit action areas must constrain candidate selection even when no
+        # occupancy sensor is configured. Otherwise an output from another room
+        # can win level/availability selection and then be discarded later.
+        area_filter_active = (
+            occupancy_filter_active or bool(requested_output_area_ids)
+        )
+        # General/moveable outputs normally bypass room filtering, but an
+        # occupied-only call with no effective occupied/requested area is a
+        # documented silent no-op, never a general-output broadcast.
+        allow_general_outputs = not (
+            occupancy_filter_active and not output_area_ids
+        )
+
         requested = self._ensure_list(requested_services)
         configured = self._configured_outputs()
         selected = self._select_requested_outputs(
@@ -827,7 +846,14 @@ class AnnouncementManager:
         all_notify_records = tuple(
             resolve_notify_outputs(self.hass, base_selected[1])
         )
-        all_room_tts_players = tuple(base_selected[2])
+        # A media player cannot safely be both a direct TTS target and the
+        # shared server/Snapcast source in the same job. Prefer its shared role
+        # so concurrent audio classes never issue two play requests to one entity.
+        all_room_tts_players = tuple(
+            entity_id
+            for entity_id in base_selected[2]
+            if entity_id != player
+        )
         all_companion_records = resolve_companion_tts_outputs(
             self.hass, base_selected[4]
         )
@@ -859,7 +885,11 @@ class AnnouncementManager:
                     output
                     for output in all_notify_records
                     if (
-                        self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL
+                        (
+                            allow_general_outputs
+                            and self._notify_policy(output)[0]
+                            == NOTIFY_SCOPE_GENERAL
+                        )
                         or (
                             output.area_id is not None
                             and output.area_id in effective_areas
@@ -870,7 +900,11 @@ class AnnouncementManager:
                     entity_id
                     for entity_id in all_room_tts_players
                     if (
-                        self._tts_player_scope(entity_id) == NOTIFY_SCOPE_GENERAL
+                        (
+                            allow_general_outputs
+                            and self._tts_player_scope(entity_id)
+                            == NOTIFY_SCOPE_GENERAL
+                        )
                         or (
                             (area_id := entity_area_id(self.hass, entity_id))
                             is not None
@@ -908,7 +942,7 @@ class AnnouncementManager:
                 routed_selected = (
                     base_selected[0],
                     () if tts_only else base_selected[1],
-                    base_selected[2],
+                    all_room_tts_players,
                     base_selected[3],
                     () if tts_only else base_selected[4],
                 )
@@ -1273,7 +1307,7 @@ class AnnouncementManager:
             _occupied_room_delivery_selected,
         ) = routed_plan(
             output_area_ids,
-            filter_by_area=occupancy_filter_active,
+            filter_by_area=area_filter_active,
             require_room_delivery=occupancy_filter_active,
         )
 
@@ -2368,6 +2402,10 @@ class AnnouncementManager:
 
         route_snapshot: dict[str, bool] | None = None
         route_targets: tuple[str, ...] = ()
+        restore_route = bool(
+            self.settings.get(CONF_SNAPCAST_RESTORE, DEFAULT_SNAPCAST_RESTORE)
+        )
+        hold_route = False
         if target_clients:
             route_snapshot, route_targets = await self._async_apply_snapcast_route(
                 job,
@@ -2410,20 +2448,30 @@ class AnnouncementManager:
             post_delay = float(
                 self.settings.get(CONF_POST_PLAY_DELAY, DEFAULT_POST_PLAY_DELAY)
             )
-            # The post-play cushion is useful for isolated announcements, but
-            # must never create a deliberate hole in a queued speech pipeline.
-            if post_delay > 0 and not self._has_pending_audible_job():
+            if route_snapshot is not None and restore_route:
+                hold_route = self._should_hold_snapcast_route(
+                    player,
+                    selected_clients,
+                    route_targets,
+                )
+                if not hold_route:
+                    # HA can report Snapcast idle before buffered audio has
+                    # actually reached the speakers. Drain that tail before
+                    # restoring/muting the route.
+                    drain_delay = max(
+                        post_delay, _SNAPCAST_TAIL_DRAIN_SECONDS
+                    )
+                    if drain_delay > 0:
+                        await asyncio.sleep(drain_delay)
+            # Non-Snapcast server TTS keeps the ordinary optional cushion.
+            # A prepared same-route Snapcast successor skips the drain so the
+            # next utterance can follow through the already-open route.
+            elif post_delay > 0 and not self._has_pending_audible_job():
                 await asyncio.sleep(post_delay)
         finally:
-            if route_snapshot is not None and self.settings.get(
-                CONF_SNAPCAST_RESTORE, DEFAULT_SNAPCAST_RESTORE
-            ):
+            if route_snapshot is not None and restore_route:
                 try:
-                    if self._should_hold_snapcast_route(
-                        player,
-                        selected_clients,
-                        route_targets,
-                    ):
+                    if hold_route:
                         self._held_snapcast_snapshot = route_snapshot
                         self._held_snapcast_selected = tuple(selected_clients)
                         self._held_snapcast_targets = tuple(route_targets)
