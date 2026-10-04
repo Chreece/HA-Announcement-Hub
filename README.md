@@ -16,8 +16,14 @@ helpers, edit automations, or change MPD/Snapserver configuration.
 - Persists waiting jobs across Home Assistant restarts.
 - Freezes each job's selected outputs, area bindings, player, TTS settings, and
   notification data when the job enters the queue.
-- Pre-generates later server TTS while an earlier announcement is playing.
-- Serializes jobs and audible outputs so they do not overlap.
+- Treats TTS as a continuous producer/consumer pipeline: every queued server or
+  direct-player utterance starts rendering immediately in the background, even
+  when file caching is disabled, while the current announcement is still playing.
+- Keeps announcement order on shared audio paths, but starts independent audible
+  output classes (direct room players, shared server/Snapcast, and opted-in
+  Companion App TTS) together for the same announcement.
+- Runs visual delivery alongside spoken delivery instead of making one channel
+  finish before the other can begin.
 - Uses available outputs immediately and gives unavailable or transiently
   failing outputs one configurable retry window before recording a timeout.
 - Supports visible notifications through modern `notify.*` entities and legacy
@@ -25,8 +31,11 @@ helpers, edit automations, or change MPD/Snapserver configuration.
 - Supports Android Companion App push TTS as an optional audible output. Eligible
   devices are selected in setup, while ordinary action calls opt in with
   `companion_tts: true`; the action option defaults to `false`.
-- Routes selected Snapcast clients by Home Assistant area, verifies the mute
-  state before speech, and restores every previous mute state afterward.
+- Routes selected Snapcast clients by Home Assistant area and verifies the mute
+  state before speech. For consecutive already-rendered announcements using the
+  exact same route, the verified route is handed directly to the next item to
+  avoid restore/reapply settle gaps; the original mute state is restored as soon
+  as that chain ends or the route changes.
 - Provides a diagnostic queue sensor and lifecycle events.
 
 ## Installation
