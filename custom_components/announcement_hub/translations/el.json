@@ -24,10 +24,9 @@
       },
       "tts": {
         "title": "2. Έξοδοι TTS",
-        "description": "Επίλεξε μηχανές TTS, άμεσους media players και—όταν υπάρχει Snapcast—τους συγχρονισμένους clients ανά δωμάτιο μαζί με τον κοινό media player που τους τροφοδοτεί.",
+        "description": "Επίλεξε πρώτα τη μηχανή TTS μαζί με γλώσσα, φωνή και επιλογές. Έπειτα επίλεξε τους άμεσους players ανά δωμάτιο και, όταν υπάρχει Snapcast, τους συγχρονισμένους room clients μαζί με τον κοινό player που τους τροφοδοτεί.",
         "data": {
           "tts_engines": "Μηχανές TTS",
-          "tts_room_players": "Άμεσοι media players TTS",
           "tts_media_player": "Κοινός media player που τροφοδοτεί το Snapcast",
           "snapcast_outputs": "Snapcast clients ανά δωμάτιο",
           "tts_min_level": "Χρήση TTS από επίπεδο",
@@ -37,21 +36,22 @@
           "companion_tts_media_stream": "Ροή ήχου Companion App",
           "companion_tts_words_per_minute": "Εκτίμηση ταχύτητας Companion TTS",
           "tts_area_players": "Άμεσοι TTS players ανά δωμάτιο",
-          "companion_tts_outputs": "Συσκευές TTS Companion App"
+          "companion_tts_outputs": "Συσκευές TTS Companion App",
+          "tts_voice": "Φωνή TTS"
         },
         "data_description": {
-          "tts_engines": "Οι μηχανές ομιλίας με σειρά fallback. Οι γλώσσες προέρχονται από τις ίδιες τις μηχανές και η πρώτη που λειτουργεί δημιουργεί την ομιλία.",
+          "tts_engines": "Οι μηχανές TTS με σειρά fallback. Η προεπιλεγμένη μηχανή TTS του Home Assistant επιλέγεται αυτόματα όταν είναι διαθέσιμη· η πρώτη που λειτουργεί δημιουργεί την ομιλία.",
           "tts_media_player": "Ο γενικός player που παίζει πραγματικά το TTS στην κοινή ροή Snapserver, π.χ. MPD. Δεν φιλτράρεται ποτέ ανά δωμάτιο.",
           "tts_min_level": "Το χαμηλότερο επίπεδο ανακοίνωσης που επιτρέπεται να μιλήσει. Τα χαμηλότερα μένουν σιωπηλά· το Critical παραμένει πάντα ηχητικό.",
           "tts_cache": "Δημιουργεί/cache-άρει το TTS πριν την αναπαραγωγή όταν γίνεται. Μειώνει την καθυστέρηση έναρξης και επιτρέπει επαναχρησιμοποίηση του ίδιου audio.",
-          "tts_language": "Η γλώσσα που περνά στη μηχανή TTS. Οι επιλογές δημιουργούνται από τις γλώσσες που δηλώνουν αυτή τη στιγμή οι διαθέσιμες TTS engines.",
-          "tts_options": "Προαιρετικές επιλογές ειδικές για τη μηχανή, όπως voice/model. Άφησέ το κενό αν η επιλεγμένη TTS integration δεν τεκμηριώνει τέτοιες επιλογές.",
+          "tts_language": "Η γλώσσα που περνά στην επιλεγμένη μηχανή TTS. Οι επιλογές προέρχονται απευθείας από τις υποστηριζόμενες γλώσσες που δηλώνει η ίδια η μηχανή.",
+          "tts_options": "Πρόσθετες επιλογές ειδικές για τη μηχανή TTS. Η γλώσσα και η υποστηριζόμενη φωνή ρυθμίζονται ξεχωριστά παραπάνω· εδώ μπαίνουν μόνο άλλες επιλογές του provider.",
           "companion_tts_media_stream": "Το Android audio stream που χρησιμοποιείται για push-TTS και καθορίζει συμπεριφορά έντασης/audio focus.",
           "companion_tts_words_per_minute": "Χρησιμοποιείται μόνο για εκτίμηση της διάρκειας ομιλίας επειδή το push-TTS δεν αναφέρει πότε τελείωσε. Η queue περιμένει αυτόν τον χρόνο ώστε να μη γίνουν επικαλύψεις.",
-          "tts_room_players": "Media players που μπορούν να λάβουν απευθείας το παραγόμενο TTS, π.χ. voice assistants/ηχεία. Οι Snapcast clients δεν μπαίνουν εδώ.",
           "snapcast_outputs": "Οι συγχρονισμένες φυσικές έξοδοι ανά δωμάτιο. Το TTS δεν στέλνεται απευθείας σε αυτούς· το Announcement Hub διαχειρίζεται mute/routing ενώ ο κοινός player τροφοδοτεί το Snapserver.",
           "companion_tts_outputs": "Android Companion App συσκευές που επιτρέπεται να λαμβάνουν push-TTS. Είναι ανεξάρτητο από τις κανονικές οπτικές ειδοποιήσεις κινητού.",
-          "tts_area_players": "Οι direct TTS players εδώ χρησιμοποιούνται μόνο όταν η περιοχή τους ταιριάζει με το occupied/fallback δωμάτιο. Όσοι επιλεγμένοι direct players μείνουν εκτός θεωρούνται γενικοί."
+          "tts_area_players": "Άμεσοι media players που λαμβάνουν το παραγόμενο TTS μόνο όταν η περιοχή Home Assistant τους ταιριάζει με το occupied/fallback δωμάτιο. Κάθε player που επιλέγεται εδώ θεωρείται αυτόματα room-scoped.",
+          "tts_voice": "Η φωνή που δηλώνει η επιλεγμένη μηχανή TTS για τη συγκεκριμένη γλώσσα. Το πεδίο εμφανίζεται μόνο όταν το Home Assistant αναφέρει διαθέσιμες φωνές."
         }
       },
       "notification_profile": {
@@ -175,10 +175,9 @@
       },
       "tts": {
         "title": "2. Έξοδοι TTS",
-        "description": "Επίλεξε μηχανές TTS, άμεσους media players και—όταν υπάρχει Snapcast—τους συγχρονισμένους clients ανά δωμάτιο μαζί με τον κοινό media player που τους τροφοδοτεί.",
+        "description": "Επίλεξε πρώτα τη μηχανή TTS μαζί με γλώσσα, φωνή και επιλογές. Έπειτα επίλεξε τους άμεσους players ανά δωμάτιο και, όταν υπάρχει Snapcast, τους συγχρονισμένους room clients μαζί με τον κοινό player που τους τροφοδοτεί.",
         "data": {
           "tts_engines": "Μηχανές TTS",
-          "tts_room_players": "Άμεσοι media players TTS",
           "tts_media_player": "Κοινός media player που τροφοδοτεί το Snapcast",
           "snapcast_outputs": "Snapcast clients ανά δωμάτιο",
           "tts_min_level": "Χρήση TTS από επίπεδο",
@@ -188,21 +187,22 @@
           "companion_tts_media_stream": "Ροή ήχου Companion App",
           "companion_tts_words_per_minute": "Εκτίμηση ταχύτητας Companion TTS",
           "tts_area_players": "Άμεσοι TTS players ανά δωμάτιο",
-          "companion_tts_outputs": "Συσκευές TTS Companion App"
+          "companion_tts_outputs": "Συσκευές TTS Companion App",
+          "tts_voice": "Φωνή TTS"
         },
         "data_description": {
-          "tts_engines": "Οι μηχανές ομιλίας με σειρά fallback. Οι γλώσσες προέρχονται από τις ίδιες τις μηχανές και η πρώτη που λειτουργεί δημιουργεί την ομιλία.",
+          "tts_engines": "Οι μηχανές TTS με σειρά fallback. Η προεπιλεγμένη μηχανή TTS του Home Assistant επιλέγεται αυτόματα όταν είναι διαθέσιμη· η πρώτη που λειτουργεί δημιουργεί την ομιλία.",
           "tts_media_player": "Ο γενικός player που παίζει πραγματικά το TTS στην κοινή ροή Snapserver, π.χ. MPD. Δεν φιλτράρεται ποτέ ανά δωμάτιο.",
           "tts_min_level": "Το χαμηλότερο επίπεδο ανακοίνωσης που επιτρέπεται να μιλήσει. Τα χαμηλότερα μένουν σιωπηλά· το Critical παραμένει πάντα ηχητικό.",
           "tts_cache": "Δημιουργεί/cache-άρει το TTS πριν την αναπαραγωγή όταν γίνεται. Μειώνει την καθυστέρηση έναρξης και επιτρέπει επαναχρησιμοποίηση του ίδιου audio.",
-          "tts_language": "Η γλώσσα που περνά στη μηχανή TTS. Οι επιλογές δημιουργούνται από τις γλώσσες που δηλώνουν αυτή τη στιγμή οι διαθέσιμες TTS engines.",
-          "tts_options": "Προαιρετικές επιλογές ειδικές για τη μηχανή, όπως voice/model. Άφησέ το κενό αν η επιλεγμένη TTS integration δεν τεκμηριώνει τέτοιες επιλογές.",
+          "tts_language": "Η γλώσσα που περνά στην επιλεγμένη μηχανή TTS. Οι επιλογές προέρχονται απευθείας από τις υποστηριζόμενες γλώσσες που δηλώνει η ίδια η μηχανή.",
+          "tts_options": "Πρόσθετες επιλογές ειδικές για τη μηχανή TTS. Η γλώσσα και η υποστηριζόμενη φωνή ρυθμίζονται ξεχωριστά παραπάνω· εδώ μπαίνουν μόνο άλλες επιλογές του provider.",
           "companion_tts_media_stream": "Το Android audio stream που χρησιμοποιείται για push-TTS και καθορίζει συμπεριφορά έντασης/audio focus.",
           "companion_tts_words_per_minute": "Χρησιμοποιείται μόνο για εκτίμηση της διάρκειας ομιλίας επειδή το push-TTS δεν αναφέρει πότε τελείωσε. Η queue περιμένει αυτόν τον χρόνο ώστε να μη γίνουν επικαλύψεις.",
-          "tts_room_players": "Media players που μπορούν να λάβουν απευθείας το παραγόμενο TTS, π.χ. voice assistants/ηχεία. Οι Snapcast clients δεν μπαίνουν εδώ.",
           "snapcast_outputs": "Οι συγχρονισμένες φυσικές έξοδοι ανά δωμάτιο. Το TTS δεν στέλνεται απευθείας σε αυτούς· το Announcement Hub διαχειρίζεται mute/routing ενώ ο κοινός player τροφοδοτεί το Snapserver.",
           "companion_tts_outputs": "Android Companion App συσκευές που επιτρέπεται να λαμβάνουν push-TTS. Είναι ανεξάρτητο από τις κανονικές οπτικές ειδοποιήσεις κινητού.",
-          "tts_area_players": "Οι direct TTS players εδώ χρησιμοποιούνται μόνο όταν η περιοχή τους ταιριάζει με το occupied/fallback δωμάτιο. Όσοι επιλεγμένοι direct players μείνουν εκτός θεωρούνται γενικοί."
+          "tts_area_players": "Άμεσοι media players που λαμβάνουν το παραγόμενο TTS μόνο όταν η περιοχή Home Assistant τους ταιριάζει με το occupied/fallback δωμάτιο. Κάθε player που επιλέγεται εδώ θεωρείται αυτόματα room-scoped.",
+          "tts_voice": "Η φωνή που δηλώνει η επιλεγμένη μηχανή TTS για τη συγκεκριμένη γλώσσα. Το πεδίο εμφανίζεται μόνο όταν το Home Assistant αναφέρει διαθέσιμες φωνές."
         }
       },
       "notification_profile": {

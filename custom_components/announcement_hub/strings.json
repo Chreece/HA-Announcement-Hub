@@ -24,10 +24,9 @@
       },
       "tts": {
         "title": "2. TTS outputs",
-        "description": "Choose TTS engines, direct media-player outputs, and—when Snapcast is available—synchronised room clients plus their shared driving media player.",
+        "description": "Choose the TTS engine and its language/voice/options first, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
         "data": {
           "tts_engines": "TTS engines",
-          "tts_room_players": "Direct TTS media players",
           "tts_media_player": "Shared media player driving Snapcast",
           "snapcast_outputs": "Snapcast room clients",
           "tts_min_level": "Use TTS from level",
@@ -36,22 +35,23 @@
           "tts_options": "TTS engine options",
           "companion_tts_media_stream": "Companion App audio stream",
           "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Room-based direct TTS players",
-          "companion_tts_outputs": "Companion App TTS devices"
+          "tts_area_players": "Direct TTS players per room",
+          "companion_tts_outputs": "Companion App TTS devices",
+          "tts_voice": "TTS voice"
         },
         "data_description": {
-          "tts_engines": "Speech engines Announcement Hub may use, in fallback order. The displayed languages come from each engine; the first working engine generates the speech.",
+          "tts_engines": "TTS engines in fallback order. Home Assistant's default TTS engine is preselected when available; the first engine that succeeds produces the speech.",
           "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
           "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
           "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices are built from languages currently advertised by the available TTS engines.",
-          "tts_options": "Optional engine-specific options such as voice/model settings. Leave empty unless the selected TTS integration documents supported options.",
+          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
+          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
           "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
           "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "tts_room_players": "Media players that can receive generated TTS directly. Use this for voice assistants/speakers; do not put Snapcast clients here.",
           "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct TTS players in this list are used only when their Home Assistant area matches the occupied/fallback room. Selected direct players left out of this list are treated as general outputs."
+          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
+          "tts_voice": "Voice advertised by the selected TTS engine for the chosen language. This field appears only when Home Assistant reports selectable voices."
         }
       },
       "notification_profile": {
@@ -175,10 +175,9 @@
       },
       "tts": {
         "title": "2. TTS outputs",
-        "description": "Choose TTS engines, direct media-player outputs, and—when Snapcast is available—synchronised room clients plus their shared driving media player.",
+        "description": "Choose the TTS engine and its language/voice/options first, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
         "data": {
           "tts_engines": "TTS engines",
-          "tts_room_players": "Direct TTS media players",
           "tts_media_player": "Shared media player driving Snapcast",
           "snapcast_outputs": "Snapcast room clients",
           "tts_min_level": "Use TTS from level",
@@ -187,22 +186,23 @@
           "tts_options": "TTS engine options",
           "companion_tts_media_stream": "Companion App audio stream",
           "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Room-based direct TTS players",
-          "companion_tts_outputs": "Companion App TTS devices"
+          "tts_area_players": "Direct TTS players per room",
+          "companion_tts_outputs": "Companion App TTS devices",
+          "tts_voice": "TTS voice"
         },
         "data_description": {
-          "tts_engines": "Speech engines Announcement Hub may use, in fallback order. The displayed languages come from each engine; the first working engine generates the speech.",
+          "tts_engines": "TTS engines in fallback order. Home Assistant's default TTS engine is preselected when available; the first engine that succeeds produces the speech.",
           "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
           "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
           "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices are built from languages currently advertised by the available TTS engines.",
-          "tts_options": "Optional engine-specific options such as voice/model settings. Leave empty unless the selected TTS integration documents supported options.",
+          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
+          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
           "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
           "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "tts_room_players": "Media players that can receive generated TTS directly. Use this for voice assistants/speakers; do not put Snapcast clients here.",
           "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct TTS players in this list are used only when their Home Assistant area matches the occupied/fallback room. Selected direct players left out of this list are treated as general outputs."
+          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
+          "tts_voice": "Voice advertised by the selected TTS engine for the chosen language. This field appears only when Home Assistant reports selectable voices."
         }
       },
       "notification_profile": {

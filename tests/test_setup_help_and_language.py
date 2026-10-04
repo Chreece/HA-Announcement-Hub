@@ -7,20 +7,23 @@ ROOT=Path(__file__).resolve().parents[1]
 C=ROOT/"custom_components"/"announcement_hub"
 
 
-def test_tts_language_is_dropdown_from_engine_capabilities() -> None:
+def test_tts_language_and_voice_are_engine_capability_dropdowns() -> None:
     flow=(C/"config_flow.py").read_text(encoding="utf-8")
     outputs=(C/"outputs.py").read_text(encoding="utf-8")
     assert "tts_engine_languages(self.hass" in flow
-    assert "tts_default_language(self.hass" in flow
+    assert "tts_default_language(" in flow
+    assert "tts_engine_voice_options(" in flow
     tts_block=flow[
         flow.index("async def async_step_tts"):
         flow.index("async def async_step_snapcast")
     ]
-    marker="_optional_marker(\n                    CONF_TTS_LANGUAGE"
-    language_pos=tts_block.index(marker)
-    block=tts_block[language_pos:language_pos+900]
-    assert "selector.SelectSelector(" in block
-    assert "selector.TextSelector()" not in block
+    language_pos=tts_block.index("CONF_TTS_LANGUAGE")
+    voice_pos=tts_block.index("CONF_TTS_VOICE")
+    options_pos=tts_block.rindex("CONF_TTS_OPTIONS")
+    direct_pos=tts_block.rindex("CONF_TTS_AREA_PLAYERS")
+    assert language_pos < voice_pos < options_pos < direct_pos
+    assert "selector.SelectSelector(" in tts_block
+    assert "async_get_supported_voices(language)" in outputs
     assert "supported_languages" in outputs
 
 

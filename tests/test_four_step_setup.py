@@ -24,14 +24,33 @@ def test_notify_step_auto_discovers_concrete_entities_and_groups_policies() -> N
     assert "entity_device_name" in outputs
 
 
-def test_tts_step_uses_ha_default_languages_and_role_discovery() -> None:
+def test_tts_step_uses_ha_default_language_voice_and_room_discovery() -> None:
     flow = (C / "config_flow.py").read_text()
     outputs = (C / "outputs.py").read_text()
-    assert "tts_default_engine(self.hass)" in flow
+    assert "default_engine = tts_default_engine(self.hass)" in flow
+    assert "[default_engine] if default_engine in engine_ids else []" in flow
+    assert "tts_default_language(" in flow
+    assert "tts_engine_voice_options(" in flow
+    assert "tts_default_voice(" in flow
     assert "tts_media_player_options(self.hass)" in flow
+    assert "entity_area_id(self.hass, str(item[\"value\"])) is not None" in flow
     assert "snapcast_output_options(self.hass)" in flow
     assert "supported_languages" in outputs
+    assert "async_get_supported_voices(language)" in outputs
     assert "tts.async_default_engine" in outputs
+
+
+def test_tts_step_has_only_one_direct_player_selector() -> None:
+    flow = (C / "config_flow.py").read_text()
+    block = flow[
+        flow.index("async def async_step_tts"):
+        flow.index("async def async_step_snapcast")
+    ]
+    assert "CONF_TTS_AREA_PLAYERS" in block
+    assert "user_input.get(CONF_TTS_ROOM_PLAYERS" not in block
+    assert "probatio.Optional(\n                CONF_TTS_ROOM_PLAYERS" not in block
+    assert "self._working[CONF_TTS_ROOM_PLAYERS] = direct" in block
+    assert "NOTIFY_POLICY_SCOPE: NOTIFY_SCOPE_ROOM" in block
 
 
 def test_general_step_has_presence_fallback_door_label_and_timeouts() -> None:
