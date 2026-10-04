@@ -312,31 +312,37 @@ def tts_engine_voice_options(
             if not family or _tts_language_family(advertised_value) == family:
                 candidates.append(advertised_value)
 
-    # If the provider supports voices but the selected language is too generic
-    # or not represented exactly, search every advertised language as a final
-    # provider-backed fallback. This is especially important for Wyoming/Piper
-    # installations where "el" and "el_GR" can refer to the same installed voice.
-    if tts_engine_supports_voice(hass, engine_id):
-        with suppress(Exception):
-            for advertised in entity.supported_languages or []:
-                advertised_value = str(advertised)
-                if advertised_value not in candidates:
-                    candidates.append(advertised_value)
-
-    options: dict[str, SelectOption] = {}
-    for candidate in candidates:
-        with suppress(Exception):
-            for voice in entity.async_get_supported_voices(candidate) or []:
-                voice_id = str(voice.voice_id or "")
-                if not voice_id:
-                    continue
-                options.setdefault(
-                    voice_id,
-                    SelectOption(
+    def collect(candidate_languages: Sequence[str]) -> dict[str, SelectOption]:
+        options: dict[str, SelectOption] = {}
+        for candidate in candidate_languages:
+            with suppress(Exception):
+                for voice in entity.async_get_supported_voices(candidate) or []:
+                    voice_id = str(voice.voice_id or "")
+                    if not voice_id:
+                        continue
+                    options.setdefault(
                         voice_id,
-                        str(voice.name or voice_id),
-                    ),
-                )
+                        SelectOption(
+                            voice_id,
+                            str(voice.name or voice_id),
+                        ),
+                    )
+        return options
+
+    options = collect(candidates)
+
+    # Wyoming/Piper may advertise the UI language as "el" while its installed
+    # voice is registered as "el_GR". The family scan above handles that. Only
+    # when the family still yields no voice do we fall back to every provider
+    # language, so a supported voice field is never silently lost.
+    if not options and tts_engine_supports_voice(hass, engine_id):
+        all_languages: list[str] = []
+        with suppress(Exception):
+            all_languages = [
+                str(value) for value in (entity.supported_languages or [])
+            ]
+        options = collect(all_languages)
+
     return [
         option.as_dict()
         for option in sorted(options.values(), key=lambda item: item.label.casefold())
