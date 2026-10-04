@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "2. TTS-Ausgänge",
-        "description": "Wähle zuerst die TTS-Engine mit Sprache, Stimme und Optionen. Danach wählst du direkte Raum-Player und – falls Snapcast vorhanden ist – die synchronisierten Raum-Clients plus den gemeinsamen Player, der sie speist.",
+        "description": "Wähle die eine TTS-Engine mit Sprache, Stimme und Provider-Optionen. Danach wählst du direkte Raum-Player und – falls Snapcast vorhanden ist – die synchronisierten Raum-Clients plus den gemeinsamen Player, der sie speist.",
         "data": {
           "tts_engines": "TTS-Engine",
           "tts_media_player": "Gemeinsamer Mediaplayer für Snapcast",
@@ -139,7 +139,7 @@
     },
     "error": {
       "tts_player_required": "Wähle einen TTS-Mediaplayer, wenn TTS-Engines ausgewählt sind.",
-      "tts_engine_required": "Wähle mindestens eine TTS-Engine, wenn ein TTS-Mediaplayer ausgewählt ist.",
+      "tts_engine_required": "Wähle eine TTS-Engine, wenn ein TTS-Player ausgewählt ist.",
       "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
       "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang.",
       "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein.",
@@ -175,7 +175,7 @@
       },
       "tts": {
         "title": "2. TTS-Ausgänge",
-        "description": "Wähle zuerst die TTS-Engine mit Sprache, Stimme und Optionen. Danach wählst du direkte Raum-Player und – falls Snapcast vorhanden ist – die synchronisierten Raum-Clients plus den gemeinsamen Player, der sie speist.",
+        "description": "Wähle die eine TTS-Engine mit Sprache, Stimme und Provider-Optionen. Danach wählst du direkte Raum-Player und – falls Snapcast vorhanden ist – die synchronisierten Raum-Clients plus den gemeinsamen Player, der sie speist.",
         "data": {
           "tts_engines": "TTS-Engine",
           "tts_media_player": "Gemeinsamer Mediaplayer für Snapcast",
@@ -290,7 +290,7 @@
     },
     "error": {
       "tts_player_required": "Wähle einen TTS-Mediaplayer, wenn TTS-Engines ausgewählt sind.",
-      "tts_engine_required": "Wähle mindestens eine TTS-Engine, wenn ein TTS-Mediaplayer ausgewählt ist.",
+      "tts_engine_required": "Wähle eine TTS-Engine, wenn ein TTS-Player ausgewählt ist.",
       "snapcast_tts_path_required": "Snapcast-Ausgänge benötigen mindestens eine TTS-Engine und einen TTS-Mediaplayer.",
       "output_required": "Wähle mindestens einen optischen, Server-TTS- oder Companion-App-TTS-Ausgang.",
       "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein.",
