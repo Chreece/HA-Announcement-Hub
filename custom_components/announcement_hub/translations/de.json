@@ -24,10 +24,9 @@
       },
       "tts": {
         "title": "2. TTS-Ausgänge",
-        "description": "TTS-Engines, direkte Mediaplayer-Ausgänge und – wenn Snapcast verfügbar ist – synchronisierte Raum-Clients samt gemeinsamem steuernden Mediaplayer auswählen.",
+        "description": "Wähle zuerst die TTS-Engine mit Sprache, Stimme und Optionen. Danach wählst du direkte Raum-Player und – falls Snapcast vorhanden ist – die synchronisierten Raum-Clients plus den gemeinsamen Player, der sie speist.",
         "data": {
           "tts_engines": "TTS-Engines",
-          "tts_room_players": "Direkte TTS-Mediaplayer",
           "tts_media_player": "Gemeinsamer Mediaplayer für Snapcast",
           "snapcast_outputs": "Snapcast-Raumclients",
           "tts_min_level": "TTS erst ab Stufe",
@@ -36,22 +35,23 @@
           "tts_options": "TTS-Engine-Optionen",
           "companion_tts_media_stream": "Companion-App-Audiostream",
           "companion_tts_words_per_minute": "Companion-TTS-Sprechschätzung",
-          "tts_area_players": "Raumgebundene direkte TTS-Player",
-          "companion_tts_outputs": "Companion-App-TTS-Geräte"
+          "tts_area_players": "Direkte TTS-Player pro Raum",
+          "companion_tts_outputs": "Companion-App-TTS-Geräte",
+          "tts_voice": "TTS-Stimme"
         },
         "data_description": {
-          "tts_engines": "Sprach-Engines in Ausweichreihenfolge. Die angezeigten Sprachen stammen direkt von der Engine; die erste funktionierende Engine erzeugt die Sprache.",
+          "tts_engines": "TTS-Engines in Fallback-Reihenfolge. Die Home-Assistant-Standard-TTS-Engine wird automatisch vorausgewählt, wenn sie verfügbar ist; die erste erfolgreiche Engine erzeugt die Sprache.",
           "tts_media_player": "Globaler Player, der TTS tatsächlich in den gemeinsamen Snapserver-Stream abspielt, z. B. MPD. Er wird nie nach Raum gefiltert.",
           "tts_min_level": "Niedrigste Meldungsstufe, die gesprochen werden darf. Niedrigere Stufen bleiben stumm; Kritisch bleibt immer hörbar.",
           "tts_cache": "Erzeugt/cacht TTS vor der Wiedergabe, wenn möglich. Das reduziert Startverzögerung und erlaubt die Wiederverwendung derselben Audiodatei.",
-          "tts_language": "Sprache, die an die TTS-Engine übergeben wird. Die Auswahl stammt aus den aktuell von den verfügbaren Engines gemeldeten Sprachen.",
-          "tts_options": "Optionale enginespezifische Einstellungen wie Stimme/Modell. Leer lassen, wenn die ausgewählte TTS-Integration keine Optionen dokumentiert.",
+          "tts_language": "Sprache für die ausgewählte TTS-Engine. Die Auswahl stammt direkt aus den von der Engine gemeldeten unterstützten Sprachen.",
+          "tts_options": "Zusätzliche enginespezifische TTS-Optionen. Sprache und unterstützte Stimme werden separat oben gewählt; hier gehören nur weitere Provider-Optionen hinein.",
           "companion_tts_media_stream": "Android-Audiostream für Push-TTS; bestimmt Lautstärke-/Audiofokus-Verhalten.",
           "companion_tts_words_per_minute": "Schätzt die Sprechdauer, weil Push-TTS kein Wiedergabeende meldet. Die Queue wartet diese Zeit, um Überlappungen zu vermeiden.",
-          "tts_room_players": "Mediaplayer, die erzeugtes TTS direkt wiedergeben können, z. B. Sprachassistenten/Lautsprecher. Snapcast-Clients gehören nicht hier hinein.",
           "snapcast_outputs": "Synchronisierte physische Raum-Ausgänge. TTS wird nicht direkt an sie gesendet; Announcement Hub verwaltet Mute/Routing, während der gemeinsame Player Snapserver speist.",
           "companion_tts_outputs": "Android-Companion-App-Geräte, die Push-TTS erhalten dürfen. Das ist getrennt von normalen visuellen Handy-Benachrichtigungen.",
-          "tts_area_players": "Diese direkten TTS-Player werden nur genutzt, wenn ihr Home-Assistant-Bereich zum belegten/Fallback-Raum passt. Andere ausgewählte direkte Player gelten als allgemein."
+          "tts_area_players": "Direkte Media Player, die erzeugtes TTS nur erhalten, wenn ihre Home-Assistant-Area dem belegten/Fallback-Raum entspricht. Jeder hier gewählte Player ist automatisch raumgebunden.",
+          "tts_voice": "Von der ausgewählten TTS-Engine für die gewählte Sprache angebotene Stimme. Dieses Feld erscheint nur, wenn Home Assistant auswählbare Stimmen meldet."
         }
       },
       "notification_profile": {
@@ -175,10 +175,9 @@
       },
       "tts": {
         "title": "2. TTS-Ausgänge",
-        "description": "TTS-Engines, direkte Mediaplayer-Ausgänge und – wenn Snapcast verfügbar ist – synchronisierte Raum-Clients samt gemeinsamem steuernden Mediaplayer auswählen.",
+        "description": "Wähle zuerst die TTS-Engine mit Sprache, Stimme und Optionen. Danach wählst du direkte Raum-Player und – falls Snapcast vorhanden ist – die synchronisierten Raum-Clients plus den gemeinsamen Player, der sie speist.",
         "data": {
           "tts_engines": "TTS-Engines",
-          "tts_room_players": "Direkte TTS-Mediaplayer",
           "tts_media_player": "Gemeinsamer Mediaplayer für Snapcast",
           "snapcast_outputs": "Snapcast-Raumclients",
           "tts_min_level": "TTS erst ab Stufe",
@@ -187,22 +186,23 @@
           "tts_options": "TTS-Engine-Optionen",
           "companion_tts_media_stream": "Companion-App-Audiostream",
           "companion_tts_words_per_minute": "Companion-TTS-Sprechschätzung",
-          "tts_area_players": "Raumgebundene direkte TTS-Player",
-          "companion_tts_outputs": "Companion-App-TTS-Geräte"
+          "tts_area_players": "Direkte TTS-Player pro Raum",
+          "companion_tts_outputs": "Companion-App-TTS-Geräte",
+          "tts_voice": "TTS-Stimme"
         },
         "data_description": {
-          "tts_engines": "Sprach-Engines in Ausweichreihenfolge. Die angezeigten Sprachen stammen direkt von der Engine; die erste funktionierende Engine erzeugt die Sprache.",
+          "tts_engines": "TTS-Engines in Fallback-Reihenfolge. Die Home-Assistant-Standard-TTS-Engine wird automatisch vorausgewählt, wenn sie verfügbar ist; die erste erfolgreiche Engine erzeugt die Sprache.",
           "tts_media_player": "Globaler Player, der TTS tatsächlich in den gemeinsamen Snapserver-Stream abspielt, z. B. MPD. Er wird nie nach Raum gefiltert.",
           "tts_min_level": "Niedrigste Meldungsstufe, die gesprochen werden darf. Niedrigere Stufen bleiben stumm; Kritisch bleibt immer hörbar.",
           "tts_cache": "Erzeugt/cacht TTS vor der Wiedergabe, wenn möglich. Das reduziert Startverzögerung und erlaubt die Wiederverwendung derselben Audiodatei.",
-          "tts_language": "Sprache, die an die TTS-Engine übergeben wird. Die Auswahl stammt aus den aktuell von den verfügbaren Engines gemeldeten Sprachen.",
-          "tts_options": "Optionale enginespezifische Einstellungen wie Stimme/Modell. Leer lassen, wenn die ausgewählte TTS-Integration keine Optionen dokumentiert.",
+          "tts_language": "Sprache für die ausgewählte TTS-Engine. Die Auswahl stammt direkt aus den von der Engine gemeldeten unterstützten Sprachen.",
+          "tts_options": "Zusätzliche enginespezifische TTS-Optionen. Sprache und unterstützte Stimme werden separat oben gewählt; hier gehören nur weitere Provider-Optionen hinein.",
           "companion_tts_media_stream": "Android-Audiostream für Push-TTS; bestimmt Lautstärke-/Audiofokus-Verhalten.",
           "companion_tts_words_per_minute": "Schätzt die Sprechdauer, weil Push-TTS kein Wiedergabeende meldet. Die Queue wartet diese Zeit, um Überlappungen zu vermeiden.",
-          "tts_room_players": "Mediaplayer, die erzeugtes TTS direkt wiedergeben können, z. B. Sprachassistenten/Lautsprecher. Snapcast-Clients gehören nicht hier hinein.",
           "snapcast_outputs": "Synchronisierte physische Raum-Ausgänge. TTS wird nicht direkt an sie gesendet; Announcement Hub verwaltet Mute/Routing, während der gemeinsame Player Snapserver speist.",
           "companion_tts_outputs": "Android-Companion-App-Geräte, die Push-TTS erhalten dürfen. Das ist getrennt von normalen visuellen Handy-Benachrichtigungen.",
-          "tts_area_players": "Diese direkten TTS-Player werden nur genutzt, wenn ihr Home-Assistant-Bereich zum belegten/Fallback-Raum passt. Andere ausgewählte direkte Player gelten als allgemein."
+          "tts_area_players": "Direkte Media Player, die erzeugtes TTS nur erhalten, wenn ihre Home-Assistant-Area dem belegten/Fallback-Raum entspricht. Jeder hier gewählte Player ist automatisch raumgebunden.",
+          "tts_voice": "Von der ausgewählten TTS-Engine für die gewählte Sprache angebotene Stimme. Dieses Feld erscheint nur, wenn Home Assistant auswählbare Stimmen meldet."
         }
       },
       "notification_profile": {
