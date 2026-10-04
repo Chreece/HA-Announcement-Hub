@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "2. Έξοδοι TTS",
-        "description": "Επίλεξε πρώτα τη μηχανή TTS μαζί με γλώσσα, φωνή και επιλογές. Έπειτα επίλεξε τους άμεσους players ανά δωμάτιο και, όταν υπάρχει Snapcast, τους συγχρονισμένους room clients μαζί με τον κοινό player που τους τροφοδοτεί.",
+        "description": "Επίλεξε τη μία μηχανή TTS μαζί με γλώσσα, φωνή και επιλογές provider. Έπειτα επίλεξε τους άμεσους players ανά δωμάτιο και, όταν υπάρχει Snapcast, τους συγχρονισμένους room clients μαζί με τον κοινό player που τους τροφοδοτεί.",
         "data": {
           "tts_engines": "Μηχανή TTS",
           "tts_media_player": "Κοινός media player που τροφοδοτεί το Snapcast",
@@ -139,7 +139,7 @@
     },
     "error": {
       "tts_player_required": "Επίλεξε media player TTS όταν έχουν επιλεγεί μηχανές TTS.",
-      "tts_engine_required": "Επίλεξε τουλάχιστον μία μηχανή TTS όταν έχει επιλεγεί media player TTS.",
+      "tts_engine_required": "Επίλεξε μία μηχανή TTS όταν έχει επιλεγεί TTS player.",
       "snapcast_tts_path_required": "Οι έξοδοι Snapcast απαιτούν τουλάχιστον μία μηχανή TTS και media player TTS.",
       "output_required": "Επίλεξε τουλάχιστον μία οπτική έξοδο, έξοδο TTS του server ή έξοδο TTS Companion App.",
       "display_time_order": "Ο μέγιστος χρόνος εμφάνισης πρέπει να είναι μεγαλύτερος ή ίσος με τον ελάχιστο.",
@@ -175,7 +175,7 @@
       },
       "tts": {
         "title": "2. Έξοδοι TTS",
-        "description": "Επίλεξε πρώτα τη μηχανή TTS μαζί με γλώσσα, φωνή και επιλογές. Έπειτα επίλεξε τους άμεσους players ανά δωμάτιο και, όταν υπάρχει Snapcast, τους συγχρονισμένους room clients μαζί με τον κοινό player που τους τροφοδοτεί.",
+        "description": "Επίλεξε τη μία μηχανή TTS μαζί με γλώσσα, φωνή και επιλογές provider. Έπειτα επίλεξε τους άμεσους players ανά δωμάτιο και, όταν υπάρχει Snapcast, τους συγχρονισμένους room clients μαζί με τον κοινό player που τους τροφοδοτεί.",
         "data": {
           "tts_engines": "Μηχανή TTS",
           "tts_media_player": "Κοινός media player που τροφοδοτεί το Snapcast",
@@ -290,7 +290,7 @@
     },
     "error": {
       "tts_player_required": "Επίλεξε media player TTS όταν έχουν επιλεγεί μηχανές TTS.",
-      "tts_engine_required": "Επίλεξε τουλάχιστον μία μηχανή TTS όταν έχει επιλεγεί media player TTS.",
+      "tts_engine_required": "Επίλεξε μία μηχανή TTS όταν έχει επιλεγεί TTS player.",
       "snapcast_tts_path_required": "Οι έξοδοι Snapcast απαιτούν τουλάχιστον μία μηχανή TTS και media player TTS.",
       "output_required": "Επίλεξε τουλάχιστον μία οπτική έξοδο, έξοδο TTS του server ή έξοδο TTS Companion App.",
       "display_time_order": "Ο μέγιστος χρόνος εμφάνισης πρέπει να είναι μεγαλύτερος ή ίσος με τον ελάχιστο.",
