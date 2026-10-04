@@ -183,6 +183,13 @@ from .outputs import (
 _LOGGER = logging.getLogger(__name__)
 
 _BUSY_STATES = {"playing", "buffering", "paused"}
+
+# Snapcast clients can still have about one second of buffered audio after both
+# the source player and HA Snapcast entities have transitioned to idle. Keep a
+# routed client audible slightly longer before restoring mute state, otherwise
+# the end of the spoken sentence can be clipped.
+_SNAPCAST_TAIL_DRAIN_SECONDS = 1.2
+
 _TERMINAL_JOB_STATES = {
     "completed",
     "completed_with_errors",
@@ -2364,6 +2371,10 @@ class AnnouncementManager:
 
         route_snapshot: dict[str, bool] | None = None
         route_targets: tuple[str, ...] = ()
+        restore_route = bool(
+            self.settings.get(CONF_SNAPCAST_RESTORE, DEFAULT_SNAPCAST_RESTORE)
+        )
+        hold_route = False
         if target_clients:
             route_snapshot, route_targets = await self._async_apply_snapcast_route(
                 job,
@@ -2406,20 +2417,28 @@ class AnnouncementManager:
             post_delay = float(
                 self.settings.get(CONF_POST_PLAY_DELAY, DEFAULT_POST_PLAY_DELAY)
             )
-            # The post-play cushion is useful for isolated announcements, but
-            # must never create a deliberate hole in a queued speech pipeline.
-            if post_delay > 0 and not self._has_pending_audible_job():
+            if route_snapshot is not None and restore_route:
+                hold_route = self._should_hold_snapcast_route(
+                    player,
+                    selected_clients,
+                    route_targets,
+                )
+                if not hold_route:
+                    # HA reports the Snapcast entities idle before the client's
+                    # buffered tail has necessarily reached the speakers. Do not
+                    # restore/mute the route until that tail has drained.
+                    drain_delay = max(post_delay, _SNAPCAST_TAIL_DRAIN_SECONDS)
+                    if drain_delay > 0:
+                        await asyncio.sleep(drain_delay)
+            # Non-Snapcast server TTS keeps the ordinary optional cushion. A
+            # prepared same-route Snapcast successor intentionally skips both
+            # delays so its audio can follow through the already-open route.
+            elif post_delay > 0 and not self._has_pending_audible_job():
                 await asyncio.sleep(post_delay)
         finally:
-            if route_snapshot is not None and self.settings.get(
-                CONF_SNAPCAST_RESTORE, DEFAULT_SNAPCAST_RESTORE
-            ):
+            if route_snapshot is not None and restore_route:
                 try:
-                    if self._should_hold_snapcast_route(
-                        player,
-                        selected_clients,
-                        route_targets,
-                    ):
+                    if hold_route:
                         self._held_snapcast_snapshot = route_snapshot
                         self._held_snapcast_selected = tuple(selected_clients)
                         self._held_snapcast_targets = tuple(route_targets)
