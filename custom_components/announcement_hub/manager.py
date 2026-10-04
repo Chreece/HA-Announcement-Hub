@@ -2764,6 +2764,11 @@ class AnnouncementManager:
         target_clients: Sequence[str],
     ) -> bool:
         """Keep an identical route warm only for the immediate prepared successor."""
+        # Do not hold a partial first round while this same job is still waiting
+        # for late Snapcast clients; that would keep unrelated clients muted
+        # during the availability window.
+        if set(target_clients) != set(selected_clients):
+            return False
         for pending in self._queue:
             if not self._job_runnable_now(pending):
                 continue
