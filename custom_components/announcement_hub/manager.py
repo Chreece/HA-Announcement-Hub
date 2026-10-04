@@ -818,13 +818,6 @@ class AnnouncementManager:
         area_filter_active = (
             occupancy_filter_active or bool(requested_output_area_ids)
         )
-        # General/moveable outputs normally bypass room filtering, but an
-        # occupied-only call with no effective occupied/requested area is a
-        # documented silent no-op, never a general-output broadcast.
-        allow_general_outputs = not (
-            occupancy_filter_active and not output_area_ids
-        )
-
         requested = self._ensure_list(requested_services)
         configured = self._configured_outputs()
         selected = self._select_requested_outputs(
@@ -885,11 +878,7 @@ class AnnouncementManager:
                     output
                     for output in all_notify_records
                     if (
-                        (
-                            allow_general_outputs
-                            and self._notify_policy(output)[0]
-                            == NOTIFY_SCOPE_GENERAL
-                        )
+                        self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL
                         or (
                             output.area_id is not None
                             and output.area_id in effective_areas
@@ -900,11 +889,7 @@ class AnnouncementManager:
                     entity_id
                     for entity_id in all_room_tts_players
                     if (
-                        (
-                            allow_general_outputs
-                            and self._tts_player_scope(entity_id)
-                            == NOTIFY_SCOPE_GENERAL
-                        )
+                        self._tts_player_scope(entity_id) == NOTIFY_SCOPE_GENERAL
                         or (
                             (area_id := entity_area_id(self.hass, entity_id))
                             is not None
