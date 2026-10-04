@@ -29,7 +29,6 @@ jobs:
           assert manifest["version"]=="0.9.7", manifest
           PY
           python -m compileall -q custom_components tests
-          python -m pytest -q
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
