@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.9 - 2026-10-04
+
+- Changed TTS engine selection from a multi-select to exactly one active engine.
+  Existing multi-engine configurations remain readable, but setup, new jobs,
+  restored queue jobs and runtime delivery use only the first configured engine.
+- Home Assistant's default TTS engine remains automatically preselected when no
+  engine is already configured.
+- Fixed Wyoming/Piper voice discovery when the selected language is generic but
+  the installed voice is advertised under a locale variant, e.g. `el` with
+  `el_GR` or `el-GR`.
+- Voice support is detected from the TTS entity's Home Assistant capabilities.
+  When voices can be enumerated, the setup shows a dropdown; if the provider
+  accepts a voice option but cannot enumerate values, a manual voice-ID field is
+  still shown instead of hiding voice configuration.
+- Changing the engine or language refreshes the same TTS setup page once so the
+  language and voice controls are rebuilt for the exact provider before saving.
+- Updated English, German and Greek setup wording to use the singular TTS engine
+  model and added runtime regression coverage.
+
 ## 0.9.8 - 2026-10-04
 
 - Simplified the TTS setup page by removing the separate generic direct-player
