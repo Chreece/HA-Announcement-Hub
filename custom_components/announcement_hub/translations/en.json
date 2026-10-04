@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "2. TTS outputs",
-        "description": "Choose the TTS engine and its language/voice/options first, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
         "data": {
           "tts_engines": "TTS engine",
           "tts_media_player": "Shared media player driving Snapcast",
@@ -139,7 +139,7 @@
     },
     "error": {
       "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select at least one TTS engine when a TTS media player is selected.",
+      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
       "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
       "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
       "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
@@ -175,7 +175,7 @@
       },
       "tts": {
         "title": "2. TTS outputs",
-        "description": "Choose the TTS engine and its language/voice/options first, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
         "data": {
           "tts_engines": "TTS engine",
           "tts_media_player": "Shared media player driving Snapcast",
@@ -290,7 +290,7 @@
     },
     "error": {
       "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select at least one TTS engine when a TTS media player is selected.",
+      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
       "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
       "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
       "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
