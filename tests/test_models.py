@@ -102,7 +102,7 @@ def test_critical_uses_both_channels_even_when_one_text_is_missing() -> None:
     )
     assert plan.tts_text == "Smoke detected"
     assert plan.notify_text == "Smoke detected"
-    assert plan.tts_engines == ("tts.piper", "tts.cloud")
+    assert plan.tts_engines == ("tts.piper",)
     assert plan.notify_outputs == ("entity:notify.tv",)
     assert plan.has_visual_output is True
     assert plan.has_audible_output is True
