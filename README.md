@@ -239,6 +239,12 @@ only TTS receives speech and a room with only visual notify outputs receives onl
 those notifications. Unavailable outputs still wait for the configured
 availability timeout and are silently skipped afterward.
 
+If the configured occupancy source is unavailable or currently resolves to no
+occupied areas, room-bound outputs have no room target, but **General/movable
+outputs remain eligible**. This is intentional: phones, watches, laptops and
+other General outputs can still receive the announcement when nobody is detected
+in a specific room.
+
 Use `occupied_only: false` to ignore occupancy for one call. Without a
 configured occupancy sensor, the option has no effect.
 
