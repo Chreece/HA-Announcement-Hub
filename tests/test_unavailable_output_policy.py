@@ -17,7 +17,12 @@ def test_unavailable_outputs_do_not_create_channel_errors() -> None:
 def test_all_unavailable_outputs_are_a_valid_no_op() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     assert "if not job.successful_channels and job.channel_errors:" in manager
-    assert "if not await self._async_wait_player_available(player, job):\n                return" in manager
+    server = manager[
+        manager.index("async def _async_send_server_tts"):
+        manager.index("async def _async_play_server_round")
+    ]
+    assert "if not await self._async_wait_player_available(player, job):" in server
+    assert "return" in server
     assert "skipped unavailable Snapcast output(s)" in manager
 
 
