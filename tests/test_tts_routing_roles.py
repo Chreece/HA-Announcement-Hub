@@ -13,7 +13,8 @@ def test_setup_distinguishes_direct_shared_and_routing_players() -> None:
         outputs=strings[section]["step"]["outputs"]["data"]
         tts=strings[section]["step"]["tts"]["data"]
         assert "snapcast_outputs" not in outputs
-        assert "tts_room_players" in tts
+        assert "tts_room_players" not in tts
+        assert "tts_area_players" in tts
         assert "tts_media_player" in tts
         assert "snapcast_outputs" in tts
 
