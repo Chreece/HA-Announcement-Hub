@@ -215,7 +215,11 @@ class AnnouncementManager:
         self._wake = asyncio.Event()
         self._running = False
         self._cancel_requested: set[str] = set()
-        self._active_tts_player: str | None = None
+        self._active_tts_players: set[str] = set()
+        self._held_snapcast_snapshot: dict[str, bool] | None = None
+        self._held_snapcast_selected: tuple[str, ...] = ()
+        self._held_snapcast_targets: tuple[str, ...] = ()
+        self._held_snapcast_player: str | None = None
         self._stop_lock = asyncio.Lock()
 
     @property
@@ -407,9 +411,14 @@ class AnnouncementManager:
             if prefetch_tasks:
                 await asyncio.gather(*prefetch_tasks, return_exceptions=True)
 
-            if self._active_tts_player:
-                await self._async_stop_player(self._active_tts_player)
-            self._active_tts_player = None
+            active_players = tuple(self._active_tts_players)
+            self._active_tts_players.clear()
+            if active_players:
+                await asyncio.gather(
+                    *(self._async_stop_player(player) for player in active_players),
+                    return_exceptions=True,
+                )
+            await self._async_restore_held_snapcast_route()
 
             if self._current and self._current.status == "processing":
                 self._current.status = "pending"
@@ -1457,8 +1466,12 @@ class AnnouncementManager:
     async def async_cancel(self, job_id: str) -> str:
         if self._current and self._current.job_id == job_id:
             self._cancel_requested.add(job_id)
-            if self._active_tts_player:
-                await self._async_stop_player(self._active_tts_player)
+            active_players = tuple(self._active_tts_players)
+            if active_players:
+                await asyncio.gather(
+                    *(self._async_stop_player(player) for player in active_players),
+                    return_exceptions=True,
+                )
             self._notify_update()
             return "cancelling"
 
@@ -1482,12 +1495,19 @@ class AnnouncementManager:
         while self._running:
             job = self._next_runnable_job()
             if job is None:
+                await self._async_restore_held_snapcast_route()
                 self._wake.clear()
                 try:
                     await asyncio.wait_for(self._wake.wait(), timeout=0.25)
                 except TimeoutError:
                     pass
                 continue
+
+            if (
+                self._held_snapcast_snapshot is not None
+                and not self._job_matches_held_snapcast_route(job)
+            ):
+                await self._async_restore_held_snapcast_route()
 
             self._queue.remove(job)
             self._current = job
@@ -1536,7 +1556,7 @@ class AnnouncementManager:
             finally:
                 self._cancel_requested.discard(job.job_id)
                 self._current = None
-                self._active_tts_player = None
+                self._active_tts_players.clear()
                 if not requeued:
                     job.finished_at = utcnow_iso()
                     self._prefetch_tasks.pop(job.job_id, None)
@@ -1683,13 +1703,32 @@ class AnnouncementManager:
         return None
 
     async def _async_process_job(self, job: AnnouncementJob) -> None:
+        """Run visual and audible channels as a pipelined pair.
+
+        Dispatch order controls which channel is started first, but one channel
+        no longer has to finish before the other can begin. This keeps TTS
+        playback moving while visual reading timers run independently.
+        """
         order = self.settings.get(CONF_DISPATCH_ORDER, DEFAULT_DISPATCH_ORDER)
         if order == DISPATCH_NOTIFY_THEN_TTS:
-            await self._async_send_notifications(job)
-            await self._async_send_tts(job)
+            first = self._async_send_notifications
+            second = self._async_send_tts
         else:
-            await self._async_send_tts(job)
-            await self._async_send_notifications(job)
+            first = self._async_send_tts
+            second = self._async_send_notifications
+
+        first_task = asyncio.create_task(first(job))
+        await asyncio.sleep(0)
+        second_task = asyncio.create_task(second(job))
+        tasks = (first_task, second_task)
+        try:
+            await asyncio.gather(*tasks)
+        except BaseException:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            raise
 
         self._raise_if_cancelled(job)
         # A job whose configured outputs all stayed unavailable is a valid
@@ -1789,7 +1828,16 @@ class AnnouncementManager:
                     part_index=index,
                     part_count=len(parts),
                 )
-                await self._async_reading_hold(job, hold_seconds)
+                # A final visual reading timer must not hold up the next spoken
+                # announcement when this job also has audible delivery. Keep
+                # the hold between multipart notification parts, and preserve
+                # the final hold for notify-only jobs.
+                hold_after_part = (
+                    index < len(parts)
+                    or not job.tts_text
+                )
+                if hold_after_part:
+                    await self._async_reading_hold(job, hold_seconds)
                 if index < len(parts):
                     gap = float(profile[PROFILE_PART_GAP])
                     if gap > 0:
@@ -2054,26 +2102,47 @@ class AnnouncementManager:
             )
 
     async def _async_send_tts(self, job: AnnouncementJob) -> None:
+        """Launch independent audible output classes together."""
         if not job.tts_text:
             return
 
-        if job.room_tts_players and job.tts_engines:
-            await self._async_send_room_tts(job)
-
-        if job.server_tts_enabled and job.tts_engines:
+        async def run_channel(
+            channel: str,
+            deliver: Callable[[], Awaitable[None]],
+        ) -> None:
             try:
-                await self._async_send_server_tts(job)
+                await deliver()
             except JobCancelled:
                 raise
             except asyncio.CancelledError:
                 raise
             except Exception as err:  # noqa: BLE001
-                # A failed shared player, TTS engine, or Snapcast route must not
-                # prevent a separately selected Companion App TTS output.
-                self._record_channel_failure(job, "server_tts", err)
+                self._record_channel_failure(job, channel, err)
 
+        deliveries: list[tuple[str, Callable[[], Awaitable[None]]]] = []
+        if job.room_tts_players and job.tts_engines:
+            deliveries.append(("room_tts", lambda: self._async_send_room_tts(job)))
+        if job.server_tts_enabled and job.tts_engines:
+            deliveries.append(("server_tts", lambda: self._async_send_server_tts(job)))
         if job.companion_tts_entries:
-            await self._async_send_companion_tts(job)
+            deliveries.append(
+                ("companion_tts", lambda: self._async_send_companion_tts(job))
+            )
+        if not deliveries:
+            return
+
+        tasks = [
+            asyncio.create_task(run_channel(channel, deliver))
+            for channel, deliver in deliveries
+        ]
+        try:
+            await asyncio.gather(*tasks)
+        except BaseException:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            raise
 
     async def _async_send_room_tts(self, job: AnnouncementJob) -> None:
         """Speak directly on area-bound media players using the TTS engine chain."""
@@ -2103,42 +2172,45 @@ class AnnouncementManager:
             }
 
         async def deliver(player: str) -> None:
-            self._active_tts_player = player
-            await self._await_prefetch(job)
-            idle_timeout = float(
-                self.settings.get(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT)
-            )
-            await self._wait_audio_path_idle(player, idle_timeout, job)
-            engines = await self._async_available_tts_engines(job)
-            if not engines:
-                return
-            errors: list[str] = []
-            for engine in engines:
-                channel = f"room_tts:{player}:{engine}"
-                self._fire_channel_event(EVENT_CHANNEL_STARTED, job, channel)
-                try:
-                    media_source_id = job.media_source_ids.get(engine)
-                    if not media_source_id:
-                        media_source_id = self._build_media_source_id(job, engine)
-                        job.media_source_ids[engine] = media_source_id
-                    await self._async_play_media_source(
-                        job, player, media_source_id, ()
-                    )
-                except JobCancelled:
-                    raise
-                except asyncio.CancelledError:
-                    raise
-                except Exception as err:  # noqa: BLE001
-                    errors.append(f"{engine}: {err}")
-                    await self._async_stop_player(player)
-                    self._record_channel_failure(job, channel, err)
-                    continue
-                self._record_channel_success(job, channel)
-                return
-            raise HomeAssistantError(
-                f"Every selected TTS engine failed on {player}: "
-                + "; ".join(errors)
-            )
+            self._active_tts_players.add(player)
+            try:
+                await self._await_prefetch(job)
+                idle_timeout = float(
+                    self.settings.get(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT)
+                )
+                await self._wait_audio_path_idle(player, idle_timeout, job)
+                engines = await self._async_available_tts_engines(job)
+                if not engines:
+                    return
+                errors: list[str] = []
+                for engine in engines:
+                    channel = f"room_tts:{player}:{engine}"
+                    self._fire_channel_event(EVENT_CHANNEL_STARTED, job, channel)
+                    try:
+                        media_source_id = job.media_source_ids.get(engine)
+                        if not media_source_id:
+                            media_source_id = self._build_media_source_id(job, engine)
+                            job.media_source_ids[engine] = media_source_id
+                        await self._async_play_media_source(
+                            job, player, media_source_id, ()
+                        )
+                    except JobCancelled:
+                        raise
+                    except asyncio.CancelledError:
+                        raise
+                    except Exception as err:  # noqa: BLE001
+                        errors.append(f"{engine}: {err}")
+                        await self._async_stop_player(player)
+                        self._record_channel_failure(job, channel, err)
+                        continue
+                    self._record_channel_success(job, channel)
+                    return
+                raise HomeAssistantError(
+                    f"Every selected TTS engine failed on {player}: "
+                    + "; ".join(errors)
+                )
+            finally:
+                self._active_tts_players.discard(player)
 
         pending = list(players)
         timeout = self._availability_timeout
@@ -2154,21 +2226,22 @@ class AnnouncementManager:
                     and state.state not in {STATE_UNAVAILABLE, STATE_UNKNOWN}
                 )
             ]
-            for player in ready:
-                try:
-                    await deliver(player)
-                except JobCancelled:
-                    raise
-                except asyncio.CancelledError:
-                    raise
-                except Exception as err:  # noqa: BLE001
-                    _LOGGER.debug(
-                        "Direct room TTS output %s failed during availability window: %s",
-                        player,
-                        err,
-                    )
-                    continue
-                pending.remove(player)
+            if ready:
+                results = await asyncio.gather(
+                    *(deliver(player) for player in ready),
+                    return_exceptions=True,
+                )
+                for player, result in zip(ready, results, strict=True):
+                    if isinstance(result, (JobCancelled, asyncio.CancelledError)):
+                        raise result
+                    if isinstance(result, BaseException):
+                        _LOGGER.debug(
+                            "Direct room TTS output %s failed during availability window: %s",
+                            player,
+                            result,
+                        )
+                        continue
+                    pending.remove(player)
             if not pending or timeout <= 0 or loop.time() >= deadline:
                 break
             await asyncio.sleep(min(0.1, max(0.0, deadline - loop.time())))
@@ -2188,7 +2261,7 @@ class AnnouncementManager:
                 job, "server_tts", "No TTS media player is configured"
             )
             return
-        self._active_tts_player = player
+        self._active_tts_players.add(player)
         await self._await_prefetch(job)
 
         matching_clients = [
