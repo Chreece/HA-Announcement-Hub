@@ -17,14 +17,15 @@ def test_explicit_action_areas_filter_candidate_planning_without_occupancy() -> 
     assert "filter_by_area=area_filter_active" in manager
 
 
-def test_empty_occupied_target_is_silent_even_for_general_outputs() -> None:
+def test_empty_or_unavailable_occupancy_keeps_general_outputs_eligible() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
-    assert "allow_general_outputs = not (" in manager
-    assert "occupancy_filter_active and not output_area_ids" in manager
-    assert "allow_general_outputs" in manager[
+    routed = manager[
         manager.index("def routed_plan("):
         manager.index("# Build all physical channel candidates first")
     ]
+    assert "self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL" in routed
+    assert "self._tts_player_scope(entity_id) == NOTIFY_SCOPE_GENERAL" in routed
+    assert "allow_general_outputs" not in routed
 
 
 def test_same_player_cannot_run_direct_and_shared_tts_concurrently() -> None:
