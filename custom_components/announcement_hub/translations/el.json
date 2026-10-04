@@ -145,7 +145,8 @@
       "display_time_order": "Ο μέγιστος χρόνος εμφάνισης πρέπει να είναι μεγαλύτερος ή ίσος με τον ελάχιστο.",
       "room_notify_area_required": "Μια συσκευή ειδοποίησης ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant.",
       "notify_level_overlap": "Μια συσκευή ειδοποίησης μπορεί να ανήκει μόνο σε ένα ελάχιστο επίπεδο.",
-      "room_tts_area_required": "Ένας άμεσος TTS media player ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant."
+      "room_tts_area_required": "Ένας άμεσος TTS media player ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant.",
+      "tts_player_role_overlap": "Ο ίδιος media player δεν μπορεί να είναι ταυτόχρονα άμεσος TTS player και ο κοινός source player του Snapcast."
     },
     "abort": {
       "single_instance_allowed": "Το Κέντρο Ανακοινώσεων έχει ήδη ρυθμιστεί."
@@ -296,7 +297,8 @@
       "display_time_order": "Ο μέγιστος χρόνος εμφάνισης πρέπει να είναι μεγαλύτερος ή ίσος με τον ελάχιστο.",
       "room_notify_area_required": "Μια συσκευή ειδοποίησης ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant.",
       "notify_level_overlap": "Μια συσκευή ειδοποίησης μπορεί να ανήκει μόνο σε ένα ελάχιστο επίπεδο.",
-      "room_tts_area_required": "Ένας άμεσος TTS media player ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant."
+      "room_tts_area_required": "Ένας άμεσος TTS media player ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant.",
+      "tts_player_role_overlap": "Ο ίδιος media player δεν μπορεί να είναι ταυτόχρονα άμεσος TTS player και ο κοινός source player του Snapcast."
     }
   },
   "selector": {

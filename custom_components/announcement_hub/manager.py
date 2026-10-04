@@ -813,6 +813,13 @@ class AnnouncementManager:
         else:
             output_area_ids = requested_output_area_ids
 
+        # Explicit action areas must constrain candidate selection even when no
+        # occupancy sensor is configured. Otherwise an output from another room
+        # can win level/availability selection and then be discarded later.
+        area_filter_active = (
+            occupancy_filter_active or bool(requested_output_area_ids)
+        )
+
         requested = self._ensure_list(requested_services)
         configured = self._configured_outputs()
         selected = self._select_requested_outputs(
@@ -834,7 +841,14 @@ class AnnouncementManager:
         all_notify_records = tuple(
             resolve_notify_outputs(self.hass, base_selected[1])
         )
-        all_room_tts_players = tuple(base_selected[2])
+        # A media player cannot safely be both a direct TTS target and the
+        # shared server/Snapcast source in the same job. Prefer its shared role
+        # so concurrent audio classes never issue two play requests to one entity.
+        all_room_tts_players = tuple(
+            entity_id
+            for entity_id in base_selected[2]
+            if entity_id != player
+        )
         all_companion_records = resolve_companion_tts_outputs(
             self.hass, base_selected[4]
         )
@@ -915,7 +929,7 @@ class AnnouncementManager:
                 routed_selected = (
                     base_selected[0],
                     () if tts_only else base_selected[1],
-                    base_selected[2],
+                    all_room_tts_players,
                     base_selected[3],
                     () if tts_only else base_selected[4],
                 )
@@ -1280,7 +1294,7 @@ class AnnouncementManager:
             _occupied_room_delivery_selected,
         ) = routed_plan(
             output_area_ids,
-            filter_by_area=occupancy_filter_active,
+            filter_by_area=area_filter_active,
             require_room_delivery=occupancy_filter_active,
         )
 
