@@ -48,6 +48,7 @@ from .const import (
     CONF_TTS_CACHE,
     CONF_TTS_ENGINES,
     CONF_TTS_LANGUAGE,
+    CONF_TTS_VOICE,
     CONF_TTS_MEDIA_PLAYER,
     CONF_TTS_ROOM_PLAYERS,
     CONF_TTS_AREA_PLAYERS,
@@ -124,8 +125,10 @@ from .outputs import (
     snapcast_output_options,
     tts_default_engine,
     tts_default_language,
+    tts_default_voice,
     tts_engine_languages,
     tts_engine_options,
+    tts_engine_voice_options,
     tts_media_player_options,
 )
 
@@ -561,49 +564,99 @@ class _AnnouncementFlowMixin:
     ) -> ConfigFlowResult:
         """Step 2: configure TTS engines and physical output roles."""
         errors: dict[str, str] = {}
+
         engine_options = tts_engine_options(self.hass)
         engine_ids = [str(item["value"]) for item in engine_options]
-        if CONF_TTS_ENGINES in self._working:
-            engine_default = [
-                value for value in self._value(CONF_TTS_ENGINES, []) if value in engine_ids
-            ]
-        else:
-            default_engine = tts_default_engine(self.hass)
-            engine_default = [default_engine] if default_engine in engine_ids else []
+        configured_engines = [
+            value
+            for value in self._value(CONF_TTS_ENGINES, [])
+            if value in engine_ids
+        ]
+        default_engine = tts_default_engine(self.hass)
+        engine_default = configured_engines or (
+            [default_engine] if default_engine in engine_ids else []
+        )
 
+        # Language and voice belong directly to the selected TTS engine. Home
+        # Assistant config flows are not live-reactive, so the currently saved
+        # or default engine drives the first render; reopening the step after an
+        # engine change refreshes the provider-advertised language/voice lists.
         language_engines = engine_default or engine_ids
-        language_values = list(tts_engine_languages(self.hass, language_engines))
+        language_values = list(
+            tts_engine_languages(self.hass, language_engines)
+        )
         configured_language = str(
             self._value(CONF_TTS_LANGUAGE, DEFAULT_TTS_LANGUAGE) or ""
         )
         if configured_language in language_values:
             language_default = configured_language
         else:
-            preferred_language = tts_default_language(self.hass, language_engines)
+            preferred_language = tts_default_language(
+                self.hass, language_engines
+            )
             language_default = (
-                preferred_language if preferred_language in language_values else None
+                preferred_language
+                if preferred_language in language_values
+                else None
             )
 
-        direct_options = tts_media_player_options(self.hass)
+        configured_tts_options = dict(
+            self._value(CONF_TTS_OPTIONS, DEFAULT_TTS_OPTIONS) or {}
+        )
+        voice_engine = (
+            engine_default[0] if len(engine_default) == 1 else None
+        )
+        voice_options = tts_engine_voice_options(
+            self.hass, voice_engine, language_default
+        )
+        voice_values = {
+            str(item["value"]) for item in voice_options
+        }
+        configured_voice = str(
+            configured_tts_options.get("voice", "") or ""
+        )
+        if configured_voice in voice_values:
+            voice_default = configured_voice
+        else:
+            voice_default = tts_default_voice(
+                self.hass, voice_engine, language_default
+            )
+        additional_tts_options = (
+            {
+                key: value
+                for key, value in configured_tts_options.items()
+                if key != "voice"
+            }
+            if voice_options
+            else configured_tts_options
+        )
+
+        # The UI exposes one direct-player concept only: players bound to a
+        # Home Assistant room. The old "all direct players + room subset" pair
+        # was redundant and made it unclear which selector actually routed TTS.
+        all_direct_options = tts_media_player_options(self.hass)
+        direct_options = [
+            item
+            for item in all_direct_options
+            if entity_area_id(self.hass, str(item["value"])) is not None
+        ]
         direct_ids = [str(item["value"]) for item in direct_options]
-        direct_default = [
-            value for value in self._value(CONF_TTS_ROOM_PLAYERS, [])
+        configured_direct = [
+            value
+            for value in self._value(CONF_TTS_ROOM_PLAYERS, [])
             if value in direct_ids
         ]
         policies = self._working.get(CONF_TTS_PLAYER_POLICIES, {})
         if not isinstance(policies, dict):
             policies = {}
-        area_default = []
-        for entity_id in direct_default:
+        area_default: list[str] = []
+        for entity_id in configured_direct:
             policy = policies.get(entity_id, {})
             scope = (
                 str(policy.get(NOTIFY_POLICY_SCOPE))
-                if isinstance(policy, dict) and policy.get(NOTIFY_POLICY_SCOPE)
-                else (
-                    NOTIFY_SCOPE_ROOM
-                    if entity_area_id(self.hass, entity_id)
-                    else NOTIFY_SCOPE_GENERAL
-                )
+                if isinstance(policy, dict)
+                and policy.get(NOTIFY_POLICY_SCOPE)
+                else NOTIFY_SCOPE_ROOM
             )
             if scope == NOTIFY_SCOPE_ROOM:
                 area_default.append(entity_id)
@@ -614,82 +667,133 @@ class _AnnouncementFlowMixin:
             for item in snap_options
         ]
         snap_default = [
-            value for value in expand_snapcast_output_tokens(
-                self.hass, self._value(CONF_SNAPCAST_OUTPUTS, [])
+            value
+            for value in expand_snapcast_output_tokens(
+                self.hass,
+                self._value(CONF_SNAPCAST_OUTPUTS, []),
             )
             if value in snap_ids
         ]
 
         if user_input is not None:
-            engines = [v for v in user_input.get(CONF_TTS_ENGINES, []) if v in engine_ids]
-            direct = [v for v in user_input.get(CONF_TTS_ROOM_PLAYERS, []) if v in direct_ids]
-            area_players = set(user_input.get(CONF_TTS_AREA_PLAYERS, [])) & set(direct)
-            snapcast_refs = list(user_input.get(CONF_SNAPCAST_OUTPUTS, []))
-            snapcast = list(expand_snapcast_output_tokens(self.hass, snapcast_refs))
+            engines = [
+                value
+                for value in user_input.get(CONF_TTS_ENGINES, [])
+                if value in engine_ids
+            ]
+            direct = [
+                value
+                for value in user_input.get(CONF_TTS_AREA_PLAYERS, [])
+                if value in direct_ids
+            ]
+            snapcast_refs = list(
+                user_input.get(CONF_SNAPCAST_OUTPUTS, [])
+            )
+            snapcast = list(
+                expand_snapcast_output_tokens(
+                    self.hass, snapcast_refs
+                )
+            )
             shared_player = user_input.get(CONF_TTS_MEDIA_PLAYER)
+
             if (direct or snapcast) and not engines:
                 errors["base"] = "tts_engine_required"
             elif snapcast and not shared_player:
                 errors["base"] = "snapcast_tts_path_required"
             else:
-                no_area = [
-                    entity_id for entity_id in area_players
-                    if entity_area_id(self.hass, entity_id) is None
-                ]
-                if no_area:
-                    errors["base"] = "room_tts_area_required"
-                else:
-                    self._working[CONF_TTS_ENGINES] = engines
-                    self._working[CONF_TTS_ROOM_PLAYERS] = direct
-                    self._working[CONF_TTS_PLAYER_POLICIES] = {
-                        entity_id: {
-                            NOTIFY_POLICY_SCOPE: (
-                                NOTIFY_SCOPE_ROOM
-                                if entity_id in area_players
-                                else NOTIFY_SCOPE_GENERAL
-                            )
-                        }
-                        for entity_id in direct
+                self._working[CONF_TTS_ENGINES] = engines
+                self._working[CONF_TTS_ROOM_PLAYERS] = direct
+                self._working[CONF_TTS_PLAYER_POLICIES] = {
+                    entity_id: {
+                        NOTIFY_POLICY_SCOPE: NOTIFY_SCOPE_ROOM
                     }
-                    self._working[CONF_SNAPCAST_OUTPUTS] = snapcast_refs
-                    self._working[CONF_TTS_MEDIA_PLAYER] = shared_player
-                    for key in (
-                        CONF_TTS_MIN_LEVEL,
-                        CONF_TTS_CACHE,
-                        CONF_TTS_LANGUAGE,
-                        CONF_TTS_OPTIONS,
-                        CONF_COMPANION_TTS_OUTPUTS,
-                        CONF_COMPANION_TTS_MEDIA_STREAM,
-                        CONF_COMPANION_TTS_WPM,
-                    ):
-                        if key in user_input:
-                            self._working[key] = user_input[key]
-                    self._prepare_notify_profile_steps()
-                    if snapcast:
-                        self._notify_profile_domains.append("snapcast")
-                    return await self.async_step_notification_profile()
+                    for entity_id in direct
+                }
+                self._working.pop(CONF_TTS_AREA_PLAYERS, None)
+                self._working[CONF_SNAPCAST_OUTPUTS] = snapcast_refs
+                self._working[CONF_TTS_MEDIA_PLAYER] = shared_player
 
+                for key in (
+                    CONF_TTS_MIN_LEVEL,
+                    CONF_TTS_CACHE,
+                    CONF_TTS_LANGUAGE,
+                    CONF_COMPANION_TTS_OUTPUTS,
+                    CONF_COMPANION_TTS_MEDIA_STREAM,
+                    CONF_COMPANION_TTS_WPM,
+                ):
+                    if key in user_input:
+                        self._working[key] = user_input[key]
+
+                submitted_options = dict(
+                    user_input.get(
+                        CONF_TTS_OPTIONS, additional_tts_options
+                    )
+                    or {}
+                )
+                if voice_options:
+                    selected_voice = str(
+                        user_input.get(CONF_TTS_VOICE, "") or ""
+                    )
+                    if selected_voice in voice_values:
+                        submitted_options["voice"] = selected_voice
+                    else:
+                        submitted_options.pop("voice", None)
+                self._working[CONF_TTS_OPTIONS] = submitted_options
+
+                self._prepare_notify_profile_steps()
+                if snapcast:
+                    self._notify_profile_domains.append("snapcast")
+                return await self.async_step_notification_profile()
+
+        # Keep engine-specific controls together and at the top of the page.
         fields: dict[probatio.Marker, Any] = {
             probatio.Optional(
                 CONF_TTS_ENGINES,
                 default=engine_default,
             ): _known_multi_select(engine_options),
+            _optional_marker(
+                CONF_TTS_LANGUAGE,
+                language_default,
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=language_values,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+        }
+        if voice_options:
+            fields[
+                _optional_marker(
+                    CONF_TTS_VOICE,
+                    voice_default,
+                )
+            ] = selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=voice_options,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            )
+        fields[
             probatio.Optional(
-                CONF_TTS_ROOM_PLAYERS,
-                default=direct_default,
-            ): _known_multi_select(direct_options),
+                CONF_TTS_OPTIONS,
+                default=additional_tts_options,
+            )
+        ] = selector.ObjectSelector()
+
+        fields[
             probatio.Optional(
                 CONF_TTS_AREA_PLAYERS,
                 default=area_default,
-            ): _known_multi_select(direct_options),
-        }
+            )
+        ] = _known_multi_select(direct_options)
 
         if snap_options:
             fields[
                 probatio.Optional(
                     CONF_SNAPCAST_OUTPUTS,
                     default=[
-                        f"entity:{entity_id}" for entity_id in snap_default
+                        f"entity:{entity_id}"
+                        for entity_id in snap_default
                     ],
                 )
             ] = _known_multi_select(snap_options)
@@ -706,7 +810,9 @@ class _AnnouncementFlowMixin:
             {
                 probatio.Required(
                     CONF_TTS_MIN_LEVEL,
-                    default=self._value(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL),
+                    default=self._value(
+                        CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL
+                    ),
                 ): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=list(TTS_MIN_LEVELS),
@@ -716,25 +822,18 @@ class _AnnouncementFlowMixin:
                 ),
                 probatio.Required(
                     CONF_TTS_CACHE,
-                    default=self._value(CONF_TTS_CACHE, DEFAULT_TTS_CACHE),
+                    default=self._value(
+                        CONF_TTS_CACHE, DEFAULT_TTS_CACHE
+                    ),
                 ): selector.BooleanSelector(),
-                _optional_marker(
-                    CONF_TTS_LANGUAGE,
-                    language_default,
-                ): selector.SelectSelector(
-                    selector.SelectSelectorConfig(
-                        options=language_values,
-                        mode=selector.SelectSelectorMode.DROPDOWN,
-                    )
-                ),
-                probatio.Optional(
-                    CONF_TTS_OPTIONS,
-                    default=self._value(CONF_TTS_OPTIONS, DEFAULT_TTS_OPTIONS),
-                ): selector.ObjectSelector(),
                 probatio.Optional(
                     CONF_COMPANION_TTS_OUTPUTS,
-                    default=self._value(CONF_COMPANION_TTS_OUTPUTS, []),
-                ): _multi_select(companion_tts_output_options(self.hass)),
+                    default=self._value(
+                        CONF_COMPANION_TTS_OUTPUTS, []
+                    ),
+                ): _multi_select(
+                    companion_tts_output_options(self.hass)
+                ),
                 probatio.Required(
                     CONF_COMPANION_TTS_MEDIA_STREAM,
                     default=self._value(
@@ -765,7 +864,11 @@ class _AnnouncementFlowMixin:
                 ),
             }
         )
-        return self.async_show_form(step_id="tts", data_schema=probatio.Schema(fields), errors=errors)
+        return self.async_show_form(
+            step_id="tts",
+            data_schema=probatio.Schema(fields),
+            errors=errors,
+        )
 
     async def async_step_snapcast(
         self, user_input: dict[str, Any] | None = None
