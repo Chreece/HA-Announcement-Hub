@@ -108,10 +108,17 @@ TV, phone, and Snapcast devices to their correct Home Assistant areas.
 
 Configure:
 
-- one or more TTS engines, such as the Piper integration or `tts.piper`;
-- the shared server TTS media player, normally `media_player.mpd`;
-- the minimum level that is allowed to use audible TTS;
-- cache/prefetch, language, and engine options;
+- one or more TTS engines, such as the Piper integration or `tts.piper`.
+  Home Assistant's default TTS engine is preselected when one is available;
+- the selected engine's language and, when the provider advertises them, its
+  supported voices. Additional provider-specific options sit directly beside
+  those engine controls;
+- direct TTS media players **per room**. There is no second generic direct-player
+  selector: every direct player selected here is automatically room-scoped;
+- when Snapcast is present, the synchronized room clients plus the shared server
+  TTS media player, normally `media_player.mpd`;
+- the minimum level that is allowed to use audible TTS and cache/prefetch
+  behavior;
 - Companion App audio stream and estimated words per minute.
 
 Multiple server TTS engines are a fallback chain. The first engine that
