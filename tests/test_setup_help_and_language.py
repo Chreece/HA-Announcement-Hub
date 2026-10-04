@@ -23,8 +23,11 @@ def test_tts_language_and_voice_are_engine_capability_dropdowns() -> None:
     direct_pos=tts_block.rindex("CONF_TTS_AREA_PLAYERS")
     assert language_pos < voice_pos < options_pos < direct_pos
     assert "selector.SelectSelector(" in tts_block
-    assert "async_get_supported_voices(language)" in outputs
+    assert "async_get_supported_voices(candidate)" in outputs
     assert "supported_languages" in outputs
+    assert "_tts_language_family" in outputs
+    assert "tts_engine_supports_voice" in outputs
+    assert "selector.TextSelector()" in tts_block
 
 
 def test_every_visible_four_step_field_has_specific_help_in_all_locales() -> None:
