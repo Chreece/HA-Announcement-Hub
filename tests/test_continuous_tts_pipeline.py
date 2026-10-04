@@ -84,9 +84,27 @@ def test_multiple_direct_and_companion_outputs_launch_in_parallel() -> None:
     assert "parallel=True" in companion
 
 
-def test_queued_audio_skips_intentional_post_play_gap() -> None:
+def test_snapcast_tail_drains_before_route_restore() -> None:
     source = _source()
-    assert "if post_delay > 0 and not self._has_pending_audible_job():" in source
+    start = source.index("async def _async_play_server_round")
+    end = source.index("async def _async_available_tts_engines", start)
+    block = source[start:end]
+    assert "_SNAPCAST_TAIL_DRAIN_SECONDS = 1.2" in source
+    assert "hold_route = self._should_hold_snapcast_route(" in block
+    assert "if not hold_route:" in block
+    assert "drain_delay = max(post_delay, _SNAPCAST_TAIL_DRAIN_SECONDS)" in block
+    assert "await asyncio.sleep(drain_delay)" in block
+
+
+def test_prepared_same_route_handoff_still_skips_tail_gap() -> None:
+    source = _source()
+    start = source.index("async def _async_play_server_round")
+    end = source.index("async def _async_available_tts_engines", start)
+    block = source[start:end]
+    assert "if not hold_route:" in block
+    assert "if hold_route:" in block
+    assert "self._held_snapcast_snapshot = route_snapshot" in block
+    assert "elif post_delay > 0 and not self._has_pending_audible_job():" in block
     assert "def _has_pending_audible_job(" in source
 
 
