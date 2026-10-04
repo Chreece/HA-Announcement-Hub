@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.8 - 2026-10-04
+
+- Simplified the TTS setup page by removing the separate generic direct-player
+  selector. There is now one direct TTS player selector and every selected
+  player is automatically room-scoped.
+- Direct TTS discovery now offers only media players that have a Home Assistant
+  area, matching the occupied/fallback room routing model.
+- Home Assistant's default TTS engine is preselected whenever no engine is
+  already configured.
+- Moved the selected engine's language and additional TTS options directly
+  underneath the engine selector.
+- Added a TTS voice selector when the selected engine and language expose
+  supported voices through Home Assistant. Existing/provider default voice
+  selection is preserved when possible and stored through the existing TTS
+  options payload.
+- Updated English, German and Greek setup labels/help and README documentation.
+- Added regression coverage for the single direct-player selector, default
+  engine preselection, engine language/voice discovery and field ordering.
+
 ## 0.9.7 - 2026-10-04
 
 - Reworked TTS delivery into a continuous producer/consumer pipeline. Every
