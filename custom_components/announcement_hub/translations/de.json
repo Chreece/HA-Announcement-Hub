@@ -145,7 +145,8 @@
       "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein.",
       "room_notify_area_required": "Ein raumgebundenes Benachrichtigungsgerät benötigt einen Home-Assistant-Bereich.",
       "notify_level_overlap": "Ein Benachrichtigungsgerät darf nur einer Mindeststufe zugeordnet sein.",
-      "room_tts_area_required": "Ein raumgebundener direkter TTS-Mediaplayer benötigt einen Home-Assistant-Bereich."
+      "room_tts_area_required": "Ein raumgebundener direkter TTS-Mediaplayer benötigt einen Home-Assistant-Bereich.",
+      "tts_player_role_overlap": "Derselbe Media Player kann nicht gleichzeitig direkter TTS-Player und gemeinsamer Snapcast-Quellplayer sein."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub ist bereits eingerichtet."
@@ -296,7 +297,8 @@
       "display_time_order": "Die maximale Anzeigedauer muss größer oder gleich der minimalen Anzeigedauer sein.",
       "room_notify_area_required": "Ein raumgebundenes Benachrichtigungsgerät benötigt einen Home-Assistant-Bereich.",
       "notify_level_overlap": "Ein Benachrichtigungsgerät darf nur einer Mindeststufe zugeordnet sein.",
-      "room_tts_area_required": "Ein raumgebundener direkter TTS-Mediaplayer benötigt einen Home-Assistant-Bereich."
+      "room_tts_area_required": "Ein raumgebundener direkter TTS-Mediaplayer benötigt einen Home-Assistant-Bereich.",
+      "tts_player_role_overlap": "Derselbe Media Player kann nicht gleichzeitig direkter TTS-Player und gemeinsamer Snapcast-Quellplayer sein."
     }
   },
   "selector": {
