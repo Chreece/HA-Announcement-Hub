@@ -108,11 +108,14 @@ TV, phone, and Snapcast devices to their correct Home Assistant areas.
 
 Configure:
 
-- one or more TTS engines, such as the Piper integration or `tts.piper`.
-  Home Assistant's default TTS engine is preselected when one is available;
-- the selected engine's language and, when the provider advertises them, its
-  supported voices. Additional provider-specific options sit directly beside
-  those engine controls;
+- exactly one active TTS engine, such as the Piper/Wyoming TTS entity. Home
+  Assistant's default TTS engine is preselected when one is available;
+- the active engine's language and voice directly underneath it. Voice discovery
+  accepts locale-compatible variants, so a generic language such as `el` can
+  use voices advertised as `el_GR`/ `el-GR`. If an engine accepts a voice
+  option but cannot enumerate values, the voice field remains available for a
+  manual voice ID;
+- any remaining provider-specific TTS options;
 - direct TTS media players **per room**. There is no second generic direct-player
   selector: every direct player selected here is automatically room-scoped;
 - when Snapcast is present, the synchronized room clients plus the shared server
@@ -121,9 +124,9 @@ Configure:
   behavior;
 - Companion App audio stream and estimated words per minute.
 
-Multiple server TTS engines are a fallback chain. The first engine that
-successfully starts playback is used; the same message is not intentionally
-spoken once per voice.
+The stored configuration keeps the historical `tts_engines` list shape for
+backward compatibility, but setup, queued jobs, and runtime delivery always use
+at most one engine.
 
 ### TTS level threshold
 

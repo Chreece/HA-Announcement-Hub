@@ -279,6 +279,9 @@ class AnnouncementManager:
                 continue
             if job.status in _TERMINAL_JOB_STATES:
                 continue
+            # Normalize queues created before the single-engine model.
+            if len(job.tts_engines) > 1:
+                job.tts_engines = job.tts_engines[:1]
             if legacy_job and job.server_tts_enabled and not job.snapcast_clients:
                 job.snapcast_clients = current_snapcast
             if job.server_tts_enabled and not job.tts_media_player:
@@ -446,11 +449,12 @@ class AnnouncementManager:
         tuple[str, ...],
         tuple[str, ...],
     ]:
+        configured_tts = expand_tts_engine_tokens(
+            self.hass,
+            self._ensure_list(self.settings.get(CONF_TTS_ENGINES, [])),
+        )
         return (
-            expand_tts_engine_tokens(
-                self.hass,
-                self._ensure_list(self.settings.get(CONF_TTS_ENGINES, [])),
-            ),
+            configured_tts[:1],
             expand_notify_output_tokens(
                 self.hass,
                 self._ensure_list(self.settings.get(CONF_NOTIFY_OUTPUTS, [])),

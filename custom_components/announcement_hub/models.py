@@ -108,7 +108,9 @@ def build_delivery_plan(
         )
 
     return DeliveryPlan(
-        tts_engines=_unique(tuple(tts_engines)),
+        # Announcement Hub has exactly one active TTS engine. Keep the tuple
+        # shape for queue/storage compatibility, but never freeze more than one.
+        tts_engines=_unique(tuple(tts_engines))[:1],
         notify_outputs=_unique(tuple(notify_outputs)),
         room_tts_players=_unique(tuple(room_tts_players)),
         snapcast_clients=_unique(tuple(snapcast_clients)),

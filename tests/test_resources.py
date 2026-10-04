@@ -165,3 +165,4 @@ def test_translations_cover_all_config_steps_and_service_fields() -> None:
         assert service_fields.issubset(
             translated["services"]["send"]["fields"]
         ), path
+

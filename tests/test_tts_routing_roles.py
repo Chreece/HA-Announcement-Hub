@@ -50,3 +50,12 @@ def test_new_role_model_keeps_startup_safe_tasks() -> None:
     manager=(C/"manager.py").read_text()
     assert "self.hass.async_create_task(" not in manager
     assert manager.count("self.entry.async_create_background_task(")==2
+
+
+def test_runtime_never_activates_more_than_one_tts_engine() -> None:
+    manager=(C/"manager.py").read_text()
+    models=(C/"models.py").read_text()
+    assert "configured_tts[:1]" in manager
+    assert "if len(job.tts_engines) > 1:" in manager
+    assert "job.tts_engines = job.tts_engines[:1]" in manager
+    assert "tts_engines=_unique(tuple(tts_engines))[:1]" in models

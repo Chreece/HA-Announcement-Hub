@@ -28,7 +28,7 @@ def test_tts_step_uses_ha_default_language_voice_and_room_discovery() -> None:
     flow = (C / "config_flow.py").read_text()
     outputs = (C / "outputs.py").read_text()
     assert "default_engine = tts_default_engine(self.hass)" in flow
-    assert "[default_engine] if default_engine in engine_ids else []" in flow
+    assert "default_engine if default_engine in engine_ids else None" in flow
     assert "tts_default_language(" in flow
     assert "tts_engine_voice_options(" in flow
     assert "tts_default_voice(" in flow
@@ -36,17 +36,20 @@ def test_tts_step_uses_ha_default_language_voice_and_room_discovery() -> None:
     assert "entity_area_id(self.hass, str(item[\"value\"])) is not None" in flow
     assert "snapcast_output_options(self.hass)" in flow
     assert "supported_languages" in outputs
-    assert "async_get_supported_voices(language)" in outputs
+    assert "async_get_supported_voices(candidate)" in outputs
     assert "tts.async_default_engine" in outputs
 
 
-def test_tts_step_has_only_one_direct_player_selector() -> None:
+def test_tts_step_has_one_engine_and_one_direct_player_selector() -> None:
     flow = (C / "config_flow.py").read_text()
     block = flow[
         flow.index("async def async_step_tts"):
         flow.index("async def async_step_snapcast")
     ]
     assert "CONF_TTS_AREA_PLAYERS" in block
+    assert "multiple=False" in block
+    assert "selected_engine = str(" in block
+    assert "self._working[CONF_TTS_ENGINES] = [engine] if engine else []" in block
     assert "user_input.get(CONF_TTS_ROOM_PLAYERS" not in block
     assert "probatio.Optional(\n                CONF_TTS_ROOM_PLAYERS" not in block
     assert "self._working[CONF_TTS_ROOM_PLAYERS] = direct" in block

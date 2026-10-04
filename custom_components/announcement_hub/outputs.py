@@ -256,29 +256,97 @@ def tts_default_language(
     return available[0] if available else None
 
 
+def _tts_language_family(language: str | None) -> str:
+    """Return a normalized base language for locale-compatible voice lookup."""
+    value = str(language or "").strip().replace("-", "_").casefold()
+    return value.split("_", 1)[0] if value else ""
+
+
+def tts_engine_supports_voice(
+    hass: HomeAssistant,
+    engine_id: str | None,
+) -> bool:
+    """Return whether a concrete TTS engine accepts a voice option."""
+    if not engine_id:
+        return False
+    component = hass.data.get(getattr(tts, "DATA_COMPONENT", "tts_entity_component"))
+    entity = component.get_entity(engine_id) if component is not None else None
+    if entity is None:
+        return False
+    voice_key = getattr(tts, "ATTR_VOICE", "voice")
+    with suppress(Exception):
+        if voice_key in (entity.supported_options or []):
+            return True
+    # Some providers can enumerate voices even when supported_options is absent.
+    with suppress(Exception):
+        for language in entity.supported_languages or []:
+            if entity.async_get_supported_voices(str(language)):
+                return True
+    return False
+
+
 def tts_engine_voice_options(
     hass: HomeAssistant,
     engine_id: str | None,
     language: str | None,
 ) -> list[dict[str, str]]:
-    """Return voices advertised by one concrete TTS engine/language."""
-    if not engine_id or not language:
+    """Return voices advertised for an exact or locale-compatible language."""
+    if not engine_id:
         return []
     component = hass.data.get(getattr(tts, "DATA_COMPONENT", "tts_entity_component"))
     entity = component.get_entity(engine_id) if component is not None else None
     if entity is None:
         return []
+
+    requested = str(language or "").strip()
+    candidates: list[str] = []
+    if requested:
+        candidates.append(requested)
+
+    family = _tts_language_family(requested)
     with suppress(Exception):
-        voices = entity.async_get_supported_voices(language) or []
-        return [
-            SelectOption(
-                str(voice.voice_id),
-                str(voice.name or voice.voice_id),
-            ).as_dict()
-            for voice in voices
-            if str(voice.voice_id)
-        ]
-    return []
+        for advertised in entity.supported_languages or []:
+            advertised_value = str(advertised)
+            if advertised_value in candidates:
+                continue
+            if not family or _tts_language_family(advertised_value) == family:
+                candidates.append(advertised_value)
+
+    def collect(candidate_languages: Sequence[str]) -> dict[str, SelectOption]:
+        options: dict[str, SelectOption] = {}
+        for candidate in candidate_languages:
+            with suppress(Exception):
+                for voice in entity.async_get_supported_voices(candidate) or []:
+                    voice_id = str(voice.voice_id or "")
+                    if not voice_id:
+                        continue
+                    options.setdefault(
+                        voice_id,
+                        SelectOption(
+                            voice_id,
+                            str(voice.name or voice_id),
+                        ),
+                    )
+        return options
+
+    options = collect(candidates)
+
+    # Wyoming/Piper may advertise the UI language as "el" while its installed
+    # voice is registered as "el_GR". The family scan above handles that. Only
+    # when the family still yields no voice do we fall back to every provider
+    # language, so a supported voice field is never silently lost.
+    if not options and tts_engine_supports_voice(hass, engine_id):
+        all_languages: list[str] = []
+        with suppress(Exception):
+            all_languages = [
+                str(value) for value in (entity.supported_languages or [])
+            ]
+        options = collect(all_languages)
+
+    return [
+        option.as_dict()
+        for option in sorted(options.values(), key=lambda item: item.label.casefold())
+    ]
 
 
 def tts_default_voice(
@@ -288,7 +356,7 @@ def tts_default_voice(
 ) -> str | None:
     """Return the engine's advertised default voice when it is selectable."""
     options = tts_engine_voice_options(hass, engine_id, language)
-    if not options or not engine_id:
+    if not engine_id:
         return None
     valid = {str(option["value"]) for option in options}
     component = hass.data.get(getattr(tts, "DATA_COMPONENT", "tts_entity_component"))
@@ -297,8 +365,10 @@ def tts_default_voice(
         with suppress(Exception):
             defaults = entity.default_options or {}
             if isinstance(defaults, Mapping):
-                voice = str(defaults.get(getattr(tts, "ATTR_VOICE", "voice"), "") or "")
-                if voice in valid:
+                voice = str(
+                    defaults.get(getattr(tts, "ATTR_VOICE", "voice"), "") or ""
+                )
+                if voice and (not valid or voice in valid):
                     return voice
     return str(options[0]["value"]) if len(options) == 1 else None
 
