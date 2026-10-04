@@ -201,7 +201,7 @@ def _migrate_v1_settings(settings: dict[str, Any]) -> dict[str, Any]:
             settings.get(LEGACY_CONF_SNAPCAST_CLIENTS)
         )
 
-    migrated[CONF_TTS_ENGINES] = _entity_refs(tts_entities)
+    migrated[CONF_TTS_ENGINES] = _entity_refs(tts_entities)[:1]
     migrated[CONF_NOTIFY_OUTPUTS] = [
         *_entity_refs(notify_entities),
         *_service_refs(notify_services),
