@@ -2746,6 +2746,17 @@ class AnnouncementManager:
             self._held_snapcast_targets,
         )
 
+    def _held_snapcast_route_is_applied(self) -> bool:
+        snapshot = self._held_snapcast_snapshot
+        if snapshot is None:
+            return False
+        target_set = set(self._held_snapcast_targets)
+        desired = {
+            entity_id: entity_id not in target_set
+            for entity_id in snapshot
+        }
+        return self._mute_states_match(desired)
+
     def _should_hold_snapcast_route(
         self,
         player: str,
@@ -2787,11 +2798,14 @@ class AnnouncementManager:
         target_clients: Sequence[str],
     ) -> tuple[dict[str, bool], tuple[str, ...]]:
         if self._held_snapcast_snapshot is not None:
-            if self._job_matches_snapcast_route(
-                job,
-                self._held_snapcast_player or "",
-                self._held_snapcast_selected,
-                self._held_snapcast_targets,
+            if (
+                self._job_matches_snapcast_route(
+                    job,
+                    self._held_snapcast_player or "",
+                    self._held_snapcast_selected,
+                    self._held_snapcast_targets,
+                )
+                and self._held_snapcast_route_is_applied()
             ):
                 return (
                     self._held_snapcast_snapshot,
@@ -3025,12 +3039,9 @@ class AnnouncementManager:
         )
 
     def _prefetch_ready_for_job(self, job: AnnouncementJob) -> bool:
-        task = self._prefetch_tasks.get(job.job_id)
-        if task is None or not task.done() or task.cancelled():
-            return False
-        with suppress(asyncio.CancelledError):
-            if task.exception() is not None:
-                return False
+        # media_source_ids is populated only after rendering finishes, so one
+        # successful preferred/fallback render is enough to make a handoff safe
+        # even while another fallback engine is still rendering.
         return any(
             engine in job.media_source_ids
             and engine not in job.prefetch_errors
