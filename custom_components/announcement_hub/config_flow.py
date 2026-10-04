@@ -128,6 +128,7 @@ from .outputs import (
     tts_default_voice,
     tts_engine_languages,
     tts_engine_options,
+    tts_engine_supports_voice,
     tts_engine_voice_options,
     tts_media_player_options,
 )
@@ -562,52 +563,54 @@ class _AnnouncementFlowMixin:
     async def async_step_tts(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Step 2: configure TTS engines and physical output roles."""
+        """Step 2: configure one TTS engine and physical output roles."""
         errors: dict[str, str] = {}
 
         engine_options = tts_engine_options(self.hass)
         engine_ids = [str(item["value"]) for item in engine_options]
-        configured_engines = [
-            value
-            for value in self._value(CONF_TTS_ENGINES, [])
-            if value in engine_ids
-        ]
+        configured_engine = next(
+            (
+                value
+                for value in self._value(CONF_TTS_ENGINES, [])
+                if value in engine_ids
+            ),
+            None,
+        )
         default_engine = tts_default_engine(self.hass)
-        engine_default = configured_engines or (
-            [default_engine] if default_engine in engine_ids else []
+        engine_default = configured_engine or (
+            default_engine if default_engine in engine_ids else None
         )
 
-        # Language and voice belong directly to the selected TTS engine. Home
-        # Assistant config flows are not live-reactive, so the currently saved
-        # or default engine drives the first render; reopening the step after an
-        # engine change refreshes the provider-advertised language/voice lists.
-        language_engines = engine_default or engine_ids
-        language_values = list(
-            tts_engine_languages(self.hass, language_engines)
+        language_values = (
+            list(tts_engine_languages(self.hass, [engine_default]))
+            if engine_default
+            else []
         )
         configured_language = str(
             self._value(CONF_TTS_LANGUAGE, DEFAULT_TTS_LANGUAGE) or ""
         )
         if configured_language in language_values:
             language_default = configured_language
-        else:
+        elif engine_default:
             preferred_language = tts_default_language(
-                self.hass, language_engines
+                self.hass, [engine_default]
             )
             language_default = (
                 preferred_language
                 if preferred_language in language_values
-                else None
+                else (language_values[0] if language_values else None)
             )
+        else:
+            language_default = None
 
         configured_tts_options = dict(
             self._value(CONF_TTS_OPTIONS, DEFAULT_TTS_OPTIONS) or {}
         )
-        voice_engine = (
-            engine_default[0] if len(engine_default) == 1 else None
+        voice_supported = tts_engine_supports_voice(
+            self.hass, engine_default
         )
         voice_options = tts_engine_voice_options(
-            self.hass, voice_engine, language_default
+            self.hass, engine_default, language_default
         )
         voice_values = {
             str(item["value"]) for item in voice_options
@@ -615,25 +618,27 @@ class _AnnouncementFlowMixin:
         configured_voice = str(
             configured_tts_options.get("voice", "") or ""
         )
-        if configured_voice in voice_values:
+        if configured_voice and (
+            not voice_values or configured_voice in voice_values
+        ):
             voice_default = configured_voice
         else:
             voice_default = tts_default_voice(
-                self.hass, voice_engine, language_default
+                self.hass, engine_default, language_default
             )
+
+        # Voice gets its own field whenever the engine says it supports one.
+        # Keep only the remaining provider-specific options in the object editor.
         additional_tts_options = (
             {
                 key: value
                 for key, value in configured_tts_options.items()
                 if key != "voice"
             }
-            if voice_options
+            if voice_supported
             else configured_tts_options
         )
 
-        # The UI exposes one direct-player concept only: players bound to a
-        # Home Assistant room. The old "all direct players + room subset" pair
-        # was redundant and made it unclear which selector actually routed TTS.
         all_direct_options = tts_media_player_options(self.hass)
         direct_options = [
             item
@@ -676,11 +681,14 @@ class _AnnouncementFlowMixin:
         ]
 
         if user_input is not None:
-            engines = [
-                value
-                for value in user_input.get(CONF_TTS_ENGINES, [])
-                if value in engine_ids
-            ]
+            selected_engine = str(
+                user_input.get(CONF_TTS_ENGINES, "") or ""
+            )
+            engine = (
+                selected_engine
+                if selected_engine in engine_ids
+                else None
+            )
             direct = [
                 value
                 for value in user_input.get(CONF_TTS_AREA_PLAYERS, [])
@@ -695,34 +703,69 @@ class _AnnouncementFlowMixin:
                 )
             )
             shared_player = user_input.get(CONF_TTS_MEDIA_PLAYER)
+            submitted_language = str(
+                user_input.get(CONF_TTS_LANGUAGE, "") or ""
+            )
 
-            if (direct or snapcast) and not engines:
+            # Persist the non-engine controls before a provider refresh so a
+            # second render of this same step does not discard user choices.
+            self._working[CONF_TTS_ENGINES] = [engine] if engine else []
+            self._working[CONF_TTS_ROOM_PLAYERS] = direct
+            self._working[CONF_TTS_PLAYER_POLICIES] = {
+                entity_id: {
+                    NOTIFY_POLICY_SCOPE: NOTIFY_SCOPE_ROOM
+                }
+                for entity_id in direct
+            }
+            self._working.pop(CONF_TTS_AREA_PLAYERS, None)
+            self._working[CONF_SNAPCAST_OUTPUTS] = snapcast_refs
+            self._working[CONF_TTS_MEDIA_PLAYER] = shared_player
+            for key in (
+                CONF_TTS_MIN_LEVEL,
+                CONF_TTS_CACHE,
+                CONF_COMPANION_TTS_OUTPUTS,
+                CONF_COMPANION_TTS_MEDIA_STREAM,
+                CONF_COMPANION_TTS_WPM,
+            ):
+                if key in user_input:
+                    self._working[key] = user_input[key]
+
+            engine_changed = engine != engine_default
+            if engine_changed:
+                new_languages = (
+                    list(tts_engine_languages(self.hass, [engine]))
+                    if engine
+                    else []
+                )
+                if submitted_language in new_languages:
+                    self._working[CONF_TTS_LANGUAGE] = submitted_language
+                else:
+                    self._working.pop(CONF_TTS_LANGUAGE, None)
+                refreshed_options = dict(additional_tts_options)
+                refreshed_options.pop("voice", None)
+                self._working[CONF_TTS_OPTIONS] = refreshed_options
+                return await self.async_step_tts()
+
+            language_changed = (
+                submitted_language
+                and submitted_language != (language_default or "")
+            )
+            if language_changed:
+                self._working[CONF_TTS_LANGUAGE] = submitted_language
+                refreshed_options = dict(additional_tts_options)
+                refreshed_options.pop("voice", None)
+                self._working[CONF_TTS_OPTIONS] = refreshed_options
+                return await self.async_step_tts()
+
+            if (direct or snapcast) and not engine:
                 errors["base"] = "tts_engine_required"
             elif snapcast and not shared_player:
                 errors["base"] = "snapcast_tts_path_required"
             else:
-                self._working[CONF_TTS_ENGINES] = engines
-                self._working[CONF_TTS_ROOM_PLAYERS] = direct
-                self._working[CONF_TTS_PLAYER_POLICIES] = {
-                    entity_id: {
-                        NOTIFY_POLICY_SCOPE: NOTIFY_SCOPE_ROOM
-                    }
-                    for entity_id in direct
-                }
-                self._working.pop(CONF_TTS_AREA_PLAYERS, None)
-                self._working[CONF_SNAPCAST_OUTPUTS] = snapcast_refs
-                self._working[CONF_TTS_MEDIA_PLAYER] = shared_player
-
-                for key in (
-                    CONF_TTS_MIN_LEVEL,
-                    CONF_TTS_CACHE,
-                    CONF_TTS_LANGUAGE,
-                    CONF_COMPANION_TTS_OUTPUTS,
-                    CONF_COMPANION_TTS_MEDIA_STREAM,
-                    CONF_COMPANION_TTS_WPM,
-                ):
-                    if key in user_input:
-                        self._working[key] = user_input[key]
+                if submitted_language:
+                    self._working[CONF_TTS_LANGUAGE] = submitted_language
+                else:
+                    self._working.pop(CONF_TTS_LANGUAGE, None)
 
                 submitted_options = dict(
                     user_input.get(
@@ -730,11 +773,14 @@ class _AnnouncementFlowMixin:
                     )
                     or {}
                 )
-                if voice_options:
+                if voice_supported:
                     selected_voice = str(
                         user_input.get(CONF_TTS_VOICE, "") or ""
                     )
-                    if selected_voice in voice_values:
+                    if selected_voice and (
+                        not voice_values
+                        or selected_voice in voice_values
+                    ):
                         submitted_options["voice"] = selected_voice
                     else:
                         submitted_options.pop("voice", None)
@@ -745,12 +791,18 @@ class _AnnouncementFlowMixin:
                     self._notify_profile_domains.append("snapcast")
                 return await self.async_step_notification_profile()
 
-        # Keep engine-specific controls together and at the top of the page.
         fields: dict[probatio.Marker, Any] = {
-            probatio.Optional(
+            _optional_marker(
                 CONF_TTS_ENGINES,
-                default=engine_default,
-            ): _known_multi_select(engine_options),
+                engine_default,
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=engine_options,
+                    multiple=False,
+                    custom_value=False,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
             _optional_marker(
                 CONF_TTS_LANGUAGE,
                 language_default,
@@ -761,18 +813,24 @@ class _AnnouncementFlowMixin:
                 )
             ),
         }
-        if voice_options:
-            fields[
-                _optional_marker(
-                    CONF_TTS_VOICE,
-                    voice_default,
-                )
-            ] = selector.SelectSelector(
-                selector.SelectSelectorConfig(
-                    options=voice_options,
-                    mode=selector.SelectSelectorMode.DROPDOWN,
-                )
+
+        if voice_supported:
+            marker = _optional_marker(
+                CONF_TTS_VOICE,
+                voice_default,
             )
+            if voice_options:
+                fields[marker] = selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=voice_options,
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                )
+            else:
+                # Keep voice available for providers that accept the option but
+                # cannot enumerate values through Home Assistant.
+                fields[marker] = selector.TextSelector()
+
         fields[
             probatio.Optional(
                 CONF_TTS_OPTIONS,
