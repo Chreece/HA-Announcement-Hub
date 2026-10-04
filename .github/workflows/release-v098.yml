@@ -1,0 +1,44 @@
+name: Release v0.9.8
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .release-v098.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate release target
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("custom_components/announcement_hub/manifest.json").read_text())
+          assert manifest["version"]=="0.9.8", manifest
+          PY
+          python -m compileall -q custom_components tests
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if gh release view v0.9.8 >/dev/null 2>&1; then
+            exit 0
+          fi
+          gh release create v0.9.8 \
+            --target "${GITHUB_SHA}" \
+            --title "Announcement Hub v0.9.8" \
+            --notes "Simplifies TTS setup to one room-scoped direct-player selector, preselects Home Assistant's default TTS engine when available, places engine language/options directly under the engine selector, and adds a supported voice selector when the selected provider/language exposes voices through Home Assistant."
