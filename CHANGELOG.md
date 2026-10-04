@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.9.7 - 2026-10-04
+
+- Reworked TTS delivery into a continuous producer/consumer pipeline. Every
+  queued server/direct-player utterance starts rendering immediately in the
+  background while the current announcement is still playing, even when file
+  caching is disabled.
+- Playback now waits only for the preferred engine render needed for the current
+  attempt instead of waiting for every configured fallback engine to finish
+  rendering.
+- Visual and audible channels now run concurrently for the same announcement
+  while preserving the configured launch order.
+- Direct room TTS, shared server/Snapcast TTS, and opted-in Companion App TTS
+  launch as independent parallel audio paths. Multiple direct room players and
+  Companion App TTS outputs also start in parallel.
+- Final visual reading timers no longer delay the next spoken announcement when
+  the same job already has audible delivery.
+- The intentional post-play cushion is skipped whenever another audible job is
+  queued.
+- Consecutive already-rendered announcements using the exact same verified
+  Snapcast route can hand that route directly to the next item, avoiding the
+  restore/reapply settle gap. The original mute state is restored immediately
+  when the route changes, the queue drains, or the chain ends.
+- Partial Snapcast rounds are never held warm while waiting for late clients.
+- Added continuous-pipeline regression coverage; the full suite passes.
+
 ## 0.9.6 - 2026-10-03
 
 - Fixed occupied-room candidate classification so movable outputs do not count
