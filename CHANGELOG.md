@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.9.12 - 2026-10-06
+
+- Made explicit `output:` rooms authoritative for `notify.announcement_hub`.
+  When rooms are supplied by the action, occupancy no longer intersects,
+  replaces, or modifies those room targets.
+- Occupancy routing still applies normally when `output:` is omitted and
+  `occupied_only` is enabled.
+- General/movable outputs remain eligible according to their configured policy.
+- Changed TTS fallback to use fixed TTS candidate existence instead of current
+  availability. A configured fixed TTS candidate that is unavailable or unknown
+  blocks fallback and is waited for until the configured availability timeout.
+- The fallback TTS room is used only when the current target room set contains
+  zero fixed TTS candidates at all. Fallback remains TTS-only.
+- Selected TTS outputs are now retained in the frozen job even when currently
+  unavailable/unknown, so direct TTS, Snapcast and Companion App TTS get their
+  full availability-timeout window.
+- Snapcast no longer drops unavailable clients when some selected clients are
+  already ready; ready clients play first and remaining selected clients wait
+  until timeout.
+- Fallback door checks now refer to the current target rooms regardless of
+  whether those rooms came from occupancy or an explicit action `output:`.
+- Updated English, German and Greek help text plus routing regression coverage.
+
 ## 0.9.11 - 2026-10-06
 
 - Added `notify.announcement_hub` as the canonical Announcement Hub action.
