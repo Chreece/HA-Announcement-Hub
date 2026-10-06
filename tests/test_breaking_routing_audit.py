@@ -51,3 +51,52 @@ def test_same_player_cannot_run_direct_and_shared_tts_concurrently() -> None:
         data = json.loads((C / relative).read_text(encoding="utf-8"))
         for section in ("config", "options"):
             assert "tts_player_role_overlap" in data[section]["error"]
+
+
+def test_explicit_rooms_override_occupancy_for_room_routing() -> None:
+    manager = (C / "manager.py").read_text(encoding="utf-8")
+    block = manager[
+        manager.index("requested_output_area_ids = self._resolve_area_ids"):
+        manager.index("requested = self._ensure_list")
+    ]
+    assert "explicit_area_routing = bool(requested_output_area_ids)" in block
+    assert "if occupied_only and not explicit_area_routing" in block
+    assert "if explicit_area_routing:" in block
+    assert "output_area_ids = requested_output_area_ids" in block
+    assert "occupied_set" not in block
+
+
+def test_tts_targets_are_frozen_even_when_currently_unavailable() -> None:
+    manager = (C / "manager.py").read_text(encoding="utf-8")
+    start = manager.index("# TTS has a stronger availability contract")
+    end = manager.index("room_delivery_selected = any(", start)
+    block = manager[start:end]
+    assert "tts_must_output = bool(" in block
+    assert "mandatory_tts = [" in block
+    assert '{"room_tts", "server_tts", "companion_tts"}' in block
+    assert "chosen.extend(" in block
+    assert 'item["available"]' not in block
+
+
+def test_fallback_requires_zero_fixed_tts_candidates_not_unavailability() -> None:
+    manager = (C / "manager.py").read_text(encoding="utf-8")
+    assert "fixed_tts_candidate_exists = bool(fixed_tts_candidates)" in manager
+    assert "and not target_fixed_tts_candidate_exists" in manager
+    fallback = manager[
+        manager.index("tts_must_output = bool(", manager.index(") = routed_plan(")):
+        manager.index("notify_output_areas = {")
+    ]
+    assert "target_room_routing_active" in fallback
+    assert "_target_fixed_tts_candidate_available" in fallback
+    assert "not _target_fixed_tts_candidate_available" not in fallback
+
+
+def test_fallback_door_rule_uses_current_target_rooms() -> None:
+    manager = (C / "manager.py").read_text(encoding="utf-8")
+    start = manager.index("def _fallback_door_allows")
+    end = manager.index("def _occupied_area_ids", start)
+    block = manager[start:end]
+    assert "target_area_ids" in block
+    assert "target_areas" in block
+    assert "occupied_area_ids" not in block
+    assert "target-area door" in block
