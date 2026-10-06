@@ -28,10 +28,16 @@ def test_cross_channel_fallback_can_reuse_other_text() -> None:
     assert "text_notify or text_tts" in models
 
 
-def test_available_server_tts_drops_unavailable_snapclients() -> None:
+def test_server_tts_keeps_unavailable_snapclients_for_timeout_wait() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
-    assert "ready_snapcast" in manager
-    assert "chosen_snapcast = ready_snapcast" in manager
+    assert "chosen_snapcast = tuple(routed_selected[3])" in manager
+    assert "chosen_snapcast = ready_snapcast" not in manager
+    server=manager[
+        manager.index("async def _async_send_server_tts"):
+        manager.index("async def _async_play_server_round")
+    ]
+    assert "pending = [" in server
+    assert "while pending and loop.time() < deadline:" in server
 
 
 def test_nothing_available_keeps_timeout_wait_path() -> None:
