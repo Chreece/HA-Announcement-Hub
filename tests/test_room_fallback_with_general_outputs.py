@@ -6,13 +6,14 @@ ROOT=Path(__file__).resolve().parents[1]
 C=ROOT/"custom_components"/"announcement_hub"
 
 
-def test_moveable_outputs_do_not_satisfy_fixed_room_candidate_requirement() -> None:
+def test_moveable_outputs_do_not_satisfy_fixed_tts_candidate_requirement() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
     assert '"fixed_room": (' in manager
     assert "output.integration != INTEGRATION_MOBILE_APP" in manager
     assert '"fixed_room": False' in manager
-    assert "occupied_room_candidate_available" in manager
-    assert "if occupancy_filter_active and not occupied_room_candidate_available:" in manager
+    assert "fixed_tts_candidates" in manager
+    assert 'item["kind"] in {"room_tts", "server_tts"}' in manager
+    assert "and not target_fixed_tts_candidate_exists" in manager
 
 
 def test_fixed_room_selection_waits_for_unavailable_room_candidate() -> None:
