@@ -35,15 +35,15 @@ def test_occupied_only_defaults_true_and_does_not_touch_task_lifecycle() -> None
 
 
 
-def test_fallback_requires_no_available_fixed_room_candidate_and_open_door() -> None:
+def test_fallback_requires_zero_fixed_tts_candidates_and_open_target_door() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     config_flow = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
-    assert "if occupancy_filter_active and not occupied_room_candidate_available:" in manager
-    assert "output.integration != INTEGRATION_MOBILE_APP" in manager
-    assert '"fixed_room": False' in manager
+    assert "target_fixed_tts_candidate_exists" in manager
+    assert "and not target_fixed_tts_candidate_exists" in manager
+    assert 'item["kind"] in {"room_tts", "server_tts"}' in manager
     assert "tts_only=True" in manager
     assert "def _fallback_area_id(" in manager
-    assert "def _fallback_door_allows(" in manager
+    assert "def _fallback_door_allows(self, target_area_ids" in manager
     assert 'self.hass.states.async_all("binary_sensor")' in manager
     assert 'state.attributes.get("device_class") != "door"' in manager
     assert "state.state == STATE_ON" in manager
