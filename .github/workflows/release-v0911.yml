@@ -1,0 +1,44 @@
+name: Release v0.9.11
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .release-v0911.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate release target
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("custom_components/announcement_hub/manifest.json").read_text())
+          assert manifest["version"]=="0.9.11", manifest
+          PY
+          python -m compileall -q custom_components tests
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if gh release view v0.9.11 >/dev/null 2>&1; then
+            exit 0
+          fi
+          gh release create v0.9.11 \
+            --target "${GITHUB_SHA}" \
+            --title "Announcement Hub v0.9.11" \
+            --notes "Adds notify.announcement_hub as the canonical Announcement Hub action with the full routing/TTS schema and optional response. announcement_hub.send remains as a backward-compatible legacy alias; queue controls remain under announcement_hub.cancel and announcement_hub.clear_queue."
