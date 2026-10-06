@@ -1,0 +1,44 @@
+name: Release v0.9.12
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .release-v0912.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate release target
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("custom_components/announcement_hub/manifest.json").read_text())
+          assert manifest["version"]=="0.9.12", manifest
+          PY
+          python -m compileall -q custom_components tests
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if gh release view v0.9.12 >/dev/null 2>&1; then
+            exit 0
+          fi
+          gh release create v0.9.12 \
+            --target "${GITHUB_SHA}" \
+            --title "Announcement Hub v0.9.12" \
+            --notes "Routing semantics update: explicit output rooms are authoritative, occupancy is used only when no rooms are supplied, fixed TTS candidates block fallback even while unavailable/unknown and are waited until timeout, fallback is used only when target rooms have zero fixed TTS candidates, and selected TTS/Snapcast targets remain frozen while unavailable so they receive the full wait window."
