@@ -241,12 +241,14 @@ Optionally configure an occupied-areas sensor. Its state can contain comma,
 semicolon, or newline-separated Home Assistant area names/IDs, or a configured
 attribute can contain a list of areas.
 
-`notify.announcement_hub` defaults to `occupied_only: true`. With a configured
-occupancy sensor, omitted `output` targets the occupied areas; explicit areas
-are intersected with occupancy. Filtering is capability-neutral, so a room with
-only TTS receives speech and a room with only visual notify outputs receives only
-those notifications. Unavailable outputs still wait for the configured
-availability timeout and are silently skipped afterward.
+`notify.announcement_hub` defaults to `occupied_only: true`. When `output`
+is omitted, a configured occupancy source chooses the target rooms. When the
+action supplies one or more `output` rooms, **those rooms are authoritative**:
+occupancy does not intersect, replace, or otherwise change them.
+
+Filtering is capability-neutral, so a target room with only TTS receives speech
+and a room with only visual notify outputs receives only those notifications.
+General/movable outputs remain eligible according to their configured policy.
 
 If the configured occupancy source is unavailable or currently resolves to no
 occupied areas, room-bound outputs have no room target, but **General/movable
@@ -265,26 +267,24 @@ TV/Snapcast/direct TTS outputs count as fixed candidates. Mobile App notificatio
 outputs and Companion App TTS outputs are moveable and never count as proof that
 the occupied room itself has a delivery candidate.
 
-Available fixed-room candidates are filtered by the announcement level. If the
-normal threshold leaves no usable fixed-room output, Announcement Hub relaxes
-the level selection to the nearest usable room tier before considering the
-fallback room. Configured fixed-room outputs that are temporarily unavailable
-remain wait targets for the normal availability timeout.
+For spoken announcements, fallback is based on **candidate existence, not current
+availability**. If any fixed TTS candidate exists in the target room set, that
+candidate is kept in the job even when it is `unavailable` or `unknown`, and
+Announcement Hub waits for it until the configured output-availability timeout.
+The same wait rule applies to selected direct TTS players, Snapcast clients,
+Companion App TTS outputs, the shared TTS player, and the active TTS engine.
 
-If no fixed-room candidate is currently available, the fallback room may be
-used when the occupied-room door policy allows it. **Fallback is TTS-only**:
-the original visual/general notifications stay on their original outputs, while
-only the spoken route is taken from the configured default room. The fallback
-room therefore needs a configured direct-TTS or Snapcast TTS route; visual
-outputs in the fallback room are not substituted for the occupied room.
+The configured fallback room is considered only when the target room set has
+**zero fixed TTS candidates at all**. A temporarily unavailable/unknown fixed
+TTS candidate therefore blocks fallback and is waited for instead. **Fallback
+is TTS-only**: the original visual/general notifications remain on their
+original outputs while only the spoken route is taken from the fallback room.
 
-When **Check occupied-room door before fallback** is enabled, at least one
-occupied target room must contain a `binary_sensor` with
-`device_class: door` whose state is `on` (open). Closed (`off`), unknown,
-unavailable, or missing door sensors block fallback. With fallback blocked,
-configured fixed-room candidates continue waiting for the normal availability
-timeout. Disable the checkbox to permit the TTS-only fallback regardless of
-door state.
+When **Check target-room door before fallback** is enabled, at least one current
+target room must contain a `binary_sensor` with `device_class: door` whose
+state is `on` (open). Closed (`off`), unknown, unavailable, or missing door
+sensors block fallback. Disable the checkbox to permit the TTS-only fallback
+regardless of door state.
 
 ## Main action
 
@@ -313,9 +313,14 @@ all configured matching outputs enabled for that call are candidates
 → remaining outputs are recorded with their final timeout/error
 ```
 
-When one or more areas are supplied, area-bound outputs are filtered to those
-areas. Global outputs, such as a manually entered legacy notification service,
-continue to match because Home Assistant provides no room binding for them.
+When one or more areas are supplied, those areas are the authoritative room
+targets for that action. Area-bound outputs are filtered to exactly those rooms;
+occupancy is not applied on top. General/global outputs continue to match
+according to their configured policy.
+
+For TTS, selected targets are never dropped merely because they are currently
+`unavailable` or `unknown`. They remain pending and are retried until the
+configured output-availability timeout expires.
 
 ### Specific outputs or integrations
 

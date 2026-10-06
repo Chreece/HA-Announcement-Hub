@@ -28,7 +28,7 @@ def test_runtime_filters_level_and_only_room_scope_by_occupancy() -> None:
 
 def test_general_outputs_freeze_without_area_binding() -> None:
     manager=(C/"manager.py").read_text()
-    start=manager.index("notify_output_areas = {", manager.index("occupied_room_candidate_exists"))
+    start=manager.index("notify_output_areas = {", manager.index("target_fixed_tts_candidate_exists"))
     block=manager[start:manager.index("configured_profiles =", start)]
     assert "NOTIFY_SCOPE_GENERAL" in block
     assert "None" in block

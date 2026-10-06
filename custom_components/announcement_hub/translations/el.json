@@ -131,9 +131,9 @@
           "critical_notify_data": "Provider-specific δεδομένα που συγχωνεύονται μόνο στις Critical οπτικές ειδοποιήσεις, π.χ. priority/urgency επιλογές που υποστηρίζει η integration.",
           "occupancy_sensor": "Η οντότητα της οποίας το state ή επιλεγμένο attribute περιέχει τα ονόματα/ID των κατειλημμένων περιοχών Home Assistant. Χρησιμοποιείται μόνο όταν ένα send action έχει occupied-only routing.",
           "occupancy_attribute": "Επίλεξε αν τα occupied rooms διαβάζονται από το state της οντότητας ή από ένα από τα τρέχοντα attributes της.",
-          "fallback_room": "Χρησιμοποιείται μόνο όταν το occupancy routing δεν βρει καμία επιλέξιμη room output και ο κανόνας πόρτας επιτρέψει fallback.",
-          "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν κατάλληλος door sensor στο occupied δωμάτιο αναφέρει ρητά ανοιχτός.",
-          "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors του occupied room."
+          "fallback_room": "Fallback περιοχή TTS που χρησιμοποιείται μόνο όταν τα τρέχοντα target rooms δεν έχουν κανέναν fixed TTS candidate. Οι unavailable/unknown TTS candidates εξακολουθούν να μετρούν και περιμένουν μέχρι το availability timeout.",
+          "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν κατάλληλος door sensor σε ένα από τα τρέχοντα target rooms αναφέρει ρητά ανοιχτός.",
+          "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors στα τρέχοντα target rooms."
         }
       }
     },
@@ -283,9 +283,9 @@
           "critical_notify_data": "Provider-specific δεδομένα που συγχωνεύονται μόνο στις Critical οπτικές ειδοποιήσεις, π.χ. priority/urgency επιλογές που υποστηρίζει η integration.",
           "occupancy_sensor": "Η οντότητα της οποίας το state ή επιλεγμένο attribute περιέχει τα ονόματα/ID των κατειλημμένων περιοχών Home Assistant. Χρησιμοποιείται μόνο όταν ένα send action έχει occupied-only routing.",
           "occupancy_attribute": "Επίλεξε αν τα occupied rooms διαβάζονται από το state της οντότητας ή από ένα από τα τρέχοντα attributes της.",
-          "fallback_room": "Χρησιμοποιείται μόνο όταν το occupancy routing δεν βρει καμία επιλέξιμη room output και ο κανόνας πόρτας επιτρέψει fallback.",
-          "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν κατάλληλος door sensor στο occupied δωμάτιο αναφέρει ρητά ανοιχτός.",
-          "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors του occupied room."
+          "fallback_room": "Fallback περιοχή TTS που χρησιμοποιείται μόνο όταν τα τρέχοντα target rooms δεν έχουν κανέναν fixed TTS candidate. Οι unavailable/unknown TTS candidates εξακολουθούν να μετρούν και περιμένουν μέχρι το availability timeout.",
+          "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν κατάλληλος door sensor σε ένα από τα τρέχοντα target rooms αναφέρει ρητά ανοιχτός.",
+          "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors στα τρέχοντα target rooms."
         }
       }
     },
@@ -462,7 +462,7 @@
         },
         "occupied_only": {
           "name": "Μόνο κατειλημμένες περιοχές",
-          "description": "Προεπιλογή: ενεργό. Όταν έχει ρυθμιστεί αισθητήρας κατειλημμένων περιοχών, η ανακοίνωση περιορίζεται σε outputs που ανήκουν στις περιοχές που είναι τώρα κατειλημμένες. Αν δοθούν ρητά output areas, χρησιμοποιείται η τομή τους με την παρουσία. Απενεργοποίησέ το για να αγνοηθεί η παρουσία σε αυτή την κλήση."
+          "description": "Προεπιλογή: ενεργό. Όταν το action δεν δίνει ρητά output rooms, η ρυθμισμένη πηγή occupancy επιλέγει τα target rooms. Αν το action δώσει output rooms, αυτά είναι απόλυτα και το occupancy αγνοείται για το room routing."
         }
       }
     },
