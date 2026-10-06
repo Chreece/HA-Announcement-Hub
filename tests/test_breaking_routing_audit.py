@@ -15,8 +15,11 @@ def test_explicit_action_areas_filter_candidate_planning_without_occupancy() -> 
             manager.index("requested_output_area_ids = self._resolve_area_ids"),
         )
     ]
-    assert "area_filter_active = (" in block
-    assert "occupancy_filter_active or bool(requested_output_area_ids)" in block
+    assert "explicit_area_routing = bool(requested_output_area_ids)" in block
+    assert "if occupied_only and not explicit_area_routing" in block
+    assert "if explicit_area_routing:" in block
+    assert "output_area_ids = requested_output_area_ids" in block
+    assert "area_filter_active = explicit_area_routing or occupancy_filter_active" in block
     assert "filter_by_area=area_filter_active" in manager
 
 
