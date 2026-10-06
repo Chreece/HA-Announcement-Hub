@@ -131,9 +131,9 @@
           "critical_notify_data": "Provider-spezifische Daten, die nur bei kritischen visuellen Benachrichtigungen ergänzt werden, z. B. Prioritätsoptionen.",
           "occupancy_sensor": "Entität, deren Zustand oder ausgewähltes Attribut die aktuell belegten Home-Assistant-Bereiche enthält. Wird nur bei occupied-only Routing verwendet.",
           "occupancy_attribute": "Wähle, ob belegte Räume aus dem Entitätszustand oder einem aktuellen Attribut gelesen werden.",
-          "fallback_room": "Wird nur verwendet, wenn das Belegungsrouting null geeignete Raumausgänge findet und die Türregel Fallback erlaubt.",
-          "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor im belegten Raum ausdrücklich offen meldet.",
-          "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer = alle Türsensoren des belegten Raums."
+          "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen TTS-Kandidaten enthalten. Nicht verfügbare/unknown TTS-Kandidaten zählen weiterhin und werden bis zum Verfügbarkeits-Timeout abgewartet.",
+          "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor in einem der aktuellen Zielräume ausdrücklich offen meldet.",
+          "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen."
         }
       }
     },
@@ -283,9 +283,9 @@
           "critical_notify_data": "Provider-spezifische Daten, die nur bei kritischen visuellen Benachrichtigungen ergänzt werden, z. B. Prioritätsoptionen.",
           "occupancy_sensor": "Entität, deren Zustand oder ausgewähltes Attribut die aktuell belegten Home-Assistant-Bereiche enthält. Wird nur bei occupied-only Routing verwendet.",
           "occupancy_attribute": "Wähle, ob belegte Räume aus dem Entitätszustand oder einem aktuellen Attribut gelesen werden.",
-          "fallback_room": "Wird nur verwendet, wenn das Belegungsrouting null geeignete Raumausgänge findet und die Türregel Fallback erlaubt.",
-          "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor im belegten Raum ausdrücklich offen meldet.",
-          "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer = alle Türsensoren des belegten Raums."
+          "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen TTS-Kandidaten enthalten. Nicht verfügbare/unknown TTS-Kandidaten zählen weiterhin und werden bis zum Verfügbarkeits-Timeout abgewartet.",
+          "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor in einem der aktuellen Zielräume ausdrücklich offen meldet.",
+          "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen."
         }
       }
     },
@@ -462,7 +462,7 @@
         },
         "occupied_only": {
           "name": "Nur belegte Bereiche",
-          "description": "Standard: aktiviert. Wenn ein Belegungssensor konfiguriert ist, wird diese Ankündigung auf Ausgaben in aktuell belegten Bereichen beschränkt. Eine explizite Bereichsauswahl wird mit der Belegung geschnitten. Deaktivieren, um die Belegung für diesen Aufruf zu ignorieren."
+          "description": "Standard: aktiviert. Wenn die Aktion keine expliziten Zielräume angibt, bestimmt die konfigurierte Belegungsquelle die Zielräume. Werden Räume über output angegeben, sind genau diese Räume maßgeblich und die Belegung wird für das Raum-Routing ignoriert."
         }
       }
     },
