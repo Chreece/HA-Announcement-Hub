@@ -406,8 +406,8 @@
   },
   "services": {
     "send": {
-      "name": "Ankündigung senden",
-      "description": "Stellt eine gesprochene und/oder optische Meldung mit optionaler Raum- und Ausgangsauswahl in die serialisierte Warteschlange.",
+      "name": "Ankündigung senden (Legacy-Alias)",
+      "description": "Abwärtskompatibler Alias für notify.announcement_hub. Neue Automationen sollten notify.announcement_hub verwenden.",
       "sections": {
         "content": {
           "name": "Inhalt"
