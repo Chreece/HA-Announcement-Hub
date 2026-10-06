@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.9.11 - 2026-10-06
+
+- Added `notify.announcement_hub` as the canonical Announcement Hub action.
+- The new notify-domain action keeps the full Announcement Hub payload, routing
+  selectors, queue behavior, and optional service response.
+- Registered a rich Home Assistant service description for
+  `notify.announcement_hub` so the action remains usable from the action UI.
+- Made the Home Assistant `notify` integration a setup dependency so the notify
+  domain is ready before Announcement Hub registers its action.
+- Kept `announcement_hub.send` as a backward-compatible legacy alias so existing
+  automations continue to work; new automations should use
+  `notify.announcement_hub`.
+- Queue management remains under `announcement_hub.cancel` and
+  `announcement_hub.clear_queue`.
+- Updated README examples and English, German, and Greek service labels.
+
 ## 0.9.10 - 2026-10-04
 
 - Fixed Snapcast TTS tail clipping. Announcement Hub now keeps the active
