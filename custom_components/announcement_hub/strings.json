@@ -131,9 +131,9 @@
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
           "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Area used only when occupancy routing finds zero eligible room outputs and the fallback door rule allows rerouting.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in the occupied room explicitly reports open.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the occupied room."
+          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed TTS candidates. Unavailable/unknown TTS candidates still count and are waited for until the availability timeout.",
+          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
+          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms."
         }
       }
     },
@@ -283,9 +283,9 @@
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
           "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Area used only when occupancy routing finds zero eligible room outputs and the fallback door rule allows rerouting.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in the occupied room explicitly reports open.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the occupied room."
+          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed TTS candidates. Unavailable/unknown TTS candidates still count and are waited for until the availability timeout.",
+          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
+          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms."
         }
       }
     },
@@ -462,7 +462,7 @@
         },
         "occupied_only": {
           "name": "Only occupied areas",
-          "description": "Default: enabled. When an occupied-areas sensor is configured, restrict this announcement to outputs belonging to the currently occupied areas. An explicit output list is intersected with occupancy. Disable to ignore occupancy for this call."
+          "description": "Default: enabled. When no explicit output rooms are supplied, a configured occupancy source chooses the target rooms. If output rooms are supplied by the action, those rooms are authoritative and occupancy is ignored for room targeting."
         }
       }
     },
