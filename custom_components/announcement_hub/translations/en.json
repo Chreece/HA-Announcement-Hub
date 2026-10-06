@@ -406,8 +406,8 @@
   },
   "services": {
     "send": {
-      "name": "Send announcement",
-      "description": "Queues a spoken and/or visual announcement with optional room and output selection. Jobs and audible outputs are serialized.",
+      "name": "Send announcement (legacy alias)",
+      "description": "Backward-compatible alias for notify.announcement_hub. New automations should use notify.announcement_hub.",
       "sections": {
         "content": {
           "name": "Content"

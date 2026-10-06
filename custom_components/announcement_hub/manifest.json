@@ -7,10 +7,10 @@
   "config_flow": true,
   "dependencies": [
     "media_player",
-    "tts"
+    "tts",
+    "notify"
   ],
   "after_dependencies": [
-    "notify",
     "snapcast",
     "mobile_app",
     "nfandroidtv"

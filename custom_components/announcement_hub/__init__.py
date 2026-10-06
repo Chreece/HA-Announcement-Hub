@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import json
+import logging
+from pathlib import Path
 from typing import Any
 
 import probatio
 
+from homeassistant.components.notify.const import DOMAIN as NOTIFY_DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import (
     HassJob,
@@ -16,6 +20,8 @@ from homeassistant.core import (
 )
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.service import async_set_service_schema
+from homeassistant.util.yaml import load_yaml_dict
 
 from .const import (
     ATTR_COMPANION_TTS,
@@ -59,6 +65,7 @@ from .const import (
     LEGACY_CONF_SNAPCAST_ENABLED,
     LEVEL_INFO,
     LEVELS,
+    NOTIFY_SERVICE_ANNOUNCEMENT_HUB,
     PLATFORMS,
     SERVICE_CANCEL,
     SERVICE_CLEAR_QUEUE,
@@ -68,6 +75,41 @@ from .const import (
 )
 from .manager import AnnouncementManager
 from .outputs import area_name
+
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def _notify_action_description() -> dict[str, Any]:
+    """Build the notify.announcement_hub action description."""
+    root = Path(__file__).parent
+    services = load_yaml_dict(str(root / "services.yaml"))
+    strings = json.loads((root / "strings.json").read_text(encoding="utf-8"))
+
+    send_schema = dict(services.get(SERVICE_SEND, {}) or {})
+    send_strings = dict(strings.get("services", {}).get(SERVICE_SEND, {}) or {})
+    translated_fields = dict(send_strings.get("fields", {}) or {})
+
+    flat_fields: dict[str, Any] = {}
+    for value in dict(send_schema.get("fields", {}) or {}).values():
+        if not isinstance(value, dict):
+            continue
+        nested = value.get("fields")
+        if isinstance(nested, dict):
+            for field_name, field_schema in nested.items():
+                merged = dict(translated_fields.get(field_name, {}) or {})
+                if isinstance(field_schema, dict):
+                    merged.update(field_schema)
+                flat_fields[field_name] = merged
+
+    return {
+        "name": "Announcement Hub",
+        "description": (
+            "Queues a spoken and/or visual Announcement Hub message with "
+            "optional room and output selection."
+        ),
+        "fields": flat_fields,
+    }
 
 
 def _validate_send_payload(data: dict[str, Any]) -> dict[str, Any]:
@@ -305,6 +347,33 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
         }
         return response if call.return_response else None
 
+    if hass.services.has_service(
+        NOTIFY_DOMAIN, NOTIFY_SERVICE_ANNOUNCEMENT_HUB
+    ):
+        _LOGGER.error(
+            "Cannot register notify.%s because that action already exists",
+            NOTIFY_SERVICE_ANNOUNCEMENT_HUB,
+        )
+        return False
+
+    hass.services.async_register(
+        NOTIFY_DOMAIN,
+        NOTIFY_SERVICE_ANNOUNCEMENT_HUB,
+        async_send,
+        schema=SEND_SCHEMA,
+        supports_response=SupportsResponse.OPTIONAL,
+    )
+    description = await hass.async_add_executor_job(
+        _notify_action_description
+    )
+    async_set_service_schema(
+        hass,
+        NOTIFY_DOMAIN,
+        NOTIFY_SERVICE_ANNOUNCEMENT_HUB,
+        description,
+    )
+
+    # Backward-compatible alias for automations created before v0.9.11.
     if not hass.services.has_service(DOMAIN, SERVICE_SEND):
         hass.services.async_register(
             DOMAIN,
@@ -313,6 +382,8 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             schema=SEND_SCHEMA,
             supports_response=SupportsResponse.OPTIONAL,
         )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_CLEAR_QUEUE):
         hass.services.async_register(
             DOMAIN,
             SERVICE_CLEAR_QUEUE,
@@ -320,6 +391,8 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             schema=CLEAR_QUEUE_SCHEMA,
             supports_response=SupportsResponse.OPTIONAL,
         )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_CANCEL):
         hass.services.async_register(
             DOMAIN,
             SERVICE_CANCEL,

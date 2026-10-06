@@ -406,8 +406,8 @@
   },
   "services": {
     "send": {
-      "name": "Αποστολή ανακοίνωσης",
-      "description": "Προσθέτει στην σειριακή ουρά μία ηχητική και/ή οπτική ανακοίνωση με προαιρετική επιλογή δωματίων και εξόδων.",
+      "name": "Αποστολή ανακοίνωσης (legacy alias)",
+      "description": "Alias συμβατότητας για το notify.announcement_hub. Οι νέοι αυτοματισμοί πρέπει να χρησιμοποιούν το notify.announcement_hub.",
       "sections": {
         "content": {
           "name": "Περιεχόμενο"
