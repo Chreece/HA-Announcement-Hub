@@ -797,28 +797,25 @@ class AnnouncementManager:
         requested_output_area_ids = self._resolve_area_ids(
             self._ensure_list(outputs)
         )
-        occupied_area_ids = self._occupied_area_ids() if occupied_only else None
-        occupancy_filter_active = occupied_area_ids is not None
-        if occupancy_filter_active:
-            occupied_set = set(occupied_area_ids)
-            output_area_ids = (
-                tuple(
-                    area_id
-                    for area_id in requested_output_area_ids
-                    if area_id in occupied_set
-                )
-                if requested_output_area_ids
-                else occupied_area_ids
-            )
-        else:
-            output_area_ids = requested_output_area_ids
+        explicit_area_routing = bool(requested_output_area_ids)
 
-        # Explicit action areas must constrain candidate selection even when no
-        # occupancy sensor is configured. Otherwise an output from another room
-        # can win level/availability selection and then be discarded later.
-        area_filter_active = (
-            occupancy_filter_active or bool(requested_output_area_ids)
+        # Explicit output rooms are authoritative. Occupancy is consulted only
+        # when the action does not name its own target rooms.
+        occupied_area_ids = (
+            self._occupied_area_ids()
+            if occupied_only and not explicit_area_routing
+            else None
         )
+        occupancy_filter_active = occupied_area_ids is not None
+        if explicit_area_routing:
+            output_area_ids = requested_output_area_ids
+        elif occupancy_filter_active:
+            output_area_ids = occupied_area_ids
+        else:
+            output_area_ids = ()
+
+        area_filter_active = explicit_area_routing or occupancy_filter_active
+        target_room_routing_active = bool(output_area_ids) and area_filter_active
 
         requested = self._ensure_list(requested_services)
         configured = self._configured_outputs()
@@ -1040,9 +1037,15 @@ class AnnouncementManager:
             room_candidates = [
                 item for item in candidates if item["fixed_room"]
             ]
-            room_candidate_exists = bool(room_candidates)
-            room_candidate_available = any(
-                item["available"] for item in room_candidates
+            fixed_tts_candidates = [
+                item
+                for item in room_candidates
+                if item["kind"] in {"room_tts", "server_tts"}
+                and item["native_text"]
+            ]
+            fixed_tts_candidate_exists = bool(fixed_tts_candidates)
+            fixed_tts_candidate_available = any(
+                item["available"] for item in fixed_tts_candidates
             )
             available = [item for item in candidates if item["available"]]
             normal_available = [
@@ -1205,6 +1208,32 @@ class AnnouncementManager:
                         for item in room_chosen
                     )
 
+            # TTS has a stronger availability contract than visual delivery:
+            # when speech is required, every selected TTS target remains frozen
+            # into the job even if it is currently unavailable/unknown. The
+            # delivery loops then wait for each path until the configured
+            # availability timeout instead of silently dropping it at planning.
+            tts_must_output = bool(
+                (text_tts or level == LEVEL_CRITICAL)
+                and tts_allowed_for_level(level, minimum_tts_level)
+            )
+            if tts_must_output:
+                mandatory_tts = [
+                    item
+                    for item in candidates
+                    if item["kind"]
+                    in {"room_tts", "server_tts", "companion_tts"}
+                    and item["native_text"]
+                ]
+                chosen_keys = {
+                    (item["kind"], item["id"]) for item in chosen
+                }
+                chosen.extend(
+                    item
+                    for item in mandatory_tts
+                    if (item["kind"], item["id"]) not in chosen_keys
+                )
+
             room_delivery_selected = any(
                 item["fixed_room"] for item in chosen
             )
@@ -1224,18 +1253,10 @@ class AnnouncementManager:
                 item["kind"] == "server_tts" for item in chosen
             )
 
-            # When a server-TTS path is immediately available, do not freeze
-            # unavailable Snapcast clients into the job: use the clients that
-            # can receive the shared stream right now.
+            # Keep every selected Snapcast TTS target in the frozen job,
+            # including unavailable/unknown clients. Server delivery handles
+            # ready clients first and waits for the rest until timeout.
             chosen_snapcast = tuple(routed_selected[3])
-            if choose_server_tts and routed_selected[3]:
-                ready_snapcast = tuple(
-                    entity_id
-                    for entity_id in routed_selected[3]
-                    if self._snapcast_output_available(entity_id)
-                )
-                if ready_snapcast:
-                    chosen_snapcast = ready_snapcast
 
             routed_notify = tuple(
                 output for output in routed_notify
@@ -1279,8 +1300,8 @@ class AnnouncementManager:
                 routed_notify,
                 routed_companion,
                 route_plan,
-                room_candidate_exists,
-                room_candidate_available,
+                fixed_tts_candidate_exists,
+                fixed_tts_candidate_available,
                 room_delivery_selected,
             )
 
@@ -1289,16 +1310,24 @@ class AnnouncementManager:
             notify_records,
             companion_records,
             plan,
-            _occupied_room_candidate_exists,
-            occupied_room_candidate_available,
-            _occupied_room_delivery_selected,
+            target_fixed_tts_candidate_exists,
+            _target_fixed_tts_candidate_available,
+            _target_room_delivery_selected,
         ) = routed_plan(
             output_area_ids,
             filter_by_area=area_filter_active,
             require_room_delivery=occupancy_filter_active,
         )
 
-        if occupancy_filter_active and not occupied_room_candidate_available:
+        tts_must_output = bool(
+            (text_tts or level == LEVEL_CRITICAL)
+            and tts_allowed_for_level(level, minimum_tts_level)
+        )
+        if (
+            tts_must_output
+            and target_room_routing_active
+            and not target_fixed_tts_candidate_exists
+        ):
             fallback_area_id = self._fallback_area_id()
             if (
                 fallback_area_id
@@ -1309,8 +1338,8 @@ class AnnouncementManager:
                     _fallback_notify_records,
                     _fallback_companion_records,
                     fallback_plan,
-                    fallback_room_candidate_exists,
-                    _fallback_room_candidate_available,
+                    fallback_fixed_tts_candidate_exists,
+                    _fallback_fixed_tts_candidate_available,
                     fallback_room_delivery_selected,
                 ) = routed_plan(
                     (fallback_area_id,),
@@ -1319,7 +1348,7 @@ class AnnouncementManager:
                     tts_only=True,
                 )
                 if (
-                    fallback_room_candidate_exists
+                    fallback_fixed_tts_candidate_exists
                     and fallback_room_delivery_selected
                     and fallback_plan.has_audible_output
                 ):
@@ -1353,7 +1382,7 @@ class AnnouncementManager:
                     )
                     _LOGGER.debug(
                         "Announcement routed TTS to fallback area %s because "
-                        "the occupied area(s) had no available fixed-room candidate",
+                        "the target area(s) had no fixed TTS candidate",
                         fallback_area_id,
                     )
 
@@ -3151,8 +3180,8 @@ class AnnouncementManager:
         _LOGGER.debug("Configured fallback room %s is not a known area", value)
         return None
 
-    def _fallback_door_allows(self, occupied_area_ids: Sequence[str]) -> bool:
-        """Allow fallback when door checking is disabled or an occupied door is open."""
+    def _fallback_door_allows(self, target_area_ids: Sequence[str]) -> bool:
+        """Allow fallback when disabled or a target-room door is open."""
         if not bool(
             self.settings.get(
                 CONF_FALLBACK_CHECK_DOOR,
@@ -3161,8 +3190,8 @@ class AnnouncementManager:
         ):
             return True
 
-        occupied = set(occupied_area_ids)
-        if not occupied:
+        target_areas = set(target_area_ids)
+        if not target_areas:
             return False
 
         found_door = False
@@ -3180,7 +3209,7 @@ class AnnouncementManager:
                     or required_label not in getattr(reg_entry, "labels", set())
                 ):
                     continue
-            if entity_area_id(self.hass, state.entity_id) not in occupied:
+            if entity_area_id(self.hass, state.entity_id) not in target_areas:
                 continue
             found_door = True
             if state.state == STATE_ON:
@@ -3188,12 +3217,12 @@ class AnnouncementManager:
 
         if not found_door:
             _LOGGER.debug(
-                "Fallback blocked: no door binary sensor belongs to occupied area(s) %s",
-                sorted(occupied),
+                "Fallback blocked: no door binary sensor belongs to target area(s) %s",
+                sorted(target_areas),
             )
         else:
             _LOGGER.debug(
-                "Fallback blocked: every occupied-area door is closed or unavailable"
+                "Fallback blocked: every target-area door is closed or unavailable"
             )
         return False
 
