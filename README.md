@@ -17,8 +17,10 @@ helpers, edit automations, or change MPD/Snapserver configuration.
 
 ## Main behavior
 
-- Adds `announcement_hub.send`, `announcement_hub.cancel`, and
-  `announcement_hub.clear_queue`.
+- Adds the primary announcement action `notify.announcement_hub`, plus
+  `announcement_hub.cancel` and `announcement_hub.clear_queue`.
+- Keeps `announcement_hub.send` as a backward-compatible legacy alias for
+  existing automations; new automations should use `notify.announcement_hub`.
 - Accepts `text_tts`, `text_notify`, or both; at least one is required.
 - Persists waiting jobs across Home Assistant restarts.
 - Freezes each job's selected outputs, area bindings, player, TTS settings, and
@@ -239,7 +241,7 @@ Optionally configure an occupied-areas sensor. Its state can contain comma,
 semicolon, or newline-separated Home Assistant area names/IDs, or a configured
 attribute can contain a list of areas.
 
-`announcement_hub.send` defaults to `occupied_only: true`. With a configured
+`notify.announcement_hub` defaults to `occupied_only: true`. With a configured
 occupancy sensor, omitted `output` targets the occupied areas; explicit areas
 are intersected with occupancy. Filtering is capability-neutral, so a room with
 only TTS receives speech and a room with only visual notify outputs receives only
@@ -287,7 +289,7 @@ door state.
 ## Main action
 
 ```yaml
-action: announcement_hub.send
+action: notify.announcement_hub
 data:
   text_tts: "Το πλυντήριο ολοκλήρωσε το πρόγραμμα."
   text_notify: "Το πλυντήριο τελείωσε."
@@ -347,7 +349,7 @@ First select eligible Android Companion App entries/entities under
 opts in; `critical` always uses every configured matching output.
 
 ```yaml
-action: announcement_hub.send
+action: notify.announcement_hub
 data:
   text_tts: "The garage door is still open."
   companion_tts: true
@@ -369,7 +371,7 @@ the next audible output.
 ### Critical example
 
 ```yaml
-action: announcement_hub.send
+action: notify.announcement_hub
 data:
   text_tts: "Smoke detected in the kitchen."
   output:
@@ -385,7 +387,7 @@ remaining outputs from being attempted.
 ### Action response
 
 ```yaml
-- action: announcement_hub.send
+- action: notify.announcement_hub
   data:
     text_tts: "Test announcement"
   response_variable: announcement_job
