@@ -12,6 +12,7 @@ VERSION: Final = "0.9.10"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
+NOTIFY_SERVICE_ANNOUNCEMENT_HUB: Final = "announcement_hub"
 SERVICE_CLEAR_QUEUE: Final = "clear_queue"
 SERVICE_CANCEL: Final = "cancel"
 
