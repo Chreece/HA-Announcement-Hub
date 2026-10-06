@@ -82,9 +82,10 @@ def test_fallback_requires_zero_fixed_tts_candidates_not_unavailability() -> Non
     manager = (C / "manager.py").read_text(encoding="utf-8")
     assert "fixed_tts_candidate_exists = bool(fixed_tts_candidates)" in manager
     assert "and not target_fixed_tts_candidate_exists" in manager
+    start = manager.index("target_fixed_tts_candidate_exists")
     fallback = manager[
-        manager.index("target_fixed_tts_candidate_exists"):
-        manager.index("notify_output_areas = {")
+        start:
+        manager.index("notify_output_areas = {", start)
     ]
     assert "target_room_routing_active" in fallback
     assert "_target_fixed_tts_candidate_available" in fallback
