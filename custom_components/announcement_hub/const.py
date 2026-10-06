@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.9.10"
+VERSION: Final = "0.9.11"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
