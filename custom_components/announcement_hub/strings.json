@@ -462,7 +462,7 @@
         },
         "occupied_only": {
           "name": "Only occupied areas",
-          "description": "Default: enabled. When no explicit output rooms are supplied, a configured occupancy source chooses the target rooms. If output rooms are supplied by the action, those rooms are authoritative and occupancy is ignored for room targeting."
+          "description": "Default: enabled. When an occupancy source is configured, room-bound delivery is restricted to currently occupied areas. If output rooms are also supplied, only rooms present in both the explicit output list and the occupied-room set are used. Disable to make the explicit output list authoritative."
         }
       }
     },
