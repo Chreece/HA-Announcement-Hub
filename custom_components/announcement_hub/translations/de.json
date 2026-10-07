@@ -462,7 +462,7 @@
         },
         "occupied_only": {
           "name": "Nur belegte Bereiche",
-          "description": "Standard: aktiviert. Wenn die Aktion keine expliziten Zielräume angibt, bestimmt die konfigurierte Belegungsquelle die Zielräume. Werden Räume über output angegeben, sind genau diese Räume maßgeblich und die Belegung wird für das Raum-Routing ignoriert."
+          "description": "Standard: aktiviert. Wenn eine Belegungsquelle konfiguriert ist, wird die raumgebundene Ausgabe auf aktuell belegte Bereiche beschränkt. Werden zusätzlich output-Räume angegeben, werden nur Räume verwendet, die sowohl in der expliziten Liste als auch in der Belegung vorkommen. Deaktivieren, damit die explizite output-Liste maßgeblich ist."
         }
       }
     },
