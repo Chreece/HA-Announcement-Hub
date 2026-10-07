@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.13 - 2026-10-07
+
+- Fixed a planner bug where supplying both `text_tts` and `text_notify` could
+  suppress the TTS path even though the same `text_tts`-only announcement
+  selected and played TTS correctly.
+- TTS candidate selection is now resolved independently from visual notification
+  candidate selection. An available notify output can no longer prevent requested
+  TTS from selecting its own level/fallback path.
+- Preserved nearest-level relaxation for TTS while keeping `never` as the hard
+  TTS disable except for Critical announcements.
+- Kept unavailable/unknown TTS targets frozen into the job so they still receive
+  the full configured availability-timeout window.
+- Fallback-room TTS can now be used when the TTS level was relaxed, instead of
+  being blocked solely by the original threshold.
+
 ## 0.9.12 - 2026-10-06
 
 - Made explicit `output:` rooms authoritative for `notify.announcement_hub`.
