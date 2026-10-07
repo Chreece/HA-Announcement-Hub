@@ -16,8 +16,8 @@ def test_explicit_action_areas_filter_candidate_planning_without_occupancy() -> 
         )
     ]
     assert "explicit_area_routing = bool(requested_output_area_ids)" in block
-    assert "if occupied_only and not explicit_area_routing" in block
-    assert "if explicit_area_routing:" in block
+    assert "occupied_area_ids = self._occupied_area_ids() if occupied_only else None" in block
+    assert "elif explicit_area_routing:" in block
     assert "output_area_ids = requested_output_area_ids" in block
     assert "area_filter_active = explicit_area_routing or occupancy_filter_active" in block
     assert "filter_by_area=area_filter_active" in manager
@@ -53,17 +53,27 @@ def test_same_player_cannot_run_direct_and_shared_tts_concurrently() -> None:
             assert "tts_player_role_overlap" in data[section]["error"]
 
 
-def test_explicit_rooms_override_occupancy_for_room_routing() -> None:
+def test_explicit_rooms_intersect_occupancy_when_occupied_only() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
     block = manager[
         manager.index("requested_output_area_ids = self._resolve_area_ids"):
         manager.index("requested = self._ensure_list")
     ]
-    assert "explicit_area_routing = bool(requested_output_area_ids)" in block
-    assert "if occupied_only and not explicit_area_routing" in block
-    assert "if explicit_area_routing:" in block
+    assert "occupied_area_ids = self._occupied_area_ids() if occupied_only else None" in block
+    assert "occupied_set = set(occupied_area_ids)" in block
+    assert "for area_id in requested_output_area_ids" in block
+    assert "if area_id in occupied_set" in block
+    assert "if explicit_area_routing" in block
+
+
+def test_explicit_rooms_are_authoritative_when_occupied_only_is_false() -> None:
+    manager = (C / "manager.py").read_text(encoding="utf-8")
+    block = manager[
+        manager.index("requested_output_area_ids = self._resolve_area_ids"):
+        manager.index("requested = self._ensure_list")
+    ]
+    assert "elif explicit_area_routing:" in block
     assert "output_area_ids = requested_output_area_ids" in block
-    assert "occupied_set" not in block
 
 
 def test_tts_targets_are_frozen_even_when_currently_unavailable() -> None:

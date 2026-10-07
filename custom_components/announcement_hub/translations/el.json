@@ -462,7 +462,7 @@
         },
         "occupied_only": {
           "name": "Μόνο κατειλημμένες περιοχές",
-          "description": "Προεπιλογή: ενεργό. Όταν το action δεν δίνει ρητά output rooms, η ρυθμισμένη πηγή occupancy επιλέγει τα target rooms. Αν το action δώσει output rooms, αυτά είναι απόλυτα και το occupancy αγνοείται για το room routing."
+          "description": "Προεπιλογή: ενεργό. Όταν έχει ρυθμιστεί πηγή occupancy, το room-bound routing περιορίζεται στα τρέχοντα occupied rooms. Αν δοθούν και output rooms, χρησιμοποιούνται μόνο τα δωμάτια που υπάρχουν και στη ρητή λίστα και στο occupancy. Απενεργοποίησέ το ώστε η ρητή λίστα output να είναι απόλυτη."
         }
       }
     },

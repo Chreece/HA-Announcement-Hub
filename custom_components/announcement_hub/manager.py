@@ -799,18 +799,25 @@ class AnnouncementManager:
         )
         explicit_area_routing = bool(requested_output_area_ids)
 
-        # Explicit output rooms are authoritative. Occupancy is consulted only
-        # when the action does not name its own target rooms.
-        occupied_area_ids = (
-            self._occupied_area_ids()
-            if occupied_only and not explicit_area_routing
-            else None
-        )
+        # occupied_only always means "restrict room-bound delivery to occupied
+        # rooms". If explicit output rooms are also supplied, use their
+        # intersection with occupancy. With occupied_only disabled, explicit
+        # output rooms are authoritative.
+        occupied_area_ids = self._occupied_area_ids() if occupied_only else None
         occupancy_filter_active = occupied_area_ids is not None
-        if explicit_area_routing:
+        if occupancy_filter_active:
+            occupied_set = set(occupied_area_ids)
+            output_area_ids = (
+                tuple(
+                    area_id
+                    for area_id in requested_output_area_ids
+                    if area_id in occupied_set
+                )
+                if explicit_area_routing
+                else occupied_area_ids
+            )
+        elif explicit_area_routing:
             output_area_ids = requested_output_area_ids
-        elif occupancy_filter_active:
-            output_area_ids = occupied_area_ids
         else:
             output_area_ids = ()
 
