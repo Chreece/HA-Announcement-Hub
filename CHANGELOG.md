@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.14 - 2026-10-07
+
+- Fixed a regression where `occupied_only: true` was ignored whenever an
+  explicit `output:` room list was also supplied.
+- `occupied_only: true` + explicit `output:` now uses the intersection of
+  the explicit room list and the currently occupied rooms.
+- `occupied_only: true` without `output:` continues to target the currently
+  occupied rooms.
+- `occupied_only: false` + explicit `output:` keeps the explicit room list
+  authoritative.
+- General/movable output behavior, TTS fallback candidate rules, and
+  unavailable/unknown TTS timeout handling are unchanged.
+- Updated README and English, German, and Greek action help.
+
 ## 0.9.13 - 2026-10-07
 
 - Fixed a planner bug where supplying both `text_tts` and `text_notify` could
