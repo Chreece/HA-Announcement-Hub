@@ -315,10 +315,11 @@ all configured matching outputs enabled for that call are candidates
 → remaining outputs are recorded with their final timeout/error
 ```
 
-When one or more areas are supplied, those areas are the authoritative room
-targets for that action. Area-bound outputs are filtered to exactly those rooms;
-occupancy is not applied on top. General/global outputs continue to match
-according to their configured policy.
+When one or more areas are supplied, area-bound outputs are filtered to those
+rooms. With `occupied_only: true`, the final room targets are the intersection
+of the explicit areas and the currently occupied areas. With
+`occupied_only: false`, the explicit areas are authoritative. General/global
+outputs continue to match according to their configured policy.
 
 For TTS, selected targets are never dropped merely because they are currently
 `unavailable` or `unknown`. They remain pending and are retried until the
