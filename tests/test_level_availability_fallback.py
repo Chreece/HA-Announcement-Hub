@@ -51,3 +51,27 @@ def test_never_remains_a_hard_tts_disable_except_critical() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
     assert "tts_hard_disabled" in manager
     assert "minimum_tts_level == TTS_LEVEL_NEVER" in manager
+
+
+def test_requested_tts_is_selected_independently_from_visual_notifications() -> None:
+    manager=(C/"manager.py").read_text(encoding="utf-8")
+    start=manager.index("# Resolve the audible channel independently")
+    end=manager.index("# TTS has a stronger availability contract", start)
+    block=manager[start:end]
+    assert "tts_requested = bool(text_tts or level == LEVEL_CRITICAL)" in block
+    assert "tts_candidates = [" in block
+    assert "tts_normal_available" in block
+    assert "elif tts_available:" in block
+    assert "tts_normal_configured" in block
+    assert "chosen.extend(" in block
+    assert "force_tts = force_tts or tts_relaxed" in block
+    assert "text_notify" not in block
+
+
+def test_tts_fallback_is_not_blocked_only_because_level_was_relaxed() -> None:
+    manager=(C/"manager.py").read_text(encoding="utf-8")
+    start=manager.index("tts_must_output = bool(", manager.index(") = routed_plan("))
+    end=manager.index("if (", start)
+    block=manager[start:end]
+    assert "minimum_tts_level != TTS_LEVEL_NEVER" in block
+    assert "tts_allowed_for_level" not in block
