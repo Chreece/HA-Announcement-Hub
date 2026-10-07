@@ -33,6 +33,8 @@ helpers, edit automations, or change MPD/Snapserver configuration.
   Companion App TTS) together for the same announcement.
 - Runs visual delivery alongside spoken delivery instead of making one channel
   finish before the other can begin.
+- Resolves TTS and visual level routing independently, so adding a visual
+  notification cannot suppress an otherwise valid spoken route.
 - Uses available outputs immediately and gives unavailable or transiently
   failing outputs one configurable retry window before recording a timeout.
 - Supports visible notifications through modern `notify.*` entities and legacy
