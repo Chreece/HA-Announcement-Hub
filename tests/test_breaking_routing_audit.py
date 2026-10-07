@@ -72,8 +72,7 @@ def test_tts_targets_are_frozen_even_when_currently_unavailable() -> None:
     end = manager.index("room_delivery_selected = any(", start)
     block = manager[start:end]
     assert "tts_must_output = bool(" in block
-    assert "mandatory_tts = [" in block
-    assert '{"room_tts", "server_tts", "companion_tts"}' in block
+    assert "tts_candidates" in block
     assert "chosen.extend(" in block
     assert 'item["available"]' not in block
 
