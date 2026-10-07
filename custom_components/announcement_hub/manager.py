@@ -1208,29 +1208,94 @@ class AnnouncementManager:
                         for item in room_chosen
                     )
 
-            # TTS has a stronger availability contract than visual delivery:
-            # when speech is required, every selected TTS target remains frozen
-            # into the job even if it is currently unavailable/unknown. The
-            # delivery loops then wait for each path until the configured
-            # availability timeout instead of silently dropping it at planning.
-            tts_must_output = bool(
-                (text_tts or level == LEVEL_CRITICAL)
-                and tts_allowed_for_level(level, minimum_tts_level)
-            )
-            if tts_must_output:
-                mandatory_tts = [
-                    item
-                    for item in candidates
-                    if item["kind"]
-                    in {"room_tts", "server_tts", "companion_tts"}
-                    and item["native_text"]
+            # Resolve the audible channel independently from visual
+            # notifications. A matching/available notify output must never
+            # suppress requested TTS just because it satisfied the global
+            # candidate pass first.
+            tts_requested = bool(text_tts or level == LEVEL_CRITICAL)
+            tts_candidates = [
+                item
+                for item in candidates
+                if item["kind"]
+                in {"room_tts", "server_tts", "companion_tts"}
+                and item["native_text"]
+            ]
+            tts_selected: list[dict[str, Any]] = []
+            tts_relaxed = False
+            if tts_requested and not tts_hard_disabled and tts_candidates:
+                tts_available = [
+                    item for item in tts_candidates if item["available"]
                 ]
+                tts_normal_available = [
+                    item
+                    for item in tts_available
+                    if actual_priority
+                    >= LEVEL_PRIORITY.get(
+                        item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
+                    )
+                ]
+                if tts_normal_available:
+                    tts_selected = tts_normal_available
+                elif tts_available:
+                    tts_distance = min(
+                        self._level_distance(level, item["minimum"])
+                        for item in tts_available
+                    )
+                    tts_selected = [
+                        item
+                        for item in tts_available
+                        if self._level_distance(level, item["minimum"])
+                        == tts_distance
+                    ]
+                    tts_relaxed = True
+                else:
+                    tts_normal_configured = [
+                        item
+                        for item in tts_candidates
+                        if actual_priority
+                        >= LEVEL_PRIORITY.get(
+                            item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
+                        )
+                    ]
+                    if tts_normal_configured:
+                        tts_selected = tts_normal_configured
+                    else:
+                        tts_distance = min(
+                            self._level_distance(level, item["minimum"])
+                            for item in tts_candidates
+                        )
+                        tts_selected = [
+                            item
+                            for item in tts_candidates
+                            if self._level_distance(level, item["minimum"])
+                            == tts_distance
+                        ]
+                        tts_relaxed = True
+
                 chosen_keys = {
                     (item["kind"], item["id"]) for item in chosen
                 }
                 chosen.extend(
                     item
-                    for item in mandatory_tts
+                    for item in tts_selected
+                    if (item["kind"], item["id"]) not in chosen_keys
+                )
+                force_tts = force_tts or tts_relaxed
+
+            # TTS has a stronger availability contract than visual delivery:
+            # once the audible channel is selected, keep every matching TTS
+            # target frozen into the job even if unavailable/unknown. The
+            # delivery loops then wait for each path until timeout.
+            tts_must_output = bool(
+                tts_requested and not tts_hard_disabled and tts_candidates
+            )
+            if tts_must_output:
+                chosen_keys = {
+                    (item["kind"], item["id"]) for item in chosen
+                }
+                chosen.extend(
+                    item
+                    for item in tts_candidates
                     if (item["kind"], item["id"]) not in chosen_keys
                 )
 
@@ -1321,7 +1386,10 @@ class AnnouncementManager:
 
         tts_must_output = bool(
             (text_tts or level == LEVEL_CRITICAL)
-            and tts_allowed_for_level(level, minimum_tts_level)
+            and (
+                minimum_tts_level != TTS_LEVEL_NEVER
+                or level == LEVEL_CRITICAL
+            )
         )
         if (
             tts_must_output
