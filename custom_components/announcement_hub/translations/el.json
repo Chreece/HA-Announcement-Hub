@@ -131,7 +131,7 @@
           "critical_notify_data": "Provider-specific δεδομένα που συγχωνεύονται μόνο στις Critical οπτικές ειδοποιήσεις, π.χ. priority/urgency επιλογές που υποστηρίζει η integration.",
           "occupancy_sensor": "Η οντότητα της οποίας το state ή επιλεγμένο attribute περιέχει τα ονόματα/ID των κατειλημμένων περιοχών Home Assistant. Χρησιμοποιείται μόνο όταν ένα send action έχει occupied-only routing.",
           "occupancy_attribute": "Επίλεξε αν τα occupied rooms διαβάζονται από το state της οντότητας ή από ένα από τα τρέχοντα attributes της.",
-          "fallback_room": "Fallback περιοχή TTS που χρησιμοποιείται μόνο όταν τα τρέχοντα target rooms δεν έχουν κανέναν fixed TTS candidate. Οι unavailable/unknown TTS candidates εξακολουθούν να μετρούν και περιμένουν μέχρι το availability timeout.",
+          "fallback_room": "Fallback περιοχή TTS που χρησιμοποιείται μόνο όταν τα τρέχοντα target rooms δεν έχουν κανέναν fixed room candidate. Υπάρχοντες fixed room candidates, ακόμη και unavailable/unknown, μπλοκάρουν το fallback και παραμένουν στο κανονικό availability timeout.",
           "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν κατάλληλος door sensor σε ένα από τα τρέχοντα target rooms αναφέρει ρητά ανοιχτός.",
           "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors στα τρέχοντα target rooms."
         }
@@ -283,7 +283,7 @@
           "critical_notify_data": "Provider-specific δεδομένα που συγχωνεύονται μόνο στις Critical οπτικές ειδοποιήσεις, π.χ. priority/urgency επιλογές που υποστηρίζει η integration.",
           "occupancy_sensor": "Η οντότητα της οποίας το state ή επιλεγμένο attribute περιέχει τα ονόματα/ID των κατειλημμένων περιοχών Home Assistant. Χρησιμοποιείται μόνο όταν ένα send action έχει occupied-only routing.",
           "occupancy_attribute": "Επίλεξε αν τα occupied rooms διαβάζονται από το state της οντότητας ή από ένα από τα τρέχοντα attributes της.",
-          "fallback_room": "Fallback περιοχή TTS που χρησιμοποιείται μόνο όταν τα τρέχοντα target rooms δεν έχουν κανέναν fixed TTS candidate. Οι unavailable/unknown TTS candidates εξακολουθούν να μετρούν και περιμένουν μέχρι το availability timeout.",
+          "fallback_room": "Fallback περιοχή TTS που χρησιμοποιείται μόνο όταν τα τρέχοντα target rooms δεν έχουν κανέναν fixed room candidate. Υπάρχοντες fixed room candidates, ακόμη και unavailable/unknown, μπλοκάρουν το fallback και παραμένουν στο κανονικό availability timeout.",
           "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν κατάλληλος door sensor σε ένα από τα τρέχοντα target rooms αναφέρει ρητά ανοιχτός.",
           "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors στα τρέχοντα target rooms."
         }

@@ -35,12 +35,12 @@ def test_occupied_only_defaults_true_and_does_not_touch_task_lifecycle() -> None
 
 
 
-def test_fallback_requires_zero_fixed_tts_candidates_and_open_target_door() -> None:
+def test_fallback_requires_zero_fixed_room_candidates_and_open_target_door() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     config_flow = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
-    assert "target_fixed_tts_candidate_exists" in manager
-    assert "and not target_fixed_tts_candidate_exists" in manager
-    assert 'item["kind"] in {"room_tts", "server_tts"}' in manager
+    assert "target_room_candidate_exists" in manager
+    assert "and not target_room_candidate_exists" in manager
+    assert "room_candidate_exists = bool(room_candidates)" in manager
     assert "tts_only=True" in manager
     assert "def _fallback_area_id(" in manager
     assert "def _fallback_door_allows(self, target_area_ids" in manager

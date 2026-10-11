@@ -1044,15 +1044,9 @@ class AnnouncementManager:
             room_candidates = [
                 item for item in candidates if item["fixed_room"]
             ]
-            fixed_tts_candidates = [
-                item
-                for item in room_candidates
-                if item["kind"] in {"room_tts", "server_tts"}
-                and item["native_text"]
-            ]
-            fixed_tts_candidate_exists = bool(fixed_tts_candidates)
-            fixed_tts_candidate_available = any(
-                item["available"] for item in fixed_tts_candidates
+            room_candidate_exists = bool(room_candidates)
+            room_candidate_available = any(
+                item["available"] for item in room_candidates
             )
             available = [item for item in candidates if item["available"]]
             normal_available = [
@@ -1215,10 +1209,11 @@ class AnnouncementManager:
                         for item in room_chosen
                     )
 
-            # Resolve the audible channel independently from visual
-            # notifications. A matching/available notify output must never
-            # suppress requested TTS just because it satisfied the global
-            # candidate pass first.
+            # TTS follows the same room-level selection as every other
+            # fixed output. A below-threshold TTS path is relaxed only when the
+            # normal candidate selection (including the target-room requirement)
+            # actually selected TTS as the nearest usable tier. Merely requesting
+            # text_tts must not bypass an available same-room visual candidate.
             tts_requested = bool(text_tts or level == LEVEL_CRITICAL)
             tts_candidates = [
                 item
@@ -1227,75 +1222,18 @@ class AnnouncementManager:
                 in {"room_tts", "server_tts", "companion_tts"}
                 and item["native_text"]
             ]
-            tts_selected: list[dict[str, Any]] = []
-            tts_relaxed = False
-            if tts_requested and not tts_hard_disabled and tts_candidates:
-                tts_available = [
-                    item for item in tts_candidates if item["available"]
-                ]
-                tts_normal_available = [
-                    item
-                    for item in tts_available
-                    if actual_priority
-                    >= LEVEL_PRIORITY.get(
-                        item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
-                    )
-                ]
-                if tts_normal_available:
-                    tts_selected = tts_normal_available
-                elif tts_available:
-                    tts_distance = min(
-                        self._level_distance(level, item["minimum"])
-                        for item in tts_available
-                    )
-                    tts_selected = [
-                        item
-                        for item in tts_available
-                        if self._level_distance(level, item["minimum"])
-                        == tts_distance
-                    ]
-                    tts_relaxed = True
-                else:
-                    tts_normal_configured = [
-                        item
-                        for item in tts_candidates
-                        if actual_priority
-                        >= LEVEL_PRIORITY.get(
-                            item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
-                        )
-                    ]
-                    if tts_normal_configured:
-                        tts_selected = tts_normal_configured
-                    else:
-                        tts_distance = min(
-                            self._level_distance(level, item["minimum"])
-                            for item in tts_candidates
-                        )
-                        tts_selected = [
-                            item
-                            for item in tts_candidates
-                            if self._level_distance(level, item["minimum"])
-                            == tts_distance
-                        ]
-                        tts_relaxed = True
-
-                chosen_keys = {
-                    (item["kind"], item["id"]) for item in chosen
-                }
-                chosen.extend(
-                    item
-                    for item in tts_selected
-                    if (item["kind"], item["id"]) not in chosen_keys
-                )
-                force_tts = force_tts or tts_relaxed
-
-            # TTS has a stronger availability contract than visual delivery:
-            # once the audible channel is selected, keep every matching TTS
-            # target frozen into the job even if unavailable/unknown. The
-            # delivery loops then wait for each path until timeout.
-            tts_must_output = bool(
-                tts_requested and not tts_hard_disabled and tts_candidates
+            tts_normally_allowed = bool(
+                tts_requested
+                and not tts_hard_disabled
+                and tts_allowed_for_level(level, minimum_tts_level)
             )
+            tts_must_output = bool(
+                tts_candidates and (tts_normally_allowed or force_tts)
+            )
+
+            # Once TTS is legitimately selected, keep every matching TTS target
+            # frozen into the job even if unavailable/unknown. Ready targets run
+            # immediately and the remaining targets wait until timeout.
             if tts_must_output:
                 chosen_keys = {
                     (item["kind"], item["id"]) for item in chosen
@@ -1372,8 +1310,8 @@ class AnnouncementManager:
                 routed_notify,
                 routed_companion,
                 route_plan,
-                fixed_tts_candidate_exists,
-                fixed_tts_candidate_available,
+                room_candidate_exists,
+                room_candidate_available,
                 room_delivery_selected,
             )
 
@@ -1382,13 +1320,13 @@ class AnnouncementManager:
             notify_records,
             companion_records,
             plan,
-            target_fixed_tts_candidate_exists,
-            _target_fixed_tts_candidate_available,
+            target_room_candidate_exists,
+            _target_room_candidate_available,
             _target_room_delivery_selected,
         ) = routed_plan(
             output_area_ids,
             filter_by_area=area_filter_active,
-            require_room_delivery=occupancy_filter_active,
+            require_room_delivery=target_room_routing_active,
         )
 
         tts_must_output = bool(
@@ -1401,7 +1339,7 @@ class AnnouncementManager:
         if (
             tts_must_output
             and target_room_routing_active
-            and not target_fixed_tts_candidate_exists
+            and not target_room_candidate_exists
         ):
             fallback_area_id = self._fallback_area_id()
             if (
@@ -1413,8 +1351,8 @@ class AnnouncementManager:
                     _fallback_notify_records,
                     _fallback_companion_records,
                     fallback_plan,
-                    fallback_fixed_tts_candidate_exists,
-                    _fallback_fixed_tts_candidate_available,
+                    fallback_room_candidate_exists,
+                    _fallback_room_candidate_available,
                     fallback_room_delivery_selected,
                 ) = routed_plan(
                     (fallback_area_id,),
@@ -1423,7 +1361,7 @@ class AnnouncementManager:
                     tts_only=True,
                 )
                 if (
-                    fallback_fixed_tts_candidate_exists
+                    fallback_room_candidate_exists
                     and fallback_room_delivery_selected
                     and fallback_plan.has_audible_output
                 ):
@@ -1457,7 +1395,7 @@ class AnnouncementManager:
                     )
                     _LOGGER.debug(
                         "Announcement routed TTS to fallback area %s because "
-                        "the target area(s) had no fixed TTS candidate",
+                        "the target area(s) had no fixed room candidate",
                         fallback_area_id,
                     )
 

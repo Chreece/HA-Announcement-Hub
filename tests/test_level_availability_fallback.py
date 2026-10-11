@@ -53,25 +53,23 @@ def test_never_remains_a_hard_tts_disable_except_critical() -> None:
     assert "minimum_tts_level == TTS_LEVEL_NEVER" in manager
 
 
-def test_requested_tts_is_selected_independently_from_visual_notifications() -> None:
+def test_room_level_candidate_prevents_unnecessary_tts_relaxation() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
-    start=manager.index("# Resolve the audible channel independently")
-    end=manager.index("# TTS has a stronger availability contract", start)
+    start=manager.index("# TTS follows the same room-level selection")
+    end=manager.index("room_delivery_selected = any(", start)
     block=manager[start:end]
-    assert "tts_requested = bool(text_tts or level == LEVEL_CRITICAL)" in block
-    assert "tts_candidates = [" in block
-    assert "tts_normal_available" in block
-    assert "elif tts_available:" in block
-    assert "tts_normal_configured" in block
-    assert "chosen.extend(" in block
-    assert "force_tts = force_tts or tts_relaxed" in block
-    assert "text_notify" not in block
+    assert "tts_normally_allowed" in block
+    assert "tts_allowed_for_level(level, minimum_tts_level)" in block
+    assert "tts_must_output = bool(" in block
+    assert "tts_candidates and (tts_normally_allowed or force_tts)" in block
+    assert "tts_relaxed" not in block
 
 
-def test_tts_fallback_is_not_blocked_only_because_level_was_relaxed() -> None:
+def test_below_threshold_tts_can_still_be_selected_as_room_fallback() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
-    start=manager.index("tts_must_output = bool(", manager.index(") = routed_plan("))
-    end=manager.index("if (", start)
-    block=manager[start:end]
-    assert "minimum_tts_level != TTS_LEVEL_NEVER" in block
-    assert "tts_allowed_for_level" not in block
+    room_start=manager.index("if require_room_delivery:")
+    room_end=manager.index("# TTS follows the same room-level selection", room_start)
+    room_block=manager[room_start:room_end]
+    assert "room_normal_available" in room_block
+    assert "elif room_available:" in room_block
+    assert "force_tts = force_tts or any(" in room_block
