@@ -223,19 +223,26 @@ announcement concurrently.
 Placement and styling are delivered through the provider's advanced legacy notify action when available. On modern config-entry installations where that action is absent or named differently, Announcement Hub uses the integration's live runtime client in an executor, preserving position, duration, font, colour, transparency, and interrupt without falling back to generic `notify.send_message`.
 
 For room-routing availability, Announcement Hub automatically associates an
-NFAndroidTV notification output with the physical TV's `media_player` when
-Home Assistant exposes a reliable identity link. It first accepts a shared
-device-registry device; otherwise it compares the NFAndroidTV config entry's
-configured host/IP with media-player config entries. If more than one exact host
-match exists, the Home Assistant area is used only to disambiguate those exact
-matches.
+NFAndroidTV notification output with the physical TV's `media_player` observers
+when Home Assistant exposes a reliable identity link. It first accepts media
+players on the same device-registry device; otherwise it compares the
+NFAndroidTV config entry's configured host/IP with media-player config entries.
+An exact host may legitimately have several observers when the same TV is
+exposed through Android TV, Android TV Remote, Bravia, or another integration.
+Those observers are kept as one physical-endpoint group instead of being treated
+as an ambiguous match. Home Assistant area is used only to narrow an already
+exact host match when matching observers exist in the notification output's area.
 
-When an associated media player is `off`, `unavailable`, or `unknown`, the
-NFAndroidTV visual output is treated as unavailable even if its `notify.*`
-entity/service still exists. This allows the room's TTS tier to be selected
-instead. Names and friendly names are never used to infer an association; if no
-unique strong match exists, Announcement Hub keeps the normal notify-transport
-availability behavior rather than guessing.
+Power state is evaluated conservatively across the whole observer group. Any
+observer that positively reports an active state keeps visual delivery eligible.
+The NFAndroidTV visual output is treated as unavailable only when every reliable
+observer is `off`, `standby`, `unavailable`, `unknown`, or has no state. This
+allows the room's TTS tier to be selected when the display cannot be shown,
+without letting one stale/disconnected integration override another observer
+that proves the TV is on. Entity IDs, friendly names, model strings, and fuzzy
+text similarity are never used to infer an association. If no strong
+device/host association exists, Announcement Hub keeps normal notify-transport
+availability rather than guessing.
 
 The native legacy notification action is used when available so each profile
 can control:
