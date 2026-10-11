@@ -222,6 +222,20 @@ announcement concurrently.
 
 Placement and styling are delivered through the provider's advanced legacy notify action when available. On modern config-entry installations where that action is absent or named differently, Announcement Hub uses the integration's live runtime client in an executor, preserving position, duration, font, colour, transparency, and interrupt without falling back to generic `notify.send_message`.
 
+For room-routing availability, Announcement Hub automatically associates an
+NFAndroidTV notification output with the physical TV's `media_player` when
+Home Assistant exposes a reliable identity link. It first accepts a shared
+device-registry device; otherwise it compares the NFAndroidTV config entry's
+configured host/IP with media-player config entries. If more than one exact host
+match exists, the Home Assistant area is used only to disambiguate those exact
+matches.
+
+When an associated media player is `off`, `unavailable`, or `unknown`, the
+NFAndroidTV visual output is treated as unavailable even if its `notify.*`
+entity/service still exists. This allows the room's TTS tier to be selected
+instead. Names and friendly names are never used to infer an association; if no
+unique strong match exists, Announcement Hub keeps the normal notify-transport
+availability behavior rather than guessing.
 
 The native legacy notification action is used when available so each profile
 can control:
