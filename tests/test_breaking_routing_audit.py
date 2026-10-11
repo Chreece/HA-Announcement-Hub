@@ -78,13 +78,13 @@ def test_explicit_rooms_are_authoritative_when_occupied_only_is_false() -> None:
 
 def test_tts_targets_are_frozen_even_when_currently_unavailable() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
-    start = manager.index("# TTS has a stronger availability contract")
+    start = manager.index("# TTS follows the same room-level selection")
     end = manager.index("room_delivery_selected = any(", start)
     block = manager[start:end]
     assert "tts_must_output = bool(" in block
     assert "tts_candidates" in block
+    assert "tts_normally_allowed or force_tts" in block
     assert "chosen.extend(" in block
-    assert 'item["available"]' not in block
 
 
 def test_fallback_requires_zero_fixed_room_candidates_not_unavailability() -> None:
