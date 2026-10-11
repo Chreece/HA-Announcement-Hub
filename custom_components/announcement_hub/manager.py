@@ -1148,32 +1148,43 @@ class AnnouncementManager:
                         == room_distance
                     ]
                 elif room_candidates:
-                    # No fixed room candidate is available. Preserve the
-                    # configured fixed room candidates so the normal
-                    # availability timeout can wait for one, even when a
-                    # moveable/general output is immediately usable.
-                    room_normal_configured = [
+                    # No fixed room candidate is available right now. If the
+                    # room has a TTS path, make that the room delivery fallback
+                    # instead of letting an unavailable normal-level visual
+                    # output suppress speech. Once selected, unavailable/unknown
+                    # TTS targets stay frozen and wait until the availability
+                    # timeout. If there is no room TTS path at all, preserve the
+                    # normal configured visual candidate and wait for it.
+                    room_tts_wait_candidates = [
                         item
                         for item in room_candidates
-                        if item["native_text"]
-                        and actual_priority
-                        >= LEVEL_PRIORITY.get(
-                            item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
-                        )
+                        if item["kind"] in {"room_tts", "server_tts"}
                     ]
-                    if room_normal_configured:
-                        room_chosen = room_normal_configured
+                    if room_tts_wait_candidates:
+                        room_chosen = room_tts_wait_candidates
                     else:
-                        room_distance = min(
-                            self._level_distance(level, item["minimum"])
-                            for item in room_candidates
-                        )
-                        room_chosen = [
+                        room_normal_configured = [
                             item
                             for item in room_candidates
-                            if self._level_distance(level, item["minimum"])
-                            == room_distance
+                            if item["native_text"]
+                            and actual_priority
+                            >= LEVEL_PRIORITY.get(
+                                item["minimum"], LEVEL_PRIORITY[LEVEL_INFO]
+                            )
                         ]
+                        if room_normal_configured:
+                            room_chosen = room_normal_configured
+                        else:
+                            room_distance = min(
+                                self._level_distance(level, item["minimum"])
+                                for item in room_candidates
+                            )
+                            room_chosen = [
+                                item
+                                for item in room_candidates
+                                if self._level_distance(level, item["minimum"])
+                                == room_distance
+                            ]
 
                 if room_chosen:
                     chosen_keys = {

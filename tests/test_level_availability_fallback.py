@@ -73,3 +73,15 @@ def test_below_threshold_tts_can_still_be_selected_as_room_fallback() -> None:
     assert "room_normal_available" in room_block
     assert "elif room_available:" in room_block
     assert "force_tts = force_tts or any(" in room_block
+
+
+def test_unavailable_normal_room_output_can_promote_tts_fallback_tier() -> None:
+    manager=(C/"manager.py").read_text(encoding="utf-8")
+    room_start=manager.index("if require_room_delivery:")
+    room_end=manager.index("# TTS follows the same room-level selection", room_start)
+    room_block=manager[room_start:room_end]
+    assert "room_normal_available" in room_block
+    assert "elif room_available:" in room_block
+    assert "room_tts_wait_candidates" in room_block
+    assert "room_chosen = room_tts_wait_candidates" in room_block
+    assert "force_tts = force_tts or any(" in room_block

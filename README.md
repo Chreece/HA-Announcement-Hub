@@ -270,16 +270,22 @@ TV/Snapcast/direct TTS outputs count as fixed candidates. Mobile App notificatio
 outputs and Companion App TTS outputs are moveable and never count as proof that
 the occupied room itself has a delivery candidate.
 
-Fixed room candidates are filtered by the announcement level first. For example,
-if the room has an Info-capable NFAndroidTV output and TTS begins at Warning, an
-Info announcement uses the NFAndroidTV output and TTS remains suppressed. Only
-when no fixed-room candidate survives the level filter does Announcement Hub
-relax to the nearest fixed-room tier.
+Fixed room candidates are filtered by the announcement level and current
+availability first. For example, if the room has an available Info-capable
+NFAndroidTV output and TTS begins at Warning, an Info announcement uses the
+NFAndroidTV output and TTS remains suppressed.
 
-Fallback is based on **fixed room candidate existence, not current
-availability**. If any fixed room candidate exists in the target room set,
-including an unavailable/unknown one, that room remains the target and its
-selected path is waited for until the configured output-availability timeout.
+If that normal-level fixed room output is unavailable/off but the same room has a
+configured TTS route, Announcement Hub selects the room TTS path as the fallback
+delivery tier instead of letting a General/movable notification satisfy the
+room. If the selected TTS path is itself unavailable or unknown, it is kept in
+the job and waited for until the configured output-availability timeout. If the
+room has no TTS path at all, the unavailable normal-level fixed visual output is
+kept as the wait target instead.
+
+Fallback **to another room** is still based on fixed room candidate existence,
+not current availability. Any fixed room candidate in the target room prevents
+cross-room fallback.
 
 The configured fallback room is considered only when the target room set has
 **zero fixed room candidates at all**. **Fallback is TTS-only**: the original
