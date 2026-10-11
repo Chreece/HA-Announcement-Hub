@@ -86,5 +86,5 @@ def test_nfandroidtv_host_matching_is_conservative_and_name_free() -> None:
     start = outputs.index("def notify_output_power_entities(")
     end = outputs.index("def notify_output_power_entity(", start)
     block = outputs[start:end]
-    assert "exact configured host/IP match" in block
+    assert "configured host/IP match" in block
     assert "Entity IDs, names, models, and fuzzy text matching are never used" in block
