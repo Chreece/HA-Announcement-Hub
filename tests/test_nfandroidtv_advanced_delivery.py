@@ -34,3 +34,40 @@ def test_direct_legacy_service_keeps_integration_and_area_binding() -> None:
     assert "slugify(str(entry.title)) != object_id" in outputs
     assert "integration = str(entry.domain)" in outputs
     assert "resolved_area = entry_area_id(hass, entry.entry_id)" in outputs
+
+
+def test_nfandroidtv_power_entity_uses_strong_identity_links_only() -> None:
+    outputs = (COMPONENT / "outputs.py").read_text(encoding="utf-8")
+    start = outputs.index("def notify_output_power_entity(")
+    end = outputs.index("def area_name(", start)
+    block = outputs[start:end]
+    assert "output.integration != INTEGRATION_NFANDROIDTV" in block
+    assert "notify_device_id" in block
+    assert "_config_entry_host(notify_entry)" in block
+    assert "_config_entry_host(media_entry) == notify_host" in block
+    assert "len(host_matches) == 1" in block
+    assert "output.area_id and host_matches" in block
+    assert "len(same_area) == 1" in block
+    assert "entity_name(" not in block
+    assert "friendly_name" not in block
+
+
+def test_nfandroidtv_power_state_blocks_visual_candidate_when_tv_is_off() -> None:
+    outputs = (COMPONENT / "outputs.py").read_text(encoding="utf-8")
+    start = outputs.index("def notify_output_available(")
+    end = outputs.index("def snapcast_output_available(", start)
+    block = outputs[start:end]
+    assert "notify_output_power_entity(hass, output)" in block
+    assert "power_state = hass.states.get(power_entity)" in block
+    assert "STATE_OFF" in block
+    assert "STATE_UNAVAILABLE" in block
+    assert "STATE_UNKNOWN" in block
+    assert "return False" in block
+
+
+def test_nfandroidtv_host_matching_is_conservative() -> None:
+    outputs = (COMPONENT / "outputs.py").read_text(encoding="utf-8")
+    assert "from homeassistant.const import CONF_HOST" in outputs
+    assert "def _normalise_host(" in outputs
+    assert "def _config_entry_host(" in outputs
+    assert "Ambiguous matches are intentionally ignored" in outputs

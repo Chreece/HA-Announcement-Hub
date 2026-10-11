@@ -9,7 +9,7 @@ from typing import Any
 
 from homeassistant.components import tts
 from homeassistant.components.media_player import MediaPlayerEntityFeature
-from homeassistant.const import STATE_OFF, STATE_UNAVAILABLE, STATE_UNKNOWN
+from homeassistant.const import CONF_HOST, STATE_OFF, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import device_registry as dr
@@ -17,6 +17,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.util import slugify
 
 from .const import (
+    INTEGRATION_NFANDROIDTV,
     TARGET_ENTITY_PREFIX,
     TARGET_ENTRY_PREFIX,
     TARGET_INTEGRATION_PREFIX,
@@ -155,6 +156,91 @@ def entry_area_id(hass: HomeAssistant, entry_id: str) -> str | None:
     }
     if len(device_areas) == 1:
         return next(iter(device_areas))
+    return None
+
+
+def _normalise_host(value: Any) -> str | None:
+    """Return a conservative normalized host/IP identity."""
+    raw = str(value or "").strip().casefold().rstrip(".")
+    if not raw:
+        return None
+    if raw.startswith("[") and raw.endswith("]"):
+        raw = raw[1:-1]
+    return raw or None
+
+
+def _config_entry_host(entry: Any | None) -> str | None:
+    """Return an entry's explicit host/IP when it exposes one."""
+    if entry is None:
+        return None
+    for source in (getattr(entry, "options", None), getattr(entry, "data", None)):
+        if not isinstance(source, Mapping):
+            continue
+        if host := _normalise_host(source.get(CONF_HOST)):
+            return host
+    return None
+
+
+def notify_output_power_entity(
+    hass: HomeAssistant, output: NotifyOutput
+) -> str | None:
+    """Resolve a reliably associated media player for a room notification.
+
+    NFAndroidTV is a notification service and does not expose TV power state on
+    its notify entity. Associate it with a media_player only when Home Assistant
+    provides a strong identity link: the same device-registry device, or an
+    exact configured host/IP match. Ambiguous matches are intentionally ignored.
+    """
+    if output.integration != INTEGRATION_NFANDROIDTV:
+        return None
+
+    entity_registry = er.async_get(hass)
+    media_players = _enabled_registry_entries(
+        hass, entity_domain="media_player"
+    )
+
+    # Prefer a true shared HA device identity when one exists.
+    if output.entity_id:
+        notify_entry = entity_registry.async_get(output.entity_id)
+        notify_device_id = (
+            getattr(notify_entry, "device_id", None)
+            if notify_entry is not None
+            else None
+        )
+        if notify_device_id:
+            same_device = [
+                item.entity_id
+                for item in media_players
+                if getattr(item, "device_id", None) == notify_device_id
+            ]
+            if len(same_device) == 1:
+                return same_device[0]
+
+    notify_entry = _entry(hass, output.config_entry_id)
+    notify_host = _config_entry_host(notify_entry)
+    if not notify_host:
+        return None
+
+    host_matches: list[str] = []
+    for item in media_players:
+        media_entry = _entry(hass, _entity_config_entry_id(item))
+        if _config_entry_host(media_entry) == notify_host:
+            host_matches.append(item.entity_id)
+
+    if len(host_matches) == 1:
+        return host_matches[0]
+
+    # Multiple integrations may expose the same physical TV. Area is allowed
+    # only as a disambiguator after the exact host/IP identity already matched.
+    if output.area_id and host_matches:
+        same_area = [
+            entity_id
+            for entity_id in host_matches
+            if entity_area_id(hass, entity_id) == output.area_id
+        ]
+        if len(same_area) == 1:
+            return same_area[0]
+
     return None
 
 
@@ -896,10 +982,20 @@ def notify_output_legacy_service(
 
 def notify_output_available(hass: HomeAssistant, output: NotifyOutput) -> bool:
     """Return whether a visual output can currently be attempted."""
+    if power_entity := notify_output_power_entity(hass, output):
+        power_state = hass.states.get(power_entity)
+        if power_state is None or power_state.state in {
+            STATE_OFF,
+            STATE_UNAVAILABLE,
+            STATE_UNKNOWN,
+        }:
+            return False
+
     if output.entity_id:
         state = hass.states.get(output.entity_id)
         # NotifyEntity has an unknown state before its first message; that does
-        # not mean the transport is unavailable.
+        # not mean the transport is unavailable. For NFAndroidTV, actual device
+        # power is handled above when a reliable media_player association exists.
         return state is not None and state.state != STATE_UNAVAILABLE
     if output.service:
         domain, separator, service = output.service.partition(".")
