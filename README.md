@@ -1,3 +1,20 @@
+<p align="center">
+  <img src=".github/assets/announcement-hub-banner.svg" alt="Announcement Hub for Home Assistant" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/Chreece/HA-Announcement-Hub/releases"><img alt="GitHub release" src="https://img.shields.io/github/v/release/Chreece/HA-Announcement-Hub?display_name=tag&sort=semver"></a>
+  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/validate.yml"><img alt="Tests" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/validate.yml/badge.svg"></a>
+  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hacs.yml"><img alt="HACS" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hacs.yml/badge.svg"></a>
+  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hassfest.yml"><img alt="Hassfest" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hassfest.yml/badge.svg"></a>
+</p>
+
+<p align="center">
+  <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Chreece&repository=HA-Announcement-Hub&category=integration">
+    <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open Announcement Hub in HACS">
+  </a>
+</p>
+
 <!-- ko-fi-support -->
 <p align="center">
   <a href="https://ko-fi.com/chreece">
