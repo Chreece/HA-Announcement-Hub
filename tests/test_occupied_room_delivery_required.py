@@ -9,10 +9,10 @@ C=ROOT/"custom_components"/"announcement_hub"
 def test_occupancy_routing_still_requires_fixed_room_delivery() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
     call=manager[
-        manager.index("target_fixed_tts_candidate_exists"):
+        manager.index("target_room_candidate_exists"):
         manager.index("fallback_area_id = self._fallback_area_id()")
     ]
-    assert "require_room_delivery=occupancy_filter_active" in call
+    assert "require_room_delivery=target_room_routing_active" in call
 
 
 def test_general_outputs_cannot_suppress_nearest_fixed_room_level() -> None:
