@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.17 - 2026-10-11
+
+- Added automatic association between room-bound NFAndroidTV notification
+  outputs and the physical TV media_player when Home Assistant exposes a
+  reliable identity link.
+- Association first uses a shared Home Assistant device-registry device, then
+  falls back to an exact configured host/IP match between the NFAndroidTV config
+  entry and media-player config entries.
+- If multiple exact host matches exist, Home Assistant area is used only to
+  disambiguate those already-exact matches.
+- Entity IDs, friendly names, and other text similarity are never used to infer
+  an association.
+- When the associated media player is off, unavailable, or unknown, the
+  NFAndroidTV room notification is treated as unavailable even if the notify
+  entity/service itself remains registered.
+- This lets the existing room-routing logic correctly promote the room's TTS
+  tier when the TV is actually off.
+- If no unique strong association can be established, Announcement Hub keeps the
+  existing notify-transport availability behavior instead of guessing.
+
 ## 0.9.16 - 2026-10-11
 
 - Fixed the case where a target room's normal-level visual output is configured
