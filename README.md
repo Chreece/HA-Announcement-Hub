@@ -33,8 +33,9 @@ helpers, edit automations, or change MPD/Snapserver configuration.
   Companion App TTS) together for the same announcement.
 - Runs visual delivery alongside spoken delivery instead of making one channel
   finish before the other can begin.
-- Resolves TTS and visual level routing independently, so adding a visual
-  notification cannot suppress an otherwise valid spoken route.
+- Resolves fixed-room delivery by announcement level first. If a normal-level
+  fixed room output exists, it is used; only when none survives the level filter
+  does Announcement Hub relax to the nearest fixed-room tier.
 - Uses available outputs immediately and gives unavailable or transiently
   failing outputs one configurable retry window before recording a timeout.
 - Supports visible notifications through modern `notify.*` entities and legacy
@@ -269,18 +270,21 @@ TV/Snapcast/direct TTS outputs count as fixed candidates. Mobile App notificatio
 outputs and Companion App TTS outputs are moveable and never count as proof that
 the occupied room itself has a delivery candidate.
 
-For spoken announcements, fallback is based on **candidate existence, not current
-availability**. If any fixed TTS candidate exists in the target room set, that
-candidate is kept in the job even when it is `unavailable` or `unknown`, and
-Announcement Hub waits for it until the configured output-availability timeout.
-The same wait rule applies to selected direct TTS players, Snapcast clients,
-Companion App TTS outputs, the shared TTS player, and the active TTS engine.
+Fixed room candidates are filtered by the announcement level first. For example,
+if the room has an Info-capable NFAndroidTV output and TTS begins at Warning, an
+Info announcement uses the NFAndroidTV output and TTS remains suppressed. Only
+when no fixed-room candidate survives the level filter does Announcement Hub
+relax to the nearest fixed-room tier.
+
+Fallback is based on **fixed room candidate existence, not current
+availability**. If any fixed room candidate exists in the target room set,
+including an unavailable/unknown one, that room remains the target and its
+selected path is waited for until the configured output-availability timeout.
 
 The configured fallback room is considered only when the target room set has
-**zero fixed TTS candidates at all**. A temporarily unavailable/unknown fixed
-TTS candidate therefore blocks fallback and is waited for instead. **Fallback
-is TTS-only**: the original visual/general notifications remain on their
-original outputs while only the spoken route is taken from the fallback room.
+**zero fixed room candidates at all**. **Fallback is TTS-only**: the original
+visual/general notifications remain on their original outputs while only the
+spoken route is taken from the fallback room.
 
 When **Check target-room door before fallback** is enabled, at least one current
 target room must contain a `binary_sensor` with `device_class: door` whose
