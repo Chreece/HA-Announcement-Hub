@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.9.18 - 2026-10-11
+
+- Fixed NFAndroidTV power association when the same physical TV is exposed by
+  multiple Home Assistant media-player integrations on the same exact host/IP.
+- Exact-host media players are now treated as an observer set for one physical
+  notification endpoint instead of making the association fail as ambiguous.
+- Existing shared-device-registry identity remains the strongest association;
+  exact host/IP remains the fallback identity, with area used only to narrow
+  already-exact host matches.
+- Visual delivery stays eligible when any reliable observer positively reports
+  the TV active. TTS fallback is selected only when every observer is off,
+  standby, unavailable, unknown, or missing state.
+- Added `standby` to the power-off states.
+- The association remains vendor-agnostic: entity names, friendly names, models,
+  Sony-specific identifiers, and fuzzy text matching are not used.
+
 ## 0.9.17 - 2026-10-11
 
 - Added automatic association between room-bound NFAndroidTV notification
