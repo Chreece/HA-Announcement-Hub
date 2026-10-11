@@ -134,6 +134,17 @@ from .outputs import (
 )
 
 
+_NF_TRANSPARENCY_TO_SELECTOR = {
+    "0%": "p0",
+    "25%": "p25",
+    "50%": "p50",
+    "75%": "p75",
+    "100%": "p100",
+}
+_NF_TRANSPARENCY_FROM_SELECTOR = {
+    value: key for key, value in _NF_TRANSPARENCY_TO_SELECTOR.items()
+}
+
 def _optional_marker(key: str, value: str | None) -> probatio.Marker:
     if value:
         return probatio.Optional(key, default=value)
@@ -404,6 +415,16 @@ class _AnnouncementFlowMixin:
             if maximum < minimum:
                 errors["base"] = "display_time_order"
             else:
+                if integration == INTEGRATION_NFANDROIDTV:
+                    selector_value = str(
+                        user_input.get(PROFILE_NF_TRANSPARENCY, "")
+                    )
+                    if selector_value in _NF_TRANSPARENCY_FROM_SELECTOR:
+                        user_input = {
+                            **user_input,
+                            PROFILE_NF_TRANSPARENCY:
+                                _NF_TRANSPARENCY_FROM_SELECTOR[selector_value],
+                        }
                 profiles[integration] = normalise_notify_profile(
                     user_input, integration
                 )
@@ -529,10 +550,12 @@ class _AnnouncementFlowMixin:
                     ),
                     probatio.Required(
                         PROFILE_NF_TRANSPARENCY,
-                        default=current[PROFILE_NF_TRANSPARENCY],
+                        default=_NF_TRANSPARENCY_TO_SELECTOR.get(
+                            str(current[PROFILE_NF_TRANSPARENCY]), "p0"
+                        ),
                     ): selector.SelectSelector(
                         selector.SelectSelectorConfig(
-                            options=list(NFANDROIDTV_TRANSPARENCIES),
+                            options=list(_NF_TRANSPARENCY_TO_SELECTOR.values()),
                             mode=selector.SelectSelectorMode.DROPDOWN,
                             translation_key="nfandroidtv_transparency",
                         )
@@ -1007,7 +1030,7 @@ class _AnnouncementFlowMixin:
         sensor = str(self._working.get(CONF_OCCUPANCY_SENSOR, "") or "").strip()
         state = self.hass.states.get(sensor) if sensor else None
         attributes = sorted(str(key) for key in (state.attributes if state else {}))
-        return ["__state__", *attributes]
+        return ["state", *attributes]
 
     async def async_step_occupancy(
         self, user_input: dict[str, Any] | None = None
@@ -1061,14 +1084,14 @@ class _AnnouncementFlowMixin:
 
         options = self._occupancy_attribute_options()
         if user_input is not None:
-            source = str(user_input.get(CONF_OCCUPANCY_ATTRIBUTE, "__state__"))
+            source = str(user_input.get(CONF_OCCUPANCY_ATTRIBUTE, "state"))
             self._working[CONF_OCCUPANCY_ATTRIBUTE] = (
-                "" if source == "__state__" else source
+                "" if source == "state" else source
             )
             return await self.async_step_queue()
 
         current = str(self._working.get(CONF_OCCUPANCY_ATTRIBUTE, "") or "")
-        default = current if current in options else "__state__"
+        default = current if current in options else "state"
         schema = probatio.Schema(
             {
                 probatio.Required(
@@ -1117,9 +1140,9 @@ class _AnnouncementFlowMixin:
             if incoming_sensor:
                 if not had_source_field:
                     return await self.async_step_queue()
-                source = str(user_input.get(CONF_OCCUPANCY_ATTRIBUTE, "__state__"))
+                source = str(user_input.get(CONF_OCCUPANCY_ATTRIBUTE, "state"))
                 self._working[CONF_OCCUPANCY_ATTRIBUTE] = (
-                    "" if source == "__state__" else source
+                    "" if source == "state" else source
                 )
             else:
                 self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
@@ -1163,7 +1186,7 @@ class _AnnouncementFlowMixin:
             state = self.hass.states.get(sensor)
             attributes = sorted(str(key) for key in (state.attributes if state else {}))
             options = [
-                selector.SelectOptionDict(value="__state__", label="State"),
+                selector.SelectOptionDict(value="state", label="State"),
                 *[
                     selector.SelectOptionDict(value=key, label=key)
                     for key in attributes
@@ -1174,7 +1197,7 @@ class _AnnouncementFlowMixin:
             fields[
                 probatio.Required(
                     CONF_OCCUPANCY_ATTRIBUTE,
-                    default=current if current in values else "__state__",
+                    default=current if current in values else "state",
                 )
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
