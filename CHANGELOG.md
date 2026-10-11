@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.15 - 2026-10-11
+
+- Fixed a level-routing regression where TTS could be relaxed independently from
+  an already valid same-room visual output.
+- Fixed-room candidates are now filtered by announcement level first. If a
+  normal-level fixed-room candidate exists, it is used and below-threshold TTS
+  remains suppressed.
+- Only when no fixed-room candidate survives the level filter does Announcement
+  Hub relax to the nearest fixed-room tier.
+- General/movable notifications do not satisfy the fixed-room delivery
+  requirement and therefore cannot suppress the room fallback tier.
+- Once TTS is legitimately selected, unavailable/unknown TTS targets remain
+  frozen in the job and wait for the configured availability timeout.
+- Fallback room routing now requires zero fixed-room candidates in the target
+  room set, not merely zero fixed TTS candidates.
+- Explicit room routing and occupancy routing now use the same fixed-room level
+  selection semantics.
+- Updated README and English, German, and Greek fallback help.
+
 ## 0.9.14 - 2026-10-07
 
 - Fixed a regression where `occupied_only: true` was ignored whenever an
