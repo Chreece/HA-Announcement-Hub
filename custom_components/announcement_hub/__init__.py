@@ -79,6 +79,8 @@ from .outputs import area_name
 
 _LOGGER = logging.getLogger(__name__)
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 
 def _notify_action_description() -> dict[str, Any]:
     """Build the notify.announcement_hub action description."""
