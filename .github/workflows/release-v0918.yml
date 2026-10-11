@@ -1,0 +1,59 @@
+name: Release v0.9.18
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .release-v0918.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate release target
+        shell: bash
+        env:
+          TARGET: 3e2576a9fda20c0603aa024cf1e76e24aba82938
+        run: |
+          set -Eeuo pipefail
+          git cat-file -e "${TARGET}^{commit}"
+          git merge-base --is-ancestor "$TARGET" HEAD
+          VERSION="$(git show "$TARGET:custom_components/announcement_hub/manifest.json" | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')"
+          test "$VERSION" = "0.9.18"
+          git archive "$TARGET" | tar -x -C /tmp/announcement-hub-release
+        continue-on-error: false
+
+      - name: Validate source
+        shell: bash
+        env:
+          TARGET: 3e2576a9fda20c0603aa024cf1e76e24aba82938
+        run: |
+          set -Eeuo pipefail
+          rm -rf /tmp/announcement-hub-release
+          mkdir -p /tmp/announcement-hub-release
+          git archive "$TARGET" | tar -x -C /tmp/announcement-hub-release
+          cd /tmp/announcement-hub-release
+          python -m compileall -q custom_components tests
+          python -m pip install --disable-pip-version-check pytest pyyaml
+          python -m pytest -q
+
+      - name: Create GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: 3e2576a9fda20c0603aa024cf1e76e24aba82938
+        run: |
+          set -Eeuo pipefail
+          if gh release view v0.9.18 >/dev/null 2>&1; then
+            exit 0
+          fi
+          gh release create v0.9.18             --target "$TARGET"             --title "Announcement Hub v0.9.18"             --notes "Fixes NFAndroidTV room power routing when one physical TV is exposed through multiple Home Assistant media-player integrations. Exact-host media players are now treated as observers of the same endpoint; any active observer keeps visual delivery eligible, while TTS fallback is selected only when every reliable observer is off, standby, unavailable, unknown, or missing state. Matching remains vendor-agnostic and name-free. Also makes installer cleanup best-effort after a successful atomic component swap. Runtime validated on real multi-integration TV setups before release."
