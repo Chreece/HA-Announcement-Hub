@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-labelledby="title desc">
+  <title id="title">Announcement Hub for Home Assistant</title>
+  <desc id="desc">Persistent, room-aware announcements across TTS, Snapcast, Companion App and visual notification outputs.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#081725"/>
+      <stop offset="0.55" stop-color="#12314a"/>
+      <stop offset="1" stop-color="#1d4a68"/>
+    </linearGradient>
+    <linearGradient id="bubble" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#416b8c"/>
+      <stop offset="1" stop-color="#2f526f"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000" flood-opacity=".28"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="360" rx="28" fill="url(#bg)"/>
+  <circle cx="1170" cy="80" r="150" fill="#41bdf5" opacity=".055"/>
+  <circle cx="1090" cy="330" r="220" fill="#7dd3fc" opacity=".035"/>
+
+  <g transform="translate(82 68)" filter="url(#shadow)">
+    <path d="M30 34c0-18 14-32 32-32h132c18 0 32 14 32 32v118c0 18-14 32-32 32h-79l-45 48 12-48H62c-18 0-32-14-32-32V34z" fill="url(#bubble)"/>
+    <circle cx="126" cy="93" r="12" fill="#fff"/>
+    <g fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round">
+      <path d="M176 47c15 12 23 27 23 46s-8 34-23 46"/>
+      <path d="M208 31c21 17 33 38 33 62s-12 45-33 62"/>
+      <path d="M242 16c27 22 42 48 42 77s-15 55-42 77"/>
+    </g>
+  </g>
+
+  <g transform="translate(425 93)">
+    <text x="0" y="60" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="64" font-weight="750" letter-spacing="-1.4">Announcement Hub</text>
+    <text x="2" y="112" fill="#b9d6e8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="26" font-weight="500">for Home Assistant</text>
+
+    <g transform="translate(2 158)" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="600">
+      <rect x="0" y="0" width="102" height="36" rx="18" fill="#41bdf5" opacity=".16"/>
+      <text x="51" y="24" text-anchor="middle" fill="#d8f3ff">TTS</text>
+
+      <rect x="116" y="0" width="142" height="36" rx="18" fill="#41bdf5" opacity=".16"/>
+      <text x="187" y="24" text-anchor="middle" fill="#d8f3ff">Snapcast</text>
+
+      <rect x="272" y="0" width="194" height="36" rx="18" fill="#41bdf5" opacity=".16"/>
+      <text x="369" y="24" text-anchor="middle" fill="#d8f3ff">Room-aware</text>
+
+      <rect x="480" y="0" width="180" height="36" rx="18" fill="#41bdf5" opacity=".16"/>
+      <text x="570" y="24" text-anchor="middle" fill="#d8f3ff">Persistent queue</text>
+    </g>
+
+    <text x="2" y="246" fill="#a7c5d8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">
+      One native queue for spoken announcements and visible notifications.
+    </text>
+  </g>
+</svg>

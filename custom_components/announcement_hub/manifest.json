@@ -1,6 +1,11 @@
 {
   "domain": "announcement_hub",
   "name": "Announcement Hub",
+  "after_dependencies": [
+    "snapcast",
+    "mobile_app",
+    "nfandroidtv"
+  ],
   "codeowners": [
     "@Chreece"
   ],
@@ -10,13 +15,9 @@
     "tts",
     "notify"
   ],
-  "after_dependencies": [
-    "snapcast",
-    "mobile_app",
-    "nfandroidtv"
-  ],
-  "integration_type": "service",
-  "version": "0.9.18",
   "documentation": "https://github.com/Chreece/HA-Announcement-Hub",
-  "issue_tracker": "https://github.com/Chreece/HA-Announcement-Hub/issues"
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/Chreece/HA-Announcement-Hub/issues",
+  "version": "0.9.18"
 }
