@@ -87,18 +87,18 @@ def test_tts_targets_are_frozen_even_when_currently_unavailable() -> None:
     assert 'item["available"]' not in block
 
 
-def test_fallback_requires_zero_fixed_tts_candidates_not_unavailability() -> None:
+def test_fallback_requires_zero_fixed_room_candidates_not_unavailability() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
-    assert "fixed_tts_candidate_exists = bool(fixed_tts_candidates)" in manager
-    assert "and not target_fixed_tts_candidate_exists" in manager
-    start = manager.index("target_fixed_tts_candidate_exists")
+    assert "room_candidate_exists = bool(room_candidates)" in manager
+    assert "and not target_room_candidate_exists" in manager
+    start = manager.index("target_room_candidate_exists")
     fallback = manager[
         start:
         manager.index("notify_output_areas = {", start)
     ]
     assert "target_room_routing_active" in fallback
-    assert "_target_fixed_tts_candidate_available" in fallback
-    assert "not _target_fixed_tts_candidate_available" not in fallback
+    assert "_target_room_candidate_available" in fallback
+    assert "not _target_room_candidate_available" not in fallback
 
 
 def test_fallback_door_rule_uses_current_target_rooms() -> None:
