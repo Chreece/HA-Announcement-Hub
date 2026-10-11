@@ -9,7 +9,13 @@ from typing import Any
 
 from homeassistant.components import tts
 from homeassistant.components.media_player import MediaPlayerEntityFeature
-from homeassistant.const import CONF_HOST, STATE_OFF, STATE_UNAVAILABLE, STATE_UNKNOWN
+from homeassistant.const import (
+    CONF_HOST,
+    STATE_OFF,
+    STATE_STANDBY,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import device_registry as dr
@@ -181,25 +187,33 @@ def _config_entry_host(entry: Any | None) -> str | None:
     return None
 
 
-def notify_output_power_entity(
+def notify_output_power_entities(
     hass: HomeAssistant, output: NotifyOutput
-) -> str | None:
-    """Resolve a reliably associated media player for a room notification.
+) -> tuple[str, ...]:
+    """Resolve reliable media-player observers for an NFAndroidTV output.
 
-    NFAndroidTV is a notification service and does not expose TV power state on
-    its notify entity. Associate it with a media_player only when Home Assistant
-    provides a strong identity link: the same device-registry device, or an
-    exact configured host/IP match. Ambiguous matches are intentionally ignored.
+    NFAndroidTV exposes notification transport state, not physical display power.
+    A shared device-registry device is the strongest link. Otherwise an exact
+    configured host/IP match links the notification endpoint to every enabled
+    media_player observing that same endpoint.
+
+    Multiple matching media players are expected when Home Assistant exposes the
+    same TV through more than one integration. They are kept as an observer set
+    rather than treated as an ambiguity. Area is used only to narrow an already
+    exact host match when at least one matching observer is in the output area.
+    Entity IDs, names, models, and fuzzy text matching are never used.
     """
     if output.integration != INTEGRATION_NFANDROIDTV:
-        return None
+        return ()
 
     entity_registry = er.async_get(hass)
     media_players = _enabled_registry_entries(
         hass, entity_domain="media_player"
     )
 
-    # Prefer a true shared HA device identity when one exists.
+    # Prefer a true shared HA device identity when one exists. Keep every media
+    # player on that device because integrations may legitimately expose more
+    # than one observer for the same physical endpoint.
     if output.entity_id:
         notify_entry = entity_registry.async_get(output.entity_id)
         notify_device_id = (
@@ -208,41 +222,88 @@ def notify_output_power_entity(
             else None
         )
         if notify_device_id:
-            same_device = [
+            same_device = tuple(
                 item.entity_id
                 for item in media_players
                 if getattr(item, "device_id", None) == notify_device_id
-            ]
-            if len(same_device) == 1:
-                return same_device[0]
+            )
+            if same_device:
+                return same_device
 
     notify_entry = _entry(hass, output.config_entry_id)
     notify_host = _config_entry_host(notify_entry)
     if not notify_host:
-        return None
+        return ()
 
-    host_matches: list[str] = []
-    for item in media_players:
-        media_entry = _entry(hass, _entity_config_entry_id(item))
-        if _config_entry_host(media_entry) == notify_host:
-            host_matches.append(item.entity_id)
+    host_matches = [
+        item.entity_id
+        for item in media_players
+        if _config_entry_host(
+            _entry(hass, _entity_config_entry_id(item))
+        )
+        == notify_host
+    ]
+    if not host_matches:
+        return ()
 
-    if len(host_matches) == 1:
-        return host_matches[0]
-
-    # Multiple integrations may expose the same physical TV. Area is allowed
-    # only as a disambiguator after the exact host/IP identity already matched.
-    if output.area_id and host_matches:
+    # Exact host/IP is the physical-endpoint identity. If HA has area metadata,
+    # use it only to discard same-host observers explicitly assigned elsewhere.
+    # Never require a single remaining entity: multiple integrations can expose
+    # the same TV and should contribute power-state evidence together.
+    if output.area_id:
         same_area = [
             entity_id
             for entity_id in host_matches
             if entity_area_id(hass, entity_id) == output.area_id
         ]
-        if len(same_area) == 1:
-            return same_area[0]
+        if same_area:
+            host_matches = same_area
 
-    return None
+    return tuple(dict.fromkeys(host_matches))
 
+
+def notify_output_power_entity(
+    hass: HomeAssistant, output: NotifyOutput
+) -> str | None:
+    """Return the sole associated power entity, when exactly one exists.
+
+    Kept for compatibility with code that used the v0.9.17 singular helper.
+    Availability routing uses the full observer set instead.
+    """
+    candidates = notify_output_power_entities(hass, output)
+    return candidates[0] if len(candidates) == 1 else None
+
+
+_POWER_OFF_STATES = {
+    STATE_OFF,
+    STATE_STANDBY,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
+}
+
+
+def notify_output_power_available(
+    hass: HomeAssistant, output: NotifyOutput
+) -> bool | None:
+    """Return physical display availability from all reliable observers.
+
+    None means no reliable power association exists and normal notify transport
+    availability should be used. With an observer set, any positive state keeps
+    visual delivery eligible. The display is considered unavailable only when
+    every observer is off/standby/unavailable/unknown or has no state. This
+    avoids one stale or disconnected integration overriding another integration
+    that can positively prove the same TV is on.
+    """
+    candidates = notify_output_power_entities(hass, output)
+    if not candidates:
+        return None
+
+    for entity_id in candidates:
+        state = hass.states.get(entity_id)
+        if state is not None and state.state not in _POWER_OFF_STATES:
+            return True
+
+    return False
 
 def area_name(hass: HomeAssistant, area_id: str | None) -> str:
     """Return a friendly area suffix."""
@@ -982,20 +1043,14 @@ def notify_output_legacy_service(
 
 def notify_output_available(hass: HomeAssistant, output: NotifyOutput) -> bool:
     """Return whether a visual output can currently be attempted."""
-    if power_entity := notify_output_power_entity(hass, output):
-        power_state = hass.states.get(power_entity)
-        if power_state is None or power_state.state in {
-            STATE_OFF,
-            STATE_UNAVAILABLE,
-            STATE_UNKNOWN,
-        }:
-            return False
+    if notify_output_power_available(hass, output) is False:
+        return False
 
     if output.entity_id:
         state = hass.states.get(output.entity_id)
         # NotifyEntity has an unknown state before its first message; that does
-        # not mean the transport is unavailable. For NFAndroidTV, actual device
-        # power is handled above when a reliable media_player association exists.
+        # not mean the transport is unavailable. For NFAndroidTV, physical power
+        # is handled above by the associated media-player observer set.
         return state is not None and state.state != STATE_UNAVAILABLE
     if output.service:
         domain, separator, service = output.service.partition(".")
@@ -1005,7 +1060,6 @@ def notify_output_available(hass: HomeAssistant, output: NotifyOutput) -> bool:
             and hass.services.has_service(domain, service)
         )
     return False
-
 
 def snapcast_output_available(hass: HomeAssistant, entity_id: str) -> bool:
     """Return whether a selected Snapcast client is currently routable."""
