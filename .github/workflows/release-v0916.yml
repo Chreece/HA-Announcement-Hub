@@ -1,0 +1,44 @@
+name: Release v0.9.16
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .release-v0916.ready
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate release target
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("custom_components/announcement_hub/manifest.json").read_text())
+          assert manifest["version"]=="0.9.16", manifest
+          PY
+          python -m compileall -q custom_components tests
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if gh release view v0.9.16 >/dev/null 2>&1; then
+            exit 0
+          fi
+          gh release create v0.9.16 \
+            --target "${GITHUB_SHA}" \
+            --title "Announcement Hub v0.9.16" \
+            --notes "Fixes the target-room edge case where the normal visual output is off/unavailable but the room has a TTS route. General outputs no longer satisfy the room; the room TTS route is selected as the fallback tier and unavailable/unknown TTS waits until timeout. Cross-room fallback still requires zero fixed room candidates."
