@@ -36,38 +36,55 @@ def test_direct_legacy_service_keeps_integration_and_area_binding() -> None:
     assert "resolved_area = entry_area_id(hass, entry.entry_id)" in outputs
 
 
-def test_nfandroidtv_power_entity_uses_strong_identity_links_only() -> None:
+def test_nfandroidtv_power_observers_use_strong_identity_links_only() -> None:
     outputs = (COMPONENT / "outputs.py").read_text(encoding="utf-8")
-    start = outputs.index("def notify_output_power_entity(")
-    end = outputs.index("def area_name(", start)
+    start = outputs.index("def notify_output_power_entities(")
+    end = outputs.index("def notify_output_power_entity(", start)
     block = outputs[start:end]
     assert "output.integration != INTEGRATION_NFANDROIDTV" in block
     assert "notify_device_id" in block
     assert "_config_entry_host(notify_entry)" in block
-    assert "_config_entry_host(media_entry) == notify_host" in block
-    assert "len(host_matches) == 1" in block
-    assert "output.area_id and host_matches" in block
-    assert "len(same_area) == 1" in block
+    assert "== notify_host" in block
+    assert "if same_device:" in block
+    assert "if same_area:" in block
+    assert "return tuple(dict.fromkeys(host_matches))" in block
+    assert "len(host_matches) == 1" not in block
+    assert "len(same_area) == 1" not in block
     assert "entity_name(" not in block
     assert "friendly_name" not in block
 
 
-def test_nfandroidtv_power_state_blocks_visual_candidate_when_tv_is_off() -> None:
+def test_nfandroidtv_multiple_power_observers_are_aggregated() -> None:
     outputs = (COMPONENT / "outputs.py").read_text(encoding="utf-8")
-    start = outputs.index("def notify_output_available(")
-    end = outputs.index("def snapcast_output_available(", start)
+    start = outputs.index("def notify_output_power_available(")
+    end = outputs.index("def area_name(", start)
     block = outputs[start:end]
-    assert "notify_output_power_entity(hass, output)" in block
-    assert "power_state = hass.states.get(power_entity)" in block
-    assert "STATE_OFF" in block
-    assert "STATE_UNAVAILABLE" in block
-    assert "STATE_UNKNOWN" in block
+    assert "notify_output_power_entities(hass, output)" in block
+    assert "for entity_id in candidates:" in block
+    assert "state.state not in _POWER_OFF_STATES" in block
+    assert "return True" in block
     assert "return False" in block
 
 
-def test_nfandroidtv_host_matching_is_conservative() -> None:
+def test_nfandroidtv_power_state_blocks_visual_candidate_when_all_observers_are_off() -> None:
     outputs = (COMPONENT / "outputs.py").read_text(encoding="utf-8")
-    assert "from homeassistant.const import CONF_HOST" in outputs
+    assert "STATE_STANDBY" in outputs
+    assert "_POWER_OFF_STATES" in outputs
+    start = outputs.index("def notify_output_available(")
+    end = outputs.index("def snapcast_output_available(", start)
+    block = outputs[start:end]
+    assert "notify_output_power_available(hass, output) is False" in block
+    assert "return False" in block
+
+
+def test_nfandroidtv_host_matching_is_conservative_and_name_free() -> None:
+    outputs = (COMPONENT / "outputs.py").read_text(encoding="utf-8")
+    assert "from homeassistant.const import (" in outputs
+    assert "CONF_HOST" in outputs
     assert "def _normalise_host(" in outputs
     assert "def _config_entry_host(" in outputs
-    assert "Ambiguous matches are intentionally ignored" in outputs
+    start = outputs.index("def notify_output_power_entities(")
+    end = outputs.index("def notify_output_power_entity(", start)
+    block = outputs[start:end]
+    assert "exact configured host/IP match" in block
+    assert "Entity IDs, names, models, and fuzzy text matching are never used" in block
