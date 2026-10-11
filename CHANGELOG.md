@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.16 - 2026-10-11
+
+- Fixed the case where a target room's normal-level visual output is configured
+  but currently off/unavailable while the room also has a TTS route.
+- General/movable notifications no longer leave the room without a fixed
+  delivery path in that situation.
+- If no fixed-room output is currently available and the room has a TTS route,
+  Announcement Hub selects that room TTS path as the delivery fallback tier.
+- If the selected room TTS path is unavailable/unknown, it remains frozen in
+  the job and is waited for until the configured availability timeout.
+- If the room has no TTS path at all, the unavailable normal-level visual output
+  remains the wait target.
+- Cross-room fallback behavior is unchanged and still requires zero fixed-room
+  candidates in the target room set.
+
 ## 0.9.15 - 2026-10-11
 
 - Fixed a level-routing regression where TTS could be relaxed independently from
