@@ -15,13 +15,26 @@ def test_moveable_outputs_do_not_satisfy_fixed_room_candidate_requirement() -> N
     assert "and not target_room_candidate_exists" in manager
 
 
-def test_fixed_room_selection_waits_for_unavailable_room_candidate() -> None:
+def test_unavailable_room_visual_prefers_room_tts_fallback() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")
-    assert "require_room_delivery=True" in manager
-    assert "room_normal_available" in manager
-    assert "elif room_available:" in manager
-    assert "elif room_candidates:" in manager
-    assert "moveable/general output is immediately usable" in manager
+    start=manager.index("elif room_candidates:")
+    end=manager.index("if room_chosen:", start)
+    block=manager[start:end]
+    assert "room_tts_wait_candidates" in block
+    assert 'item["kind"] in {"room_tts", "server_tts"}' in block
+    assert "if room_tts_wait_candidates:" in block
+    assert "room_chosen = room_tts_wait_candidates" in block
+    assert "room_normal_configured" in block
+
+
+def test_unavailable_visual_is_waited_when_room_has_no_tts_path() -> None:
+    manager=(C/"manager.py").read_text(encoding="utf-8")
+    start=manager.index("if room_tts_wait_candidates:")
+    end=manager.index("if room_chosen:", start)
+    block=manager[start:end]
+    assert "else:" in block
+    assert "room_normal_configured" in block
+    assert "room_chosen = room_normal_configured" in block
 
 
 def test_fallback_is_tts_only_and_preserves_original_visual_outputs() -> None:
