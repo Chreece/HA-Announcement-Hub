@@ -100,7 +100,12 @@ if ! mv "$STAGE_DIR" "$TARGET_DIR"; then
   fail "Could not install the component"
 fi
 trap - EXIT
-[[ -n "$OLD_DIR" ]] && rm -rf "$OLD_DIR"
+if [[ -n "$OLD_DIR" && -e "$OLD_DIR" ]]; then
+  if ! rm -rf "$OLD_DIR"; then
+    printf 'WARNING: Installed successfully, but could not remove old component directory: %s\n' "$OLD_DIR" >&2
+    printf 'The validated backup remains at: %s\n' "$BACKUP_DIR/announcement_hub" >&2
+  fi
+fi
 
 printf '\nAnnouncement Hub installed at:\n  %s\n' "$TARGET_DIR"
 printf 'No Home Assistant script, automation, helper, MPD setting, or Snapserver setting was changed.\n'
