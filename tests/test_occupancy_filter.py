@@ -66,7 +66,7 @@ def test_occupancy_ui_uses_live_dropdown_not_free_text() -> None:
     ]
     assert "CONF_OCCUPANCY_SENSOR" in queue_block
     assert "CONF_OCCUPANCY_ATTRIBUTE" in queue_block
-    assert 'value="__state__"' in queue_block
+    assert 'value="state"' in queue_block
     assert "selector.SelectSelector(" in queue_block
 
 
