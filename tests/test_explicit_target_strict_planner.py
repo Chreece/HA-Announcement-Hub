@@ -167,6 +167,7 @@ def test_explicit_critical_mobile_app_never_selects_tts_even_if_configured():
         (), ("entity:notify.mobile_app_phone",), (), (), (),
     )
     assert plan.notify_outputs == ("entity:notify.mobile_app_phone",)
+    assert plan.tts_text is None
     assert plan.snapcast_clients == ()
     assert plan.tts_engines == ()
     assert plan.server_tts_enabled is False

@@ -1089,7 +1089,9 @@ class AnnouncementManager:
                     text_notify=text_notify,
                     level=level,
                     minimum_tts_level=minimum_tts_level,
-                    tts_engines=routed_selected[0],
+                    tts_engines=(
+                        routed_selected[0] if strict_tts else ()
+                    ),
                     notify_outputs=routed_selected[1],
                     room_tts_players=(
                         routed_selected[2] if strict_tts else ()
@@ -1104,6 +1106,13 @@ class AnnouncementManager:
                     force_tts=strict_tts,
                     force_notify=strict_visual,
                 )
+                # Cross-channel text fallback is allowed only *inside* a
+                # selected output (for example text_tts -> visual). Never
+                # queue or AI-rewrite a channel with no selected destination.
+                if not strict_tts:
+                    route_plan.tts_text = None
+                if not strict_visual:
+                    route_plan.notify_text = None
                 room_candidates = [
                     item for item in candidates if item["fixed_room"]
                 ]
