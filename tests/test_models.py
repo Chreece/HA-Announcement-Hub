@@ -356,3 +356,28 @@ def test_ai_trace_is_persisted_and_backwards_compatible() -> None:
     legacy = original.to_dict()
     legacy.pop("ai")
     assert AnnouncementJob.from_dict(legacy).ai == {}
+
+
+def test_click_action_round_trip_and_legacy_default() -> None:
+    plan = build_delivery_plan(
+        text_tts=None, text_notify="Door open",
+        level="info", minimum_tts_level="info",
+        tts_engines=[], notify_outputs=["entity:notify.phone"],
+        snapcast_clients=[], companion_tts_entries=[],
+        server_tts_enabled=False,
+    )
+    job = AnnouncementJob.create(
+        text_tts=None, text_notify="Door open",
+        outputs=[], requested_services=["mobile_app"],
+        level="info", title="Door", notify_data={"tag": "door"},
+        language=None, tts_options=None, tts_cache=True,
+        plan=plan, click_action="/lovelace/cameras",
+    )
+    restored = AnnouncementJob.from_dict(job.to_dict())
+    assert restored.click_action == "/lovelace/cameras"
+    assert restored.requested_services == ("mobile_app",)
+    assert "click_action" not in restored.public_dict()
+    assert restored.public_dict(include_text=True)["click_action"] == "/lovelace/cameras"
+    old_data = job.to_dict()
+    old_data.pop("click_action")
+    assert AnnouncementJob.from_dict(old_data).click_action is None

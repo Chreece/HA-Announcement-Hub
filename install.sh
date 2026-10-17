@@ -38,6 +38,7 @@ required = {
     "__init__.py",
     "config_flow.py",
     "flow_settings.py",
+    "notify_click_action.py",
     "ai_filter.py",
     "ai_settings.py",
     "const.py",

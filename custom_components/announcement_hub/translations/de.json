@@ -493,7 +493,7 @@
         },
         "service": {
           "name": "Bestimmte Ausgänge",
-          "description": "Optional: Integration, Eintrag, Entität, Dienst oder Alias einschränken, z. B. mobile_app, entry:ID, entity:notify.tv, service:notify.name, tts, notify, snapcast, companion_tts oder all."
+          "description": "Optionale Einschränkung auf konfigurierte Integrationen (mobile_app, nfandroidtv, integration:mobile_app), Einträge (entry:ID), einzelne Geräte (entity:notify.device), bisherige Dienste (service:notify.device) oder Kürzel (notify, tts, snapcast, companion_tts, all). Kritische Meldungen ignorieren die Einschränkung absichtlich und nutzen alle passenden konfigurierten Ausgänge."
         },
         "notify_data": {
           "name": "Benachrichtigungsdaten",
@@ -522,6 +522,10 @@
         "ai_agent": {
           "name": "KI-Konversationsagent überschreiben",
           "description": "Wähle einen verfügbaren Konversationsagenten für diese Ankündigung. Leer übernimmt die Integrationsauswahl (anfangs Home Assistant Standard)."
+        },
+        "click_action": {
+          "name": "Klickaktion (Companion App)",
+          "description": "Optionale URL, Home-Assistant-Dashboard-Pfad, app://-Link oder entityId:entity_id, der beim Tippen auf eine visuelle Companion-App-Benachrichtigung geöffnet wird. Android erhält clickAction, iOS/macOS url. Keine Weitergabe an Android TV/Fire TV, TTS oder nicht unterstützte Dienste. Überschreibt entsprechende Schlüssel in notify_data."
         }
       }
     },

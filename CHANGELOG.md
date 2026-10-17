@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Added optional `click_action` to `notify.announcement_hub` and its legacy
+  `announcement_hub.send` alias. The URL/deep link is stored with each queued
+  announcement and applied only to compatible Companion App visual outputs.
+- Map Companion App Android taps to `data.clickAction` and iOS/macOS taps to
+  `data.url`, preserving other provider-specific `notify_data` and allowing
+  the explicit top-level click_action to override those keys.
+- Avoid passing unsupported click-action metadata to Android TV/Fire TV,
+  generic notification providers, and all audible TTS paths.
+- Clarified existing `service` integration/entity selector (including its
+  critical-alert broadcast exception), updated EN/DE/EL action descriptions,
+  and added routing/provider/persistence regression tests.
+
 ## 0.9.23 - 2026-10-17
 
 - Fixed AI "Home Assistant default" incorrectly calling `conversation.process`

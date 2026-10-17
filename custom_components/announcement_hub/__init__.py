@@ -25,6 +25,7 @@ from homeassistant.util.yaml import load_yaml_dict
 
 from .const import (
     ATTR_COMPANION_TTS,
+    ATTR_CLICK_ACTION,
     ATTR_INCLUDE_CURRENT,
     ATTR_JOB_ID,
     ATTR_LANGUAGE,
@@ -143,6 +144,7 @@ SEND_SCHEMA = probatio.All(
             ),
             probatio.Optional(ATTR_TITLE): cv.string,
             probatio.Optional(ATTR_NOTIFY_DATA): dict,
+            probatio.Optional(ATTR_CLICK_ACTION): cv.string,
             probatio.Optional(ATTR_LANGUAGE): cv.string,
             probatio.Optional(ATTR_TTS_OPTIONS): dict,
             probatio.Optional(ATTR_COMPANION_TTS, default=False): bool,
@@ -299,6 +301,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             level=call.data[ATTR_LEVEL],
             title=call.data.get(ATTR_TITLE),
             notify_data=call.data.get(ATTR_NOTIFY_DATA),
+            click_action=call.data.get(ATTR_CLICK_ACTION),
             language=call.data.get(ATTR_LANGUAGE),
             tts_options=call.data.get(ATTR_TTS_OPTIONS),
             companion_tts=call.data[ATTR_COMPANION_TTS],

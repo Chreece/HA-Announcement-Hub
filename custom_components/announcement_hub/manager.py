@@ -42,6 +42,7 @@ from homeassistant.helpers.storage import Store
 
 from .ai_filter import async_filter_announcement
 from .ai_settings import resolve_ai_enabled
+from .notify_click_action import mobile_click_action_data
 from .const import (
     COMPANION_STREAM_DEFAULT,
     CONF_COMPANION_TTS_MEDIA_STREAM,
@@ -782,6 +783,7 @@ class AnnouncementManager:
         level: str,
         title: str | None,
         notify_data: Mapping[str, Any] | None,
+        click_action: str | None = None,
         language: str | None,
         tts_options: Mapping[str, Any] | None,
         companion_tts: bool,
@@ -793,6 +795,7 @@ class AnnouncementManager:
         text_notify = (
             text_notify.strip() if text_notify and text_notify.strip() else None
         )
+        click_action = click_action.strip() if click_action and click_action.strip() else None
         if not text_tts and not text_notify:
             raise ServiceValidationError(
                 "At least one of text_tts or text_notify must contain text"
@@ -1563,6 +1566,7 @@ class AnnouncementManager:
             level=level,
             title=effective_title,
             notify_data=effective_notify_data,
+            click_action=click_action,
             language=effective_language,
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
@@ -2025,6 +2029,16 @@ class AnnouncementManager:
         provider_data = self._deep_merge(
             dict(integration_data) if isinstance(integration_data, Mapping) else {},
             job.notify_data,
+        )
+        # Top-level click_action is a provider-aware convenience, NOT a
+        # generic notify.data key. Android Companion uses clickAction and
+        # Apple Companion uses url. TV/other providers must not receive these
+        # unsupported options, and the TTS channel is never changed.
+        provider_data = mobile_click_action_data(
+            provider_data,
+            click_action=job.click_action,
+            integration=output.integration,
+            service=output.service,
         )
 
         if output.integration == INTEGRATION_NFANDROIDTV:
