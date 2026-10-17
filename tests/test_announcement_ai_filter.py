@@ -80,6 +80,92 @@ def test_rewrites_both_channels_using_ha_default() -> None:
     assert "Do not call tools" in payload["text"]
 
 
+def test_prompt_specifies_independent_speech_and_visual_styles() -> None:
+    hass = Hass(ha_reply("Room is ready.", "✅ **Room is ready**"))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Room is ready",
+        text_notify="Room is ready",
+        agent_id=None,
+    ))
+    assert got == ("Room is ready.", "✅ **Room is ready**")
+    prompt = hass.services.calls[0][2]["text"]
+    assert "text_tts (SPOKEN VERSION)" in prompt
+    assert "text_notify (VISUAL VERSION)" in prompt
+    assert "NO emoji, emoticons" in prompt
+    assert "simple text styling" in prompt
+    assert "NEVER enable a new delivery channel" in prompt
+
+
+def test_ai_tts_cleaning_keeps_facts_and_separate_visual_styling() -> None:
+    hass = Hass(ha_reply(
+        "🚨 **The kitchen is at 23°C!**\nStay alert. :)",
+        "🌡️ **Kitchen: 23°C**\n⚠️ Stay alert.",
+    ))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="The kitchen is at 23°C. Stay alert.",
+        text_notify="Kitchen 23°C. Stay alert.",
+        agent_id=None,
+    ))
+    assert got == (
+        "The kitchen is at 23°C! Stay alert.",
+        "🌡️ **Kitchen: 23°C**\n⚠️ Stay alert.",
+    )
+
+
+@pytest.mark.parametrize(
+    "generated",
+    [
+        "✅ Garage closed.",
+        "**Garage closed.**",
+        "# Garage closed.\n- Done.",
+        "Garage closed. :-)",
+        "TTS: Garage closed.",
+    ],
+)
+def test_ai_generated_speech_never_contains_simple_decoration(generated) -> None:
+    hass = Hass(ha_reply(generated, None))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Garage closed.", text_notify=None, agent_id=None,
+    ))
+    assert got == ("Garage closed.", None)
+
+
+@pytest.mark.parametrize(
+    "unsafe",
+    [
+        "<speak>Garage closed.</speak>",
+        "<b>Garage closed.</b>",
+        "[Garage](https://example.com) closed.",
+        chr(96) * 3 + "Garage closed." + chr(96) * 3,
+    ],
+)
+def test_unsafe_generated_tts_markup_triggers_backup(unsafe) -> None:
+    hass = Hass(responses=[
+        ha_reply(unsafe, None),
+        ha_reply("Garage is closed.", None),
+    ])
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Garage closed.", text_notify=None,
+        agent_id="conversation.primary",
+        fallback_agent_id="conversation.backup",
+    ))
+    assert got == ("Garage is closed.", None)
+    assert len(hass.services.calls) == 2
+
+
+def test_original_text_is_preserved_when_both_agents_fail_even_with_decoration() -> None:
+    original = ("**Garage** is closed 🚗", "🚗 **Garage is closed**")
+    hass = Hass(responses=[RuntimeError("offline"), RuntimeError("offline")])
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=original[0], text_notify=original[1],
+        agent_id="conversation.primary", fallback_agent_id="conversation.backup",
+    ))
+    assert got == original
+    assert len(hass.services.calls) == 2
+
+
 def test_explicit_agent_passed_and_null_channel_preserved() -> None:
     hass = Hass(ha_reply(None, "The window is open."))
     result = asyncio.run(
@@ -272,8 +358,10 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert "if use_ai is None" in manager
     assert "if ai_enabled:" in manager
     assert manager.count("Announcement queue is full") == 2
-    assert "plan.tts_text = text_tts or text_notify" in manager
-    assert "plan.notify_text = text_notify or text_tts" in manager
+    assert "plan.tts_text, plan.notify_text = await async_filter_announcement(" in manager
+    assert "text_tts=plan.tts_text," in manager
+    assert "text_notify=plan.notify_text," in manager
+    assert "text_tts, text_notify = plan.tts_text, plan.notify_text" in manager
     fields = service["send"]["fields"]["ai"]["fields"]
     assert "boolean" in fields["use_ai"]["selector"]
     assert "conversation_agent" in fields["ai_agent"]["selector"]
