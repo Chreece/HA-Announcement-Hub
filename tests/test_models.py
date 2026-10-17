@@ -291,3 +291,42 @@ def test_public_status_omits_message_content_and_title() -> None:
     private = job.public_dict(include_text=True)
     assert private["title"] == "Private title"
     assert private["text_tts"] == "Private spoken message"
+
+
+def test_critical_visual_only_source_creates_both_channel_texts() -> None:
+    """The AI must see both planned outputs even if only visual input was given."""
+    plan = build_delivery_plan(
+        text_tts=None,
+        text_notify="Window is open",
+        level="critical",
+        minimum_tts_level="never",
+        tts_engines=["tts.piper"],
+        notify_outputs=["entity:notify.tv"],
+        room_tts_players=["media_player.kitchen"],
+        snapcast_clients=[],
+        companion_tts_entries=[],
+        server_tts_enabled=False,
+    )
+    assert plan.tts_text == "Window is open"
+    assert plan.notify_text == "Window is open"
+    assert plan.has_audible_output
+    assert plan.has_visual_output
+
+
+def test_noncritical_visual_only_does_not_invent_speech() -> None:
+    plan = build_delivery_plan(
+        text_tts=None,
+        text_notify="Window is open",
+        level="info",
+        minimum_tts_level="debug",
+        tts_engines=["tts.piper"],
+        notify_outputs=["entity:notify.tv"],
+        room_tts_players=["media_player.kitchen"],
+        snapcast_clients=[],
+        companion_tts_entries=[],
+        server_tts_enabled=False,
+    )
+    assert plan.tts_text is None
+    assert plan.notify_text == "Window is open"
+
+

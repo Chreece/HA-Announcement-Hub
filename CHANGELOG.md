@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- AI now produces two independent output variants in one request: plain,
+  speech-ready text for TTS and expressive visual text for notifications.
+- Speech results are normalized to remove emoji/emoticons, simple Markdown
+  decoration and line breaks; unsafe HTML/SSML/links trigger the existing
+  backup-agent and unchanged-original fallback.
+- AI now receives the actual resolved delivery-plan texts, including speech
+  synthesized from visual-only Critical alerts and level/room fallback paths.
+  This does not enable new channels or modify announcement routing.
+- Added tests for multilingual-friendly channel separation, speech hygiene,
+  decorated visual messages and fail-open recovery.
+
 ## 0.9.19 - 2026-10-17
 
 - Added **Rewrite announcements with AI** in integration setup/options, with a

@@ -364,8 +364,21 @@ currently discovered conversation agent instead. The backup dropdown defaults
 to **Original announcement (no backup AI)**, or can select Home Assistant's
 default or another configured conversation agent.
 
-When enabled, the agent rephrases spoken and visual text to sound more natural
-and variable. The prompt asks it to preserve the original information and not
+When enabled, the agent produces **two channel-specific versions** from the
+resolved delivery plan in **one AI request**: 
+
+- **Spoken (`text_tts`)** is short, natural speech with no emoji, emoticons,
+  headings, Markdown, HTML, SSML, symbols or visual decoration. A final
+  speech-cleaning pass removes harmless formatting and rejects complex markup.
+- **Visual (`text_notify`)** is separately composed for readability, with
+  optional appropriate emoji, brief emphasis, line breaks and simple styling.
+  Rich formatting varies by notification provider; HTML/SSML is not requested.
+
+Only planned output channels are rewritten. For example, a Critical alert
+with only visual input still has a planned TTS channel, so AI returns a
+speech-ready variant as well; an ordinary visual-only alert does not suddenly
+start speaking. Both versions use the same source facts but are formatted
+independently. The prompt asks it to preserve the original information and not
 to control devices or execute actions; the integration checks the response
 format, but cannot guarantee that every paraphrase is factually equivalent.
 AI cannot change the announcement level, recipients,
@@ -401,7 +414,9 @@ data:
 **Note:** Home Assistant's built-in intent-only agent generally cannot
 rewrite arbitrary text. For natural variation, select an LLM-backed
 conversation agent. Its home-control permissions also apply when processing
-rewriting prompts; use an agent with only the capabilities you intend.
+rewriting prompts; use an agent with only the capabilities you intend. If all
+AI attempts fail, the previously established original-text fallback is kept
+unchanged (rather than silently stripping the sender's input formatting).
 
 ### Output behavior
 

@@ -1517,18 +1517,22 @@ class AnnouncementManager:
                 if fallback_setting == DEFAULT_FALLBACK_AI_AGENT
                 else ("" if fallback_setting == DEFAULT_AI_AGENT else fallback_setting)
             )
-            text_tts, text_notify = await async_filter_announcement(
-                self.hass,
-                text_tts=text_tts,
-                text_notify=text_notify,
-                agent_id=agent_id,
-                fallback_agent_id=fallback_agent_id,
-            )
-            # Editing must not change levels, output eligibility, or routing.
-            if plan.tts_text is not None:
-                plan.tts_text = text_tts or text_notify
-            if plan.notify_text is not None:
-                plan.notify_text = text_notify or text_tts
+            # Critical delivery and room/level fallback may derive a spoken
+            # message from a visual input (or the reverse). AI must rewrite
+            # the *actual frozen channel texts* to guarantee that speech gets
+            # plain words and displays get their independent visual version.
+            # Do not introduce a new channel that the planner did not select.
+            if plan.tts_text is not None or plan.notify_text is not None:
+                plan.tts_text, plan.notify_text = await async_filter_announcement(
+                    self.hass,
+                    text_tts=plan.tts_text,
+                    text_notify=plan.notify_text,
+                    agent_id=agent_id,
+                    fallback_agent_id=fallback_agent_id,
+                )
+                # Persist effective output copy alongside the frozen plan;
+                # original delivery level, targets and metadata remain intact.
+                text_tts, text_notify = plan.tts_text, plan.notify_text
 
         job = AnnouncementJob.create(
             text_tts=text_tts,
