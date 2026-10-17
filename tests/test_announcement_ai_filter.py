@@ -423,7 +423,7 @@ def test_agent_successful_but_unchanged_is_reported_separately() -> None:
     assert got == (None, "Already clear")
     assert diag["status"] == "accepted_unchanged"
     assert diag["attempted"] is True
-    assert diag["agent_used"] == "Home Assistant default"
+    assert diag["agent_used"] == "Home Assistant built-in"
 
 
 def test_intent_only_default_agent_error_is_visible_without_text() -> None:
@@ -443,7 +443,7 @@ def test_intent_only_default_agent_error_is_visible_without_text() -> None:
     assert diag["status"] == "fallback_original"
     assert diag["failure_reason"] == "no_intent_match"
     assert diag["attempts"] == [
-        {"agent": "Home Assistant default", "outcome": "no_intent_match"}
+        {"agent": "Home Assistant built-in", "outcome": "no_intent_match"}
     ]
     assert "Sorry" not in str(diag)
 
