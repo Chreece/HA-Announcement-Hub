@@ -510,15 +510,18 @@ class AnnouncementManager:
         tuple[str, ...],
     ]:
         """Resolve optional per-call provider/output restrictions."""
-        if level == LEVEL_CRITICAL:
-            return (
-                tuple(tts_engines),
-                tuple(notify_outputs),
-                tuple(room_tts_players),
-                tuple(snapcast_clients),
-                tuple(companion_entries),
-            )
         if not requested:
+            # Critical broadcasts remain global ONLY without an explicit
+            # service/provider selection. Explicit targets are authoritative
+            # regardless of level: never expand to other channels.
+            if level == LEVEL_CRITICAL:
+                return (
+                    tuple(tts_engines),
+                    tuple(notify_outputs),
+                    tuple(room_tts_players),
+                    tuple(snapcast_clients),
+                    tuple(companion_entries),
+                )
             return (
                 tuple(tts_engines),
                 tuple(notify_outputs),
@@ -662,11 +665,9 @@ class AnnouncementManager:
                 + ", ".join(invalid)
             )
 
-        # The explicit boolean is an opt-in convenience in addition to the
-        # service selector. Critical jobs already returned above with every
-        # configured Companion App TTS output.
-        if companion_tts:
-            selected_companion.extend(companion_entries)
+        # A caller may opt in to Companion TTS with companion_tts=True when
+        # service is omitted. An explicit service list instead specifies the
+        # complete permitted set: it must never silently append Companion TTS.
 
         # Selecting a server TTS engine chooses the voice/provider, not a room.
         # Preserve the configured Snapcast physical outputs unless the call also
@@ -807,10 +808,30 @@ class AnnouncementManager:
                 f"Announcement queue is full ({queue_max} items)"
             )
 
-        requested_output_area_ids = self._resolve_area_ids(
-            self._ensure_list(outputs)
-        )
+        output_tokens = self._ensure_list(outputs)
+        requested = self._ensure_list(requested_services)
+        # Do not interpret explicitly supplied empty selector lists as
+        # unrestricted: for Critical that would accidentally broadcast
+        # to every configured device instead of zero selected devices.
+        if outputs is not None and not any(
+            str(token).strip() for token in output_tokens
+        ):
+            raise ServiceValidationError(
+                "Explicit output selector is empty; omit output for automatic routing"
+            )
+        if requested_services is not None and not any(
+            str(token).strip() for token in requested
+        ):
+            raise ServiceValidationError(
+                "Explicit service selector is empty; omit service for automatic routing"
+            )
+        requested_output_area_ids = self._resolve_area_ids(output_tokens)
         explicit_area_routing = bool(requested_output_area_ids)
+        explicit_targeting = bool(requested) or explicit_area_routing
+        # An explicit service or output area is a hard delivery contract.
+        # It must not trigger room/channel/level fallback or route onto
+        # additional devices if a selected output is temporarily unavailable.
+        # Only the configured output-availability timeout may skip a target.
 
         # occupied_only always means "restrict room-bound delivery to occupied
         # rooms". If explicit output rooms are also supplied, use their
@@ -837,7 +858,6 @@ class AnnouncementManager:
         area_filter_active = explicit_area_routing or occupancy_filter_active
         target_room_routing_active = bool(output_area_ids) and area_filter_active
 
-        requested = self._ensure_list(requested_services)
         configured = self._configured_outputs()
         selected = self._select_requested_outputs(
             requested,
@@ -897,7 +917,11 @@ class AnnouncementManager:
                     output
                     for output in all_notify_records
                     if (
-                        self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL
+                        (
+                            not explicit_area_routing
+                            and self._notify_policy(output)[0]
+                            == NOTIFY_SCOPE_GENERAL
+                        )
                         or (
                             output.area_id is not None
                             and output.area_id in effective_areas
@@ -908,7 +932,11 @@ class AnnouncementManager:
                     entity_id
                     for entity_id in all_room_tts_players
                     if (
-                        self._tts_player_scope(entity_id) == NOTIFY_SCOPE_GENERAL
+                        (
+                            not explicit_area_routing
+                            and self._tts_player_scope(entity_id)
+                            == NOTIFY_SCOPE_GENERAL
+                        )
                         or (
                             (area_id := entity_area_id(self.hass, entity_id))
                             is not None
@@ -1053,6 +1081,64 @@ class AnnouncementManager:
                             "fixed_room": False,
                         }
                     )
+
+            if explicit_targeting:
+                # Freeze exactly the requested physical targets, regardless
+                # of current availability or minimum-level preference. An
+                # explicitly selected TTS channel is allowed to speak, and
+                # an explicitly selected visual channel can display the
+                # supplied spoken text. No other channel is substituted.
+                # The worker retries only these frozen targets until timeout.
+                strict_tts = any(
+                    item["kind"] in {
+                        "room_tts", "server_tts", "companion_tts"
+                    }
+                    for item in candidates
+                )
+                strict_visual = any(
+                    item["kind"] == "notify" for item in candidates
+                )
+                route_plan = build_delivery_plan(
+                    text_tts=text_tts,
+                    text_notify=text_notify,
+                    level=level,
+                    minimum_tts_level=minimum_tts_level,
+                    tts_engines=(
+                        routed_selected[0] if strict_tts else ()
+                    ),
+                    notify_outputs=routed_selected[1],
+                    room_tts_players=(
+                        routed_selected[2] if strict_tts else ()
+                    ),
+                    snapcast_clients=(
+                        routed_selected[3] if strict_tts else ()
+                    ),
+                    companion_tts_entries=(
+                        routed_selected[4] if strict_tts else ()
+                    ),
+                    server_tts_enabled=server_tts_enabled and strict_tts,
+                    force_tts=strict_tts,
+                    force_notify=strict_visual,
+                )
+                # Cross-channel text fallback is allowed only *inside* a
+                # selected output (for example text_tts -> visual). Never
+                # queue or AI-rewrite a channel with no selected destination.
+                if not strict_tts:
+                    route_plan.tts_text = None
+                if not strict_visual:
+                    route_plan.notify_text = None
+                room_candidates = [
+                    item for item in candidates if item["fixed_room"]
+                ]
+                return (
+                    routed_selected,
+                    routed_notify,
+                    routed_companion,
+                    route_plan,
+                    bool(room_candidates),
+                    any(item["available"] for item in room_candidates),
+                    bool(room_candidates),
+                )
 
             room_candidates = [
                 item for item in candidates if item["fixed_room"]
@@ -1361,7 +1447,8 @@ class AnnouncementManager:
             )
         )
         if (
-            tts_must_output
+            not explicit_targeting
+            and tts_must_output
             and target_room_routing_active
             and not target_room_candidate_exists
         ):
@@ -1571,6 +1658,7 @@ class AnnouncementManager:
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
+            strict_targets=explicit_targeting,
             ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,

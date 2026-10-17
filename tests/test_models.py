@@ -381,3 +381,26 @@ def test_click_action_round_trip_and_legacy_default() -> None:
     old_data = job.to_dict()
     old_data.pop("click_action")
     assert AnnouncementJob.from_dict(old_data).click_action is None
+
+def test_strict_targets_persist_in_job_and_legacy_jobs_default_false() -> None:
+    plan = build_delivery_plan(
+        text_tts=None, text_notify="Movement detected",
+        level="critical", minimum_tts_level="never",
+        tts_engines=[], notify_outputs=["entity:notify.phone"],
+        room_tts_players=[], snapcast_clients=[],
+        companion_tts_entries=[], server_tts_enabled=False,
+    )
+    job = AnnouncementJob.create(
+        text_tts=None, text_notify="Movement detected",
+        outputs=[], requested_services=["mobile_app"],
+        level="critical", title="Alert", notify_data={},
+        language=None, tts_options={}, tts_cache=True,
+        plan=plan, strict_targets=True,
+    )
+    assert job.strict_targets
+    assert job.public_dict()["strict_targets"] is True
+    restored = AnnouncementJob.from_dict(job.to_dict())
+    assert restored.strict_targets
+    old_job = job.to_dict()
+    old_job.pop("strict_targets")
+    assert AnnouncementJob.from_dict(old_job).strict_targets is False

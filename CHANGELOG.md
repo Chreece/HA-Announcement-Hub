@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+- Fixed Critical announcements ignoring an explicit `service` integration or
+  entity target and expanding to every configured output (including TTS).
+- `service` and explicit `output` rooms are now **strict routing constraints**
+  at every severity: only selected physical targets are frozen into the job,
+  whether immediately available or not, with no level/channel substitution or
+  fallback to other rooms/devices.
+- Unavailable explicitly selected targets use the existing
+  output-availability timeout and then skip silently. No TTS or Companion App
+  speech is activated when only visual notifications were selected.
+- Explicit areas now exclude general/unassigned outputs. When
+  `occupied_only: true`, the existing occupancy intersection is preserved.
+- Added `strict_targets` to the send action response and persisted job/status
+  for transparent verification; legacy queued jobs remain readable.
+- Explicitly empty `service: []` or `output: []` fails validation instead of
+  silently becoming an unrestricted Critical broadcast; omit the field to
+  request automatic routing.
+- Preserved the previous automatic Critical broadcast and level/fallback
+  behavior when no explicit selectors are supplied. Updated action help in
+  English, German and Greek and added executable routing regression tests.
+
 ## 0.9.24 - 2026-10-17
 
 - Added optional `click_action` to `notify.announcement_hub` and its legacy
