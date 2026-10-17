@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.22 - 2026-10-17
 
 - Fixed AI response parsing for Home Assistant conversation agents that return
   `action_done` for a text-only response with no affected devices, while
