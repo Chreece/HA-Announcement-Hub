@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.25 - 2026-10-17
 
 - Fixed Critical announcements ignoring an explicit `service` integration or
   entity target and expanding to every configured output (including TTS).
