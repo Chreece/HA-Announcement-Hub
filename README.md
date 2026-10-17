@@ -203,7 +203,9 @@ Configure:
 - maximum queue length;
 - unavailable-output wait;
 - audio-path idle, playback-start, and playback-duration timeouts;
-- the gap between audible outputs.
+- the gap between audible outputs;
+- optional AI message rewriting (off by default) and a conversation-agent
+  selector, preselected to **Home Assistant default**.
 
 ## Per-integration visual profiles and multipart reading time
 
@@ -352,6 +354,44 @@ data:
 The call returns as soon as the job has been accepted. It does not wait for the
 queued playback to finish.
 
+### Optional AI rewriting
+
+Under **General options**, configure **Rewrite announcements with AI** and
+**Default AI conversation agent**. Rewriting defaults to off for backward
+compatibility. The preselected **Home Assistant default** option follows the
+default conversation agent used by `conversation.process`. You can choose any
+currently discovered conversation agent instead.
+
+When enabled, the agent rephrases spoken and visual text to sound more natural
+and variable while preserving the original information. The AI prompt asks the
+agent not to control devices or execute actions, and the integration validates
+the returned message. AI cannot change the announcement level, recipients,
+room routing, title or notification metadata. If an agent is offline, times
+out, or returns an invalid response, the original announcement is delivered.
+AI runs only once before the announcement enters the persistent queue.
+
+To override AI for an individual announcement:
+
+```yaml
+action: notify.announcement_hub
+data:
+  text_tts: "The washing machine has finished."
+  text_notify: "Washing machine finished"
+  use_ai: true
+  ai_agent: conversation.my_ai_assistant
+```
+
+- Omit `use_ai` to inherit the integration setting; set `use_ai: false` to
+  bypass AI even when globally enabled.
+- Omit `ai_agent` to inherit the integration agent. The action editor provides
+  Home Assistant's conversation-agent selector.
+- Both `notify.announcement_hub` and the legacy `announcement_hub.send`
+  support the per-announcement overrides.
+
+**Note:** Home Assistant's built-in intent-only agent generally cannot
+rewrite arbitrary text. For natural variation, select an LLM-backed
+conversation agent. Its home-control permissions also apply when processing
+rewriting prompts; use an agent with only the capabilities you intend.
 ### Output behavior
 
 When `output` is omitted:
