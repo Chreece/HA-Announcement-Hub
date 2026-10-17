@@ -119,7 +119,7 @@ def test_ai_tts_cleaning_keeps_facts_and_separate_visual_styling() -> None:
     [
         "✅ Garage closed.",
         "**Garage closed.**",
-"# Garage closed.",
+        "# Garage closed.",
         "Garage closed. :-)",
         "TTS: Garage closed.",
     ],
