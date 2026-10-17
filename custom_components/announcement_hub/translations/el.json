@@ -493,7 +493,7 @@
         },
         "service": {
           "name": "Συγκεκριμένες έξοδοι",
-          "description": "Προαιρετικός περιορισμός σε ενσωμάτωση, καταχώριση, οντότητα, υπηρεσία ή ψευδώνυμο, π.χ. mobile_app, entry:ID, entity:notify.tv, service:notify.name, tts, notify, snapcast, companion_tts ή all."
+          "description": "Προαιρετικός περιορισμός σε ρυθμισμένες ενσωματώσεις (mobile_app, nfandroidtv, integration:mobile_app), καταχωρίσεις (entry:ID), συγκεκριμένες συσκευές (entity:notify.device), παλιές υπηρεσίες (service:notify.device) ή συντομογραφίες (notify, tts, snapcast, companion_tts, all). Οι κρίσιμες ανακοινώσεις αγνοούν σκόπιμα αυτόν τον περιορισμό και χρησιμοποιούν όλες τις κατάλληλες ρυθμισμένες εξόδους."
         },
         "notify_data": {
           "name": "Δεδομένα ειδοποίησης",
@@ -522,6 +522,10 @@
         "ai_agent": {
           "name": "Παράκαμψη πράκτορα συνομιλίας AI",
           "description": "Διάλεξε διαθέσιμο πράκτορα συνομιλίας για τη συγκεκριμένη ανακοίνωση. Κενό σημαίνει την επιλογή της ενσωμάτωσης (αρχικά Home Assistant default)."
+        },
+        "click_action": {
+          "name": "Ενέργεια πατήματος (Companion App)",
+          "description": "Προαιρετικό URL, διαδρομή πίνακα Home Assistant, σύνδεσμος app:// ή entityId:entity_id που ανοίγει με πάτημα στην οπτική ειδοποίηση Companion App. Στο Android αποστέλλεται clickAction, σε iOS/macOS url. Αγνοείται σε Android TV/Fire TV, TTS και παρόχους χωρίς υποστήριξη. Υπερισχύει των αντίστοιχων πεδίων του notify_data."
         }
       }
     },

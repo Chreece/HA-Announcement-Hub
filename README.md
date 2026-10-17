@@ -502,9 +502,60 @@ For TTS, selected targets are never dropped merely because they are currently
 `unavailable` or `unknown`. They remain pending and are retried until the
 configured output-availability timeout expires.
 
+### Provider-targeted notifications and tap actions
+
+The existing `service` action field selects **which configured integrations
+or devices** are eligible for a non-critical announcement. `output` selects
+**where** (areas). For example, target only Companion App visual
+notifications with a tap-through dashboard link:
+
+```yaml
+action: notify.announcement_hub
+data:
+  text_notify: "Movement detected at the front door."
+  title: "Doorbell"
+  service:
+    - mobile_app                 # or integration:mobile_app
+  click_action: /lovelace/cameras
+```
+
+Or target only Notifications for Android TV/Fire TV:
+
+```yaml
+action: notify.announcement_hub
+data:
+  text_notify: "The washing machine has finished."
+  service:
+    - nfandroidtv
+```
+
+The optional `click_action` field is understood by **Companion App visual
+notifications**. Announcement Hub maps the same value to the documented
+`data.clickAction` key for Android and `data.url` for iOS/macOS. Supported
+targets include a Home Assistant dashboard path (e.g. `/lovelace/cameras`),
+a full HTTPS URL, `app://<package>`, and `entityId:<entity_id>`. On individual
+Companion App devices, tapping the notification opens the target; it does
+not add buttons or run Home Assistant actions.
+
+The value is sent only to known Companion App notification routes, including
+their advanced legacy notify actions and the `notify.mobile_app` group.
+Unsupported integrations, direct/Companion TTS and the Android TV/Fire TV
+overlay do not receive it. NFAndroidTV's `interrupt` option makes the
+overlay interactive, but it does not support opening arbitrary URLs.
+Existing `notify_data` remains available for more provider-specific options;
+an explicitly supplied `click_action` takes precedence over
+`notify_data.clickAction` and `notify_data.url` for Companion App outputs.
+Notifications routed through generic `notify.send_message` cannot carry
+provider-specific click metadata if no advanced mobile_app action is present.
+
+**Safety:** `level: critical` intentionally broadcasts to all configured
+matching outputs regardless of an explicit `service` restriction. For
+selective delivery, use another severity. Click actions never change routing.
+
 ### Specific outputs or integrations
 
-The optional `service` field narrows a non-critical job. It accepts:
+The optional `service` field narrows a non-critical job (the same field is
+available on both `notify.announcement_hub` and `announcement_hub.send`). It accepts:
 
 ```text
 mobile_app                    # selected outputs from an integration

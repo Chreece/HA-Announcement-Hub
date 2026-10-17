@@ -493,7 +493,7 @@
         },
         "service": {
           "name": "Specific outputs",
-          "description": "Optional restriction to an integration, entry, entity, service, or alias, such as mobile_app, entry:ID, entity:notify.tv, service:notify.name, tts, notify, snapcast, companion_tts, or all."
+          "description": "Optional explicit restriction to configured integrations (mobile_app, nfandroidtv, integration:mobile_app), config entries (entry:ID), individual entities (entity:notify.device), legacy actions (service:notify.device), or aliases (notify, tts, snapcast, companion_tts, all). Critical deliberately ignores service restrictions and reaches every configured matching output."
         },
         "notify_data": {
           "name": "Notification data",
@@ -522,6 +522,10 @@
         "ai_agent": {
           "name": "Override AI conversation agent",
           "description": "Choose a currently available conversation agent for this announcement. Leave empty to inherit the integration selection (initially Home Assistant default)."
+        },
+        "click_action": {
+          "name": "Click action (Companion App)",
+          "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
         }
       }
     },
