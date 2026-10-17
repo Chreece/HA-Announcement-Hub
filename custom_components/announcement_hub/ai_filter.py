@@ -217,6 +217,44 @@ def _failure_reason(response: Any) -> str:
     return "invalid_response"
 
 
+# A selected "default" means the preferred Assist pipeline, not the built-in
+# conversation.process default, which handles commands but not freeform rewriting.
+PREFERRED_ASSIST_AGENT = "default"
+HOME_ASSISTANT_INTENT_AGENT = "conversation.home_assistant"
+
+
+def resolve_preferred_assist_agent(
+    hass: Any,
+) -> tuple[str | None, str | None, str | None]:
+    """Resolve the current preferred Assist pipeline's conversation engine.
+
+    The preferred pipeline can change without reconfiguring Announcement Hub.
+    Never silently call conversation.process without an agent_id when the
+    user requested the preferred agent: omitted agent_id targets the built-in
+    intent-only Home Assistant agent, NOT the pipeline's configured LLM.
+    """
+    try:
+        from homeassistant.components.assist_pipeline import async_get_pipeline
+
+        pipeline = async_get_pipeline(hass)
+    except Exception as error:  # noqa: BLE001
+        _LOGGER.debug(
+            "Announcement AI preferred Assist pipeline cannot be resolved (%s)",
+            type(error).__name__,
+        )
+        return None, None, "preferred_assist_pipeline_unavailable"
+
+    engine = getattr(pipeline, "conversation_engine", None)
+    if not isinstance(engine, str) or not engine:
+        return None, None, "preferred_assist_agent_unavailable"
+    if engine == HOME_ASSISTANT_INTENT_AGENT:
+        return None, None, "preferred_assist_agent_not_generative"
+    language = getattr(pipeline, "conversation_language", None)
+    if not isinstance(language, str) or not language.strip():
+        language = None
+    return engine, language, None
+
+
 async def async_filter_announcement(
     hass: Any,
     *,
@@ -226,10 +264,12 @@ async def async_filter_announcement(
     fallback_agent_id: str | None = None,
     diagnostics: dict[str, Any] | None = None,
 ) -> tuple[str | None, str | None]:
-    """Try the primary AI, optional backup AI, then use untouched originals.
+    """Try the configured AI, optional backup AI, then untouched originals.
 
-    The empty fallback-agent string explicitly selects Home Assistant default;
-    None means there is no backup agent and the original text is the fallback.
+    The string "default" follows the preferred Assist pipeline at send time.
+    A legacy None or empty string still targets the built-in conversation
+    agent for compatibility with direct helper callers; the manager no longer
+    passes None when the default dropdown is selected.
     """
     originals = {"text_tts": text_tts, "text_notify": text_notify}
     # Status goes into the action response, never raw prompts or message text.
@@ -250,13 +290,44 @@ async def async_filter_announcement(
         if backup not in agents:
             agents.append(backup)
 
-    for index, candidate in enumerate(agents):
-        agent_label = candidate or "Home Assistant default"
+    called_agents: set[str | None] = set()
+    for index, chosen_agent in enumerate(agents):
+        candidate = chosen_agent
+        preferred_language: str | None = None
+        if chosen_agent == PREFERRED_ASSIST_AGENT:
+            candidate, preferred_language, resolve_error = (
+                resolve_preferred_assist_agent(hass)
+            )
+            if resolve_error:
+                if diagnostics is not None:
+                    diagnostics["attempts"].append(
+                        {"agent": "Preferred Assist pipeline", "outcome": resolve_error}
+                    )
+                    diagnostics["failure_reason"] = resolve_error
+                    if index == 0:
+                        diagnostics["agent"] = "Preferred Assist pipeline"
+                _LOGGER.warning(
+                    "Announcement %s AI cannot resolve a generative agent from "
+                    "the preferred Assist pipeline (%s); using fallback",
+                    "backup" if index else "primary",
+                    resolve_error,
+                )
+                continue
+
+        # A backup pointing to the same effective agent is not a useful retry.
+        if candidate in called_agents:
+            continue
+        called_agents.add(candidate)
+        agent_label = candidate or "Home Assistant built-in"
         if diagnostics is not None:
             diagnostics["attempted"] = True
+            if index == 0:
+                diagnostics["agent"] = agent_label
         payload = {"text": prompt}
         if candidate:
             payload["agent_id"] = candidate
+        if preferred_language:
+            payload["language"] = preferred_language
         try:
             async with asyncio.timeout(AI_FILTER_TIMEOUT_SECONDS):
                 response = await hass.services.async_call(
