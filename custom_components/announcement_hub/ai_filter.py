@@ -183,6 +183,28 @@ def _parse_reply(
     return parsed["text_tts"], parsed["text_notify"]
 
 
+def _failure_reason(response: Any) -> str:
+    """Classify expected HA intent errors without revealing response content."""
+    if not isinstance(response, dict):
+        return "invalid_response"
+    details = response.get("response")
+    if not isinstance(details, dict):
+        return "invalid_response"
+    kind = details.get("response_type")
+    if kind == "action_done":
+        return "action_response_not_allowed"
+    if kind == "error":
+        payload = details.get("data")
+        if isinstance(payload, dict) and payload.get("code") in {
+            "no_intent_match",
+            "no_valid_targets",
+            "failed_to_handle",
+        }:
+            return str(payload["code"])
+        return "agent_error_response"
+    return "invalid_response"
+
+
 async def async_filter_announcement(
     hass: Any,
     *,
@@ -278,10 +300,11 @@ async def async_filter_announcement(
                 )
             return edited
         if diagnostics is not None:
+            reason = _failure_reason(response)
             diagnostics["attempts"].append(
-                {"agent": agent_label, "outcome": "invalid_response"}
+                {"agent": agent_label, "outcome": reason}
             )
-            diagnostics["failure_reason"] = "invalid_response"
+            diagnostics["failure_reason"] = reason
         _LOGGER.warning(
             "Announcement %s AI agent %s returned invalid or unsafe text; falling back",
             "backup" if index else "primary",
