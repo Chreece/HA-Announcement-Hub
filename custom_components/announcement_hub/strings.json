@@ -472,12 +472,12 @@
       },
       "fields": {
         "text_tts": {
-          "name": "Spoken text",
-          "description": "Text for audible outputs. At least spoken or visual text is required."
+          "name": "Spoken text override",
+          "description": "Optional replacement for the spoken/TTS version. Leave empty to use text. Does not add a TTS output when the chosen service or output restricts delivery to visual notifications."
         },
         "text_notify": {
-          "name": "Visual notification text",
-          "description": "Text shown by visual notification outputs. At least spoken or visual text is required."
+          "name": "Visual notification text override",
+          "description": "Optional replacement for visual notifications. Leave empty to use text. Emoji and formatting can be used here without changing the speech version."
         },
         "title": {
           "name": "Notification title",
@@ -526,6 +526,10 @@
         "click_action": {
           "name": "Click action (Companion App)",
           "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
+        },
+        "text": {
+          "name": "Announcement text (required for new actions)",
+          "description": "Main announcement message. Used for both speech and visual notifications unless text_tts or text_notify supplies an override. Existing actions containing only text_tts or text_notify are still accepted for backward compatibility."
         }
       }
     },

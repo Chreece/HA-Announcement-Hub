@@ -38,7 +38,8 @@ helpers, edit automations, or change MPD/Snapserver configuration.
   `announcement_hub.cancel` and `announcement_hub.clear_queue`.
 - Keeps `announcement_hub.send` as a backward-compatible legacy alias for
   existing automations; new automations should use `notify.announcement_hub`.
-- Accepts `text_tts`, `text_notify`, or both; at least one is required.
+- Accepts a primary `text` with optional spoken `text_tts` and visual
+  `text_notify` overrides. Legacy channel-only actions remain supported.
 - Persists waiting jobs across Home Assistant restarts.
 - Freezes each job's selected outputs, area bindings, player, TTS settings, and
   notification data when the job enters the queue.
@@ -360,8 +361,8 @@ regardless of door state.
 ```yaml
 action: notify.announcement_hub
 data:
-  text_tts: "Το πλυντήριο ολοκλήρωσε το πρόγραμμα."
-  text_notify: "Το πλυντήριο τελείωσε."
+  text: "Το πλυντήριο ολοκλήρωσε το πρόγραμμα."
+  text_notify: "Το πλυντήριο τελείωσε."  # optional visual override
   output:
     - living_room
     - kitchen
@@ -370,6 +371,39 @@ data:
 
 The call returns as soon as the job has been accepted. It does not wait for the
 queued playback to finish.
+
+### Primary text and optional channel-specific variants
+
+Use **`text`** as the main message when creating a new announcement. It is
+the required primary field in the action editor; the two overrides are optional.
+Announcement Hub resolves the inputs **before** applying AI, severity thresholds,
+output restrictions, room selection, and queue persistence:
+
+| Supplied fields | Spoken (TTS) source | Visual notification source |
+| --- | --- | --- |
+| `text` only | `text` | `text` |
+| `text` + `text_tts` | `text_tts` | `text` |
+| `text` + `text_notify` | `text` | `text_notify` |
+| All three | `text_tts` | `text_notify` |
+
+Leave an override empty to inherit the common `text` value. Actual channels
+still depend on your routing, level, TTS threshold and explicit `service` or
+`output` targets. For example, `service: [mobile_app]` at Critical remains
+**visual-only**, even with a common `text`.
+
+For backwards compatibility, existing YAML automations using only
+`text_tts`, only `text_notify`, or both **continue to work unchanged**.
+If `text` is omitted, the old channel-specific behavior is preserved. A call
+with no non-empty text in any field is rejected.
+
+```yaml
+action: notify.announcement_hub
+data:
+  text: "Η πόρτα της εισόδου είναι ανοιχτή."
+  text_tts: "Η εξώπορτα παραμένει ανοιχτή."
+  text_notify: "🚪 **Η πόρτα της εισόδου είναι ανοιχτή.**"
+  level: warning
+```
 
 ### Optional AI rewriting
 
@@ -425,8 +459,8 @@ To override AI for an individual announcement:
 ```yaml
 action: notify.announcement_hub
 data:
-  text_tts: "The washing machine has finished."
-  text_notify: "Washing machine finished"
+  text: "The washing machine has finished."
+  text_notify: "🧺 Washing machine finished"  # optional
   use_ai: true
   ai_agent: conversation.my_ai_assistant
 ```

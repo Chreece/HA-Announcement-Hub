@@ -472,12 +472,12 @@
       },
       "fields": {
         "text_tts": {
-          "name": "Gesprochener Text",
-          "description": "Text für hörbare Ausgänge. Mindestens gesprochener oder optischer Text ist erforderlich."
+          "name": "Abweichender gesprochener Text",
+          "description": "Optionale Fassung für die TTS-Ausgabe. Leer lassen, um text zu verwenden. Aktiviert keine zusätzlichen TTS-Ausgänge, wenn service oder output nur visuelle Benachrichtigungen auswählt."
         },
         "text_notify": {
-          "name": "Optischer Benachrichtigungstext",
-          "description": "Text für sichtbare Benachrichtigungsausgänge. Mindestens gesprochener oder optischer Text ist erforderlich."
+          "name": "Abweichender Benachrichtigungstext",
+          "description": "Optionale Fassung für visuelle Benachrichtigungen. Leer lassen, um text zu verwenden. Emojis und Formatierung wirken sich nicht auf den gesprochenen Text aus."
         },
         "title": {
           "name": "Benachrichtigungstitel",
@@ -526,6 +526,10 @@
         "click_action": {
           "name": "Klickaktion (Companion App)",
           "description": "Optionale URL, Home-Assistant-Dashboard-Pfad, app://-Link oder entityId:entity_id, der beim Tippen auf eine visuelle Companion-App-Benachrichtigung geöffnet wird. Android erhält clickAction, iOS/macOS url. Keine Weitergabe an Android TV/Fire TV, TTS oder nicht unterstützte Dienste. Überschreibt entsprechende Schlüssel in notify_data."
+        },
+        "text": {
+          "name": "Ankündigungstext (für neue Aktionen erforderlich)",
+          "description": "Haupttext der Ankündigung. Wird für Sprachausgabe und visuelle Benachrichtigungen verwendet, sofern text_tts bzw. text_notify keine abweichende Fassung enthalten. Bisherige Aktionen mit nur text_tts oder text_notify bleiben kompatibel."
         }
       }
     },
