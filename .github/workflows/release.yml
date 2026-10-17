@@ -1,0 +1,85 @@
+name: Publish GitHub release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - custom_components/announcement_hub/manifest.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: announcement-hub-github-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'Chreece/HA-Announcement-Hub'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check pytest pyyaml
+      - name: Validate before publishing
+        run: |
+          python -m compileall -q custom_components tests
+          python -m pytest -q
+      - name: Prepare release metadata and notes
+        id: prepare
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          version = json.loads(
+              Path('custom_components/announcement_hub/manifest.json').read_text()
+          )['version']
+          if re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', version) is None:
+              raise SystemExit(f'Invalid version: {version!r}')
+          constants = Path('custom_components/announcement_hub/const.py').read_text()
+          expected_constant = f'VERSION: Final = "{version}"'
+          if expected_constant not in constants:
+              raise SystemExit('manifest.json and const.py versions differ')
+          changelog = Path('CHANGELOG.md').read_text(encoding='utf-8')
+          match = re.search(
+              rf'(?ms)^## {re.escape(version)} - [0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}}\n(.*?)(?=^## |\Z)',
+              changelog,
+          )
+          if match is None or not match.group(1).strip():
+              raise SystemExit(f'Missing changelog for {version}')
+          Path('/tmp/announcement-hub-release.md').write_text(
+              match.group(1).strip() + '\n', encoding='utf-8'
+          )
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'version={version}\n')
+          PY
+      - name: Create version tag and GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v${{ steps.prepare.outputs.version }}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; leaving it unchanged."
+            exit 0
+          fi
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Announcement Hub $TAG" \
+            --notes-file /tmp/announcement-hub-release.md \
+            --latest

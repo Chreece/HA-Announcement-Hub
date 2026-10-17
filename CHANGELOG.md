@@ -1,13 +1,24 @@
 # Changelog
 
-## Unreleased
+## 0.9.19 - 2026-10-17
 
-- Added an optional fallback conversation agent for AI announcement rewriting;
-  the default is to deliver the original announcement without a second AI call.
-- Failed, timed-out, refused, error-marked, numerically altered, or malformed AI
-  replies now trigger backup-agent retry (if configured), then unchanged text.
-- Preserved queue routing, channel selection and all original notification/TTS
-  content when AI is unavailable. EN/DE/EL setup help and tests updated.
+- Added **Rewrite announcements with AI** in integration setup/options, with a
+  selectable Home Assistant conversation agent (HA default preselected). AI is
+  disabled by default for backwards compatibility.
+- Added per-announcement overrides `use_ai: true/false` and `ai_agent` to
+  `notify.announcement_hub` and legacy `announcement_hub.send` actions.
+- Added a configurable backup conversation agent: primary AI, optional backup
+  AI, and guaranteed original-message fallback when AI is unavailable, fails,
+  times out, or returns faulty or malformed text. Without a backup agent,
+  the original message is delivered directly after a failed primary attempt.
+- Hardened AI reply validation to reject failed/refused replies, changed
+  numerical readings, empty or oversized responses, and malformed JSON.
+- Original spoken/visual messages, output selections, severity, queue routing
+  and notification metadata are preserved when AI rewriting is skipped.
+- AI rewriting is performed once before an announcement is persisted in the
+  queue; already queued jobs are not reprocessed after a restart.
+- Translated new configuration/action fields into English, German and Greek.
+- Added AI success/failure, timeout, validation, backup and cancellation tests.
 
 ## 0.9.18 - 2026-10-11
 
