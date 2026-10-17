@@ -200,10 +200,22 @@ def test_companion_tts_alias_only_selects_spoken_companion_app() -> None:
     assert parts == ((), (), (), (), ("phone-id",))
 
 
-def test_critical_preserves_existing_broadcast_safety_policy() -> None:
+def test_critical_explicit_mobile_app_never_leaks_to_other_outputs() -> None:
     selector, instance = _select_requested_outputs()
     parts = selector(
         instance, ["mobile_app"], level="critical",
+        tts_engines=["tts.piper"],
+        notify_outputs=["entity:notify.phone", "entity:notify.tv"],
+        room_tts_players=["media_player.room"], snapcast_clients=["snapcast"],
+        companion_entries=["phone-id"], companion_tts=False,
+    )
+    assert parts == ((), ("entity:notify.phone",), (), (), ())
+
+
+def test_critical_without_explicit_service_keeps_broadcast_behavior() -> None:
+    selector, instance = _select_requested_outputs()
+    parts = selector(
+        instance, [], level="critical",
         tts_engines=["tts.piper"],
         notify_outputs=["entity:notify.phone", "entity:notify.tv"],
         room_tts_players=["media_player.room"], snapcast_clients=["snapcast"],
@@ -213,6 +225,46 @@ def test_critical_preserves_existing_broadcast_safety_policy() -> None:
         ("tts.piper",),
         ("entity:notify.phone", "entity:notify.tv"),
         ("media_player.room",), ("snapcast",), ("phone-id",),
+    )
+
+
+def test_explicit_service_does_not_append_unselected_companion_tts() -> None:
+    selector, instance = _select_requested_outputs()
+    parts = selector(
+        instance, ["mobile_app"], level="critical",
+        tts_engines=["tts.piper"],
+        notify_outputs=["entity:notify.phone", "entity:notify.tv"],
+        room_tts_players=["media_player.room"], snapcast_clients=["snapcast"],
+        companion_entries=["phone-id"], companion_tts=True,
+    )
+    assert parts == ((), ("entity:notify.phone",), (), (), ())
+
+
+def test_explicit_critical_multiple_services_only_select_the_union() -> None:
+    selector, instance = _select_requested_outputs()
+    parts = selector(
+        instance, ["mobile_app", "nfandroidtv"], level="critical",
+        tts_engines=["tts.piper"],
+        notify_outputs=["entity:notify.phone", "entity:notify.tv"],
+        room_tts_players=["media_player.room"], snapcast_clients=["snapcast"],
+        companion_entries=["phone-id"], companion_tts=True,
+    )
+    assert parts == (
+        (), ("entity:notify.phone", "entity:notify.tv"), (), (), (),
+    )
+
+
+def test_explicit_critical_can_select_companion_tts_when_requested() -> None:
+    selector, instance = _select_requested_outputs()
+    parts = selector(
+        instance, ["mobile_app", "companion_tts"], level="critical",
+        tts_engines=["tts.piper"],
+        notify_outputs=["entity:notify.phone", "entity:notify.tv"],
+        room_tts_players=["media_player.room"], snapcast_clients=["snapcast"],
+        companion_entries=["phone-id"], companion_tts=False,
+    )
+    assert parts == (
+        (), ("entity:notify.phone",), (), (), ("phone-id",),
     )
 
 
