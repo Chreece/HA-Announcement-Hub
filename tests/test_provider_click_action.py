@@ -268,6 +268,34 @@ def test_explicit_critical_can_select_companion_tts_when_requested() -> None:
     )
 
 
+def test_reported_critical_mobile_app_click_action_is_visual_only() -> None:
+    reported = yaml.safe_load("""
+    action: notify.announcement_hub
+    data:
+      title: ΠΡΟΣΟΧΗ
+      click_action: /dashboard-metrics/0
+      service:
+        - mobile_app
+      level: critical
+      text_notify: Εντοπίστηκε κίνηση κατά την απουσία
+    """)
+    assert reported["action"] == "notify.announcement_hub"
+    assert reported["data"]["click_action"] == "/dashboard-metrics/0"
+    selector, instance = _select_requested_outputs()
+    selected = selector(
+        instance,
+        reported["data"]["service"],
+        level=reported["data"]["level"],
+        tts_engines=["tts.piper"],
+        notify_outputs=["entity:notify.phone", "entity:notify.tv"],
+        room_tts_players=["media_player.kitchen"],
+        snapcast_clients=["media_player.wohnzimmer_snapcast"],
+        companion_entries=["phone-id"],
+        companion_tts=False,
+    )
+    assert selected == ((), ("entity:notify.phone",), (), (), ())
+
+
 def test_action_schema_and_provider_wiring_and_translations() -> None:
     service = yaml.safe_load((COMPONENT / "services.yaml").read_text())
     assert "text" in service["send"]["fields"]["content"]["fields"]["click_action"]["selector"]
