@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.27 - 2026-10-17
+
+- Fixed the Announcement Hub banner failing to display in the HACS repository
+  information page. The README now references the existing repository SVG
+  through an absolute raw GitHub URL instead of a relative asset path.
+- Added tests to ensure README images use absolute HTTPS links and verify
+  that repository-owned image assets exist and contain valid SVG markup.
+- No announcement routing, AI, playback, or integration configuration changes.
+
 ## 0.9.26 - 2026-10-17
 
 - Added primary `text` field to the `notify.announcement_hub` action and
