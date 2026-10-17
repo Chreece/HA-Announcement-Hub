@@ -40,6 +40,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
 
+from .ai_filter import async_filter_announcement
 from .const import (
     COMPANION_STREAM_DEFAULT,
     CONF_COMPANION_TTS_MEDIA_STREAM,
@@ -47,6 +48,8 @@ from .const import (
     CONF_COMPANION_TTS_WPM,
     CONF_CRITICAL_NOTIFY_DATA,
     CONF_DEFAULT_TITLE,
+    CONF_DEFAULT_USE_AI,
+    CONF_DEFAULT_AI_AGENT,
     CONF_DISPATCH_ORDER,
     CONF_FALLBACK_CHECK_DOOR,
     CONF_FALLBACK_DOOR_LABEL,
@@ -80,6 +83,8 @@ from .const import (
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_CRITICAL_NOTIFY_DATA,
     DEFAULT_DISPATCH_ORDER,
+    DEFAULT_USE_AI,
+    DEFAULT_AI_AGENT,
     DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_NOTIFY_MIN_LEVEL,
@@ -778,6 +783,8 @@ class AnnouncementManager:
         tts_options: Mapping[str, Any] | None,
         companion_tts: bool,
         occupied_only: bool,
+        use_ai: bool | None = None,
+        ai_agent: str | None = None,
     ) -> AnnouncementJob:
         text_tts = text_tts.strip() if text_tts and text_tts.strip() else None
         text_notify = (
@@ -1480,6 +1487,36 @@ class AnnouncementManager:
             **dict(tts_options or {}),
         }
 
+        # Run optional AI only after routing validation, before queue storage
+        # and prefetch. Restored queued jobs never need to call the agent.
+        ai_enabled = (
+            bool(self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI))
+            if use_ai is None
+            else use_ai
+        )
+        if ai_enabled:
+            selected_agent = (
+                ai_agent
+                if ai_agent is not None
+                else self.settings.get(CONF_DEFAULT_AI_AGENT, DEFAULT_AI_AGENT)
+            )
+            agent_id = (
+                None
+                if not selected_agent or selected_agent == DEFAULT_AI_AGENT
+                else str(selected_agent)
+            )
+            text_tts, text_notify = await async_filter_announcement(
+                self.hass,
+                text_tts=text_tts,
+                text_notify=text_notify,
+                agent_id=agent_id,
+            )
+            # Editing must not change levels, output eligibility, or routing.
+            if plan.tts_text is not None:
+                plan.tts_text = text_tts or text_notify
+            if plan.notify_text is not None:
+                plan.notify_text = text_notify or text_tts
+
         job = AnnouncementJob.create(
             text_tts=text_tts,
             text_notify=text_notify,
@@ -1511,6 +1548,12 @@ class AnnouncementManager:
                 )
             ),
         )
+        # AI awaits an external agent: another call may fill the queue in
+        # the meantime. Recheck capacity immediately before insertion.
+        if len(self._queue) + (1 if self._current else 0) >= queue_max:
+            raise ServiceValidationError(
+                f"Announcement queue is full ({queue_max} items)"
+            )
         self._queue.append(job)
         self._schedule_prefetch(job)
         self._schedule_save()

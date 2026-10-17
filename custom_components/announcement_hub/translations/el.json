@@ -117,7 +117,9 @@
           "occupancy_attribute": "Τιμή κατειλημμένων δωματίων",
           "fallback_room": "Εφεδρική περιοχή",
           "fallback_check_door": "Απαίτηση ανοιχτής πόρτας για fallback",
-          "fallback_door_label": "Φίλτρο label αισθητήρων πόρτας"
+          "fallback_door_label": "Φίλτρο label αισθητήρων πόρτας",
+          "default_use_ai": "Αναδιατύπωση ανακοινώσεων με AI",
+          "default_ai_agent": "Προεπιλεγμένος πράκτορας συνομιλίας AI"
         },
         "data_description": {
           "dispatch_order": "Ορίζει αν μέσα σε ένα announcement job εκτελούνται πρώτα οι οπτικές ειδοποιήσεις ή πρώτα το TTS.",
@@ -133,7 +135,9 @@
           "occupancy_attribute": "Επίλεξε αν τα occupied rooms διαβάζονται από το state της οντότητας ή από ένα από τα τρέχοντα attributes της.",
           "fallback_room": "Fallback περιοχή TTS που χρησιμοποιείται μόνο όταν τα τρέχοντα target rooms δεν έχουν κανέναν fixed room candidate. Υπάρχοντες fixed room candidates, ακόμη και unavailable/unknown, μπλοκάρουν το fallback και παραμένουν στο κανονικό availability timeout.",
           "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν κατάλληλος door sensor σε ένα από τα τρέχοντα target rooms αναφέρει ρητά ανοιχτός.",
-          "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors στα τρέχοντα target rooms."
+          "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors στα τρέχοντα target rooms.",
+          "default_use_ai": "Απενεργοποιημένο από προεπιλογή για υπάρχουσες εγκαταστάσεις. Όταν ενεργοποιηθεί, το AI αναδιατυπώνει τα ηχητικά και οπτικά μηνύματα πριν την αποστολή. Σε αποτυχία χρησιμοποιείται το αρχικό κείμενο.",
+          "default_ai_agent": "Προεπιλεγμένη επιλογή είναι το Home Assistant default, που ακολουθεί τον προεπιλεγμένο πράκτορα του conversation.process. Μπορείς να επιλέξεις άλλον διαθέσιμο πράκτορα."
         }
       }
     },
@@ -269,7 +273,9 @@
           "occupancy_attribute": "Τιμή κατειλημμένων δωματίων",
           "fallback_room": "Εφεδρική περιοχή",
           "fallback_check_door": "Απαίτηση ανοιχτής πόρτας για fallback",
-          "fallback_door_label": "Φίλτρο label αισθητήρων πόρτας"
+          "fallback_door_label": "Φίλτρο label αισθητήρων πόρτας",
+          "default_use_ai": "Αναδιατύπωση ανακοινώσεων με AI",
+          "default_ai_agent": "Προεπιλεγμένος πράκτορας συνομιλίας AI"
         },
         "data_description": {
           "dispatch_order": "Ορίζει αν μέσα σε ένα announcement job εκτελούνται πρώτα οι οπτικές ειδοποιήσεις ή πρώτα το TTS.",
@@ -285,7 +291,9 @@
           "occupancy_attribute": "Επίλεξε αν τα occupied rooms διαβάζονται από το state της οντότητας ή από ένα από τα τρέχοντα attributes της.",
           "fallback_room": "Fallback περιοχή TTS που χρησιμοποιείται μόνο όταν τα τρέχοντα target rooms δεν έχουν κανέναν fixed room candidate. Υπάρχοντες fixed room candidates, ακόμη και unavailable/unknown, μπλοκάρουν το fallback και παραμένουν στο κανονικό availability timeout.",
           "fallback_check_door": "Όταν είναι ενεργό, το fallback επιτρέπεται μόνο αν κατάλληλος door sensor σε ένα από τα τρέχοντα target rooms αναφέρει ρητά ανοιχτός.",
-          "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors στα τρέχοντα target rooms."
+          "fallback_door_label": "Προαιρετικό Home Assistant label. Αν επιλεγεί, μόνο door binary sensors με αυτό το label μπορούν να επιτρέψουν fallback· κενό σημαίνει όλοι οι door sensors στα τρέχοντα target rooms.",
+          "default_use_ai": "Απενεργοποιημένο από προεπιλογή για υπάρχουσες εγκαταστάσεις. Όταν ενεργοποιηθεί, το AI αναδιατυπώνει τα ηχητικά και οπτικά μηνύματα πριν την αποστολή. Σε αποτυχία χρησιμοποιείται το αρχικό κείμενο.",
+          "default_ai_agent": "Προεπιλεγμένη επιλογή είναι το Home Assistant default, που ακολουθεί τον προεπιλεγμένο πράκτορα του conversation.process. Μπορείς να επιλέξεις άλλον διαθέσιμο πράκτορα."
         }
       }
     },
@@ -417,6 +425,9 @@
         },
         "advanced": {
           "name": "Προχωρημένα"
+        },
+        "ai": {
+          "name": "Αναδιατύπωση AI"
         }
       },
       "fields": {
@@ -463,6 +474,14 @@
         "occupied_only": {
           "name": "Μόνο κατειλημμένες περιοχές",
           "description": "Προεπιλογή: ενεργό. Όταν έχει ρυθμιστεί πηγή occupancy, το room-bound routing περιορίζεται στα τρέχοντα occupied rooms. Αν δοθούν και output rooms, χρησιμοποιούνται μόνο τα δωμάτια που υπάρχουν και στη ρητή λίστα και στο occupancy. Απενεργοποίησέ το ώστε η ρητή λίστα output να είναι απόλυτη."
+        },
+        "use_ai": {
+          "name": "Παράκαμψη χρήσης AI",
+          "description": "Προαιρετική παράκαμψη για τη συγκεκριμένη ανακοίνωση. Κενό σημαίνει την επιλογή της ενσωμάτωσης· true ενεργοποιεί AI και false το απενεργοποιεί ακόμη κι αν είναι ενεργό συνολικά."
+        },
+        "ai_agent": {
+          "name": "Παράκαμψη πράκτορα συνομιλίας AI",
+          "description": "Διάλεξε διαθέσιμο πράκτορα συνομιλίας για τη συγκεκριμένη ανακοίνωση. Κενό σημαίνει την επιλογή της ενσωμάτωσης (αρχικά Home Assistant default)."
         }
       }
     },

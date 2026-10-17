@@ -8,6 +8,7 @@ from typing import Any
 import probatio
 
 from homeassistant import config_entries
+from homeassistant.components.conversation.agent_manager import get_agent_manager
 from homeassistant.config_entries import ConfigFlowResult, OptionsFlow
 from homeassistant.core import callback
 from homeassistant.helpers import selector
@@ -19,6 +20,8 @@ from .const import (
     CONF_COMPANION_TTS_WPM,
     CONF_CRITICAL_NOTIFY_DATA,
     CONF_DEFAULT_TITLE,
+    CONF_DEFAULT_USE_AI,
+    CONF_DEFAULT_AI_AGENT,
     CONF_DISPATCH_ORDER,
     CONF_FALLBACK_CHECK_DOOR,
     CONF_FALLBACK_DOOR_LABEL,
@@ -59,6 +62,8 @@ from .const import (
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_CRITICAL_NOTIFY_DATA,
     DEFAULT_DISPATCH_ORDER,
+    DEFAULT_USE_AI,
+    DEFAULT_AI_AGENT,
     DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_NOTIFY_MIN_LEVEL,
@@ -1112,6 +1117,50 @@ class _AnnouncementFlowMixin:
             description_placeholders={"entity": sensor},
         )
 
+    def _ai_agent_options(self) -> list[selector.SelectOptionDict]:
+        """Offer the HA default and currently available conversation agents."""
+        options = [
+            selector.SelectOptionDict(
+                value=DEFAULT_AI_AGENT, label="Home Assistant default"
+            )
+        ]
+        seen = {DEFAULT_AI_AGENT}
+        for state in sorted(
+            self.hass.states.async_all("conversation"),
+            key=lambda state: (state.name or state.entity_id).casefold(),
+        ):
+            if state.entity_id in seen:
+                continue
+            seen.add(state.entity_id)
+            options.append(
+                selector.SelectOptionDict(
+                    value=state.entity_id,
+                    label=state.name or state.entity_id,
+                )
+            )
+        # HA also supports agents that are not represented by entities.
+        for agent in get_agent_manager(self.hass).async_get_agent_info():
+            if agent.id in seen:
+                continue
+            seen.add(agent.id)
+            options.append(
+                selector.SelectOptionDict(
+                    value=agent.id,
+                    label=agent.name or agent.id,
+                )
+            )
+        selected = str(
+            self._value(CONF_DEFAULT_AI_AGENT, DEFAULT_AI_AGENT)
+            or DEFAULT_AI_AGENT
+        )
+        if selected not in seen:
+            options.append(
+                selector.SelectOptionDict(
+                    value=selected, label=f"Unavailable agent ({selected})"
+                )
+            )
+        return options
+
     async def async_step_queue(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -1122,6 +1171,8 @@ class _AnnouncementFlowMixin:
             had_source_field = CONF_OCCUPANCY_ATTRIBUTE in user_input
             for key, default in (
                 (CONF_DEFAULT_TITLE, DEFAULT_TITLE),
+                (CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
+                (CONF_DEFAULT_AI_AGENT, DEFAULT_AI_AGENT),
                 (CONF_CRITICAL_NOTIFY_DATA, {}),
                 (CONF_OCCUPANCY_SENSOR, None),
                 (CONF_FALLBACK_ROOM, None),
@@ -1172,6 +1223,19 @@ class _AnnouncementFlowMixin:
                 CONF_DEFAULT_TITLE,
                 default=self._value(CONF_DEFAULT_TITLE, DEFAULT_TITLE),
             ): selector.TextSelector(),
+            probatio.Required(
+                CONF_DEFAULT_USE_AI,
+                default=self._value(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
+            ): selector.BooleanSelector(),
+            probatio.Required(
+                CONF_DEFAULT_AI_AGENT,
+                default=self._value(CONF_DEFAULT_AI_AGENT, DEFAULT_AI_AGENT),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=self._ai_agent_options(),
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
             probatio.Optional(
                 CONF_CRITICAL_NOTIFY_DATA,
                 default=self._value(CONF_CRITICAL_NOTIFY_DATA, {}),

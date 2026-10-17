@@ -50,6 +50,14 @@ send:
           default: true
           selector:
             boolean:
+    ai:
+      fields:
+        use_ai:
+          selector:
+            boolean:
+        ai_agent:
+          selector:
+            conversation_agent:
     advanced:
       collapsed: true
       fields:

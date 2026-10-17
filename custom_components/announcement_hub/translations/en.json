@@ -117,7 +117,9 @@
           "occupancy_attribute": "Occupied rooms value",
           "fallback_room": "Fallback room",
           "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter"
+          "fallback_door_label": "Door sensor label filter",
+          "default_use_ai": "Rewrite announcements with AI",
+          "default_ai_agent": "Default AI conversation agent"
         },
         "data_description": {
           "dispatch_order": "Choose whether visual notifications are delivered before spoken TTS or TTS before visual notifications within one announcement job.",
@@ -133,7 +135,9 @@
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
           "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms."
+          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "default_use_ai": "Disabled by default for existing installations. When enabled, spoken and visual messages are rephrased before delivery. If the agent fails, the original announcement is used.",
+          "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent."
         }
       }
     },
@@ -269,7 +273,9 @@
           "occupancy_attribute": "Occupied rooms value",
           "fallback_room": "Fallback room",
           "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter"
+          "fallback_door_label": "Door sensor label filter",
+          "default_use_ai": "Rewrite announcements with AI",
+          "default_ai_agent": "Default AI conversation agent"
         },
         "data_description": {
           "dispatch_order": "Choose whether visual notifications are delivered before spoken TTS or TTS before visual notifications within one announcement job.",
@@ -285,7 +291,9 @@
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
           "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms."
+          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "default_use_ai": "Disabled by default for existing installations. When enabled, spoken and visual messages are rephrased before delivery. If the agent fails, the original announcement is used.",
+          "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent."
         }
       }
     },
@@ -417,6 +425,9 @@
         },
         "advanced": {
           "name": "Advanced"
+        },
+        "ai": {
+          "name": "AI rewriting"
         }
       },
       "fields": {
@@ -463,6 +474,14 @@
         "occupied_only": {
           "name": "Only occupied areas",
           "description": "Default: enabled. When an occupancy source is configured, room-bound delivery is restricted to currently occupied areas. If output rooms are also supplied, only rooms present in both the explicit output list and the occupied-room set are used. Disable to make the explicit output list authoritative."
+        },
+        "use_ai": {
+          "name": "Override AI rewriting",
+          "description": "Optional override for this announcement. Leave unset to inherit the integration setting; true enables AI and false bypasses it even if globally enabled."
+        },
+        "ai_agent": {
+          "name": "Override AI conversation agent",
+          "description": "Choose a currently available conversation agent for this announcement. Leave empty to inherit the integration selection (initially Home Assistant default)."
         }
       }
     },
