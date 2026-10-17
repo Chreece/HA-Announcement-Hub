@@ -313,6 +313,20 @@ def test_error_and_action_done_responses_are_unusable(kind) -> None:
     assert got == ("Original", None)
 
 
+def test_rewrite_must_preserve_numeric_signs_in_both_channels() -> None:
+    source = ("Temperature is -5°C.", "Temperature: -5°C.")
+    for changed in (
+        ha_reply("Temperature is 5°C.", source[1]),
+        ha_reply(source[0], "🌡️ Temperature: +5°C."),
+    ):
+        hass = Hass(changed)
+        got = asyncio.run(ai.async_filter_announcement(
+            hass, text_tts=source[0], text_notify=source[1],
+            agent_id=None,
+        ))
+        assert got == source
+
+
 def test_faulty_numeric_or_refusal_without_backup_uses_original() -> None:
     for edited in ("The temperature is 30°C", "I am sorry, I cannot help"):
         hass = Hass(ha_reply(edited, None))

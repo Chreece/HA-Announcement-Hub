@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.20 - 2026-10-17
 
 - AI now produces two independent output variants in one request: plain,
   speech-ready text for TTS and expressive visual text for notifications.
@@ -10,8 +10,10 @@
 - AI now receives the actual resolved delivery-plan texts, including speech
   synthesized from visual-only Critical alerts and level/room fallback paths.
   This does not enable new channels or modify announcement routing.
+- Preserve signed numerical readings during AI validation, preventing a
+  negative temperature from silently becoming positive (or vice versa).
 - Added tests for multilingual-friendly channel separation, speech hygiene,
-  decorated visual messages and fail-open recovery.
+  decorated visual messages, numeric signs and fail-open recovery.
 
 ## 0.9.19 - 2026-10-17
 
