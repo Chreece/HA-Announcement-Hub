@@ -8,10 +8,20 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 from typing import Any
 
 _LOGGER = logging.getLogger(__name__)
 AI_FILTER_TIMEOUT_SECONDS = 12
+
+# Numerical readings, time, dates and quantities must never be silently changed.
+_NUMBER_PATTERN = re.compile(r"[0-9]+(?:[.,][0-9]+)*")
+_ERROR_PREFIXES = (
+    "i am sorry", "i’m sorry", "i'm sorry", "i cannot", "i can't",
+    "as an ai", "sorry, i", "an error occurred", "request failed",
+    "es tut mir leid", "ich kann nicht", "entschuldigung,",
+    "λυπάμαι", "δεν μπορώ",
+)
 
 
 def _rewrite_prompt(text_tts: str | None, text_notify: str | None) -> str:
@@ -40,6 +50,13 @@ def _parse_reply(
     """Only accept a bounded two-channel reply that keeps nonempty originals."""
     if not isinstance(response, dict):
         return None
+    if response.get("response_type") in ("error", "action_done"):
+        return None
+    inner_response = response.get("response")
+    if isinstance(inner_response, dict) and inner_response.get("response_type") in (
+        "error", "action_done"
+    ):
+        return None
     try:
         text = response["response"]["speech"]["plain"]["speech"]
     except (KeyError, TypeError):
@@ -66,7 +83,12 @@ def _parse_reply(
         elif (
             not isinstance(candidate, str)
             or not candidate.strip()
-            or len(candidate) > max(512, len(original) * 3)
+            or len(candidate) > max(240, len(original) * 2 + 80)
+            or _NUMBER_PATTERN.findall(candidate) != _NUMBER_PATTERN.findall(original)
+            or (
+                candidate.strip().casefold().startswith(_ERROR_PREFIXES)
+                and not original.strip().casefold().startswith(_ERROR_PREFIXES)
+            )
         ):
             return None
     return (
@@ -83,35 +105,57 @@ async def async_filter_announcement(
     text_tts: str | None,
     text_notify: str | None,
     agent_id: str | None,
+    fallback_agent_id: str | None = None,
 ) -> tuple[str | None, str | None]:
-    """Use one conversation request for both channel texts; fail open."""
-    originals = {"text_tts": text_tts, "text_notify": text_notify}
-    payload = {"text": _rewrite_prompt(text_tts, text_notify)}
-    if agent_id:
-        payload["agent_id"] = agent_id
-    try:
-        async with asyncio.timeout(AI_FILTER_TIMEOUT_SECONDS):
-            response = await hass.services.async_call(
-                "conversation",
-                "process",
-                payload,
-                blocking=True,
-                return_response=True,
-            )
-    except Exception as error:
-        # Never log message bodies in failure paths.
-        _LOGGER.warning(
-            "Announcement AI rewrite via %s failed (%s); using original message",
-            agent_id or "Home Assistant default",
-            type(error).__name__,
-        )
-        return text_tts, text_notify
+    """Try the primary AI, optional backup AI, then use untouched originals.
 
-    edited = _parse_reply(response, originals)
-    if edited is None:
-        _LOGGER.debug(
-            "Announcement AI agent %s produced no usable JSON; using original message",
-            agent_id or "Home Assistant default",
+    The empty fallback-agent string explicitly selects Home Assistant default;
+    None means there is no backup agent and the original text is the fallback.
+    """
+    originals = {"text_tts": text_tts, "text_notify": text_notify}
+    prompt = _rewrite_prompt(text_tts, text_notify)
+    agents: list[str | None] = [agent_id or None]
+    if fallback_agent_id is not None:
+        backup = fallback_agent_id or None
+        if backup not in agents:
+            agents.append(backup)
+
+    for index, candidate in enumerate(agents):
+        payload = {"text": prompt}
+        if candidate:
+            payload["agent_id"] = candidate
+        try:
+            async with asyncio.timeout(AI_FILTER_TIMEOUT_SECONDS):
+                response = await hass.services.async_call(
+                    "conversation",
+                    "process",
+                    payload,
+                    blocking=True,
+                    return_response=True,
+                )
+        except Exception as error:
+            # Do not include the original text, prompt or response in logs.
+            _LOGGER.warning(
+                "Announcement %s AI agent %s failed (%s); falling back",
+                "backup" if index else "primary",
+                candidate or "Home Assistant default",
+                type(error).__name__,
+            )
+            continue
+
+        edited = _parse_reply(response, originals)
+        if edited is not None:
+            if index:
+                _LOGGER.info(
+                    "Announcement AI backup %s succeeded after primary failed",
+                    candidate or "Home Assistant default",
+                )
+            return edited
+        _LOGGER.warning(
+            "Announcement %s AI agent %s returned invalid or unsafe text; falling back",
+            "backup" if index else "primary",
+            candidate or "Home Assistant default",
         )
-        return text_tts, text_notify
-    return edited
+
+    # This fallback is unconditional: AI must never suppress delivery.
+    return text_tts, text_notify

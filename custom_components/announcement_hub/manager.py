@@ -50,6 +50,7 @@ from .const import (
     CONF_DEFAULT_TITLE,
     CONF_DEFAULT_USE_AI,
     CONF_DEFAULT_AI_AGENT,
+    CONF_FALLBACK_AI_AGENT,
     CONF_DISPATCH_ORDER,
     CONF_FALLBACK_CHECK_DOOR,
     CONF_FALLBACK_DOOR_LABEL,
@@ -85,6 +86,7 @@ from .const import (
     DEFAULT_DISPATCH_ORDER,
     DEFAULT_USE_AI,
     DEFAULT_AI_AGENT,
+    DEFAULT_FALLBACK_AI_AGENT,
     DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_NOTIFY_MIN_LEVEL,
@@ -1505,11 +1507,22 @@ class AnnouncementManager:
                 if not selected_agent or selected_agent == DEFAULT_AI_AGENT
                 else str(selected_agent)
             )
+            fallback_setting = str(
+                self.settings.get(
+                    CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT
+                ) or DEFAULT_FALLBACK_AI_AGENT
+            )
+            fallback_agent_id = (
+                None
+                if fallback_setting == DEFAULT_FALLBACK_AI_AGENT
+                else ("" if fallback_setting == DEFAULT_AI_AGENT else fallback_setting)
+            )
             text_tts, text_notify = await async_filter_announcement(
                 self.hass,
                 text_tts=text_tts,
                 text_notify=text_notify,
                 agent_id=agent_id,
+                fallback_agent_id=fallback_agent_id,
             )
             # Editing must not change levels, output eligibility, or routing.
             if plan.tts_text is not None:

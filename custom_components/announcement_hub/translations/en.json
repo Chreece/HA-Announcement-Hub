@@ -119,7 +119,8 @@
           "fallback_check_door": "Require an open occupied-room door for fallback",
           "fallback_door_label": "Door sensor label filter",
           "default_use_ai": "Rewrite announcements with AI",
-          "default_ai_agent": "Default AI conversation agent"
+          "default_ai_agent": "Default AI conversation agent",
+          "fallback_ai_agent": "Backup AI conversation agent"
         },
         "data_description": {
           "dispatch_order": "Choose whether visual notifications are delivered before spoken TTS or TTS before visual notifications within one announcement job.",
@@ -137,7 +138,8 @@
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
           "default_use_ai": "Disabled by default for existing installations. When enabled, spoken and visual messages are rephrased before delivery. If the agent fails, the original announcement is used.",
-          "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent."
+          "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent.",
+          "fallback_ai_agent": "Optional backup agent tried only when the primary AI fails, times out, or returns invalid output. Original announcement is preselected: it skips a second AI attempt and sends the original text immediately. If the backup also fails, the original is always sent."
         }
       }
     },
@@ -275,7 +277,8 @@
           "fallback_check_door": "Require an open occupied-room door for fallback",
           "fallback_door_label": "Door sensor label filter",
           "default_use_ai": "Rewrite announcements with AI",
-          "default_ai_agent": "Default AI conversation agent"
+          "default_ai_agent": "Default AI conversation agent",
+          "fallback_ai_agent": "Backup AI conversation agent"
         },
         "data_description": {
           "dispatch_order": "Choose whether visual notifications are delivered before spoken TTS or TTS before visual notifications within one announcement job.",
@@ -293,7 +296,8 @@
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
           "default_use_ai": "Disabled by default for existing installations. When enabled, spoken and visual messages are rephrased before delivery. If the agent fails, the original announcement is used.",
-          "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent."
+          "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent.",
+          "fallback_ai_agent": "Optional backup agent tried only when the primary AI fails, times out, or returns invalid output. Original announcement is preselected: it skips a second AI attempt and sends the original text immediately. If the backup also fails, the original is always sent."
         }
       }
     },
