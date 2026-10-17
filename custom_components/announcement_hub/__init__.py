@@ -37,6 +37,7 @@ from .const import (
     ATTR_OUTPUT,
     ATTR_SERVICE,
     ATTR_TEXT_NOTIFY,
+    ATTR_TEXT,
     ATTR_TEXT_TTS,
     ATTR_TITLE,
     ATTR_TTS_OPTIONS,
@@ -77,6 +78,7 @@ from .const import (
     TARGET_SERVICE_PREFIX,
 )
 from .manager import AnnouncementManager
+from .message_text import resolve_channel_texts
 from .outputs import area_name
 
 
@@ -118,12 +120,16 @@ def _notify_action_description() -> dict[str, Any]:
 
 
 def _validate_send_payload(data: dict[str, Any]) -> dict[str, Any]:
-    """Require at least one non-empty text field."""
-    if not str(data.get(ATTR_TEXT_TTS, "")).strip() and not str(
-        data.get(ATTR_TEXT_NOTIFY, "")
-    ).strip():
+    """Require primary text or a backwards-compatible non-empty channel text."""
+    text_tts, text_notify = resolve_channel_texts(
+        data.get(ATTR_TEXT),
+        data.get(ATTR_TEXT_TTS),
+        data.get(ATTR_TEXT_NOTIFY),
+    )
+    if not text_tts and not text_notify:
         raise probatio.Invalid(
-            "At least one of text_tts or text_notify is required"
+            "text is required unless an existing text_tts or text_notify "
+            "channel value is provided"
         )
     return data
 
@@ -131,6 +137,10 @@ def _validate_send_payload(data: dict[str, Any]) -> dict[str, Any]:
 SEND_SCHEMA = probatio.All(
     probatio.Schema(
         {
+            # The action editor marks text as required for new calls. Keep
+            # the API schema optional so existing channel-only automations
+            # do not break when upgrading the integration.
+            probatio.Optional(ATTR_TEXT): cv.string,
             probatio.Optional(ATTR_TEXT_TTS): cv.string,
             probatio.Optional(ATTR_TEXT_NOTIFY): cv.string,
             probatio.Optional(ATTR_OUTPUT): probatio.All(
@@ -294,6 +304,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
     async def async_send(call: ServiceCall) -> ServiceResponse:
         manager = _get_manager(hass)
         job = await manager.async_enqueue(
+            text=call.data.get(ATTR_TEXT),
             text_tts=call.data.get(ATTR_TEXT_TTS),
             text_notify=call.data.get(ATTR_TEXT_NOTIFY),
             outputs=call.data.get(ATTR_OUTPUT),
