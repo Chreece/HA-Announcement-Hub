@@ -11,7 +11,7 @@ def test_explicit_action_areas_filter_candidate_planning_without_occupancy() -> 
     block = manager[
         manager.index("requested_output_area_ids = self._resolve_area_ids"):
         manager.index(
-            "requested = self._ensure_list",
+            "configured = self._configured_outputs()",
             manager.index("requested_output_area_ids = self._resolve_area_ids"),
         )
     ]
@@ -29,8 +29,8 @@ def test_empty_or_unavailable_occupancy_keeps_general_outputs_eligible() -> None
         manager.index("def routed_plan("):
         manager.index("# Build all physical channel candidates first")
     ]
-    assert "self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL" in routed
-    assert "self._tts_player_scope(entity_id) == NOTIFY_SCOPE_GENERAL" in routed
+    assert "not explicit_area_routing" in routed
+    assert "== NOTIFY_SCOPE_GENERAL" in routed
     assert "allow_general_outputs" not in routed
 
 
@@ -57,7 +57,7 @@ def test_explicit_rooms_intersect_occupancy_when_occupied_only() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
     block = manager[
         manager.index("requested_output_area_ids = self._resolve_area_ids"):
-        manager.index("requested = self._ensure_list")
+        manager.index("configured = self._configured_outputs()")
     ]
     assert "occupied_area_ids = self._occupied_area_ids() if occupied_only else None" in block
     assert "occupied_set = set(occupied_area_ids)" in block
@@ -70,7 +70,7 @@ def test_explicit_rooms_are_authoritative_when_occupied_only_is_false() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
     block = manager[
         manager.index("requested_output_area_ids = self._resolve_area_ids"):
-        manager.index("requested = self._ensure_list")
+        manager.index("configured = self._configured_outputs()")
     ]
     assert "elif explicit_area_routing:" in block
     assert "output_area_ids = requested_output_area_ids" in block
