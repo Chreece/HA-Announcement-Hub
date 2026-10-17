@@ -73,6 +73,9 @@ def test_existing_output_selection_is_preserved_not_auto_selected() -> None:
     assert "self._editing_existing or domain in domains" in FLOW_SOURCE
     assert "if self._editing_existing:" in FLOW_SOURCE
     assert "ref for ref in self._working.get(CONF_NOTIFY_OUTPUTS, [])" in FLOW_SOURCE
+    assert "if ref not in known:" in FLOW_SOURCE
+    assert "options.append(" in FLOW_SOURCE
+    assert "policies[ref].get(NOTIFY_POLICY_SCOPE)" in FLOW_SOURCE
 
 
 def test_menu_translations_match_all_languages() -> None:

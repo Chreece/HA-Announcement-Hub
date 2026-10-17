@@ -268,6 +268,15 @@ class _AnnouncementFlowMixin:
         """Step 1: discover and configure notification outputs."""
         options = notify_output_options(self.hass)
         known = [str(item["value"]) for item in options]
+        if self._editing_existing:
+            # Keep selected outputs even if their entities temporarily vanished.
+            # Otherwise opening and saving this page could erase those targets.
+            for ref in self._working.get(CONF_NOTIFY_OUTPUTS, []):
+                if ref not in known:
+                    options.append(
+                        selector.SelectOptionDict(value=ref, label=ref)
+                    )
+                    known.append(ref)
         # First-time setup auto-selects discovered notification outputs.
         # Reconfiguration instead keeps existing selections and opt-outs.
         selected_default = list(known)
@@ -331,7 +340,18 @@ class _AnnouncementFlowMixin:
                 assigned |= values
             no_area = [
                 ref for ref in room
-                if (records.get(ref) is None or records[ref].area_id is None)
+                if (
+                    records.get(ref) is not None
+                    and records[ref].area_id is None
+                )
+                or (
+                    records.get(ref) is None
+                    and not (
+                        isinstance(policies.get(ref), dict)
+                        and policies[ref].get(NOTIFY_POLICY_SCOPE)
+                        == NOTIFY_SCOPE_ROOM
+                    )
+                )
             ]
             if duplicate:
                 errors["base"] = "notify_level_overlap"
