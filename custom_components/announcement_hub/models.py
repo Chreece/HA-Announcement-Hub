@@ -148,6 +148,7 @@ class AnnouncementJob:
     tts_text: str | None
     notify_text: str | None
     server_tts_enabled: bool
+    click_action: str | None = None
     tts_media_player: str | None = None
     tts_player_area: str | None = None
     room_tts_player_areas: dict[str, str | None] = field(default_factory=dict)
@@ -184,6 +185,7 @@ class AnnouncementJob:
         tts_cache: bool,
         plan: DeliveryPlan,
         ai: Mapping[str, Any] | None = None,
+        click_action: str | None = None,
         tts_media_player: str | None = None,
         tts_player_area: str | None = None,
         room_tts_player_areas: Mapping[str, str | None] | None = None,
@@ -204,6 +206,7 @@ class AnnouncementJob:
             level=level or LEVEL_INFO,
             title=title,
             notify_data=dict(notify_data or {}),
+            click_action=click_action or None,
             language=language or None,
             tts_options=dict(tts_options or {}),
             tts_cache=bool(tts_cache),
@@ -295,6 +298,7 @@ class AnnouncementJob:
         payload.setdefault("channel_errors", {})
         payload.setdefault("successful_channels", [])
         payload.setdefault("notify_data", {})
+        payload.setdefault("click_action", None)
         payload.setdefault("tts_options", {})
         payload.setdefault("tts_cache", True)
         payload.setdefault("status", "pending")
@@ -344,4 +348,5 @@ class AnnouncementJob:
             result["title"] = self.title
             result["text_tts"] = self.text_tts
             result["text_notify"] = self.text_notify
+            result["click_action"] = self.click_action
         return result
