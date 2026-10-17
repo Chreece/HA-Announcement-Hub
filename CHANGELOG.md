@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.20 - 2026-10-17
 
 - AI now produces two independent output variants in one request: plain,
   speech-ready text for TTS and expressive visual text for notifications.
