@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.21 - 2026-10-17
 
 - Added direct step-selection menus for both Reconfigure and Configure, so
   users can jump to notification outputs, TTS, provider profiles or general/AI
