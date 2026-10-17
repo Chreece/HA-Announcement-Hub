@@ -1512,12 +1512,21 @@ class AnnouncementManager:
                 if ai_agent is not None
                 else self.settings.get(CONF_DEFAULT_AI_AGENT, DEFAULT_AI_AGENT)
             )
+            # "default" follows the preferred Assist pipeline, NOT the
+            # built-in conversation.process intent-only default (agent_id=None).
             agent_id = (
-                None
+                DEFAULT_AI_AGENT
                 if not selected_agent or selected_agent == DEFAULT_AI_AGENT
                 else str(selected_agent)
             )
-            ai_info["agent"] = agent_id or "Home Assistant default"
+            ai_info["agent_selection"] = (
+                "preferred_assist" if agent_id == DEFAULT_AI_AGENT else "explicit"
+            )
+            ai_info["agent"] = (
+                "Preferred Assist pipeline"
+                if agent_id == DEFAULT_AI_AGENT
+                else agent_id
+            )
             fallback_setting = str(
                 self.settings.get(
                     CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT
@@ -1526,7 +1535,7 @@ class AnnouncementManager:
             fallback_agent_id = (
                 None
                 if fallback_setting == DEFAULT_FALLBACK_AI_AGENT
-                else ("" if fallback_setting == DEFAULT_AI_AGENT else fallback_setting)
+                else fallback_setting
             )
             # Critical delivery and room/level fallback may derive a spoken
             # message from a visual input (or the reverse). AI must rewrite

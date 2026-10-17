@@ -4,7 +4,8 @@
   "after_dependencies": [
     "snapcast",
     "mobile_app",
-    "nfandroidtv"
+    "nfandroidtv",
+    "assist_pipeline"
   ],
   "codeowners": [
     "@Chreece"

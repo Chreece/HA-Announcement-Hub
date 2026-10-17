@@ -423,7 +423,7 @@ def test_agent_successful_but_unchanged_is_reported_separately() -> None:
     assert got == (None, "Already clear")
     assert diag["status"] == "accepted_unchanged"
     assert diag["attempted"] is True
-    assert diag["agent_used"] == "Home Assistant default"
+    assert diag["agent_used"] == "Home Assistant built-in"
 
 
 def test_intent_only_default_agent_error_is_visible_without_text() -> None:
@@ -443,7 +443,7 @@ def test_intent_only_default_agent_error_is_visible_without_text() -> None:
     assert diag["status"] == "fallback_original"
     assert diag["failure_reason"] == "no_intent_match"
     assert diag["attempts"] == [
-        {"agent": "Home Assistant default", "outcome": "no_intent_match"}
+        {"agent": "Home Assistant built-in", "outcome": "no_intent_match"}
     ]
     assert "Sorry" not in str(diag)
 
@@ -483,6 +483,206 @@ def test_parse_exception_does_not_block_original_announcement(monkeypatch) -> No
     assert got == ("Door open", None)
     assert diag["status"] == "fallback_original"
     assert diag["attempts"][0]["outcome"] == "invalid_response"
+
+
+def test_default_agent_is_preferred_assist_pipeline_not_builtin(monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai, "resolve_preferred_assist_agent",
+        lambda _hass: ("conversation.ollama", "el", None),
+    )
+    hass = Hass(ha_reply("Η πόρτα είναι ανοιχτή.", "🚪 Η πόρτα είναι ανοιχτή."))
+    diagnostics = {"agent": "Preferred Assist pipeline"}
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Η πόρτα είναι ανοιχτή",
+        text_notify="Η πόρτα είναι ανοιχτή", agent_id="default",
+        diagnostics=diagnostics,
+    ))
+    assert got == ("Η πόρτα είναι ανοιχτή.", "🚪 Η πόρτα είναι ανοιχτή.")
+    assert len(hass.services.calls) == 1
+    _, _, payload, kwargs = hass.services.calls[0]
+    assert payload["agent_id"] == "conversation.ollama"
+    assert payload["language"] == "el"
+    assert kwargs == {"blocking": True, "return_response": True}
+    assert diagnostics["agent"] == "conversation.ollama"
+    assert diagnostics["agent_used"] == "conversation.ollama"
+    assert diagnostics["status"] == "rewritten"
+
+
+def test_explicit_selected_agent_does_not_resolve_preferred(monkeypatch) -> None:
+    def fail(_hass):
+        raise AssertionError("Explicit agent must not query preferred pipeline")
+    monkeypatch.setattr(ai, "resolve_preferred_assist_agent", fail)
+    hass = Hass(ha_reply(None, "The door is open."))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=None, text_notify="Door open",
+        agent_id="conversation.explicit",
+    ))
+    assert got == (None, "The door is open.")
+    assert hass.services.calls[0][2]["agent_id"] == "conversation.explicit"
+    assert "language" not in hass.services.calls[0][2]
+
+
+@pytest.mark.parametrize("failure_reason", [
+    "preferred_assist_pipeline_unavailable",
+    "preferred_assist_agent_not_generative",
+    "preferred_assist_agent_unavailable",
+])
+def test_preferred_agent_unavailable_never_calls_builtin(
+    monkeypatch, failure_reason
+) -> None:
+    monkeypatch.setattr(
+        ai, "resolve_preferred_assist_agent",
+        lambda _hass: (None, None, failure_reason),
+    )
+    hass = Hass(error=AssertionError("Must not call the built-in agent"))
+    diagnostics = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Original speech", text_notify="Original text",
+        agent_id="default", diagnostics=diagnostics,
+    ))
+    assert got == ("Original speech", "Original text")
+    assert not hass.services.calls
+    assert diagnostics["status"] == "fallback_original"
+    assert diagnostics["attempted"] is False
+    assert diagnostics["agent_used"] is None
+    assert diagnostics["failure_reason"] == failure_reason
+    assert diagnostics["attempts"] == [
+        {"agent": "Preferred Assist pipeline", "outcome": failure_reason}
+    ]
+
+
+def test_missing_preferred_agent_tries_configured_backup(monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai, "resolve_preferred_assist_agent",
+        lambda _hass: (None, None, "preferred_assist_agent_not_generative"),
+    )
+    hass = Hass(ha_reply("The door is open.", None))
+    diagnostics = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify=None,
+        agent_id="default", fallback_agent_id="conversation.backup",
+        diagnostics=diagnostics,
+    ))
+    assert got == ("The door is open.", None)
+    assert len(hass.services.calls) == 1
+    assert hass.services.calls[0][2]["agent_id"] == "conversation.backup"
+    assert diagnostics["attempts"] == [
+        {
+            "agent": "Preferred Assist pipeline",
+            "outcome": "preferred_assist_agent_not_generative",
+        },
+        {"agent": "conversation.backup", "outcome": "rewritten"},
+    ]
+    assert diagnostics["agent_used"] == "conversation.backup"
+    assert diagnostics["failure_reason"] is None
+
+
+def test_fallback_default_uses_preferred_assist_agent(monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai, "resolve_preferred_assist_agent",
+        lambda _hass: ("conversation.qwen", "el", None),
+    )
+    hass = Hass(responses=[
+        RuntimeError("primary offline"),
+        ha_reply(None, "🚪 Η πόρτα είναι ανοιχτή."),
+    ])
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=None, text_notify="Η πόρτα είναι ανοιχτή",
+        agent_id="conversation.broken", fallback_agent_id="default",
+    ))
+    assert got == (None, "🚪 Η πόρτα είναι ανοιχτή.")
+    assert len(hass.services.calls) == 2
+    assert hass.services.calls[0][2]["agent_id"] == "conversation.broken"
+    assert hass.services.calls[1][2]["agent_id"] == "conversation.qwen"
+    assert hass.services.calls[1][2]["language"] == "el"
+
+
+def test_fallback_default_deduplicates_preferred_primary(monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai, "resolve_preferred_assist_agent",
+        lambda _hass: ("conversation.qwen", "el", None),
+    )
+    hass = Hass(error=RuntimeError("agent offline"))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify=None,
+        agent_id="conversation.qwen", fallback_agent_id="default",
+    ))
+    assert got == ("Door open", None)
+    assert len(hass.services.calls) == 1
+
+
+def test_preferred_pipeline_is_resolved_fresh_per_announcement(monkeypatch) -> None:
+    agent_ids = iter(["conversation.ollama", "conversation.openai"])
+    monkeypatch.setattr(
+        ai, "resolve_preferred_assist_agent",
+        lambda _hass: (next(agent_ids), "el", None),
+    )
+    hass = Hass(ha_reply(None, "Ready."))
+    for expected in ("conversation.ollama", "conversation.openai"):
+        got = asyncio.run(ai.async_filter_announcement(
+            hass, text_tts=None, text_notify="Ready",
+            agent_id="default",
+        ))
+        assert got == (None, "Ready.")
+        assert hass.services.calls[-1][2]["agent_id"] == expected
+
+
+def test_preferred_pipeline_resolver_uses_home_assistant_public_api(
+    monkeypatch,
+) -> None:
+    import sys
+    from types import ModuleType, SimpleNamespace
+
+    fake_homeassistant = ModuleType("homeassistant")
+    fake_homeassistant.__path__ = []
+    fake_components = ModuleType("homeassistant.components")
+    fake_components.__path__ = []
+    fake_pipeline = ModuleType("homeassistant.components.assist_pipeline")
+    calls = []
+    def get_pipeline(hass):
+        calls.append(hass)
+        return SimpleNamespace(
+            conversation_engine="conversation.ollama",
+            conversation_language="el",
+        )
+    fake_pipeline.async_get_pipeline = get_pipeline
+    monkeypatch.setitem(sys.modules, "homeassistant", fake_homeassistant)
+    monkeypatch.setitem(sys.modules, "homeassistant.components", fake_components)
+    monkeypatch.setitem(
+        sys.modules, "homeassistant.components.assist_pipeline", fake_pipeline
+    )
+    hass = Hass()
+    assert ai.resolve_preferred_assist_agent(hass) == (
+        "conversation.ollama", "el", None
+    )
+    assert calls == [hass]
+
+    fake_pipeline.async_get_pipeline = lambda _hass: SimpleNamespace(
+        conversation_engine="conversation.home_assistant",
+        conversation_language="el",
+    )
+    assert ai.resolve_preferred_assist_agent(hass) == (
+        None, None, "preferred_assist_agent_not_generative"
+    )
+
+    def no_pipeline(_hass):
+        raise KeyError("No preferred pipeline")
+    fake_pipeline.async_get_pipeline = no_pipeline
+    assert ai.resolve_preferred_assist_agent(hass) == (
+        None, None, "preferred_assist_pipeline_unavailable"
+    )
+
+
+def test_manager_passes_default_marker_instead_of_none() -> None:
+    source = (COMPONENT / "manager.py").read_text(encoding="utf-8")
+    assert "if not selected_agent or selected_agent == DEFAULT_AI_AGENT" in source
+    assert "agent_id = (" in source
+    assert '"preferred_assist" if agent_id == DEFAULT_AI_AGENT else "explicit"' in source
+    assert "else fallback_setting" in source
+    assert "diagnostics=ai_info" in source
+    flow = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
+    assert "resolve_preferred_assist_agent(" in flow
+    assert "Preferred Assist pipeline:" in flow
 
 def test_config_and_actions_support_optional_ai_overrides() -> None:
     flow = (COMPONENT / "config_flow.py").read_text()

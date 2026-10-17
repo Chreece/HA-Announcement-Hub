@@ -117,6 +117,7 @@ from .const import (
     NOTIFY_SCOPE_ROOM,
     TTS_MIN_LEVELS,
 )
+from .ai_filter import resolve_preferred_assist_agent
 from .flow_settings import merge_reconfiguration
 from .message_parts import (
     integration_label,
@@ -1209,9 +1210,22 @@ class _AnnouncementFlowMixin:
 
     def _ai_agent_options(self) -> list[selector.SelectOptionDict]:
         """Offer the HA default and currently available conversation agents."""
+        preferred_id, _, preferred_error = resolve_preferred_assist_agent(
+            self.hass
+        )
+        if preferred_id:
+            preferred_state = self.hass.states.get(preferred_id)
+            preferred_name = (
+                preferred_state.name if preferred_state else preferred_id
+            )
+            preferred_label = f"Preferred Assist pipeline: {preferred_name}"
+        elif preferred_error == "preferred_assist_agent_not_generative":
+            preferred_label = "Preferred Assist pipeline: built-in (not an AI agent)"
+        else:
+            preferred_label = "Preferred Assist pipeline: unavailable"
         options = [
             selector.SelectOptionDict(
-                value=DEFAULT_AI_AGENT, label="Home Assistant default"
+                value=DEFAULT_AI_AGENT, label=preferred_label
             )
         ]
         seen = {DEFAULT_AI_AGENT}
