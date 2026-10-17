@@ -101,6 +101,21 @@ Assistant.
 Restart Home Assistant manually, then add **Announcement Hub** from
 **Settings → Devices & services → Add integration**.
 
+## Direct navigation when reconfiguring
+
+The integration's **Reconfigure** action opens a menu rather than restarting
+the four-step first-time setup. **Configure** opens the same menu:
+
+- **Notification outputs & rooms** — devices, room scope and levels.
+- **TTS engines & devices** — engines, language, voices and physical players.
+- **Provider-specific profiles** — notification timing, appearance and Snapcast.
+- **General, presence & AI** — AI/backup agents, room fallback and queue settings.
+- **Edit all settings** — keep the full original editor when you need it.
+
+Choosing one section jumps directly to its form and **saves immediately after
+that section is completed**, without forcing the remaining pages. Previously
+saved choices and settings outside that section are preserved. First-time
+installation still uses the guided setup wizard.
 ## Setup: outputs instead of allowed/default providers
 
 Version 0.2 removes the former **Allowed** and **Default** provider lists. Every

@@ -8,6 +8,7 @@ from typing import Any
 import probatio
 
 from homeassistant import config_entries
+from homeassistant.config_entries import SOURCE_RECONFIGURE
 from homeassistant.components.conversation.agent_manager import get_agent_manager
 from homeassistant.config_entries import ConfigFlowResult, OptionsFlow
 from homeassistant.core import callback
@@ -116,6 +117,7 @@ from .const import (
     NOTIFY_SCOPE_ROOM,
     TTS_MIN_LEVELS,
 )
+from .flow_settings import merge_reconfiguration
 from .message_parts import (
     integration_label,
     normalise_notify_profile,
@@ -184,10 +186,22 @@ def _known_multi_select(
     )
 
 
+# First-time setup remains a wizard; existing entries offer direct editing.
+EDIT_MENU_OPTIONS = (
+    "edit_outputs",
+    "edit_tts",
+    "edit_profiles",
+    "edit_general",
+    "edit_all",
+)
+
+
 class _AnnouncementFlowMixin:
     """Shared multi-page setup for config and options flows."""
 
     _working: dict[str, Any]
+    _editing_existing: bool
+    _edit_section: str | None
     _notify_route_outputs: list[Any]
     _notify_route_index: int
     _notify_profile_domains: list[str]
@@ -208,16 +222,70 @@ class _AnnouncementFlowMixin:
         self._working.update(neutral_values)
         self._working.update(user_input)
 
+    async def async_step_edit_outputs(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Edit only the notification outputs and their per-output policies."""
+        self._edit_section = "outputs"
+        return await self.async_step_outputs()
+
+    async def async_step_edit_tts(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Edit only the configured TTS engines, players, and devices."""
+        self._edit_section = "tts"
+        return await self.async_step_tts()
+
+    async def async_step_edit_profiles(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Edit existing provider profiles, including Snapcast when selected."""
+        self._edit_section = "profiles"
+        self._prepare_notify_profile_steps()
+        if expand_snapcast_output_tokens(
+            self.hass, list(self._working.get(CONF_SNAPCAST_OUTPUTS, []))
+        ):
+            self._notify_profile_domains.append("snapcast")
+        return await self.async_step_notification_profile()
+
+    async def async_step_edit_general(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Jump directly to general, occupancy, queue, and AI settings."""
+        self._edit_section = "queue"
+        return await self.async_step_queue()
+
+    async def async_step_edit_all(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Provide the existing complete edit wizard if requested."""
+        self._edit_section = None
+        return await self.async_step_outputs()
+
     async def async_step_outputs(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step 1: discover and configure notification outputs."""
         options = notify_output_options(self.hass)
         known = [str(item["value"]) for item in options]
-        # Discovery is authoritative for the setup UI: every currently
-        # supported notify entity is preselected whenever this page opens.
-        # The user can deselect unwanted outputs before submitting.
+        if self._editing_existing:
+            # Keep selected outputs even if their entities temporarily vanished.
+            # Otherwise opening and saving this page could erase those targets.
+            for ref in self._working.get(CONF_NOTIFY_OUTPUTS, []):
+                if ref not in known:
+                    options.append(
+                        selector.SelectOptionDict(value=ref, label=ref)
+                    )
+                    known.append(ref)
+        # First-time setup auto-selects discovered notification outputs.
+        # Reconfiguration instead keeps existing selections and opt-outs.
         selected_default = list(known)
+        if self._editing_existing:
+            # Preserve existing choices instead of silently enabling new devices.
+            selected_default = [
+                ref for ref in self._working.get(CONF_NOTIFY_OUTPUTS, [])
+                if ref in known
+            ]
 
         records = {
             output.ref: output
@@ -272,7 +340,18 @@ class _AnnouncementFlowMixin:
                 assigned |= values
             no_area = [
                 ref for ref in room
-                if (records.get(ref) is None or records[ref].area_id is None)
+                if (
+                    records.get(ref) is not None
+                    and records[ref].area_id is None
+                )
+                or (
+                    records.get(ref) is None
+                    and not (
+                        isinstance(policies.get(ref), dict)
+                        and policies[ref].get(NOTIFY_POLICY_SCOPE)
+                        == NOTIFY_SCOPE_ROOM
+                    )
+                )
             ]
             if duplicate:
                 errors["base"] = "notify_level_overlap"
@@ -294,6 +373,8 @@ class _AnnouncementFlowMixin:
                     }
                 self._working[CONF_NOTIFY_OUTPUTS] = selected
                 self._working[CONF_NOTIFY_POLICIES] = new_policies
+                if self._edit_section == "outputs":
+                    return await self._async_finish()
                 return await self.async_step_tts()
 
         schema = probatio.Schema(
@@ -350,8 +431,11 @@ class _AnnouncementFlowMixin:
         self._working[CONF_NOTIFY_PROFILES] = {
             domain: profile
             for domain, profile in configured_profiles.items()
-            if domain in domains and isinstance(profile, dict)
+            if isinstance(profile, dict)
+            and (self._editing_existing or domain in domains)
         }
+        # Keep profiles for temporarily missing providers when reconfiguring.
+        # Only the currently discovered profiles are shown for editing.
         self._notify_profile_index = 0
 
     async def async_step_notification_profile(
@@ -359,6 +443,8 @@ class _AnnouncementFlowMixin:
     ) -> ConfigFlowResult:
         """Configure splitting, read timing, and native provider options."""
         if self._notify_profile_index >= len(self._notify_profile_domains):
+            if self._edit_section == "profiles":
+                return await self._async_finish()
             return await self.async_step_queue()
 
         integration = self._notify_profile_domains[self._notify_profile_index]
@@ -818,6 +904,8 @@ class _AnnouncementFlowMixin:
                         submitted_options.pop("voice", None)
                 self._working[CONF_TTS_OPTIONS] = submitted_options
 
+                if self._edit_section == "tts":
+                    return await self._async_finish()
                 self._prepare_notify_profile_steps()
                 if snapcast:
                     self._notify_profile_domains.append("snapcast")
@@ -1389,6 +1477,8 @@ class AnnouncementHubConfigFlow(
 
     def __init__(self) -> None:
         self._working = {}
+        self._editing_existing = False
+        self._edit_section = None
         self._notify_route_outputs = []
         self._notify_route_index = 0
         self._notify_profile_domains = []
@@ -1401,7 +1491,29 @@ class AnnouncementHubConfigFlow(
             return self.async_abort(reason="single_instance_allowed")
         return await self.async_step_outputs()
 
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Show navigation choices instead of restarting first-time setup."""
+        entry = self._get_reconfigure_entry()
+        self._editing_existing = True
+        if not self._working:
+            self._working = {**entry.data, **entry.options}
+        return self.async_show_menu(
+            step_id="reconfigure", menu_options=list(EDIT_MENU_OPTIONS)
+        )
+
     async def _async_finish(self) -> ConfigFlowResult:
+        if self.source == SOURCE_RECONFIGURE:
+            entry = self._get_reconfigure_entry()
+            data, options = merge_reconfiguration(
+                entry.data, entry.options, self._working
+            )
+            # Avoid duplicate reloads: manager's entry update listener applies
+            # changed settings live (HA 2026.6+ recommends this helper).
+            return self.async_update_and_abort(
+                entry, data=data, options=options
+            )
         return self.async_create_entry(title=NAME, data=self._working)
 
     @staticmethod
@@ -1417,6 +1529,8 @@ class AnnouncementHubOptionsFlow(_AnnouncementFlowMixin, OptionsFlow):
 
     def __init__(self) -> None:
         self._working = {}
+        self._editing_existing = True
+        self._edit_section = None
         self._notify_route_outputs = []
         self._notify_route_index = 0
         self._notify_profile_domains = []
@@ -1429,7 +1543,9 @@ class AnnouncementHubOptionsFlow(_AnnouncementFlowMixin, OptionsFlow):
             **self.config_entry.data,
             **self.config_entry.options,
         }
-        return await self.async_step_outputs()
+        return self.async_show_menu(
+            step_id="init", menu_options=list(EDIT_MENU_OPTIONS)
+        )
 
     async def _async_finish(self) -> ConfigFlowResult:
         return self.async_create_entry(data=self._working)
