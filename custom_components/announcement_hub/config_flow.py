@@ -8,6 +8,7 @@ from typing import Any
 import probatio
 
 from homeassistant import config_entries
+from homeassistant.components.conversation.agent_manager import get_agent_manager
 from homeassistant.config_entries import ConfigFlowResult, OptionsFlow
 from homeassistant.core import callback
 from homeassistant.helpers import selector
@@ -1135,6 +1136,17 @@ class _AnnouncementFlowMixin:
                 selector.SelectOptionDict(
                     value=state.entity_id,
                     label=state.name or state.entity_id,
+                )
+            )
+        # HA also supports agents that are not represented by entities.
+        for agent in get_agent_manager(self.hass).async_get_agent_info():
+            if agent.id in seen:
+                continue
+            seen.add(agent.id)
+            options.append(
+                selector.SelectOptionDict(
+                    value=agent.id,
+                    label=agent.name or agent.id,
                 )
             )
         selected = str(

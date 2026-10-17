@@ -363,12 +363,14 @@ default conversation agent used by `conversation.process`. You can choose any
 currently discovered conversation agent instead.
 
 When enabled, the agent rephrases spoken and visual text to sound more natural
-and variable while preserving the original information. The AI prompt asks the
-agent not to control devices or execute actions, and the integration validates
-the returned message. AI cannot change the announcement level, recipients,
+and variable. The prompt asks it to preserve the original information and not
+to control devices or execute actions; the integration checks the response
+format, but cannot guarantee that every paraphrase is factually equivalent.
+AI cannot change the announcement level, recipients,
 room routing, title or notification metadata. If an agent is offline, times
 out, or returns an invalid response, the original announcement is delivered.
-AI runs only once before the announcement enters the persistent queue.
+AI runs only once before the announcement enters the persistent queue. The
+AI-enabled send action may take up to 12 seconds before it is accepted.
 
 To override AI for an individual announcement:
 
@@ -392,6 +394,7 @@ data:
 rewrite arbitrary text. For natural variation, select an LLM-backed
 conversation agent. Its home-control permissions also apply when processing
 rewriting prompts; use an agent with only the capabilities you intend.
+
 ### Output behavior
 
 When `output` is omitted:

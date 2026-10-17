@@ -133,6 +133,7 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert 'DEFAULT_USE_AI: Final = False' in const
     assert 'DEFAULT_AI_AGENT: Final = "default"' in const
     assert 'self.hass.states.async_all("conversation")' in flow
+    assert "get_agent_manager(self.hass).async_get_agent_info()" in flow
     assert "CONF_DEFAULT_USE_AI" in flow and "CONF_DEFAULT_AI_AGENT" in flow
     assert "probatio.Optional(ATTR_USE_AI): bool" in init
     assert "probatio.Optional(ATTR_AI_AGENT): cv.string" in init
@@ -141,6 +142,7 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert "ai_agent=call.data.get(ATTR_AI_AGENT)" in init
     assert "if use_ai is None" in manager
     assert "if ai_enabled:" in manager
+    assert manager.count("Announcement queue is full") == 2
     assert "plan.tts_text = text_tts or text_notify" in manager
     assert "plan.notify_text = text_notify or text_tts" in manager
     fields = service["send"]["fields"]["ai"]["fields"]

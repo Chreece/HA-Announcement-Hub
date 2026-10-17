@@ -1548,6 +1548,12 @@ class AnnouncementManager:
                 )
             ),
         )
+        # AI awaits an external agent: another call may fill the queue in
+        # the meantime. Recheck capacity immediately before insertion.
+        if len(self._queue) + (1 if self._current else 0) >= queue_max:
+            raise ServiceValidationError(
+                f"Announcement queue is full ({queue_max} items)"
+            )
         self._queue.append(job)
         self._schedule_prefetch(job)
         self._schedule_save()
