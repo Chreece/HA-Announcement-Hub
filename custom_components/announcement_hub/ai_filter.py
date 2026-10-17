@@ -131,10 +131,22 @@ def _parse_reply(
     if response.get("response_type") in ("error", "action_done"):
         return None
     inner_response = response.get("response")
-    if isinstance(inner_response, dict) and inner_response.get("response_type") in (
-        "error", "action_done"
-    ):
-        return None
+    if isinstance(inner_response, dict):
+        kind = inner_response.get("response_type")
+        if kind == "error":
+            return None
+        if kind == "action_done":
+            # HA's IntentResponse defaults to action_done even when an LLM
+            # only sets speech. A response with no successful/failed action
+            # targets may still be a valid text-only AI answer.
+            data = inner_response.get("data")
+            if (
+                not isinstance(data, dict)
+                or set(data) - {"success", "failed"}
+                or data.get("success")
+                or data.get("failed")
+            ):
+                return None
     try:
         text = response["response"]["speech"]["plain"]["speech"]
     except (KeyError, TypeError):
