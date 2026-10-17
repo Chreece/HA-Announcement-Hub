@@ -268,9 +268,8 @@ class _AnnouncementFlowMixin:
         """Step 1: discover and configure notification outputs."""
         options = notify_output_options(self.hass)
         known = [str(item["value"]) for item in options]
-        # Discovery is authoritative for the setup UI: every currently
-        # supported notify entity is preselected whenever this page opens.
-        # The user can deselect unwanted outputs before submitting.
+        # First-time setup auto-selects discovered notification outputs.
+        # Reconfiguration instead keeps existing selections and opt-outs.
         selected_default = list(known)
         if self._editing_existing:
             # Preserve existing choices instead of silently enabling new devices.
@@ -412,8 +411,11 @@ class _AnnouncementFlowMixin:
         self._working[CONF_NOTIFY_PROFILES] = {
             domain: profile
             for domain, profile in configured_profiles.items()
-            if domain in domains and isinstance(profile, dict)
+            if isinstance(profile, dict)
+            and (self._editing_existing or domain in domains)
         }
+        # Keep profiles for temporarily missing providers when reconfiguring.
+        # Only the currently discovered profiles are shown for editing.
         self._notify_profile_index = 0
 
     async def async_step_notification_profile(

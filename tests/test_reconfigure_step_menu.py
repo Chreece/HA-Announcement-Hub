@@ -70,6 +70,7 @@ def test_each_selected_section_finishes_without_opening_following_pages() -> Non
 
 def test_existing_output_selection_is_preserved_not_auto_selected() -> None:
     assert "selected_default = list(known)" in FLOW_SOURCE
+    assert "self._editing_existing or domain in domains" in FLOW_SOURCE
     assert "if self._editing_existing:" in FLOW_SOURCE
     assert "ref for ref in self._working.get(CONF_NOTIFY_OUTPUTS, [])" in FLOW_SOURCE
 
