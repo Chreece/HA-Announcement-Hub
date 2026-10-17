@@ -363,6 +363,93 @@ def test_cancelled_request_is_not_swallowed() -> None:
         ))
 
 
+def test_action_diagnostics_identify_success_and_integrity() -> None:
+    diag = {}
+    hass = Hass(ha_reply("Door is open.", "🚪 **Door open**"))
+    rewritten = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify="Door open",
+        agent_id="conversation.gpt", diagnostics=diag,
+    ))
+    assert rewritten == ("Door is open.", "🚪 **Door open**")
+    assert diag["attempted"] is True
+    assert diag["status"] == "rewritten"
+    assert diag["agent_used"] == "conversation.gpt"
+    assert diag["attempts"] == [{"agent": "conversation.gpt", "outcome": "rewritten"}]
+    assert diag["failure_reason"] is None
+    assert "Door open" not in str(diag)
+
+
+def test_agent_successful_but_unchanged_is_reported_separately() -> None:
+    diag = {}
+    hass = Hass(ha_reply(None, "Already clear"))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=None, text_notify="Already clear",
+        agent_id=None, diagnostics=diag,
+    ))
+    assert got == (None, "Already clear")
+    assert diag["status"] == "accepted_unchanged"
+    assert diag["attempted"] is True
+    assert diag["agent_used"] == "Home Assistant default"
+
+
+def test_intent_only_default_agent_error_is_visible_without_text() -> None:
+    diag = {}
+    response = {"response": {
+        "response_type": "error",
+        "data": {"code": "no_intent_match"},
+        "speech": {"plain": {"speech": "Sorry I cannot do that."}},
+    }}
+    hass = Hass(response)
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=None, text_notify="Door open",
+        agent_id=None, diagnostics=diag,
+    ))
+    assert got == (None, "Door open")
+    assert diag["attempted"] is True
+    assert diag["status"] == "fallback_original"
+    assert diag["failure_reason"] == "no_intent_match"
+    assert diag["attempts"] == [
+        {"agent": "Home Assistant default", "outcome": "no_intent_match"}
+    ]
+    assert "Sorry" not in str(diag)
+
+
+def test_primary_exception_and_backup_success_are_reported() -> None:
+    diag = {}
+    hass = Hass(responses=[
+        RuntimeError("secret token in exception"),
+        ha_reply(None, "🚪 Door is open."),
+    ])
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=None, text_notify="Door open",
+        agent_id="conversation.primary",
+        fallback_agent_id="conversation.backup",
+        diagnostics=diag,
+    ))
+    assert got == (None, "🚪 Door is open.")
+    assert diag["attempted"] is True
+    assert diag["status"] == "rewritten"
+    assert diag["agent_used"] == "conversation.backup"
+    assert len(diag["attempts"]) == 2
+    assert diag["attempts"][0]["outcome"] == "agent_error"
+    assert diag["attempts"][1]["outcome"] == "rewritten"
+    assert "secret token" not in str(diag)
+
+
+def test_parse_exception_does_not_block_original_announcement(monkeypatch) -> None:
+    diag = {}
+    def fail(*_args):
+        raise RuntimeError("parser failure")
+    monkeypatch.setattr(ai, "_parse_reply", fail)
+    got = asyncio.run(ai.async_filter_announcement(
+        Hass(ha_reply("Door open", None)),
+        text_tts="Door open", text_notify=None,
+        agent_id=None, diagnostics=diag,
+    ))
+    assert got == ("Door open", None)
+    assert diag["status"] == "fallback_original"
+    assert diag["attempts"][0]["outcome"] == "invalid_response"
+
 def test_config_and_actions_support_optional_ai_overrides() -> None:
     flow = (COMPONENT / "config_flow.py").read_text()
     init = (COMPONENT / "__init__.py").read_text()
