@@ -504,7 +504,7 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert "probatio.Optional(ATTR_USE_AI, default=False)" not in init
     assert "use_ai=call.data.get(ATTR_USE_AI)" in init
     assert "ai_agent=call.data.get(ATTR_AI_AGENT)" in init
-    assert "if use_ai is None" in manager
+    assert "resolve_ai_enabled(" in manager
     assert "if ai_enabled:" in manager
     assert manager.count("Announcement queue is full") == 2
     assert "plan.tts_text, plan.notify_text = await async_filter_announcement(" in manager

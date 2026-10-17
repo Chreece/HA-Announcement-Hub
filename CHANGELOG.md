@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Fixed AI response parsing for Home Assistant conversation agents that return
+  `action_done` for a text-only response with no affected devices, while
+  continuing to reject responses reporting actual device actions or errors.
+- Kept `use_ai` a true three-way action setting: omitted inherits the saved
+  integration default; explicit true/false overrides that default.
+- Added `ai` metadata to queued announcements and the send action response,
+  including effective enablement/source, attempted agents, accepted/unchanged
+  rewrites, and safe error/fallback categories without leaking message content.
+- Hardened AI failure handling so malformed provider/parser responses fall
+  back to the original text and do not block a queued announcement.
+- Expanded tests for the user's templated automation, backup agents, the HA
+  default intent-only agent, response migration, and EN/DE/EL setup help.
 ## 0.9.21 - 2026-10-17
 
 - Added direct step-selection menus for both Reconfigure and Configure, so

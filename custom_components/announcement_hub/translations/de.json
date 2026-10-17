@@ -137,8 +137,8 @@
           "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen Raum-Kandidaten enthalten. Vorhandene feste Raum-Kandidaten, auch unavailable/unknown, blockieren den Fallback und unterliegen weiterhin dem normalen Verfügbarkeits-Timeout.",
           "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor in einem der aktuellen Zielräume ausdrücklich offen meldet.",
           "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen.",
-          "default_use_ai": "Bei bestehenden Installationen standardmäßig deaktiviert. Bei Aktivierung werden Sprachausgaben und visuelle Nachrichten vor der Ausgabe umformuliert. Falls der Agent fehlschlägt, bleibt der Originaltext erhalten.",
-          "default_ai_agent": "Home Assistant Standard ist vorausgewählt. Dies verwendet den Standardagenten von conversation.process; ein anderer verfügbarer Agent kann ausgewählt werden.",
+          "default_use_ai": "Wenn aktiviert, verwenden Ankündigungen standardmäßig die KI, solange die einzelne Aktion nicht ausdrücklich use_ai: false setzt. Ein nicht angegebenes use_ai übernimmt diese Integrationseinstellung. Bei KI-Fehlern bleibt die Originalmeldung erhalten. Der KI-Status steht in der Antwortvariable der Aktion.",
+          "default_ai_agent": "Home Assistant Standard kann der integrierte, rein befehlsbasierte Assist-Agent sein, der keine Texte umformulieren kann. Für KI-Ansagen einen generativen LLM-Konversationsagenten auswählen. Die Antwort der Send-Aktion zeigt den verwendeten Agenten, ob KI versucht wurde und den Grund für einen Fallback.",
           "fallback_ai_agent": "Optionaler Ersatzagent, der nur verwendet wird, wenn die erste KI ausfällt, das Zeitlimit erreicht oder ungültige Antworten liefert. Standard ist die Originalankündigung ohne zweiten KI-Versuch. Wenn auch die Ersatz-KI fehlschlägt, wird immer der Originaltext gesendet."
         }
       },
@@ -313,8 +313,8 @@
           "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen Raum-Kandidaten enthalten. Vorhandene feste Raum-Kandidaten, auch unavailable/unknown, blockieren den Fallback und unterliegen weiterhin dem normalen Verfügbarkeits-Timeout.",
           "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor in einem der aktuellen Zielräume ausdrücklich offen meldet.",
           "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen.",
-          "default_use_ai": "Bei bestehenden Installationen standardmäßig deaktiviert. Bei Aktivierung werden Sprachausgaben und visuelle Nachrichten vor der Ausgabe umformuliert. Falls der Agent fehlschlägt, bleibt der Originaltext erhalten.",
-          "default_ai_agent": "Home Assistant Standard ist vorausgewählt. Dies verwendet den Standardagenten von conversation.process; ein anderer verfügbarer Agent kann ausgewählt werden.",
+          "default_use_ai": "Wenn aktiviert, verwenden Ankündigungen standardmäßig die KI, solange die einzelne Aktion nicht ausdrücklich use_ai: false setzt. Ein nicht angegebenes use_ai übernimmt diese Integrationseinstellung. Bei KI-Fehlern bleibt die Originalmeldung erhalten. Der KI-Status steht in der Antwortvariable der Aktion.",
+          "default_ai_agent": "Home Assistant Standard kann der integrierte, rein befehlsbasierte Assist-Agent sein, der keine Texte umformulieren kann. Für KI-Ansagen einen generativen LLM-Konversationsagenten auswählen. Die Antwort der Send-Aktion zeigt den verwendeten Agenten, ob KI versucht wurde und den Grund für einen Fallback.",
           "fallback_ai_agent": "Optionaler Ersatzagent, der nur verwendet wird, wenn die erste KI ausfällt, das Zeitlimit erreicht oder ungültige Antworten liefert. Standard ist die Originalankündigung ohne zweiten KI-Versuch. Wenn auch die Ersatz-KI fehlschlägt, wird immer der Originaltext gesendet."
         }
       },
