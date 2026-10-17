@@ -14,6 +14,7 @@
   back to the original text and do not block a queued announcement.
 - Expanded tests for the user's templated automation, backup agents, the HA
   default intent-only agent, response migration, and EN/DE/EL setup help.
+
 ## 0.9.21 - 2026-10-17
 
 - Added direct step-selection menus for both Reconfigure and Configure, so
