@@ -37,6 +37,8 @@ root = Path(sys.argv[1])
 required = {
     "__init__.py",
     "config_flow.py",
+    "flow_settings.py",
+    "ai_filter.py",
     "const.py",
     "manager.py",
     "manifest.json",

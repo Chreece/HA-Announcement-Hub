@@ -147,6 +147,12 @@ def test_cleared_values_do_not_resurrect(where: str) -> None:
     assert new_options["notify_outputs"] == ["notify.mobile"]
 
 
+def test_installer_checks_required_flow_modules() -> None:
+    installer = (ROOT / "install.sh").read_text(encoding="utf-8")
+    assert '"flow_settings.py"' in installer
+    assert '"ai_filter.py"' in installer
+
+
 def test_unedited_legacy_unknown_settings_survive() -> None:
     data = {"future_unknown_setting": {"nested": ["keep"]}}
     options = {"other_setting": ["kept"]}
