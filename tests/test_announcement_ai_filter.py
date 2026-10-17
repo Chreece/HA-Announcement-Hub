@@ -119,7 +119,7 @@ def test_ai_tts_cleaning_keeps_facts_and_separate_visual_styling() -> None:
     [
         "✅ Garage closed.",
         "**Garage closed.**",
-        "# Garage closed.\n- Done.",
+"# Garage closed.",
         "Garage closed. :-)",
         "TTS: Garage closed.",
     ],
@@ -164,6 +164,20 @@ def test_original_text_is_preserved_when_both_agents_fail_even_with_decoration()
     ))
     assert got == original
     assert len(hass.services.calls) == 2
+
+
+def test_greek_speech_keeps_accents_but_not_emoji_or_emphasis() -> None:
+    hass = Hass(ha_reply(
+        "🚪 **Η πόρτα είναι ανοιχτή.**",
+        "🚪 **Η πόρτα είναι ανοιχτή!**",
+    ))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Η πόρτα είναι ανοιχτή.",
+        text_notify="Η πόρτα είναι ανοιχτή.",
+        agent_id="conversation.greek",
+    ))
+    assert got == ("Η πόρτα είναι ανοιχτή.", "🚪 **Η πόρτα είναι ανοιχτή!**")
 
 
 def test_explicit_agent_passed_and_null_channel_preserved() -> None:

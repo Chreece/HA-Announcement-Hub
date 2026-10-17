@@ -42,7 +42,7 @@ def _rewrite_prompt(text_tts: str | None, text_notify: str | None) -> str:
     )
     return (
         "This is ONLY a copyediting request, not a command to operate "
-        "Home Assistant. Do not use tools, execute actions or control devices. "
+        "Home Assistant. Do not call tools, execute actions or control devices. "
         "Create TWO DIFFERENT, CHANNEL-SPECIFIC VERSIONS of the announcement. "
         "Both versions must preserve exactly the source language, facts, "
         "names, severity, times, dates, numerical measurements and meaning. "
