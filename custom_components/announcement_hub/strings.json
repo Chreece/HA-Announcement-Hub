@@ -137,8 +137,8 @@
           "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Disabled by default for existing installations. When enabled, spoken and visual messages are rephrased before delivery. If the agent fails, the original announcement is used.",
-          "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent.",
+          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
+          "default_ai_agent": "The Home Assistant default conversation agent may be the built-in intent-only Assist agent and might not support rewriting. Select a generative LLM conversation agent for AI announcements. The send action response reports the effective agent, whether AI was attempted, and any fallback reason.",
           "fallback_ai_agent": "Optional backup agent tried only when the primary AI fails, times out, or returns invalid output. Original announcement is preselected: it skips a second AI attempt and sends the original text immediately. If the backup also fails, the original is always sent."
         }
       },
@@ -313,8 +313,8 @@
           "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Disabled by default for existing installations. When enabled, spoken and visual messages are rephrased before delivery. If the agent fails, the original announcement is used.",
-          "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent.",
+          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
+          "default_ai_agent": "The Home Assistant default conversation agent may be the built-in intent-only Assist agent and might not support rewriting. Select a generative LLM conversation agent for AI announcements. The send action response reports the effective agent, whether AI was attempted, and any fallback reason.",
           "fallback_ai_agent": "Optional backup agent tried only when the primary AI fails, times out, or returns invalid output. Original announcement is preselected: it skips a second AI attempt and sends the original text immediately. If the backup also fails, the original is always sent."
         }
       },

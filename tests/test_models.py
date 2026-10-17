@@ -330,3 +330,29 @@ def test_noncritical_visual_only_does_not_invent_speech() -> None:
     assert plan.notify_text == "Window is open"
 
 
+
+def test_ai_trace_is_persisted_and_backwards_compatible() -> None:
+    plan = build_delivery_plan(
+        text_tts="Door open", text_notify="Door open", level="info",
+        minimum_tts_level="debug", tts_engines=["tts.piper"],
+        notify_outputs=["entity:notify.phone"],
+        room_tts_players=["media_player.kitchen"],
+        snapcast_clients=[], companion_tts_entries=[],
+        server_tts_enabled=False,
+    )
+    original = AnnouncementJob.create(
+        text_tts="Door open", text_notify="Door open",
+        outputs=[], requested_services=[], level="info", title="Door",
+        notify_data={}, language=None, tts_options={}, tts_cache=True,
+        plan=plan, ai={
+            "enabled": True, "source": "integration",
+            "status": "fallback_original", "agent": "conversation.home",
+            "attempted": True,
+        },
+    )
+    restored = AnnouncementJob.from_dict(original.to_dict())
+    assert restored.ai["status"] == "fallback_original"
+    assert restored.public_dict()["ai"]["enabled"] is True
+    legacy = original.to_dict()
+    legacy.pop("ai")
+    assert AnnouncementJob.from_dict(legacy).ai == {}

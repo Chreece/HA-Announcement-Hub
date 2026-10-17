@@ -433,6 +433,37 @@ rewriting prompts; use an agent with only the capabilities you intend. If all
 AI attempts fail, the previously established original-text fallback is kept
 unchanged (rather than silently stripping the sender's input formatting).
 
+### Verifying AI inheritance in an announcement
+
+An omitted `use_ai` always inherits **Rewrite announcements with AI** from
+the saved integration configuration. `use_ai: true` forces AI for that call;
+`use_ai: false` disables it only for that call. An omitted `ai_agent` uses the
+configured default agent.
+
+The `notify.announcement_hub` response now includes an `ai` object when the
+action requests a response. For example, keep your existing call and add
+`response_variable: announcement_hub_result`. Inspect the
+`announcement_hub_result.ai` object in the automation/script trace:
+
+- `enabled` — whether AI was effectively enabled for this announcement.
+- `source` — `integration` (inherited default) or `action` (explicit override).
+- `status` — `rewritten`, `accepted_unchanged`, `fallback_original`,
+  `disabled`, or `not_applicable` (no eligible message channel).
+- `agent` / `agent_used` — requested and successful conversation agents.
+- `attempted` / `attempts` — whether AI was called and each safe outcome.
+- `failure_reason` — an error category such as `no_intent_match`, `timeout`,
+  `invalid_response`, or `action_response_not_allowed`.
+
+These diagnostics do not include the announcement content, AI prompt,
+provider error messages, or secrets. They are also available in queue status
+for the corresponding job.
+
+**Important:** Home Assistant's default agent can be the built-in intent-only
+Assist agent. It does not rewrite arbitrary announcements. If you see
+`no_intent_match`, select an LLM-backed conversation agent in Announcement
+Hub's General/AI configuration. A Home Assistant `action_done` conversation
+response is accepted as a rewrite only when no home-control actions are
+reported; actual action results are still rejected.
 ### Output behavior
 
 When `output` is omitted:
