@@ -808,11 +808,25 @@ class AnnouncementManager:
                 f"Announcement queue is full ({queue_max} items)"
             )
 
-        requested_output_area_ids = self._resolve_area_ids(
-            self._ensure_list(outputs)
-        )
-        explicit_area_routing = bool(requested_output_area_ids)
+        output_tokens = self._ensure_list(outputs)
         requested = self._ensure_list(requested_services)
+        # Do not interpret explicitly supplied empty selector lists as
+        # unrestricted: for Critical that would accidentally broadcast
+        # to every configured device instead of zero selected devices.
+        if outputs is not None and not any(
+            str(token).strip() for token in output_tokens
+        ):
+            raise ServiceValidationError(
+                "Explicit output selector is empty; omit output for automatic routing"
+            )
+        if requested_services is not None and not any(
+            str(token).strip() for token in requested
+        ):
+            raise ServiceValidationError(
+                "Explicit service selector is empty; omit service for automatic routing"
+            )
+        requested_output_area_ids = self._resolve_area_ids(output_tokens)
+        explicit_area_routing = bool(requested_output_area_ids)
         explicit_targeting = bool(requested) or explicit_area_routing
         # An explicit service or output area is a hard delivery contract.
         # It must not trigger room/channel/level fallback or route onto

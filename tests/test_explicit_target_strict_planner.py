@@ -253,3 +253,14 @@ def test_action_response_reports_authoritative_strict_target_mode() -> None:
     action = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
     assert '"strict_targets": job.strict_targets' in action
     assert "strict_targets=explicit_targeting" in SOURCE
+
+def test_empty_explicit_selector_must_not_become_critical_broadcast() -> None:
+    assert "if outputs is not None and not any(" in SOURCE
+    assert "if requested_services is not None and not any(" in SOURCE
+    assert "Explicit output selector is empty" in SOURCE
+    assert "Explicit service selector is empty" in SOURCE
+    # These guards must run before the implicit Critical broadcast selector.
+    entry = SOURCE.index("    async def async_enqueue(")
+    checks = SOURCE.index("if requested_services is not None and not any(", entry)
+    selector = SOURCE.index("selected = self._select_requested_outputs(", entry)
+    assert checks < selector

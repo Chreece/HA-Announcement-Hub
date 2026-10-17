@@ -15,6 +15,9 @@
   `occupied_only: true`, the existing occupancy intersection is preserved.
 - Added `strict_targets` to the send action response and persisted job/status
   for transparent verification; legacy queued jobs remain readable.
+- Explicitly empty `service: []` or `output: []` fails validation instead of
+  silently becoming an unrestricted Critical broadcast; omit the field to
+  request automatic routing.
 - Preserved the previous automatic Critical broadcast and level/fallback
   behavior when no explicit selectors are supplied. Updated action help in
   English, German and Greek and added executable routing regression tests.

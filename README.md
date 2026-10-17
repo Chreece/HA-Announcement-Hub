@@ -563,6 +563,9 @@ routing/broadcast behavior. Click actions never change routing.
 
 The send response now includes `strict_targets: true` whenever either
 selector is explicitly set; queue status preserves this flag across restarts.
+An explicitly supplied **empty** `service: []` or `output: []` raises a
+validation error rather than accidentally broadcasting a Critical alert.
+Omit the selector entirely to request automatic routing.
 
 ### Specific outputs or integrations
 
