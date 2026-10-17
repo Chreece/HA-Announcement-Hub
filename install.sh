@@ -39,6 +39,7 @@ required = {
     "config_flow.py",
     "flow_settings.py",
     "ai_filter.py",
+    "ai_settings.py",
     "const.py",
     "manager.py",
     "manifest.json",

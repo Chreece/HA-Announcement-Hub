@@ -158,6 +158,7 @@ class AnnouncementJob:
     companion_tts_media_stream: str = "default"
     companion_tts_words_per_minute: float = 150.0
     tts_suppressed_by_level: bool = False
+    ai: dict[str, Any] = field(default_factory=dict)
     media_source_ids: dict[str, str] = field(default_factory=dict)
     prefetch_errors: dict[str, str] = field(default_factory=dict)
     channel_errors: dict[str, str] = field(default_factory=dict)
@@ -182,6 +183,7 @@ class AnnouncementJob:
         tts_options: Mapping[str, Any] | None,
         tts_cache: bool,
         plan: DeliveryPlan,
+        ai: Mapping[str, Any] | None = None,
         tts_media_player: str | None = None,
         tts_player_area: str | None = None,
         room_tts_player_areas: Mapping[str, str | None] | None = None,
@@ -228,6 +230,7 @@ class AnnouncementJob:
                 companion_tts_words_per_minute
             ),
             tts_suppressed_by_level=plan.tts_suppressed_by_level,
+            ai=dict(ai or {}),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -275,6 +278,7 @@ class AnnouncementJob:
         payload.setdefault("companion_tts_media_stream", "default")
         payload.setdefault("companion_tts_words_per_minute", 150.0)
         payload.setdefault("tts_suppressed_by_level", False)
+        payload.setdefault("ai", {})
 
         for key in (
             "outputs",
@@ -328,6 +332,7 @@ class AnnouncementJob:
                 for key, value in self.notify_output_profiles.items()
             },
             "tts_suppressed_by_level": self.tts_suppressed_by_level,
+            "ai": dict(self.ai),
             "started_at": self.started_at,
             "finished_at": self.finished_at,
             "error": self.error,

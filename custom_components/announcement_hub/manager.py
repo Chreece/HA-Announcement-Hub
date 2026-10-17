@@ -41,6 +41,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
 
 from .ai_filter import async_filter_announcement
+from .ai_settings import resolve_ai_enabled
 from .const import (
     COMPANION_STREAM_DEFAULT,
     CONF_COMPANION_TTS_MEDIA_STREAM,
@@ -1491,11 +1492,20 @@ class AnnouncementManager:
 
         # Run optional AI only after routing validation, before queue storage
         # and prefetch. Restored queued jobs never need to call the agent.
-        ai_enabled = (
-            bool(self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI))
-            if use_ai is None
-            else use_ai
+        ai_enabled, ai_source = resolve_ai_enabled(
+            self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
+            use_ai,
         )
+        ai_info: dict[str, Any] = {
+            "enabled": ai_enabled,
+            "source": ai_source,
+            "status": "not_applicable" if ai_enabled else "disabled",
+            "attempted": False,
+            "agent": None,
+            "agent_used": None,
+            "attempts": [],
+            "failure_reason": None,
+        }
         if ai_enabled:
             selected_agent = (
                 ai_agent
@@ -1507,6 +1517,7 @@ class AnnouncementManager:
                 if not selected_agent or selected_agent == DEFAULT_AI_AGENT
                 else str(selected_agent)
             )
+            ai_info["agent"] = agent_id or "Home Assistant default"
             fallback_setting = str(
                 self.settings.get(
                     CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT
@@ -1529,6 +1540,7 @@ class AnnouncementManager:
                     text_notify=plan.notify_text,
                     agent_id=agent_id,
                     fallback_agent_id=fallback_agent_id,
+                    diagnostics=ai_info,
                 )
                 # Persist effective output copy alongside the frozen plan;
                 # original delivery level, targets and metadata remain intact.
@@ -1546,6 +1558,7 @@ class AnnouncementManager:
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
+            ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,
             room_tts_player_areas=room_tts_player_areas,
