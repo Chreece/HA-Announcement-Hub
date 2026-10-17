@@ -187,8 +187,10 @@ When a job is below **Use TTS from level**:
 - when only `text_tts` was supplied, that text becomes the visual notification
   instead of disappearing.
 
-`critical` always remains audible and attempts every configured matching
-physical output.
+Without an explicit `service` or `output` selector, `critical` tries
+every configured matching output and remains audible when a TTS path exists.
+With explicit targets, Critical preserves only those targets, even if that
+means visual notifications with **no TTS**.
 
 ### Snapcast page
 
@@ -492,11 +494,12 @@ all configured matching outputs enabled for that call are candidates
 → remaining outputs are recorded with their final timeout/error
 ```
 
-When one or more areas are supplied, area-bound outputs are filtered to those
-rooms. With `occupied_only: true`, the final room targets are the intersection
-of the explicit areas and the currently occupied areas. With
-`occupied_only: false`, the explicit areas are authoritative. General/global
-outputs continue to match according to their configured policy.
+When one or more `output` areas are supplied, **only physical outputs in
+those areas** are eligible; global/unassigned devices and configured fallback
+rooms are not added. With `occupied_only: true`, the areas are further
+restricted to the currently occupied areas. With `occupied_only: false`,
+the specified areas are authoritative. Without explicit areas, the existing
+room-presence and general/global delivery policy remains available.
 
 For TTS, selected targets are never dropped merely because they are currently
 `unavailable` or `unknown`. They remain pending and are retried until the
@@ -505,8 +508,11 @@ configured output-availability timeout expires.
 ### Provider-targeted notifications and tap actions
 
 The existing `service` action field selects **which configured integrations
-or devices** are eligible for a non-critical announcement. `output` selects
-**where** (areas). For example, target only Companion App visual
+or devices** may be used at **every severity**, including Critical. `output`
+restricts **where** (areas). These selectors are strict when supplied: an
+unavailable selected device waits until its configured availability timeout,
+then is skipped. **No other device, channel, integration or fallback room is
+substituted.** For example, target only Companion App visual
 notifications with a tap-through dashboard link:
 
 ```yaml
@@ -548,13 +554,20 @@ an explicitly supplied `click_action` takes precedence over
 Notifications routed through generic `notify.send_message` cannot carry
 provider-specific click metadata if no advanced mobile_app action is present.
 
-**Safety:** `level: critical` intentionally broadcasts to all configured
-matching outputs regardless of an explicit `service` restriction. For
-selective delivery, use another severity. Click actions never change routing.
+**Strict routing:** Explicit `service` and/or `output` targets are honored
+even with `level: critical`. A Critical notification directed only to
+`mobile_app` does **not** activate Piper, Snapcast or other visual providers.
+Unavailable selected targets are frozen and retried only until the output
+availability timeout. Omitting both selectors preserves the original automatic
+routing/broadcast behavior. Click actions never change routing.
+
+The send response now includes `strict_targets: true` whenever either
+selector is explicitly set; queue status preserves this flag across restarts.
 
 ### Specific outputs or integrations
 
-The optional `service` field narrows a non-critical job (the same field is
+The optional `service` field narrows every job, including Critical, to
+exactly the configured output types and devices listed (the same field is
 available on both `notify.announcement_hub` and `announcement_hub.send`). It accepts:
 
 ```text
@@ -572,17 +585,18 @@ all                           # all configured outputs
 ```
 
 Plain entity IDs such as `tts.piper` and `notify.some_entity` are also accepted.
-Companion App TTS is enabled only by `companion_tts: true`, the dedicated
-`companion_tts`/`all` service alias, or `critical`; selecting a normal
-`mobile_app` visual output does not make the phone speak. For `critical`, an
-explicit restriction is ignored and every configured output matching the
-requested area is attempted.
+When `service` is absent, Companion App TTS can be enabled with
+`companion_tts: true` or an unrestricted Critical announcement. When
+`service` is explicit, include `companion_tts` or `all` in that list to
+allow push TTS. For example, `service: [mobile_app]` is **visual only** at
+every level, even if `companion_tts: true` was supplied.
 
 ### Companion App TTS
 
 First select eligible Android Companion App entries/entities under
 **Companion App TTS outputs**. Ordinary calls do not use them unless the action
-opts in; `critical` always uses every configured matching output.
+opts in; an unrestricted `critical` uses every configured matching output.
+An explicitly targeted Critical announcement never enables unselected TTS.
 
 ```yaml
 action: notify.announcement_hub
@@ -616,9 +630,11 @@ data:
   level: critical
 ```
 
-If only one text field exists on a critical job, its text is copied to the
-missing audible or visual channel. One failed output does not prevent the
-remaining outputs from being attempted.
+If only one text field exists, it can supply the other channel **only when
+that channel has been selected**. For example, a Critical announcement with
+`service: [mobile_app]` remains visual-only even if `text_tts` is supplied.
+A failed explicitly selected output does not trigger another provider or
+room; it is retried only up to the configured availability timeout.
 
 ### Action response
 

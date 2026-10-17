@@ -485,15 +485,15 @@
         },
         "level": {
           "name": "Stufe",
-          "description": "Steuert die TTS-Mindeststufe. Kritisch verwendet alle konfigurierten passenden Ausgänge und bleibt hörbar."
+          "description": "Prioritätsstufe. Kritisch verwendet alle passenden konfigurierten Ausgänge nur ohne ausdrückliches service- oder output-Ziel. Gewählte Ziele bleiben auch bei Kritisch bindend; keine unerwünschte TTS-Ausgabe."
         },
         "output": {
           "name": "Ausgabebereiche",
-          "description": "Optional. Leer bedeutet alle konfigurierten Ausgänge. Mit Bereichen werden nur passende oder globale Ausgänge verwendet."
+          "description": "Optionale ausdrückliche Ausgabebereiche. Werden Bereiche angegeben, kommen nur Geräte mit Zuordnung zu diesen Bereichen infrage; globale Geräte und Ersatzräume werden ausgeschlossen. Mit occupied_only gilt weiterhin die Schnittmenge mit belegten Bereichen. Leer bedeutet automatische Anwesenheits- und Fallback-Weiterleitung."
         },
         "service": {
           "name": "Bestimmte Ausgänge",
-          "description": "Optionale Einschränkung auf konfigurierte Integrationen (mobile_app, nfandroidtv, integration:mobile_app), Einträge (entry:ID), einzelne Geräte (entity:notify.device), bisherige Dienste (service:notify.device) oder Kürzel (notify, tts, snapcast, companion_tts, all). Kritische Meldungen ignorieren die Einschränkung absichtlich und nutzen alle passenden konfigurierten Ausgänge."
+          "description": "Optionaler ausdrücklicher Ausgangsfilter, der auf allen Stufen einschließlich Kritisch gilt. Nur hier gewählte konfigurierte Integrationen, Einträge, Notify-Geräte, Dienste oder TTS-Kanäle werden verwendet (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). Nicht verfügbare Ziele warten nur bis zum eingestellten Verfügbarkeitstimeout; kein Wechsel zu anderen Geräten, Providern oder Ersatzräumen. Leer bedeutet automatische stufenbasierte Weiterleitung."
         },
         "notify_data": {
           "name": "Benachrichtigungsdaten",
@@ -509,7 +509,7 @@
         },
         "companion_tts": {
           "name": "Companion-App-TTS verwenden",
-          "description": "Sendet den gesprochenen Text zusätzlich an die konfigurierten Android-Companion-App-TTS-Ausgaben. Standardmäßig aus; die speziellen Aliase companion_tts/all und die Stufe „kritisch“ aktivieren sie ebenfalls."
+          "description": "Android-Companion-App-Sprachausgabe zulassen, wenn keine explizite service-Auswahl die Ziele begrenzt. Bei explizitem service muss companion_tts (oder all) enthalten sein, um Companion-App-TTS zu ermöglichen. Kritisch umgeht explizite Einschränkungen nicht."
         },
         "occupied_only": {
           "name": "Nur belegte Bereiche",

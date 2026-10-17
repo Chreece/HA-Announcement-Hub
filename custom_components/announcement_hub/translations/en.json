@@ -485,15 +485,15 @@
         },
         "level": {
           "name": "Level",
-          "description": "Controls the minimum TTS level. Critical uses every configured matching output and always remains audible."
+          "description": "Announcement severity. Critical uses every configured matching output only when no explicit service or output target is supplied. Explicit selections remain authoritative even for Critical and never enable unrequested TTS."
         },
         "output": {
           "name": "Output areas",
-          "description": "Optional. Empty means every configured output. With areas, only matching or global outputs are used."
+          "description": "Optional explicit output areas. When provided, only devices physically assigned to the selected areas are eligible; unrelated global outputs and configured fallback rooms are excluded. With occupied_only enabled, areas still intersect current occupancy. Leave empty for automatic occupancy/fallback routing."
         },
         "service": {
           "name": "Specific outputs",
-          "description": "Optional explicit restriction to configured integrations (mobile_app, nfandroidtv, integration:mobile_app), config entries (entry:ID), individual entities (entity:notify.device), legacy actions (service:notify.device), or aliases (notify, tts, snapcast, companion_tts, all). Critical deliberately ignores service restrictions and reaches every configured matching output."
+          "description": "Optional explicit output restriction, honored at every level including Critical. Select only the configured integrations, entries, notify entities, legacy services or TTS channels listed here (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). Unavailable selected targets wait only until the configured availability timeout; there is no alternate device, provider or fallback room. Leave empty for automatic level-based routing."
         },
         "notify_data": {
           "name": "Notification data",
@@ -509,7 +509,7 @@
         },
         "companion_tts": {
           "name": "Use Companion App TTS",
-          "description": "Also send spoken text to the configured Android Companion App TTS outputs. Off by default; the dedicated companion_tts/all service alias and critical level also enable it."
+          "description": "Allow Android Companion App spoken TTS when no explicit service selection limits outputs. For explicit service restrictions, include companion_tts (or all) in service to permit spoken Companion App delivery. Critical does not bypass explicit restrictions."
         },
         "occupied_only": {
           "name": "Only occupied areas",
