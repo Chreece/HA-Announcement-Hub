@@ -190,6 +190,7 @@ async def async_filter_announcement(
     text_notify: str | None,
     agent_id: str | None,
     fallback_agent_id: str | None = None,
+    diagnostics: dict[str, Any] | None = None,
 ) -> tuple[str | None, str | None]:
     """Try the primary AI, optional backup AI, then use untouched originals.
 
@@ -197,6 +198,17 @@ async def async_filter_announcement(
     None means there is no backup agent and the original text is the fallback.
     """
     originals = {"text_tts": text_tts, "text_notify": text_notify}
+    # Status goes into the action response, never raw prompts or message text.
+    if diagnostics is not None:
+        diagnostics.update(
+            {
+                "attempted": False,
+                "status": "fallback_original",
+                "agent_used": None,
+                "attempts": [],
+                "failure_reason": None,
+            }
+        )
     prompt = _rewrite_prompt(text_tts, text_notify)
     agents: list[str | None] = [agent_id or None]
     if fallback_agent_id is not None:
@@ -205,6 +217,9 @@ async def async_filter_announcement(
             agents.append(backup)
 
     for index, candidate in enumerate(agents):
+        agent_label = candidate or "Home Assistant default"
+        if diagnostics is not None:
+            diagnostics["attempted"] = True
         payload = {"text": prompt}
         if candidate:
             payload["agent_id"] = candidate
@@ -218,27 +233,59 @@ async def async_filter_announcement(
                     return_response=True,
                 )
         except Exception as error:
-            # Do not include the original text, prompt or response in logs.
+            # Error class only: never return provider secrets or original text.
+            reason = (
+                "timeout" if isinstance(error, TimeoutError) else "agent_error"
+            )
+            if diagnostics is not None:
+                diagnostics["attempts"].append(
+                    {"agent": agent_label, "outcome": reason}
+                )
+                diagnostics["failure_reason"] = reason
             _LOGGER.warning(
                 "Announcement %s AI agent %s failed (%s); falling back",
                 "backup" if index else "primary",
-                candidate or "Home Assistant default",
+                agent_label,
                 type(error).__name__,
             )
             continue
 
-        edited = _parse_reply(response, originals)
+        try:
+            edited = _parse_reply(response, originals)
+        except Exception:  # noqa: BLE001
+            # A surprising provider response must not block delivery.
+            _LOGGER.exception(
+                "Announcement AI result validation failed; using fallback"
+            )
+            edited = None
         if edited is not None:
+            if diagnostics is not None:
+                status = (
+                    "rewritten"
+                    if edited != (text_tts, text_notify)
+                    else "accepted_unchanged"
+                )
+                diagnostics["status"] = status
+                diagnostics["agent_used"] = agent_label
+                diagnostics["failure_reason"] = None
+                diagnostics["attempts"].append(
+                    {"agent": agent_label, "outcome": status}
+                )
             if index:
                 _LOGGER.info(
                     "Announcement AI backup %s succeeded after primary failed",
-                    candidate or "Home Assistant default",
+                    agent_label,
                 )
             return edited
+        if diagnostics is not None:
+            diagnostics["attempts"].append(
+                {"agent": agent_label, "outcome": "invalid_response"}
+            )
+            diagnostics["failure_reason"] = "invalid_response"
         _LOGGER.warning(
             "Announcement %s AI agent %s returned invalid or unsafe text; falling back",
             "backup" if index else "primary",
-            candidate or "Home Assistant default",
+            agent_label,
         )
 
     # This fallback is unconditional: AI must never suppress delivery.
