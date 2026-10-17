@@ -16,6 +16,7 @@ NOTIFY_SERVICE_ANNOUNCEMENT_HUB: Final = "announcement_hub"
 SERVICE_CLEAR_QUEUE: Final = "clear_queue"
 SERVICE_CANCEL: Final = "cancel"
 
+ATTR_TEXT: Final = "text"
 ATTR_TEXT_TTS: Final = "text_tts"
 ATTR_TEXT_NOTIFY: Final = "text_notify"
 ATTR_OUTPUT: Final = "output"

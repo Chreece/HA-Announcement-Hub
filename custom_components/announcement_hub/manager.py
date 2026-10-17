@@ -157,6 +157,7 @@ from .const import (
     TARGET_SERVICE_PREFIX,
     TTS_LEVEL_NEVER,
 )
+from .message_text import resolve_channel_texts
 from .message_parts import (
     format_part_title,
     normalise_notify_profile,
@@ -791,15 +792,18 @@ class AnnouncementManager:
         occupied_only: bool,
         use_ai: bool | None = None,
         ai_agent: str | None = None,
+        text: str | None = None,
     ) -> AnnouncementJob:
-        text_tts = text_tts.strip() if text_tts and text_tts.strip() else None
-        text_notify = (
-            text_notify.strip() if text_notify and text_notify.strip() else None
+        # Resolve the primary message into two independent inputs BEFORE
+        # severity/room routing and the optional AI rewrite. Channel-specific
+        # values override text; an omitted override inherits its text value.
+        text_tts, text_notify = resolve_channel_texts(
+            text, text_tts, text_notify
         )
         click_action = click_action.strip() if click_action and click_action.strip() else None
         if not text_tts and not text_notify:
             raise ServiceValidationError(
-                "At least one of text_tts or text_notify must contain text"
+                "text is required unless text_tts or text_notify contains text"
             )
 
         queue_max = int(self.settings.get(CONF_QUEUE_MAX, DEFAULT_QUEUE_MAX))

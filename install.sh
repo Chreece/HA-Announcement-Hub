@@ -45,6 +45,7 @@ required = {
     "manager.py",
     "manifest.json",
     "message_parts.py",
+    "message_text.py",
     "models.py",
     "outputs.py",
     "sensor.py",

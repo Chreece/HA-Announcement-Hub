@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+- Added primary `text` field to the `notify.announcement_hub` action and
+  legacy `announcement_hub.send` alias, shown as required for new actions.
+  Optional `text_tts` and `text_notify` fields independently override
+  the common text for the spoken and visual channels.
+- Channel text is resolved before level/room/strict routing and AI rewriting.
+  A single `text` allows AI to create distinct TTS-safe and visual variants
+  without changing the selected output channels or adding new devices.
+- Existing channel-only YAML automations continue to work unchanged.
+  Empty override values fall back to `text`, while entirely empty messages
+  remain invalid.
+- Updated service forms, Greek/German/English translations, documentation
+  and regression tests for new and legacy message combinations.
+
 ## 0.9.25 - 2026-10-17
 
 - Fixed Critical announcements ignoring an explicit `service` integration or

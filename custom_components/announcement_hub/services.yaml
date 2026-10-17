@@ -2,6 +2,12 @@ send:
   fields:
     content:
       fields:
+        text:
+          required: true
+          example: The washing machine has finished.
+          selector:
+            text:
+              multiline: true
         text_tts:
           example: The washing machine has finished.
           selector:
