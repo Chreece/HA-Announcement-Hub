@@ -138,8 +138,8 @@
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
           "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
-          "default_ai_agent": "The Home Assistant default conversation agent may be the built-in intent-only Assist agent and might not support rewriting. Select a generative LLM conversation agent for AI announcements. The send action response reports the effective agent, whether AI was attempted, and any fallback reason.",
-          "fallback_ai_agent": "Optional backup agent tried only when the primary AI fails, times out, or returns invalid output. Original announcement is preselected: it skips a second AI attempt and sends the original text immediately. If the backup also fails, the original is always sent."
+          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
+          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered."
         }
       },
       "reconfigure": {
@@ -314,8 +314,8 @@
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
           "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
-          "default_ai_agent": "The Home Assistant default conversation agent may be the built-in intent-only Assist agent and might not support rewriting. Select a generative LLM conversation agent for AI announcements. The send action response reports the effective agent, whether AI was attempted, and any fallback reason.",
-          "fallback_ai_agent": "Optional backup agent tried only when the primary AI fails, times out, or returns invalid output. Original announcement is preselected: it skips a second AI attempt and sends the original text immediately. If the backup also fails, the original is always sent."
+          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
+          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered."
         }
       },
       "init": {

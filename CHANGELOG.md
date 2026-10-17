@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+- Fixed AI "Home Assistant default" incorrectly calling `conversation.process`
+  without an `agent_id`, which always selected the built-in intent-only
+  agent and caused `no_intent_match`.
+- The default AI option now resolves the conversation engine from the
+  **preferred Assist pipeline** at announcement time and passes its actual
+  `agent_id` and preferred language to Home Assistant's conversation action.
+- Default and backup agent selectors now follow the current preferred pipeline.
+  The selected pipeline's agent appears in the dropdown and AI diagnostics.
+- If the preferred Assist pipeline is unavailable or points to the built-in
+  intent-only agent, retry the configured backup agent if available; otherwise
+  deliver the original message unchanged without invoking the intent agent.
+- Added regression tests for dynamic preferred pipeline selection, explicit
+  overrides, missing/default built-in agents, backup deduplication and Greek
+  language selection. Preserved EN/DE/EL translations and routing behavior.
+
 ## 0.9.22 - 2026-10-17
 
 - Fixed AI response parsing for Home Assistant conversation agents that return

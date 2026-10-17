@@ -373,11 +373,23 @@ queued playback to finish.
 
 Under **General options**, configure **Rewrite announcements with AI** and
 **Default AI conversation agent**, and **Backup AI conversation agent**.
-Rewriting defaults to off for backward compatibility. The preselected **Home Assistant default** option follows the
-default conversation agent used by `conversation.process`. You can choose any
-currently discovered conversation agent instead. The backup dropdown defaults
-to **Original announcement (no backup AI)**, or can select Home Assistant's
-default or another configured conversation agent.
+Rewriting defaults to off for backward compatibility. The preselected
+**Home Assistant default** option now follows the **conversation agent configured
+in Home Assistant's preferred Assist pipeline**, not the intent-only agent
+used by a bare `conversation.process` call. The dropdown shows the preferred
+agent and resolves it fresh for every announcement, so changing the preferred
+Assist pipeline automatically updates the AI used. You can select a specific
+conversation agent instead. The backup dropdown defaults to **Original
+announcement (no backup AI)** and can also choose the preferred Assist
+pipeline or a specific alternative agent.
+
+If the preferred Assist pipeline is unavailable or still uses
+`conversation.home_assistant` (the built-in intent-only agent), Announcement Hub
+does **not** send a rewriting prompt to it. Instead it tries the configured
+backup AI, if any, then delivers the original announcement unchanged. This is
+reported as `preferred_assist_pipeline_unavailable` or
+`preferred_assist_agent_not_generative` in
+`announcement_hub_result.ai.failure_reason`.
 
 When enabled, the agent produces **two channel-specific versions** from the
 resolved delivery plan in **one AI request**: 
@@ -458,12 +470,17 @@ These diagnostics do not include the announcement content, AI prompt,
 provider error messages, or secrets. They are also available in queue status
 for the corresponding job.
 
-**Important:** Home Assistant's default agent can be the built-in intent-only
-Assist agent. It does not rewrite arbitrary announcements. If you see
-`no_intent_match`, select an LLM-backed conversation agent in Announcement
-Hub's General/AI configuration. A Home Assistant `action_done` conversation
-response is accepted as a rewrite only when no home-control actions are
-reported; actual action results are still rejected.
+**Important:** Home Assistant has two distinct defaults. Without an
+`agent_id`, `conversation.process` uses the built-in intent-only agent;
+Announcement Hub's **Home Assistant default** means the agent from the
+preferred Assist pipeline. The resolved agent ID is included in the action's
+`ai.agent`, `ai.agent_used` and attempt diagnostics, while
+`ai.agent_selection` indicates `preferred_assist` or `explicit`.
+If your preferred pipeline is still set to Home Assistant's built-in Assist,
+configure it to use an LLM agent or select an explicit LLM agent in
+Announcement Hub. A Home Assistant `action_done` conversation response is
+accepted as a rewrite only when no home-control actions are reported; actual
+action results are still rejected.
 ### Output behavior
 
 When `output` is omitted:
