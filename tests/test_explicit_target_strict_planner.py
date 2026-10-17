@@ -248,3 +248,8 @@ def test_explicit_service_and_output_disable_cross_room_fallback():
     assert "route_plan = build_delivery_plan(" in strict
     assert "force_tts=strict_tts" in strict
     assert "force_notify=strict_visual" in strict
+
+def test_action_response_reports_authoritative_strict_target_mode() -> None:
+    action = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
+    assert '"strict_targets": job.strict_targets' in action
+    assert "strict_targets=explicit_targeting" in SOURCE

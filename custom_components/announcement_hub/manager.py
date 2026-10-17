@@ -1644,6 +1644,7 @@ class AnnouncementManager:
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
+            strict_targets=explicit_targeting,
             ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,
