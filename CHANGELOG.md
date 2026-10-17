@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.26 - 2026-10-17
 
 - Added primary `text` field to the `notify.announcement_hub` action and
   legacy `announcement_hub.send` alias, shown as required for new actions.
