@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Added an optional fallback conversation agent for AI announcement rewriting;
+  the default is to deliver the original announcement without a second AI call.
+- Failed, timed-out, refused, error-marked, numerically altered, or malformed AI
+  replies now trigger backup-agent retry (if configured), then unchanged text.
+- Preserved queue routing, channel selection and all original notification/TTS
+  content when AI is unavailable. EN/DE/EL setup help and tests updated.
+
 ## 0.9.18 - 2026-10-11
 
 - Fixed NFAndroidTV power association when the same physical TV is exposed by

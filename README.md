@@ -357,10 +357,12 @@ queued playback to finish.
 ### Optional AI rewriting
 
 Under **General options**, configure **Rewrite announcements with AI** and
-**Default AI conversation agent**. Rewriting defaults to off for backward
-compatibility. The preselected **Home Assistant default** option follows the
+**Default AI conversation agent**, and **Backup AI conversation agent**.
+Rewriting defaults to off for backward compatibility. The preselected **Home Assistant default** option follows the
 default conversation agent used by `conversation.process`. You can choose any
-currently discovered conversation agent instead.
+currently discovered conversation agent instead. The backup dropdown defaults
+to **Original announcement (no backup AI)**, or can select Home Assistant's
+default or another configured conversation agent.
 
 When enabled, the agent rephrases spoken and visual text to sound more natural
 and variable. The prompt asks it to preserve the original information and not
@@ -368,9 +370,13 @@ to control devices or execute actions; the integration checks the response
 format, but cannot guarantee that every paraphrase is factually equivalent.
 AI cannot change the announcement level, recipients,
 room routing, title or notification metadata. If an agent is offline, times
-out, or returns an invalid response, the original announcement is delivered.
-AI runs only once before the announcement enters the persistent queue. The
-AI-enabled send action may take up to 12 seconds before it is accepted.
+out, rejects the request, or returns an invalid response, Announcement Hub
+tries the optional backup agent once. If that fails too (or if no backup agent
+is selected), the original text is delivered unchanged. Unsafe-looking responses,
+including changed numerical readings and obvious AI refusals, are also rejected.
+AI runs only before an announcement enters the persistent queue. Each enabled
+AI agent has a 12-second timeout, so a primary plus backup can take up to
+24 seconds before enqueueing. Disable AI per action for time-critical alerts.
 
 To override AI for an individual announcement:
 
@@ -387,6 +393,8 @@ data:
   bypass AI even when globally enabled.
 - Omit `ai_agent` to inherit the integration agent. The action editor provides
   Home Assistant's conversation-agent selector.
+- The backup agent is configured globally. If both agents are unavailable or
+  return invalid text, announcements still use their exact original wording.
 - Both `notify.announcement_hub` and the legacy `announcement_hub.send`
   support the per-announcement overrides.
 

@@ -23,21 +23,27 @@ spec.loader.exec_module(ai)
 
 
 class Services:
-    def __init__(self, response=None, error=None):
+    def __init__(self, response=None, error=None, responses=None):
         self.response = response
         self.error = error
+        self.responses = None if responses is None else list(responses)
         self.calls = []
 
     async def async_call(self, domain, service, payload, **kwargs):
         self.calls.append((domain, service, payload, kwargs))
         if self.error is not None:
             raise self.error
+        if self.responses is not None:
+            result = self.responses.pop(0)
+            if isinstance(result, BaseException):
+                raise result
+            return result
         return self.response
 
 
 class Hass:
-    def __init__(self, response=None, error=None):
-        self.services = Services(response, error)
+    def __init__(self, response=None, error=None, responses=None):
+        self.services = Services(response, error, responses)
 
 
 def ha_reply(tts, notify):
@@ -124,6 +130,114 @@ def test_agent_failure_falls_back_to_original() -> None:
     assert result == ("spoken", None)
 
 
+def test_failing_primary_retries_backup_and_preserves_channel_shape() -> None:
+    hass = Hass(responses=[
+        RuntimeError("primary offline"),
+        ha_reply(None, "Fenster ist offen."),
+    ])
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts=None,
+        text_notify="Fenster offen",
+        agent_id="conversation.local",
+        fallback_agent_id="conversation.backup",
+    ))
+    assert got == (None, "Fenster ist offen.")
+    calls = hass.services.calls
+    assert len(calls) == 2
+    assert calls[0][2]["agent_id"] == "conversation.local"
+    assert calls[1][2]["agent_id"] == "conversation.backup"
+
+
+def test_unusable_primary_tries_home_assistant_default_as_backup() -> None:
+    hass = Hass(responses=[
+        ha_reply("Wrong 24°C", None),
+        ha_reply("Still 23°C", None),
+    ])
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Room temperature 23°C",
+        text_notify=None,
+        agent_id="conversation.local",
+        fallback_agent_id="",
+    ))
+    assert got == ("Still 23°C", None)
+    assert len(hass.services.calls) == 2
+    assert "agent_id" not in hass.services.calls[1][2]
+
+
+def test_both_agents_failing_delivers_original_message() -> None:
+    hass = Hass(responses=[
+        RuntimeError("offline"),
+        ha_reply("I cannot do that", "I cannot do that"),
+    ])
+    original = ("The door is open", "Door open")
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=original[0], text_notify=original[1],
+        agent_id="conversation.primary",
+        fallback_agent_id="conversation.secondary",
+    ))
+    assert got == original
+    assert len(hass.services.calls) == 2
+
+
+def test_no_duplicate_attempt_for_identical_primary_backup() -> None:
+    hass = Hass(error=RuntimeError("offline"))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Original", text_notify=None,
+        agent_id="conversation.same", fallback_agent_id="conversation.same",
+    ))
+    assert got == ("Original", None)
+    assert len(hass.services.calls) == 1
+
+
+@pytest.mark.parametrize("kind", ["error", "action_done"])
+def test_error_and_action_done_responses_are_unusable(kind) -> None:
+    response = ha_reply("Changed", None)
+    response["response"]["response_type"] = kind
+    hass = Hass(response)
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Original", text_notify=None, agent_id=None
+    ))
+    assert got == ("Original", None)
+
+
+def test_faulty_numeric_or_refusal_without_backup_uses_original() -> None:
+    for edited in ("The temperature is 30°C", "I am sorry, I cannot help"):
+        hass = Hass(ha_reply(edited, None))
+        got = asyncio.run(ai.async_filter_announcement(
+            hass, text_tts="The temperature is 23°C",
+            text_notify=None, agent_id=None
+        ))
+        assert got == ("The temperature is 23°C", None)
+
+
+def test_timeout_uses_backup_then_original(monkeypatch) -> None:
+    monkeypatch.setattr(ai, "AI_FILTER_TIMEOUT_SECONDS", 0.005)
+    class SlowServices:
+        def __init__(self):
+            self.calls = 0
+        async def async_call(self, *args, **kwargs):
+            self.calls += 1
+            await asyncio.sleep(1)
+    hass = Hass()
+    hass.services = SlowServices()
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Original", text_notify=None,
+        agent_id="conversation.primary", fallback_agent_id="conversation.backup",
+    ))
+    assert got == ("Original", None)
+    assert hass.services.calls == 2
+
+
+def test_cancelled_request_is_not_swallowed() -> None:
+    hass = Hass(error=asyncio.CancelledError())
+    with pytest.raises(asyncio.CancelledError):
+        asyncio.run(ai.async_filter_announcement(
+            hass, text_tts="Original", text_notify=None, agent_id=None
+        ))
+
+
 def test_config_and_actions_support_optional_ai_overrides() -> None:
     flow = (COMPONENT / "config_flow.py").read_text()
     init = (COMPONENT / "__init__.py").read_text()
@@ -132,6 +246,10 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     service = yaml.safe_load((COMPONENT / "services.yaml").read_text())
     assert 'DEFAULT_USE_AI: Final = False' in const
     assert 'DEFAULT_AI_AGENT: Final = "default"' in const
+    assert 'DEFAULT_FALLBACK_AI_AGENT: Final = "original"' in const
+    assert "CONF_FALLBACK_AI_AGENT" in flow
+    assert "options=self._ai_fallback_agent_options()" in flow
+    assert "fallback_agent_id=fallback_agent_id" in manager
     assert 'self.hass.states.async_all("conversation")' in flow
     assert "get_agent_manager(self.hass).async_get_agent_info()" in flow
     assert "CONF_DEFAULT_USE_AI" in flow and "CONF_DEFAULT_AI_AGENT" in flow
@@ -160,7 +278,7 @@ def test_ai_fields_localized_in_config_options_and_action() -> None:
         data = json.loads((COMPONENT / filename).read_text(encoding="utf-8"))
         for section in ("config", "options"):
             queue = data[section]["step"]["queue"]
-            for key in ("default_use_ai", "default_ai_agent"):
+            for key in ("default_use_ai", "default_ai_agent", "fallback_ai_agent"):
                 assert queue["data"][key]
                 assert queue["data_description"][key]
         send = data["services"]["send"]
