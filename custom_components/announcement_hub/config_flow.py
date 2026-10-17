@@ -1185,7 +1185,8 @@ class _AnnouncementFlowMixin:
             )
         return choices
 
-    async def async_step_queue(        self, user_input: dict[str, Any] | None = None
+    async def async_step_queue(
+        self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step 4: general routing, presence, fallback, and queue options."""
         errors: dict[str, str] = {}

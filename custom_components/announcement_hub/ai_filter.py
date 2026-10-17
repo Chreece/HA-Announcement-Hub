@@ -17,7 +17,7 @@ AI_FILTER_TIMEOUT_SECONDS = 12
 # Numerical readings, time, dates and quantities must never be silently changed.
 _NUMBER_PATTERN = re.compile(r"[0-9]+(?:[.,][0-9]+)*")
 _ERROR_PREFIXES = (
-    "i am sorry", "i’m sorry", "i\x27m sorry", "i cannot", "i can\x27t",
+    "i am sorry", "i’m sorry", "i'm sorry", "i cannot", "i can't",
     "as an ai", "sorry, i", "an error occurred", "request failed",
     "es tut mir leid", "ich kann nicht", "entschuldigung,",
     "λυπάμαι", "δεν μπορώ",

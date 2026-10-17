@@ -130,6 +130,17 @@ def test_agent_failure_falls_back_to_original() -> None:
     assert result == ("spoken", None)
 
 
+def test_successful_primary_does_not_call_backup() -> None:
+    hass = Hass(responses=[ha_reply("Door open.", None)])
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify=None,
+        agent_id="conversation.local",
+        fallback_agent_id="conversation.backup",
+    ))
+    assert got == ("Door open.", None)
+    assert len(hass.services.calls) == 1
+
+
 def test_failing_primary_retries_backup_and_preserves_channel_shape() -> None:
     hass = Hass(responses=[
         RuntimeError("primary offline"),
