@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 AI_FILTER_TIMEOUT_SECONDS = 12
 
 # Numerical readings, time, dates and quantities must never be silently changed.
-_NUMBER_PATTERN = re.compile(r"[0-9]+(?:[.,][0-9]+)*")
+_NUMBER_PATTERN = re.compile(r"(?<![0-9])[-+]?[0-9]+(?:[.,][0-9]+)*")
 _TTS_HTML_RE = re.compile(r"</?\s*[A-Za-z][^>]*>")
 _TTS_LINK_RE = re.compile(r"\[[^\]]+\]\([^)]+\)")
 _TTS_EMOTICON_RE = re.compile(r"(?<!\w)(?:[:;=]-?[)(DPp]|<3)(?!\w)")
