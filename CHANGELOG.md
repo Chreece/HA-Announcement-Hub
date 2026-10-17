@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.24 - 2026-10-17
 
 - Added optional `click_action` to `notify.announcement_hub` and its legacy
   `announcement_hub.send` alias. The URL/deep link is stored with each queued
