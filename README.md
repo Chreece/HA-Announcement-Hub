@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/assets/announcement-hub-banner.svg" alt="Announcement Hub for Home Assistant" width="100%">
+  <img src="https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/announcement-hub-banner.svg" alt="Announcement Hub for Home Assistant" width="100%">
 </p>
 
 <p align="center">
