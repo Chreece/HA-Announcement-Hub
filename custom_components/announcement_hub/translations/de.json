@@ -141,6 +141,24 @@
           "default_ai_agent": "Home Assistant Standard ist vorausgewählt. Dies verwendet den Standardagenten von conversation.process; ein anderer verfügbarer Agent kann ausgewählt werden.",
           "fallback_ai_agent": "Optionaler Ersatzagent, der nur verwendet wird, wenn die erste KI ausfällt, das Zeitlimit erreicht oder ungültige Antworten liefert. Standard ist die Originalankündigung ohne zweiten KI-Versuch. Wenn auch die Ersatz-KI fehlschlägt, wird immer der Originaltext gesendet."
         }
+      },
+      "reconfigure": {
+        "title": "Announcement Hub neu konfigurieren",
+        "description": "Wähle den Bereich, den du ändern möchtest. Nach dem Speichern geht es direkt zurück zur Integration, ohne die übrigen Einrichtungsschritte durchzugehen.",
+        "menu_options": {
+          "edit_outputs": "1. Benachrichtigungen und Räume",
+          "edit_tts": "2. TTS-Engines und Geräte",
+          "edit_profiles": "3. Ausgabespezifische Profile",
+          "edit_general": "4. Allgemein, Anwesenheit und KI",
+          "edit_all": "Alle Einstellungen bearbeiten (Assistent)"
+        },
+        "menu_option_descriptions": {
+          "edit_outputs": "Benachrichtigungsgeräte, Raumzuordnung und Mindestprioritäten ändern, ohne TTS- oder KI-Einstellungen anzupassen.",
+          "edit_tts": "Sprach-Engine, Stimme, Raumplayer, Snapcast-Clients und Companion-App-Sprachausgabe ändern.",
+          "edit_profiles": "Anzeigedauer, Darstellung und Snapcast-Wiedergabe für die ausgewählten Integrationen konfigurieren.",
+          "edit_general": "Direkt zu KI- und Ersatzagenten, Anwesenheit, Raum-Fallback, Warteschlange und Zeitlimits wechseln.",
+          "edit_all": "Alle Einrichtungsseiten wie beim ursprünglichen Konfigurationsassistenten nacheinander bearbeiten."
+        }
       }
     },
     "error": {
@@ -298,6 +316,24 @@
           "default_use_ai": "Bei bestehenden Installationen standardmäßig deaktiviert. Bei Aktivierung werden Sprachausgaben und visuelle Nachrichten vor der Ausgabe umformuliert. Falls der Agent fehlschlägt, bleibt der Originaltext erhalten.",
           "default_ai_agent": "Home Assistant Standard ist vorausgewählt. Dies verwendet den Standardagenten von conversation.process; ein anderer verfügbarer Agent kann ausgewählt werden.",
           "fallback_ai_agent": "Optionaler Ersatzagent, der nur verwendet wird, wenn die erste KI ausfällt, das Zeitlimit erreicht oder ungültige Antworten liefert. Standard ist die Originalankündigung ohne zweiten KI-Versuch. Wenn auch die Ersatz-KI fehlschlägt, wird immer der Originaltext gesendet."
+        }
+      },
+      "init": {
+        "title": "Announcement Hub konfigurieren",
+        "description": "Wähle den Bereich, den du ändern möchtest. Nach dem Speichern geht es direkt zurück zur Integration, ohne die übrigen Einrichtungsschritte durchzugehen.",
+        "menu_options": {
+          "edit_outputs": "1. Benachrichtigungen und Räume",
+          "edit_tts": "2. TTS-Engines und Geräte",
+          "edit_profiles": "3. Ausgabespezifische Profile",
+          "edit_general": "4. Allgemein, Anwesenheit und KI",
+          "edit_all": "Alle Einstellungen bearbeiten (Assistent)"
+        },
+        "menu_option_descriptions": {
+          "edit_outputs": "Benachrichtigungsgeräte, Raumzuordnung und Mindestprioritäten ändern, ohne TTS- oder KI-Einstellungen anzupassen.",
+          "edit_tts": "Sprach-Engine, Stimme, Raumplayer, Snapcast-Clients und Companion-App-Sprachausgabe ändern.",
+          "edit_profiles": "Anzeigedauer, Darstellung und Snapcast-Wiedergabe für die ausgewählten Integrationen konfigurieren.",
+          "edit_general": "Direkt zu KI- und Ersatzagenten, Anwesenheit, Raum-Fallback, Warteschlange und Zeitlimits wechseln.",
+          "edit_all": "Alle Einrichtungsseiten wie beim ursprünglichen Konfigurationsassistenten nacheinander bearbeiten."
         }
       }
     },

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Added direct step-selection menus for both Reconfigure and Configure, so
+  users can jump to notification outputs, TTS, provider profiles or general/AI
+  settings and save without traversing the rest of the setup wizard.
+- Existing device selections and configuration sections are preserved when
+  editing another section, including previous data/options overrides.
+- First-time setup remains a guided sequence; the full edit wizard is still
+  available as an explicit menu choice. EN/DE/EL menu translations added.
+
 ## 0.9.20 - 2026-10-17
 
 - AI now produces two independent output variants in one request: plain,

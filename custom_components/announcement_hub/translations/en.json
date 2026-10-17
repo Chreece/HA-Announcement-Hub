@@ -141,6 +141,24 @@
           "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent.",
           "fallback_ai_agent": "Optional backup agent tried only when the primary AI fails, times out, or returns invalid output. Original announcement is preselected: it skips a second AI attempt and sends the original text immediately. If the backup also fails, the original is always sent."
         }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Announcement Hub",
+        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "menu_options": {
+          "edit_outputs": "1. Notification outputs & rooms",
+          "edit_tts": "2. TTS engines & devices",
+          "edit_profiles": "3. Provider-specific output profiles",
+          "edit_general": "4. General settings, presence & AI",
+          "edit_all": "Edit all settings (full wizard)"
+        },
+        "menu_option_descriptions": {
+          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
+          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
+          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
+          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+        }
       }
     },
     "error": {
@@ -298,6 +316,24 @@
           "default_use_ai": "Disabled by default for existing installations. When enabled, spoken and visual messages are rephrased before delivery. If the agent fails, the original announcement is used.",
           "default_ai_agent": "Home Assistant default is preselected. This follows the default conversation agent for conversation.process; you can select another available agent.",
           "fallback_ai_agent": "Optional backup agent tried only when the primary AI fails, times out, or returns invalid output. Original announcement is preselected: it skips a second AI attempt and sends the original text immediately. If the backup also fails, the original is always sent."
+        }
+      },
+      "init": {
+        "title": "Configure Announcement Hub",
+        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "menu_options": {
+          "edit_outputs": "1. Notification outputs & rooms",
+          "edit_tts": "2. TTS engines & devices",
+          "edit_profiles": "3. Provider-specific output profiles",
+          "edit_general": "4. General settings, presence & AI",
+          "edit_all": "Edit all settings (full wizard)"
+        },
+        "menu_option_descriptions": {
+          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
+          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
+          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
+          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
         }
       }
     },

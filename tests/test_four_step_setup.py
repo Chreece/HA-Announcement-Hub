@@ -7,11 +7,11 @@ ROOT = Path(__file__).resolve().parents[1]
 C = ROOT / "custom_components" / "announcement_hub"
 
 
-def test_only_four_visible_setup_steps_remain() -> None:
+def test_original_four_setup_steps_remain_and_editing_gains_a_menu() -> None:
     strings = json.loads((C / "strings.json").read_text())
     expected = {"outputs", "tts", "notification_profile", "queue"}
-    assert set(strings["config"]["step"]) == expected
-    assert set(strings["options"]["step"]) == expected
+    assert set(strings["config"]["step"]) == expected | {"reconfigure"}
+    assert set(strings["options"]["step"]) == expected | {"init"}
 
 
 def test_notify_step_auto_discovers_concrete_entities_and_groups_policies() -> None:
