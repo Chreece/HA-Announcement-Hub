@@ -145,7 +145,8 @@ def test_manifest_and_hacs_identity() -> None:
     hacs = json.loads((ROOT / "hacs.json").read_text())
     assert manifest["domain"] == "announcement_hub"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "0.9.18"
+    const_source = (COMPONENT / "const.py").read_text(encoding="utf-8")
+    assert f'VERSION: Final = "{manifest["version"]}"' in const_source
     assert hacs["name"] == manifest["name"]
 
 
