@@ -243,6 +243,6 @@ def test_tts_push_never_reads_job_click_action() -> None:
     assert manager.count("job.click_action") == 1
     visual = manager[
         manager.index("    async def _async_deliver_notification_part("):
-        manager.index("    async def _async_reading_hold("),
+        manager.index("    async def _async_reading_hold(")
     ]
     assert "job.click_action" in visual
