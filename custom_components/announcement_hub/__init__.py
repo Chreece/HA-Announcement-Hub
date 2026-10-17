@@ -31,6 +31,8 @@ from .const import (
     ATTR_LEVEL,
     ATTR_NOTIFY_DATA,
     ATTR_OCCUPIED_ONLY,
+    ATTR_USE_AI,
+    ATTR_AI_AGENT,
     ATTR_OUTPUT,
     ATTR_SERVICE,
     ATTR_TEXT_NOTIFY,
@@ -145,6 +147,8 @@ SEND_SCHEMA = probatio.All(
             probatio.Optional(ATTR_TTS_OPTIONS): dict,
             probatio.Optional(ATTR_COMPANION_TTS, default=False): bool,
             probatio.Optional(ATTR_OCCUPIED_ONLY, default=DEFAULT_OCCUPIED_ONLY): bool,
+            probatio.Optional(ATTR_USE_AI): bool,
+            probatio.Optional(ATTR_AI_AGENT): cv.string,
         }
     ),
     _validate_send_payload,
@@ -299,6 +303,8 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             tts_options=call.data.get(ATTR_TTS_OPTIONS),
             companion_tts=call.data[ATTR_COMPANION_TTS],
             occupied_only=call.data[ATTR_OCCUPIED_ONLY],
+            use_ai=call.data.get(ATTR_USE_AI),
+            ai_agent=call.data.get(ATTR_AI_AGENT),
         )
         pending = manager.pending_jobs()
         position = next(

@@ -13,7 +13,8 @@
   "dependencies": [
     "media_player",
     "tts",
-    "notify"
+    "notify",
+    "conversation"
   ],
   "documentation": "https://github.com/Chreece/HA-Announcement-Hub",
   "integration_type": "service",
