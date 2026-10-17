@@ -22,6 +22,7 @@ from .const import (
     CONF_DEFAULT_TITLE,
     CONF_DEFAULT_USE_AI,
     CONF_DEFAULT_AI_AGENT,
+    CONF_FALLBACK_AI_AGENT,
     CONF_DISPATCH_ORDER,
     CONF_FALLBACK_CHECK_DOOR,
     CONF_FALLBACK_DOOR_LABEL,
@@ -64,6 +65,7 @@ from .const import (
     DEFAULT_DISPATCH_ORDER,
     DEFAULT_USE_AI,
     DEFAULT_AI_AGENT,
+    DEFAULT_FALLBACK_AI_AGENT,
     DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_NOTIFY_MIN_LEVEL,
@@ -1161,8 +1163,29 @@ class _AnnouncementFlowMixin:
             )
         return options
 
-    async def async_step_queue(
-        self, user_input: dict[str, Any] | None = None
+    def _ai_fallback_agent_options(self) -> list[selector.SelectOptionDict]:
+        """Offer an original-message fallback or any discovered AI agent."""
+        choices = [
+            selector.SelectOptionDict(
+                value=DEFAULT_FALLBACK_AI_AGENT,
+                label="Original announcement (no backup AI)",
+            ),
+            *self._ai_agent_options(),
+        ]
+        configured = str(
+            self._value(CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT)
+            or DEFAULT_FALLBACK_AI_AGENT
+        )
+        if configured not in {choice["value"] for choice in choices}:
+            choices.append(
+                selector.SelectOptionDict(
+                    value=configured,
+                    label=f"Unavailable backup agent ({configured})",
+                )
+            )
+        return choices
+
+    async def async_step_queue(        self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step 4: general routing, presence, fallback, and queue options."""
         errors: dict[str, str] = {}
@@ -1173,6 +1196,7 @@ class _AnnouncementFlowMixin:
                 (CONF_DEFAULT_TITLE, DEFAULT_TITLE),
                 (CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
                 (CONF_DEFAULT_AI_AGENT, DEFAULT_AI_AGENT),
+                (CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT),
                 (CONF_CRITICAL_NOTIFY_DATA, {}),
                 (CONF_OCCUPANCY_SENSOR, None),
                 (CONF_FALLBACK_ROOM, None),
@@ -1233,6 +1257,17 @@ class _AnnouncementFlowMixin:
             ): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=self._ai_agent_options(),
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            probatio.Required(
+                CONF_FALLBACK_AI_AGENT,
+                default=self._value(
+                    CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT
+                ),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=self._ai_fallback_agent_options(),
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             ),
