@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.23 - 2026-10-17
 
 - Fixed AI "Home Assistant default" incorrectly calling `conversation.process`
   without an `agent_id`, which always selected the built-in intent-only
