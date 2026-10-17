@@ -302,6 +302,40 @@ def test_no_duplicate_attempt_for_identical_primary_backup() -> None:
     assert len(hass.services.calls) == 1
 
 
+def test_ha_default_action_done_without_actions_is_valid_ai_text() -> None:
+    """HA IntentResponse defaults to action_done even for text-only agents."""
+    reply = ha_reply("The kitchen light is on.", "💡 **Kitchen light on**")
+    reply["response"]["response_type"] = "action_done"
+    reply["response"]["data"] = {"success": [], "failed": []}
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        Hass(reply),
+        text_tts="Kitchen light on", text_notify="Kitchen light on",
+        agent_id="conversation.llm", diagnostics=diag,
+    ))
+    assert got == ("The kitchen light is on.", "💡 **Kitchen light on**")
+    assert diag["status"] == "rewritten"
+    assert diag["agent_used"] == "conversation.llm"
+
+
+@pytest.mark.parametrize("action_data", [
+    {"success": [{"name": "Kitchen", "type": "area"}], "failed": []},
+    {"success": [], "failed": [{"name": "Light", "type": "entity"}]},
+    {"success": [], "failed": [], "other_actions": ["turn on"]},
+])
+def test_ai_cannot_accept_reply_reporting_actions(action_data) -> None:
+    reply = ha_reply("The kitchen light is on.", None)
+    reply["response"]["response_type"] = "action_done"
+    reply["response"]["data"] = action_data
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        Hass(reply), text_tts="Kitchen light on",
+        text_notify=None, agent_id=None, diagnostics=diag,
+    ))
+    assert got == ("Kitchen light on", None)
+    assert diag["status"] == "fallback_original"
+    assert diag["failure_reason"] == "action_response_not_allowed"
+
 @pytest.mark.parametrize("kind", ["error", "action_done"])
 def test_error_and_action_done_responses_are_unusable(kind) -> None:
     response = ha_reply("Changed", None)
