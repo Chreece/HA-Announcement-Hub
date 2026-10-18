@@ -296,65 +296,61 @@ Multipart Companion App notifications use one stable tag by default, causing
 each new part to replace the previous part instead of building a stack. This
 is independent from the optional Companion App **TTS** output.
 
-## Occupancy-aware routing
+## Occupancy-aware routing and durable room fallback
 
-Optionally configure an occupied-areas sensor. Its state can contain comma,
-semicolon, or newline-separated Home Assistant area names/IDs, or a configured
-attribute can contain a list of areas.
+Announcement Hub is responsible for routing announcements from integrations
+such as Air Quality Advisor. The caller passes the original message and the
+actual Home Assistant room name (for example \`output: ["Küche"]\`). Announcement
+Hub resolves the name into an area ID; the caller must not work out fallback
+targets or override output settings.
 
-`notify.announcement_hub` defaults to `occupied_only: true`. When `output`
-is omitted, a configured occupancy source chooses the target rooms. When the
-action supplies one or more `output` rooms, **those rooms are authoritative**:
-occupancy does not intersect, replace, or otherwise change them.
+When the action requests a room or uses the configured occupancy sensor,
+Announcement Hub tries the following priority tiers **one at a time**:
 
-Filtering is capability-neutral, so a target room with only TTS receives speech
-and a room with only visual notify outputs receives only those notifications.
-General/movable outputs remain eligible according to their configured policy.
+1. **Explicit rooms first:** physical notification/TTS/Snapcast outputs
+   belonging to the named rooms, whether or not occupancy currently detects
+   someone there. Only outputs that accept this severity are eligible.
+2. **Occupied rooms next:** if \`occupied_only\` is enabled and an occupancy
+   source is configured, try other currently occupied rooms.
+3. **Door-gated fallback room:** use the configured fallback area only if
+   the original requested/occupied room has an eligible door sensor in state
+   \`on\` (open), or the door check has been explicitly disabled.
+4. **General visual and other non-room outputs:** after room routes are
+   exhausted, try only outputs configured with General scope. Never target a
+   room-bound device in an unrelated room.
 
-If the configured occupancy source is unavailable or currently resolves to no
-occupied areas, room-bound outputs have no room target, but **General/movable
-outputs remain eligible**. This is intentional: phones, watches, laptops and
-other General outputs can still receive the announcement when nobody is detected
-in a specific room.
+Each tier is checked against the actual configured outputs and its severity
+thresholds. If there is no matching device, move immediately to the next tier.
+If matching devices are registered but \`unavailable\`, \`unknown\`, or otherwise
+unready, retain that tier for **Output availability timeout** before advancing.
+If some selected devices succeed, the announcement is delivered there; there
+is no need to broadcast it to later tiers.
 
-Use `occupied_only: false` to ignore occupancy for one call. Without a
-configured occupancy sensor, the option has no effect.
+**Info-level window-opening alerts:** when Piper/TTS starts at Warning, it
+remains muted for Info. Announcement Hub first seeks a visual notification
+configured for Info in the requested room; otherwise it considers occupied
+rooms, the permitted fallback room, and General notifications. It never turns
+an Info announcement into unrequested TTS or bypasses the configured minimum
+notification severity.
 
-### Occupancy fallback room
+**No silent expiry:** if all eligible outputs are unavailable (or none are
+configured yet), the announcement stays queued and persisted. A newer
+runnable announcement can proceed without waiting behind it. The pending
+announcement retries permitted room tiers and General outputs as availability
+or configuration changes, including after Home Assistant restarts. It will
+finish only after delivery, explicit cancellation, or an explicit queue clear.
+Normal queue capacity limits still apply to new submissions.
 
-Optionally configure a fallback Home Assistant area. Occupancy routing first
-looks for **fixed room candidates** in the occupied room. Room-scoped Android
-TV/Snapcast/direct TTS outputs count as fixed candidates. Mobile App notification
-outputs and Companion App TTS outputs are moveable and never count as proof that
-the occupied room itself has a delivery candidate.
+An explicit \`service\` restriction (provider, entity or config entry) remains
+a hard allowlist through every fallback tier. For example, \`service:
+[mobile_app]\` never turns into Piper/Snapcast or a different notify provider.
+With **\`occupied_only: false\`**, the preferred room is still attempted but
+the occupancy tier is skipped. Without a room preference or occupancy routing,
+the existing automatic level policy remains in use.
 
-Fixed room candidates are filtered by the announcement level and current
-availability first. For example, if the room has an available Info-capable
-NFAndroidTV output and TTS begins at Warning, an Info announcement uses the
-NFAndroidTV output and TTS remains suppressed.
-
-If that normal-level fixed room output is unavailable/off but the same room has a
-configured TTS route, Announcement Hub selects the room TTS path as the fallback
-delivery tier instead of letting a General/movable notification satisfy the
-room. If the selected TTS path is itself unavailable or unknown, it is kept in
-the job and waited for until the configured output-availability timeout. If the
-room has no TTS path at all, the unavailable normal-level fixed visual output is
-kept as the wait target instead.
-
-Fallback **to another room** is still based on fixed room candidate existence,
-not current availability. Any fixed room candidate in the target room prevents
-cross-room fallback.
-
-The configured fallback room is considered only when the target room set has
-**zero fixed room candidates at all**. **Fallback is TTS-only**: the original
-visual/general notifications remain on their original outputs while only the
-spoken route is taken from the fallback room.
-
-When **Check target-room door before fallback** is enabled, at least one current
-target room must contain a `binary_sensor` with `device_class: door` whose
-state is `on` (open). Closed (`off`), unknown, unavailable, or missing door
-sensors block fallback. Disable the checkbox to permit the TTS-only fallback
-regardless of door state.
+The send action and the queue diagnostic sensor expose \`routing_mode\`,
+\`routing_stage\`, \`preferred_areas\` and recent \`routing_history\`, allowing
+the real output choice and each grace-period escalation to be inspected.
 
 ## Main action
 
@@ -528,12 +524,11 @@ all configured matching outputs enabled for that call are candidates
 → remaining outputs are recorded with their final timeout/error
 ```
 
-When one or more `output` areas are supplied, **only physical outputs in
-those areas** are eligible; global/unassigned devices and configured fallback
-rooms are not added. With `occupied_only: true`, the areas are further
-restricted to the currently occupied areas. With `occupied_only: false`,
-the specified areas are authoritative. Without explicit areas, the existing
-room-presence and general/global delivery policy remains available.
+When one or more `output` areas are supplied, those areas are the **first
+priority**, not a permanent hard restriction. Other occupied rooms (when
+`occupied_only` is enabled), the door-gated fallback room, and finally
+general/non-room outputs are considered after the grace period. No unrelated
+room is selected, and no unrequested service or TTS channel is added.
 
 For TTS, selected targets are never dropped merely because they are currently
 `unavailable` or `unknown`. They remain pending and are retried until the
@@ -541,12 +536,11 @@ configured output-availability timeout expires.
 
 ### Provider-targeted notifications and tap actions
 
-The existing `service` action field selects **which configured integrations
-or devices** may be used at **every severity**, including Critical. `output`
-restricts **where** (areas). These selectors are strict when supplied: an
-unavailable selected device waits until its configured availability timeout,
-then is skipped. **No other device, channel, integration or fallback room is
-substituted.** For example, target only Companion App visual
+The existing `service` action field restricts **which configured integrations
+or devices** may be used at **every severity**, including Critical. That
+allowlist stays strict; `output` gives a **preferred room** whose delivery
+grace period is followed by controlled room/general fallback. Device selection
+does not broaden to other providers. For example, target only Companion App visual
 notifications with a tap-through dashboard link:
 
 ```yaml
@@ -588,24 +582,25 @@ an explicitly supplied `click_action` takes precedence over
 Notifications routed through generic `notify.send_message` cannot carry
 provider-specific click metadata if no advanced mobile_app action is present.
 
-**Strict routing:** Explicit `service` and/or `output` targets are honored
-even with `level: critical`. A Critical notification directed only to
-`mobile_app` does **not** activate Piper, Snapcast or other visual providers.
-Unavailable selected targets are frozen and retried only until the output
-availability timeout. Omitting both selectors preserves the original automatic
-routing/broadcast behavior. Click actions never change routing.
+**Provider restrictions stay strict:** A Critical notification directed only
+to `mobile_app` cannot activate Piper, Snapcast or another notify provider.
+`service` is a hard device/integration restriction; `output` is a preferred
+room and may advance through the configured routing stages. Click actions
+do not affect routing. Unrestricted Critical messages retain their original
+automatic broadcast behavior.
 
-The send response now includes `strict_targets: true` whenever either
-selector is explicitly set; queue status preserves this flag across restarts.
-An explicitly supplied **empty** `service: []` or `output: []` raises a
-validation error rather than accidentally broadcasting a Critical alert.
-Omit the selector entirely to request automatic routing.
+The response includes `strict_targets: true` when a `service` restriction is
+supplied. Preferred-room escalation instead reports
+`routing_mode: room_fallback` and the current `routing_stage`. An explicitly
+empty `service: []` or `output: []` remains invalid; omit the field to use
+automatic routing.
 
 ### Specific outputs or integrations
 
 The optional `service` field narrows every job, including Critical, to
-exactly the configured output types and devices listed (the same field is
-available on both `notify.announcement_hub` and `announcement_hub.send`). It accepts:
+only the configured integration/device types listed, even during area
+fallback. Both `notify.announcement_hub` and `announcement_hub.send`
+support this field:
 
 ```text
 mobile_app                    # selected outputs from an integration
