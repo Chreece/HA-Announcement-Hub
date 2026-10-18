@@ -1964,6 +1964,292 @@ class AnnouncementManager:
             or self._job_has_ready_companion_tts(job)
         )
 
+    def _room_stage_candidate(
+        self, job: AnnouncementJob, stage: str
+    ) -> dict[str, Any] | None:
+        """Resolve one live, policy-eligible room or general-output tier.
+
+        This resolver runs inside Announcement Hub, not the calling advisor.
+        Occupancy, room assignment, minimum notify/TTS levels and the door
+        gate are rechecked after every stage transition and after HA restart.
+        """
+        if not job.room_fallback or stage not in STAGES[:-1]:
+            return None
+
+        occupied = self._occupied_area_ids()
+        if stage == "explicit":
+            areas = job.requested_area_ids
+            if job.routing_occupied_only and occupied is not None:
+                areas = tuple(area for area in areas if area in set(occupied))
+        elif stage == "occupied":
+            areas = tuple(
+                area for area in (occupied or ())
+                if area not in set(job.requested_area_ids)
+            )
+        elif stage == "fallback_room":
+            area = self._fallback_area_id()
+            source_rooms = job.requested_area_ids or tuple(occupied or ())
+            areas = (
+                (area,)
+                if area and self._fallback_door_allows(source_rooms)
+                else ()
+            )
+        else:
+            areas = ()  # General devices are not bound to any room.
+
+        if stage != "general" and not areas:
+            return None
+
+        configured = self._configured_outputs()
+        records = resolve_notify_outputs(self.hass, configured[1])
+        notify_records: list[NotifyOutput] = []
+        for output in records:
+            policy_scope, minimum = self._notify_policy(output)
+            if not self._notify_level_allowed(job.level, minimum):
+                continue
+            if stage == "general":
+                if policy_scope != NOTIFY_SCOPE_GENERAL:
+                    continue
+            elif (
+                policy_scope != NOTIFY_SCOPE_ROOM
+                or output.area_id not in set(areas)
+            ):
+                continue
+            notify_records.append(output)
+
+        minimum_tts = str(
+            self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
+        )
+        can_speak = bool(
+            job.routing_source_tts
+            and tts_allowed_for_level(job.level, minimum_tts)
+            and configured[0]
+        )
+        room_players: tuple[str, ...] = ()
+        snapcast: tuple[str, ...] = ()
+        companion_ids: tuple[str, ...] = ()
+        if can_speak and stage != "general":
+            room_players = tuple(
+                entity
+                for entity in configured[2]
+                if (
+                    self._tts_player_scope(entity) == NOTIFY_SCOPE_ROOM
+                    and entity_area_id(self.hass, entity) in set(areas)
+                )
+            )
+            snapcast = tuple(
+                entity
+                for entity in configured[3]
+                if entity_area_id(self.hass, entity) in set(areas)
+            )
+            if job.level == LEVEL_CRITICAL:
+                companion_ids = tuple(
+                    output.entry_id
+                    for output in resolve_companion_tts_outputs(
+                        self.hass, configured[4]
+                    )
+                    if output.area_id in set(areas)
+                )
+
+        player_value = self.settings.get(CONF_TTS_MEDIA_PLAYER)
+        server_player = str(player_value) if player_value else None
+        snapcast = snapcast if server_player else ()
+        # Avoid duplicating the same player as a direct and shared TTS path.
+        room_players = tuple(
+            entity for entity in room_players if entity != server_player
+        )
+        route_plan = build_delivery_plan(
+            text_tts=job.routing_source_tts,
+            text_notify=job.routing_source_notify,
+            level=job.level,
+            minimum_tts_level=minimum_tts,
+            tts_engines=(
+                configured[0] if (room_players or snapcast) else ()
+            ),
+            notify_outputs=tuple(output.ref for output in notify_records),
+            room_tts_players=room_players,
+            snapcast_clients=snapcast,
+            companion_tts_entries=companion_ids,
+            server_tts_enabled=bool(snapcast),
+            force_tts=bool(room_players or snapcast or companion_ids),
+            force_notify=bool(notify_records),
+        )
+        if not (room_players or snapcast or companion_ids):
+            route_plan.tts_text = None
+        if not notify_records:
+            route_plan.notify_text = None
+        if not route_plan.has_output:
+            return None
+
+        configured_profiles = self.settings.get(CONF_NOTIFY_PROFILES, {})
+        if not isinstance(configured_profiles, Mapping):
+            configured_profiles = {}
+        return {
+            "areas": tuple(areas),
+            "plan": route_plan,
+            "notify_records": tuple(notify_records),
+            "notify_profiles": {
+                output.ref: resolve_notify_profile(
+                    configured_profiles, output.integration
+                )
+                for output in notify_records
+            },
+            "notify_areas": {
+                output.ref: (
+                    None
+                    if self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL
+                    else output.area_id
+                )
+                for output in notify_records
+            },
+            "room_player_areas": {
+                entity: entity_area_id(self.hass, entity)
+                for entity in room_players
+            },
+            "snapcast_areas": {
+                entity: entity_area_id(self.hass, entity)
+                for entity in snapcast
+            },
+            "companion_areas": {
+                output.entry_id: output.area_id
+                for output in resolve_companion_tts_outputs(
+                    self.hass, companion_ids
+                )
+            },
+            "tts_media_player": server_player,
+        }
+
+    def _apply_room_stage(
+        self,
+        job: AnnouncementJob,
+        candidate: Mapping[str, Any] | None,
+    ) -> None:
+        """Freeze a new stage's exact devices without modifying its source."""
+        plan = candidate["plan"] if candidate is not None else build_delivery_plan(
+            text_tts=None,
+            text_notify=None,
+            level=job.level,
+            minimum_tts_level=TTS_LEVEL_NEVER,
+            tts_engines=(),
+            notify_outputs=(),
+            room_tts_players=(),
+            snapcast_clients=(),
+            companion_tts_entries=(),
+            server_tts_enabled=False,
+        )
+        before = (
+            job.outputs, job.notify_outputs, job.room_tts_players,
+            job.snapcast_clients, job.companion_tts_entries,
+            job.tts_text, job.notify_text,
+        )
+        job.outputs = candidate["areas"] if candidate else ()
+        job.tts_engines = plan.tts_engines
+        job.notify_outputs = plan.notify_outputs
+        job.room_tts_players = plan.room_tts_players
+        job.snapcast_clients = plan.snapcast_clients
+        job.companion_tts_entries = plan.companion_tts_entries
+        job.tts_text = plan.tts_text
+        job.notify_text = plan.notify_text
+        job.server_tts_enabled = plan.server_tts_enabled
+        if candidate:
+            job.tts_media_player = candidate["tts_media_player"]
+            job.notify_output_areas = dict(candidate["notify_areas"])
+            job.notify_output_profiles = dict(candidate["notify_profiles"])
+            job.room_tts_player_areas = dict(candidate["room_player_areas"])
+            job.snapcast_client_areas = dict(candidate["snapcast_areas"])
+            job.companion_tts_entry_areas = dict(candidate["companion_areas"])
+        else:
+            job.notify_output_areas.clear()
+            job.notify_output_profiles.clear()
+            job.room_tts_player_areas.clear()
+            job.snapcast_client_areas.clear()
+            job.companion_tts_entry_areas.clear()
+        after = (
+            job.outputs, job.notify_outputs, job.room_tts_players,
+            job.snapcast_clients, job.companion_tts_entries,
+            job.tts_text, job.notify_text,
+        )
+        if before != after:
+            self._schedule_save()
+            self._notify_update()
+
+    def _room_candidate_ready(self, candidate: Mapping[str, Any]) -> bool:
+        """Probe a candidate without changing the queued job or playing audio."""
+        plan = candidate["plan"]
+        if plan.notify_text and any(
+            notify_output_available(self.hass, output)
+            for output in candidate["notify_records"]
+        ):
+            return True
+        if not plan.tts_text:
+            return False
+        if any(
+            self._direct_tts_available_now(entity, plan.tts_engines)
+            for entity in plan.room_tts_players
+        ):
+            return True
+        if plan.server_tts_enabled and self._server_tts_available_now(
+            engines=plan.tts_engines,
+            player=candidate["tts_media_player"],
+            snapcast_clients=plan.snapcast_clients,
+        ):
+            return True
+        return any(
+            companion_output_available(self.hass, output)
+            for output in resolve_companion_tts_outputs(
+                self.hass, plan.companion_tts_entries
+            )
+        )
+
+    def _advance_room_stage(self, job: AnnouncementJob) -> None:
+        job.routing_stage = next_stage(job.routing_stage)
+        job.routing_stage_started_at = utcnow_iso()
+        self._apply_room_stage(job, None)
+        self._schedule_save()
+        self._notify_update()
+
+    def _refresh_room_fallback(self, job: AnnouncementJob) -> bool:
+        """Progress fallback stages without dropping or broadcasting the job.
+
+        Explicit room -> occupied rooms -> door-gated fallback room ->
+        non-room/general outputs -> wait indefinitely for ANY eligible
+        configured output. A stage with no configured device is skipped
+        immediately; an offline configured device gets the full grace period.
+        """
+        if not job.room_fallback:
+            return self._job_runnable_now(job)
+
+        for _ in STAGES:
+            stage = job.routing_stage
+            if stage == "waiting":
+                # No devices are available at any priority. Keep the message
+                # in the persistent queue and revisit live HA state every
+                # worker turn, including devices configured after enqueue.
+                for retry_stage in STAGES[:-1]:
+                    candidate = self._room_stage_candidate(job, retry_stage)
+                    if candidate and self._room_candidate_ready(candidate):
+                        job.routing_stage = retry_stage
+                        job.routing_stage_started_at = utcnow_iso()
+                        self._apply_room_stage(job, candidate)
+                        self._schedule_save()
+                        return True
+                self._apply_room_stage(job, None)
+                return False
+
+            candidate = self._room_stage_candidate(job, stage)
+            if candidate is None:
+                self._advance_room_stage(job)
+                continue
+            self._apply_room_stage(job, candidate)
+            if self._job_runnable_now(job):
+                return True
+            if elapsed_seconds(job.routing_stage_started_at) < (
+                self._availability_timeout
+            ):
+                return False
+            self._advance_room_stage(job)
+        return False
+
     def _expire_waiting_job(self, job: AnnouncementJob) -> None:
         """Finish a never-runnable pending job silently after its wait window."""
         if job not in self._queue:
