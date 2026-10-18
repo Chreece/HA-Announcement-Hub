@@ -2235,10 +2235,7 @@ class AnnouncementManager:
                     if self._advance_route_tier(job):
                         if self._job_runnable_now(job):
                             return job
-                    elif (
-                        job.route_tier != "last_resort_single_device"
-                        and self._try_last_resort_available_device(job)
-                    ):
+                    elif self._try_last_resort_available_device(job):
                         return job
                     # Never discard a room announcement. The final stage
                     # remains pending for a suitable configured output to
