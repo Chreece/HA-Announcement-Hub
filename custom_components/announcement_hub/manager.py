@@ -1830,20 +1830,30 @@ class AnnouncementManager:
                 job.status = "cancelled"
                 terminal_event = EVENT_CANCELLED
             except Exception as err:  # noqa: BLE001
-                job.status = "failed"
-                job.error = str(err)
-                terminal_event = EVENT_FAILED
-                _LOGGER.exception("Announcement %s failed", job.job_id)
-            else:
-                job.status = (
-                    "completed_with_errors" if job.channel_errors else "completed"
-                )
-                if job.channel_errors:
-                    job.error = "; ".join(
-                        f"{channel}: {error}"
-                        for channel, error in job.channel_errors.items()
+                if self._requeue_undelivered_room_job(job):
+                    requeued = True
+                    _LOGGER.debug(
+                        "Announcement %s advanced to another room tier after %s",
+                        job.job_id, type(err).__name__,
                     )
-                terminal_event = EVENT_FINISHED
+                else:
+                    job.status = "failed"
+                    job.error = str(err)
+                    terminal_event = EVENT_FAILED
+                    _LOGGER.exception("Announcement %s failed", job.job_id)
+            else:
+                if self._requeue_undelivered_room_job(job):
+                    requeued = True
+                else:
+                    job.status = (
+                        "completed_with_errors" if job.channel_errors else "completed"
+                    )
+                    if job.channel_errors:
+                        job.error = "; ".join(
+                            f"{channel}: {error}"
+                            for channel, error in job.channel_errors.items()
+                        )
+                    terminal_event = EVENT_FINISHED
             finally:
                 self._cancel_requested.discard(job.job_id)
                 self._current = None
@@ -2270,14 +2280,35 @@ class AnnouncementManager:
         self._notify_update()
 
     def _next_runnable_job(self) -> AnnouncementJob | None:
-        """Pick the oldest runnable job without letting waiters block the queue."""
-        timeout = self._availability_timeout
+        """Run ready jobs without silently expiring any accepted message.
+
+        Room fallback has its own finite per-tier grace intervals. Exhaustion
+        leaves the job pending and reevaluates all compatible configured
+        outputs indefinitely. Other explicit service jobs also remain pending
+        rather than being marked completed with no delivered content.
+        """
         for job in tuple(self._queue):
-            if self._job_runnable_now(job):
+            if job.room_fallback:
+                if self._refresh_room_fallback(job):
+                    return job
+            elif self._job_runnable_now(job):
                 return job
-            if timeout <= 0 or self._pending_age_seconds(job) >= timeout:
-                self._expire_waiting_job(job)
         return None
+
+    def _requeue_undelivered_room_job(self, job: AnnouncementJob) -> bool:
+        """Retry a failed/vanished room path in the next priority tier."""
+        if not job.room_fallback or job.successful_channels:
+            return False
+        self._advance_room_stage(job)
+        job.status = "pending"
+        job.started_at = None
+        job.finished_at = None
+        job.error = None
+        job.channel_errors.clear()
+        self._queue.append(job)
+        self._wake.set()
+        self._schedule_save()
+        return True
 
     async def _async_process_job(self, job: AnnouncementJob) -> None:
         """Run visual and audible channels as a pipelined pair.
