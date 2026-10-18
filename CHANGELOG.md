@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.28 - 2026-10-18
 
 - Fixed Air Quality Advisor Info-level announcements targeting real HA rooms
   such as `Küche` being rejected when the room had no eligible visual output
