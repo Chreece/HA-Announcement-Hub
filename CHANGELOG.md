@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.28 - 2026-10-18
 
 - Fixed Air Quality Advisor Info-level announcements targeting real HA rooms
   such as `Küche` being rejected when the room had no eligible visual output
@@ -17,6 +17,9 @@
 - Recover from failed staged provider deliveries by requeueing instead of
   discarding undelivered messages; throttle retries of failing General
   providers to prevent busy loops.
+- Keep failed explicit-service and legacy non-room jobs queued for repeated
+  delivery attempts with a bounded, restart-safe retry cooldown. Successfully
+  delivered jobs still complete normally; pending jobs can be cancelled.
 - Preserved explicit service/device allowlists across all routing stages,
   occupied_only behavior, room bindings, and no-broadcast safety. No changes
   to Air Quality Advisor or its message/routing inputs.
