@@ -1686,6 +1686,7 @@ class AnnouncementManager:
             routing_mode="room_fallback" if room_fallback_routing else "normal",
             preferred_areas=requested_output_area_ids,
             companion_tts_requested=companion_tts,
+            occupancy_requested=occupied_only,
             ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,
@@ -1867,7 +1868,11 @@ class AnnouncementManager:
         """Resolve preferred, currently occupied and door-gated fallback areas."""
         preferred = tuple(job.preferred_areas)
         occupied = tuple(
-            area for area in (self._occupied_area_ids() or ())
+            area
+            for area in (
+                (self._occupied_area_ids() or ())
+                if job.occupancy_requested else ()
+            )
             if area not in set(preferred)
         )
         if stage == "primary":

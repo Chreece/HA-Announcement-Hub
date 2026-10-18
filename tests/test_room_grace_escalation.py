@@ -238,6 +238,7 @@ def job(*, preferred=("kueche",), services=(), level="info", age=0):
         preferred_areas=tuple(preferred),
         requested_services=tuple(services),
         companion_tts_requested=False,
+        occupancy_requested=True,
         level=level, text_tts="Παρακαλώ ανοίξτε το παράθυρο",
         text_notify="Ανοίξτε το παράθυρο στην Κουζίνα",
         tts_media_player="media_player.mpd", outputs=(),
@@ -396,6 +397,23 @@ def test_preferred_room_remains_first_when_it_has_ready_info_output(monkeypatch)
     assert j.outputs == ("kueche",)
     assert j.notify_outputs == ("entity:notify.kitchen",)
     assert "entity:notify.living" not in j.notify_outputs
+
+
+def test_occupied_only_false_skips_occupied_room_fallback(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_min="warning", door_open=False,
+        available={
+            "entity:notify.living": True,
+            "entity:notify.phone": True,
+        },
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    j.occupancy_requested = False
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
 
 
 def test_scheduler_does_not_drop_undelivered_jobs():
