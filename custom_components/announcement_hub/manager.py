@@ -832,10 +832,12 @@ class AnnouncementManager:
         requested_output_area_ids = self._resolve_area_ids(output_tokens)
         explicit_area_routing = bool(requested_output_area_ids)
         explicit_targeting = bool(requested) or explicit_area_routing
-        # An explicit service or output area is a hard delivery contract.
-        # It must not trigger room/channel/level fallback or route onto
-        # additional devices if a selected output is temporarily unavailable.
-        # Only the configured output-availability timeout may skip a target.
+        strict_service_targeting = bool(requested)
+        staged_room_routing = explicit_area_routing and not strict_service_targeting
+        # Explicit integration/device selections remain strict. An explicit
+        # area is instead the FIRST routing tier: requested rooms, occupied
+        # rooms, door-approved fallback room, then general non-room devices.
+        # The queue may advance tiers only after the availability grace period.
 
         # occupied_only always means "restrict room-bound delivery to occupied
         # rooms". If explicit output rooms are also supplied, use their
@@ -900,6 +902,7 @@ class AnnouncementManager:
             filter_by_area: bool,
             require_room_delivery: bool = False,
             tts_only: bool = False,
+            only_general: bool = False,
         ) -> tuple[
             tuple[
                 tuple[str, ...],
@@ -983,6 +986,22 @@ class AnnouncementManager:
                     () if tts_only else base_selected[4],
                 )
 
+            if only_general:
+                routed_notify = tuple(
+                    item for item in routed_notify
+                    if self._notify_policy(item)[0] == NOTIFY_SCOPE_GENERAL
+                )
+                routed_companion = ()
+                routed_selected = (
+                    routed_selected[0],
+                    tuple(item.ref for item in routed_notify),
+                    tuple(
+                        item for item in routed_selected[2]
+                        if self._tts_player_scope(item) == NOTIFY_SCOPE_GENERAL
+                    ),
+                    (), (),
+                )
+
             # Build all physical channel candidates first. Level policy chooses
             # among candidates that are available NOW. An unavailable preferred
             # channel never makes an immediately usable fallback wait.
@@ -998,8 +1017,11 @@ class AnnouncementManager:
                 level, LEVEL_PRIORITY[LEVEL_INFO]
             )
             tts_hard_disabled = (
-                minimum_tts_level == TTS_LEVEL_NEVER
-                and level != LEVEL_CRITICAL
+                (minimum_tts_level == TTS_LEVEL_NEVER and level != LEVEL_CRITICAL)
+                or (
+                    staged_room_routing
+                    and not tts_allowed_for_level(level, minimum_tts_level)
+                )
             )
 
             candidates: list[dict[str, Any]] = []
@@ -1086,7 +1108,7 @@ class AnnouncementManager:
                         }
                     )
 
-            if explicit_targeting:
+            if strict_service_targeting:
                 # Freeze exactly the requested physical targets, regardless
                 # of current availability or minimum-level preference. An
                 # explicitly selected TTS channel is allowed to speak, and
