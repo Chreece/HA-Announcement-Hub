@@ -252,7 +252,8 @@ def test_explicit_service_and_output_disable_cross_room_fallback():
 def test_action_response_reports_authoritative_strict_target_mode() -> None:
     action = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
     assert '"strict_targets": job.strict_targets' in action
-    assert "strict_targets=explicit_targeting" in SOURCE
+    assert "strict_targets=bool(requested)" in SOURCE
+    assert "routing_mode=\"room_fallback\" if room_fallback_routing else \"normal\"" in SOURCE
 
 def test_empty_explicit_selector_must_not_become_critical_broadcast() -> None:
     assert "if outputs is not None and not any(" in SOURCE

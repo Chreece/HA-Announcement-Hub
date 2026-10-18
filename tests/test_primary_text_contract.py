@@ -131,4 +131,5 @@ def test_user_can_supply_shared_text_to_visual_only_critical_without_tts() -> No
     manager = (C / "manager.py").read_text(encoding="utf-8")
     assert "if not strict_tts:" in manager
     assert "route_plan.tts_text = None" in manager
-    assert "strict_targets=explicit_targeting" in manager
+    assert "strict_targets=bool(requested)" in manager
+    assert "room_fallback_routing" in manager
