@@ -59,6 +59,8 @@ def _planner(
     text_notify: str | None = "Κίνηση στο σπίτι",
     explicit_area_routing: bool = False,
     explicit_targeting: bool = True,
+    staged_room_routing: bool = False,
+    minimum_tts_level: str = "debug",
 ):
     tree = ast.parse(SOURCE)
     klass = next(
@@ -122,8 +124,8 @@ def _planner(
         "explicit_area_routing": explicit_area_routing,
         "explicit_targeting": explicit_targeting,
         "strict_service_targeting": explicit_targeting,
-        "staged_room_routing": False,
-        "minimum_tts_level": "debug",
+        "staged_room_routing": staged_room_routing,
+        "minimum_tts_level": minimum_tts_level,
         "LEVEL_CRITICAL": "critical",
         "LEVEL_INFO": "info",
         "LEVEL_PRIORITY": {
@@ -266,3 +268,42 @@ def test_empty_explicit_selector_must_not_become_critical_broadcast() -> None:
     checks = SOURCE.index("if requested_services is not None and not any(", entry)
     selector = SOURCE.index("selected = self._select_requested_outputs(", entry)
     assert checks < selector
+
+
+def test_info_kitchen_room_with_muted_tts_uses_warning_level_visual() -> None:
+    """Advisor v0.2.13: Küche / info must not fail only due to TTS minimum."""
+    planner = _planner(
+        notify_refs=("entity:notify.kitchen",),
+        notification_areas={"entity:notify.kitchen": "kouzina"},
+        notification_available={"entity:notify.kitchen": False},
+        tts_engines=("tts.piper",),
+        snapcast_clients=("media_player.kitchen_snapcast",),
+        level="info",
+        text_tts="Bitte Fenster in Küche öffnen.",
+        text_notify="Bitte Fenster in Küche öffnen.",
+        explicit_area_routing=True,
+        explicit_targeting=True,
+        staged_room_routing=True,
+        minimum_tts_level="warning",
+    )
+    selected, _, _, plan, *_ = planner(
+        ("kouzina",), filter_by_area=True, require_room_delivery=False
+    )
+    assert selected[1] == ("entity:notify.kitchen",)
+    assert plan.has_visual_output
+    assert not plan.has_audible_output
+    assert plan.tts_text is None
+
+
+def test_info_critical_service_stays_hard_even_with_room_routing() -> None:
+    planner = _planner(
+        notify_refs=("entity:notify.mobile_app_phone",),
+        notification_areas={"entity:notify.mobile_app_phone": None},
+        notification_available={"entity:notify.mobile_app_phone": True},
+        tts_engines=(), snapcast_clients=(),
+        level="critical",
+        staged_room_routing=False,
+    )
+    result = planner((), filter_by_area=False)
+    assert result[3].has_visual_output
+    assert result[3].has_audible_output is False
