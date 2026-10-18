@@ -307,6 +307,7 @@ def test_unavailable_general_waits_indefinitely_then_delivers():
 
 def test_configured_new_room_output_can_revive_waiting_message():
     h = Harness()
+    h.occupied = ("kouzina",)
     job = new_job()
     h._queue.append(job)
     assert h._next_runnable_job() is None
@@ -373,6 +374,6 @@ def test_source_prevents_rejected_and_expired_info_announcements():
     assert "self._refresh_room_fallback(job)" in SOURCE
     assert "self._expire_waiting_job(job)" not in SOURCE[
         SOURCE.index("    def _next_runnable_job("):
-        SOURCE.index("    async def _async_process_job("),
+        SOURCE.index("    async def _async_process_job(")
     ]
     assert "self._requeue_undelivered_room_job(job)" in SOURCE
