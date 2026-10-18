@@ -158,6 +158,7 @@ class AnnouncementJob:
     routing_stage_started_at: str | None = None
     preferred_areas: tuple[str, ...] = ()
     routing_history: list[str] = field(default_factory=list)
+    companion_tts_requested: bool = False
     tts_media_player: str | None = None
     tts_player_area: str | None = None
     room_tts_player_areas: dict[str, str | None] = field(default_factory=dict)
@@ -196,6 +197,7 @@ class AnnouncementJob:
         strict_targets: bool = False,
         routing_mode: str = "normal",
         preferred_areas: Sequence[str] = (),
+        companion_tts_requested: bool = False,
         ai: Mapping[str, Any] | None = None,
         click_action: str | None = None,
         tts_media_player: str | None = None,
@@ -235,6 +237,7 @@ class AnnouncementJob:
             routing_stage="primary",
             routing_stage_started_at=utcnow_iso() if routing_mode != "normal" else None,
             preferred_areas=_unique(tuple(preferred_areas)),
+            companion_tts_requested=bool(companion_tts_requested),
             tts_media_player=tts_media_player or None,
             tts_player_area=tts_player_area or None,
             room_tts_player_areas=dict(room_tts_player_areas or {}),
@@ -305,6 +308,7 @@ class AnnouncementJob:
         payload.setdefault("routing_stage_started_at", None)
         payload.setdefault("preferred_areas", [])
         payload.setdefault("routing_history", [])
+        payload.setdefault("companion_tts_requested", False)
         payload.setdefault("ai", {})
 
         for key in (

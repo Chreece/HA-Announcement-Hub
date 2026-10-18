@@ -1685,6 +1685,7 @@ class AnnouncementManager:
             strict_targets=bool(requested),
             routing_mode="room_fallback" if room_fallback_routing else "normal",
             preferred_areas=requested_output_area_ids,
+            companion_tts_requested=companion_tts,
             ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,
@@ -1892,7 +1893,7 @@ class AnnouncementManager:
                 room_tts_players=configured[2],
                 snapcast_clients=configured[3],
                 companion_entries=configured[4],
-                companion_tts=bool(job.companion_tts_entries),
+                companion_tts=job.companion_tts_requested,
             )
         except ServiceValidationError:
             # A previously configured output/integration may be temporarily
@@ -2036,7 +2037,8 @@ class AnnouncementManager:
                 # device is currently configured. Periodically revisit the
                 # preferred/occupied/fallback rooms in case availability or
                 # configuration changed; never broadcast to unrelated rooms.
-                if timeout > 0 and self._routing_stage_age(job) >= timeout:
+                revisit_after = timeout if timeout > 0 else 10.0
+                if self._routing_stage_age(job) >= revisit_after:
                     job.routing_history.append("general: retry permitted rooms")
                     job.routing_history = job.routing_history[-24:]
                     job.routing_stage = "primary"
@@ -2171,33 +2173,19 @@ class AnnouncementManager:
             or self._job_has_ready_companion_tts(job)
         )
 
-    def _expire_waiting_job(self, job: AnnouncementJob) -> None:
-        """Finish a never-runnable pending job silently after its wait window."""
-        if job not in self._queue:
-            return
-        self._queue.remove(job)
-        job.status = "completed"
-        job.finished_at = utcnow_iso()
-        job.error = None
-        self._prefetch_tasks.pop(job.job_id, None)
-        self._last = job
-        self._fire_event(EVENT_FINISHED, job)
-        _LOGGER.debug(
-            "Announcement %s expired after waiting %ss for a runnable output",
-            job.job_id,
-            f"{self._availability_timeout:g}",
-        )
-        self._schedule_save()
-        self._notify_update()
-
     def _next_runnable_job(self) -> AnnouncementJob | None:
-        """Pick the oldest runnable job without letting waiters block the queue."""
-        timeout = self._availability_timeout
+        """Give each room tier its grace; never discard an undelivered message.
+
+        Unavailable jobs stay persisted and do not block newer ready jobs.
+        Explicit service targets remain hard restrictions; an unavailable
+        service is retried indefinitely until it comes online or is cancelled.
+        """
         for job in tuple(self._queue):
-            if self._job_runnable_now(job):
+            if job.routing_mode == "room_fallback":
+                if self._staged_route_ready(job):
+                    return job
+            elif self._job_runnable_now(job):
                 return job
-            if timeout <= 0 or self._pending_age_seconds(job) >= timeout:
-                self._expire_waiting_job(job)
         return None
 
     async def _async_process_job(self, job: AnnouncementJob) -> None:
