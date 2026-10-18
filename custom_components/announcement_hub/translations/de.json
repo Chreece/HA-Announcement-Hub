@@ -489,11 +489,11 @@
         },
         "output": {
           "name": "Ausgabebereiche",
-          "description": "Optionale ausdrückliche Ausgabebereiche. Werden Bereiche angegeben, kommen nur Geräte mit Zuordnung zu diesen Bereichen infrage; globale Geräte und Ersatzräume werden ausgeschlossen. Mit occupied_only gilt weiterhin die Schnittmenge mit belegten Bereichen. Leer bedeutet automatische Anwesenheits- und Fallback-Weiterleitung."
+          "description": "Bevorzugte Räume für diese Ankündigung. Zuerst die genannten Räume versuchen; ohne passenden Ausgang folgen belegte Räume, danach der konfigurierte Ersatzraum bei erfüllter Türregel und zuletzt allgemeine/nicht raumgebundene Geräte. Nicht verfügbare Geräte erhalten zuerst die eingestellte Wartefrist. service-Einschränkungen bleiben erhalten; keine Übertragung in fremde Räume."
         },
         "service": {
           "name": "Bestimmte Ausgänge",
-          "description": "Optionaler ausdrücklicher Ausgangsfilter, der auf allen Stufen einschließlich Kritisch gilt. Nur hier gewählte konfigurierte Integrationen, Einträge, Notify-Geräte, Dienste oder TTS-Kanäle werden verwendet (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). Nicht verfügbare Ziele warten nur bis zum eingestellten Verfügbarkeitstimeout; kein Wechsel zu anderen Geräten, Providern oder Ersatzräumen. Leer bedeutet automatische stufenbasierte Weiterleitung."
+          "description": "Optionale feste Einschränkung auf konfigurierte Integrationen, Einträge, Notify-Geräte, bisherige Dienste und TTS-Kanäle (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). Die Einschränkung gilt auf allen Stufen und in jeder Fallback-Phase. Für automatische Gerätealternativen das Feld weglassen; output-Räume sind Präferenzen."
         },
         "notify_data": {
           "name": "Benachrichtigungsdaten",
@@ -513,7 +513,7 @@
         },
         "occupied_only": {
           "name": "Nur belegte Bereiche",
-          "description": "Standard: aktiviert. Wenn eine Belegungsquelle konfiguriert ist, wird die raumgebundene Ausgabe auf aktuell belegte Bereiche beschränkt. Werden zusätzlich output-Räume angegeben, werden nur Räume verwendet, die sowohl in der expliziten Liste als auch in der Belegung vorkommen. Deaktivieren, damit die explizite output-Liste maßgeblich ist."
+          "description": "Wenn aktiviert, werden belegte Räume als zweite Routing-Stufe nach ausdrücklich genannten Räumen versucht. Angegebene Räume haben Vorrang, auch wenn sie aktuell nicht als belegt gelten. Deaktivieren, um diese Anwesenheitsstufe zu überspringen. Türabhängiger Ersatzraum und allgemeine Geräte bleiben danach möglich."
         },
         "use_ai": {
           "name": "KI-Umformulierung überschreiben",

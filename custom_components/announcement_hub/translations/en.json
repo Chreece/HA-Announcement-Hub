@@ -489,11 +489,11 @@
         },
         "output": {
           "name": "Output areas",
-          "description": "Optional explicit output areas. When provided, only devices physically assigned to the selected areas are eligible; unrelated global outputs and configured fallback rooms are excluded. With occupied_only enabled, areas still intersect current occupancy. Leave empty for automatic occupancy/fallback routing."
+          "description": "Preferred room(s) for this announcement. First attempt the named rooms; if no severity-eligible output exists, try occupied rooms, then the configured fallback room when its door rule allows, then general/non-room devices. Unavailable selected devices wait the configured grace period before advancing. Service restrictions are never broadened, and unrelated rooms never receive a broadcast."
         },
         "service": {
           "name": "Specific outputs",
-          "description": "Optional explicit output restriction, honored at every level including Critical. Select only the configured integrations, entries, notify entities, legacy services or TTS channels listed here (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). Unavailable selected targets wait only until the configured availability timeout; there is no alternate device, provider or fallback room. Leave empty for automatic level-based routing."
+          "description": "Optional hard restriction to configured integrations, entries, notify entities, legacy actions and TTS channels (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). These device/provider restrictions remain authoritative at all severities and every fallback stage. To allow automatic alternatives, omit this field; output rooms are preferences, not device allowlists."
         },
         "notify_data": {
           "name": "Notification data",
@@ -513,7 +513,7 @@
         },
         "occupied_only": {
           "name": "Only occupied areas",
-          "description": "Default: enabled. When an occupancy source is configured, room-bound delivery is restricted to currently occupied areas. If output rooms are also supplied, only rooms present in both the explicit output list and the occupied-room set are used. Disable to make the explicit output list authoritative."
+          "description": "When enabled, currently occupied rooms provide the second routing tier after the explicitly requested rooms. Explicit room names are tried first, even when not currently marked occupied. Disable to skip the occupancy tier. The door-gated fallback room and general devices remain available afterward."
         },
         "use_ai": {
           "name": "Override AI rewriting",
