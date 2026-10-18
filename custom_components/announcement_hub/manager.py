@@ -165,6 +165,7 @@ from .message_parts import (
     resolve_notify_profile,
     split_message,
 )
+from .room_routing import STAGES, next_stage, elapsed_seconds
 from .models import (
     AnnouncementJob,
     build_delivery_plan,
@@ -832,6 +833,10 @@ class AnnouncementManager:
         requested_output_area_ids = self._resolve_area_ids(output_tokens)
         explicit_area_routing = bool(requested_output_area_ids)
         explicit_targeting = bool(requested) or explicit_area_routing
+        # An explicit service is still a hard provider restriction. An
+        # explicit area *without* a service uses persistent room-priority
+        # fallback, owned entirely by Announcement Hub.
+        room_fallback = explicit_area_routing and not requested
         # An explicit service or output area is a hard delivery contract.
         # It must not trigger room/channel/level fallback or route onto
         # additional devices if a selected output is temporarily unavailable.
@@ -1547,7 +1552,7 @@ class AnnouncementManager:
             output.entry_id: output.area_id for output in companion_records
         }
 
-        if not plan.has_output and not occupancy_filter_active:
+        if not plan.has_output and not occupancy_filter_active and not room_fallback:
             if plan.tts_suppressed_by_level:
                 raise ServiceValidationError(
                     "TTS is muted for this level and no selected visual output "
@@ -1584,8 +1589,17 @@ class AnnouncementManager:
             **dict(tts_options or {}),
         }
 
-        # Run optional AI only after routing validation, before queue storage
-        # and prefetch. Restored queued jobs never need to call the agent.
+        # Preserve reusable channel sources for every fallback tier, including
+        # the case where the initial room has *no* announcement output.
+        # Do not let the primary routing result erase a future visual fallback.
+        routing_source_tts = text_tts or text_notify
+        routing_source_notify = text_notify or text_tts
+        if room_fallback and not tts_allowed_for_level(
+            level, minimum_tts_level
+        ):
+            routing_source_tts = None
+
+        # Run optional AI once before queueing, not on every tier transition.
         ai_enabled, ai_source = resolve_ai_enabled(
             self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
             use_ai,
@@ -1636,18 +1650,28 @@ class AnnouncementManager:
             # the *actual frozen channel texts* to guarantee that speech gets
             # plain words and displays get their independent visual version.
             # Do not introduce a new channel that the planner did not select.
-            if plan.tts_text is not None or plan.notify_text is not None:
-                plan.tts_text, plan.notify_text = await async_filter_announcement(
+            ai_tts = (
+                routing_source_tts if room_fallback else plan.tts_text
+            )
+            ai_notify = (
+                routing_source_notify if room_fallback else plan.notify_text
+            )
+            if ai_tts is not None or ai_notify is not None:
+                ai_tts, ai_notify = await async_filter_announcement(
                     self.hass,
-                    text_tts=plan.tts_text,
-                    text_notify=plan.notify_text,
+                    text_tts=ai_tts,
+                    text_notify=ai_notify,
                     agent_id=agent_id,
                     fallback_agent_id=fallback_agent_id,
                     diagnostics=ai_info,
                 )
-                # Persist effective output copy alongside the frozen plan;
-                # original delivery level, targets and metadata remain intact.
-                text_tts, text_notify = plan.tts_text, plan.notify_text
+                if room_fallback:
+                    routing_source_tts, routing_source_notify = (
+                        ai_tts, ai_notify
+                    )
+                else:
+                    plan.tts_text, plan.notify_text = ai_tts, ai_notify
+                    text_tts, text_notify = ai_tts, ai_notify
 
         job = AnnouncementJob.create(
             text_tts=text_tts,
@@ -1663,6 +1687,13 @@ class AnnouncementManager:
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
             strict_targets=explicit_targeting,
+            room_fallback=room_fallback,
+            requested_area_ids=requested_output_area_ids,
+            routing_occupied_only=bool(occupied_only),
+            routing_stage="explicit",
+            routing_stage_started_at=utcnow_iso(),
+            routing_source_tts=routing_source_tts,
+            routing_source_notify=routing_source_notify,
             ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,
@@ -1690,6 +1721,10 @@ class AnnouncementManager:
                 f"Announcement queue is full ({queue_max} items)"
             )
         self._queue.append(job)
+        if room_fallback:
+            # Replace the otherwise empty/strict primary route with the first
+            # live tier before prefetching or publishing a response.
+            self._refresh_room_fallback(job)
         self._schedule_prefetch(job)
         self._schedule_save()
         self._ensure_worker()
