@@ -1699,7 +1699,9 @@ class AnnouncementManager:
             requested_area_ids=requested_output_area_ids,
             routing_occupied_only=bool(occupied_only),
             routing_stage="explicit",
-            routing_stage_started_at=utcnow_iso(),
+            routing_stage_started_at=(
+                utcnow_iso() if room_fallback else None
+            ),
             routing_source_tts=routing_source_tts,
             routing_source_notify=routing_source_notify,
             ai=ai_info,
@@ -1838,7 +1840,7 @@ class AnnouncementManager:
                 job.status = "cancelled"
                 terminal_event = EVENT_CANCELLED
             except Exception as err:  # noqa: BLE001
-                if self._requeue_undelivered_room_job(job):
+                if self._requeue_undelivered_job(job):
                     requeued = True
                     _LOGGER.debug(
                         "Announcement %s advanced to another room tier after %s",
@@ -1850,7 +1852,7 @@ class AnnouncementManager:
                     terminal_event = EVENT_FAILED
                     _LOGGER.exception("Announcement %s failed", job.job_id)
             else:
-                if self._requeue_undelivered_room_job(job):
+                if self._requeue_undelivered_job(job):
                     requeued = True
                 else:
                     job.status = (
@@ -2299,15 +2301,30 @@ class AnnouncementManager:
             if job.room_fallback:
                 if self._refresh_room_fallback(job):
                     return job
-            elif self._job_runnable_now(job):
+            elif (
+                self._job_runnable_now(job)
+                and (
+                    job.routing_stage_started_at is None
+                    or elapsed_seconds(job.routing_stage_started_at) >= max(
+                        1.0, self._availability_timeout
+                    )
+                )
+            ):
+                # Provider-specific delivery failures also need bounded
+                # retry cadence; do not hammer a broken notify service.
                 return job
         return None
 
-    def _requeue_undelivered_room_job(self, job: AnnouncementJob) -> bool:
-        """Retry a failed/vanished room path in the next priority tier."""
-        if not job.room_fallback or job.successful_channels:
+    def _requeue_undelivered_job(self, job: AnnouncementJob) -> bool:
+        """Retain accepted but undelivered jobs across transient failures."""
+        if job.successful_channels:
             return False
-        self._advance_room_stage(job)
+        if job.room_fallback:
+            self._advance_room_stage(job)
+        else:
+            # A strict device/service target cannot escape to another device.
+            # Keep it pending with a restart-safe retry cooldown instead.
+            job.routing_stage_started_at = utcnow_iso()
         job.status = "pending"
         job.started_at = None
         job.finished_at = None
