@@ -1846,6 +1846,224 @@ class AnnouncementManager:
                 self._schedule_save()
                 self._notify_update()
 
+    def _staged_areas(
+        self, job: AnnouncementJob, stage: str
+    ) -> tuple[str, ...]:
+        """Resolve preferred, currently occupied and door-gated fallback areas."""
+        preferred = tuple(job.preferred_areas)
+        occupied = tuple(
+            area for area in (self._occupied_area_ids() or ())
+            if area not in set(preferred)
+        )
+        if stage == "primary":
+            return preferred
+        if stage == "occupied":
+            return occupied
+        if stage == "fallback":
+            fallback = self._fallback_area_id()
+            source = preferred or occupied
+            if (
+                fallback
+                and fallback not in set((*preferred, *occupied))
+                and self._fallback_door_allows(source)
+            ):
+                return (fallback,)
+        return ()
+
+    def _prepare_staged_route(self, job: AnnouncementJob) -> bool:
+        """Select only configured, severity-eligible outputs for this stage.
+
+        Read availability separately: an unavailable device is still a
+        configured candidate and earns its full grace period. An info-level
+        message does not bypass the TTS or visual minimum level; if speech is
+        muted, other suitable visual outputs remain eligible. Service
+        restrictions are never expanded during fallback.
+        """
+        stage = job.routing_stage
+        areas = self._staged_areas(job, stage)
+        stage_kind = stage if stage in STAGES else STAGES[0]
+        configured = self._configured_outputs()
+        try:
+            selected = self._select_requested_outputs(
+                job.requested_services,
+                level=job.level,
+                tts_engines=configured[0],
+                notify_outputs=configured[1],
+                room_tts_players=configured[2],
+                snapcast_clients=configured[3],
+                companion_entries=configured[4],
+                companion_tts=bool(job.companion_tts_entries),
+            )
+        except ServiceValidationError:
+            # A previously configured output/integration may be temporarily
+            # absent after a restart. Preserve the queued job; retry discovery
+            # during the next polling cycle rather than broaden the selection.
+            selected = ((), (), (), (), ())
+
+        notifications = resolve_notify_outputs(self.hass, selected[1])
+        companion = resolve_companion_tts_outputs(self.hass, selected[4])
+        speech_allowed = bool(
+            tts_allowed_for_level(
+                job.level,
+                str(
+                    self.settings.get(
+                        CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL
+                    )
+                ),
+            )
+        )
+        level_priority = LEVEL_PRIORITY.get(job.level, LEVEL_PRIORITY[LEVEL_INFO])
+        notify_policy = {
+            output.ref: self._notify_policy(output)
+            for output in notifications
+        }
+        targets = select_stage_targets(
+            stage=stage_kind,
+            areas=areas,
+            level_priority=level_priority,
+            notifications=(
+                (
+                    output.ref,
+                    output.area_id,
+                    notify_policy[output.ref][0],
+                    LEVEL_PRIORITY.get(
+                        notify_policy[output.ref][1],
+                        LEVEL_PRIORITY[DEFAULT_NOTIFY_MIN_LEVEL],
+                    ),
+                )
+                for output in notifications
+            ),
+            room_tts=(
+                (
+                    entity_id,
+                    entity_area_id(self.hass, entity_id),
+                    self._tts_player_scope(entity_id),
+                )
+                for entity_id in selected[2] if selected[0]
+            ),
+            snapcast=(
+                (entity_id, entity_area_id(self.hass, entity_id))
+                for entity_id in selected[3] if selected[0]
+            ),
+            companion_tts=(
+                (output.entry_id, output.area_id) for output in companion
+            ),
+            speech_allowed=speech_allowed,
+        )
+
+        job.outputs = tuple(areas)
+        job.notify_outputs = targets.notify
+        job.room_tts_players = targets.room_tts
+        job.snapcast_clients = targets.snapcast
+        job.companion_tts_entries = targets.companion_tts
+        job.server_tts_enabled = bool(
+            targets.snapcast and selected[0] and job.tts_media_player
+        )
+        job.tts_engines = (
+            tuple(selected[0][:1])
+            if (targets.room_tts or job.server_tts_enabled)
+            else ()
+        )
+        audible = bool(
+            job.room_tts_players or job.server_tts_enabled
+            or job.companion_tts_entries
+        )
+        job.tts_text = (job.text_tts or job.text_notify) if audible else None
+        job.notify_text = (
+            (job.text_notify or job.text_tts)
+            if job.notify_outputs else None
+        )
+        job.tts_suppressed_by_level = bool(
+            job.text_tts and not speech_allowed
+        )
+        active_notifications = {
+            output.ref: output for output in notifications
+            if output.ref in set(targets.notify)
+        }
+        job.notify_output_areas = {
+            ref: None if stage_kind == "general" else output.area_id
+            for ref, output in active_notifications.items()
+        }
+        configured_profiles = self.settings.get(CONF_NOTIFY_PROFILES, {})
+        if not isinstance(configured_profiles, Mapping):
+            configured_profiles = {}
+        job.notify_output_profiles = {
+            ref: resolve_notify_profile(
+                configured_profiles, output.integration
+            )
+            for ref, output in active_notifications.items()
+        }
+        job.room_tts_player_areas = {
+            entity_id: entity_area_id(self.hass, entity_id)
+            for entity_id in targets.room_tts
+        }
+        job.snapcast_client_areas = {
+            entity_id: entity_area_id(self.hass, entity_id)
+            for entity_id in targets.snapcast
+        }
+        job.companion_tts_entry_areas = {
+            output.entry_id: output.area_id for output in companion
+            if output.entry_id in set(targets.companion_tts)
+        }
+        return targets.has_output
+
+    def _advance_staged_route(
+        self, job: AnnouncementJob, reason: str
+    ) -> None:
+        """Move to another priority tier without completing/discarding the job."""
+        old_stage = job.routing_stage
+        job.routing_stage = next_stage(job.routing_stage)
+        job.routing_stage_started_at = utcnow_iso()
+        job.routing_history.append(f"{old_stage}: {reason}")
+        job.routing_history = job.routing_history[-24:]
+        _LOGGER.debug(
+            "Announcement %s routing %s -> %s: %s",
+            job.job_id, old_stage, job.routing_stage, reason,
+        )
+        self._schedule_save()
+        self._notify_update()
+
+    def _staged_route_ready(self, job: AnnouncementJob) -> bool:
+        """Offer each tier its grace period, then search safer alternatives."""
+        timeout = self._availability_timeout
+        for _ in range(len(STAGES) + 1):
+            has_configured_output = self._prepare_staged_route(job)
+            if has_configured_output and self._job_runnable_now(job):
+                self._schedule_prefetch(job)
+                return True
+            if job.routing_stage == "general":
+                # Final general outputs remain pending forever, even when no
+                # device is currently configured. Periodically revisit the
+                # preferred/occupied/fallback rooms in case availability or
+                # configuration changed; never broadcast to unrelated rooms.
+                if timeout > 0 and self._routing_stage_age(job) >= timeout:
+                    job.routing_history.append("general: retry permitted rooms")
+                    job.routing_history = job.routing_history[-24:]
+                    job.routing_stage = "primary"
+                    job.routing_stage_started_at = utcnow_iso()
+                    continue
+                return False
+            if has_configured_output and timeout > 0:
+                if self._routing_stage_age(job) < timeout:
+                    return False
+            reason = (
+                "unavailable after grace period"
+                if has_configured_output else "no severity-eligible output"
+            )
+            self._advance_staged_route(job, reason)
+        return False
+
+    def _routing_stage_age(self, job: AnnouncementJob) -> float:
+        """Elapsed wall time survives HA restarts without resetting deadlines."""
+        try:
+            stamp = job.routing_stage_started_at or job.created_at
+            started = datetime.fromisoformat(stamp)
+            if started.tzinfo is None:
+                started = started.replace(tzinfo=UTC)
+            return max(0.0, (datetime.now(UTC) - started).total_seconds())
+        except (TypeError, ValueError):
+            return 0.0
+
     def _pending_age_seconds(self, job: AnnouncementJob) -> float:
         """Return how long a pending job has been waiting."""
         try:
