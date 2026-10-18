@@ -1821,12 +1821,13 @@ class AnnouncementManager:
                 job.status = "cancelled"
                 terminal_event = EVENT_CANCELLED
             except Exception as err:  # noqa: BLE001
-                if job.routing_mode == "room_fallback" and not job.successful_channels:
+                if not job.successful_channels:
                     _LOGGER.warning(
-                        "Announcement %s route %s failed (%s); retaining for fallback",
-                        job.job_id, job.routing_stage, type(err).__name__,
+                        "Announcement %s had no successful output (%s); "
+                        "retaining the job for retry",
+                        job.job_id, type(err).__name__,
                     )
-                    self._requeue_undelivered_stage(job, "provider failure")
+                    self._requeue_undelivered_job(job, "provider failure")
                     requeued = True
                 else:
                     job.status = "failed"
@@ -1834,8 +1835,8 @@ class AnnouncementManager:
                     terminal_event = EVENT_FAILED
                     _LOGGER.exception("Announcement %s failed", job.job_id)
             else:
-                if job.routing_mode == "room_fallback" and not job.successful_channels:
-                    self._requeue_undelivered_stage(
+                if not job.successful_channels:
+                    self._requeue_undelivered_job(
                         job, "selected outputs did not deliver"
                     )
                     requeued = True
@@ -2115,6 +2116,31 @@ class AnnouncementManager:
         job.channel_errors.clear()
         self._queue.appendleft(job)
 
+    def _requeue_undelivered_job(
+        self, job: AnnouncementJob, reason: str
+    ) -> None:
+        """Keep every accepted but undelivered job until an output succeeds.
+
+        Room-aware jobs advance their fallback tier. Hard service-targeted
+        and legacy non-room jobs retain their original allowed devices and
+        only retry after a bounded cooldown. The caller may explicitly cancel
+        an unwanted waiting job using announcement_hub.cancel.
+        """
+        if job.routing_mode == "room_fallback":
+            self._requeue_undelivered_stage(job, reason)
+        else:
+            delay = max(self._availability_timeout, 5.0)
+            job.routing_retry_after = (
+                datetime.now(UTC) + timedelta(seconds=delay)
+            ).isoformat()
+            job.status = "pending"
+            job.started_at = None
+            job.finished_at = None
+            job.error = None
+            job.channel_errors.clear()
+            self._queue.append(job)
+        self._wake.set()
+
     def _pending_age_seconds(self, job: AnnouncementJob) -> float:
         """Return how long a pending job has been waiting."""
         try:
@@ -2234,6 +2260,18 @@ class AnnouncementManager:
                 if self._staged_route_ready(job):
                     return job
             elif self._job_runnable_now(job):
+                # A provider can be available but repeatedly reject or
+                # fail delivery. Avoid a tight infinite retry loop without
+                # silently dropping the message or changing its recipients.
+                if job.routing_retry_after:
+                    try:
+                        if datetime.now(UTC) < datetime.fromisoformat(
+                            job.routing_retry_after
+                        ):
+                            continue
+                    except (TypeError, ValueError):
+                        pass
+                    job.routing_retry_after = None
                 return job
         return None
 
