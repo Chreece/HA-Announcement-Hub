@@ -1953,15 +1953,30 @@ class AnnouncementManager:
                 terminal_event = EVENT_FAILED
                 _LOGGER.exception("Announcement %s failed", job.job_id)
             else:
-                job.status = (
-                    "completed_with_errors" if job.channel_errors else "completed"
-                )
-                if job.channel_errors:
-                    job.error = "; ".join(
-                        f"{channel}: {error}"
-                        for channel, error in job.channel_errors.items()
+                if (
+                    job.route_tier != "default"
+                    and not job.successful_channels
+                ):
+                    # Runtime output failure must never complete/drop a room
+                    # announcement. Continue on the next configured tier,
+                    # or keep its final tier pending until a device recovers.
+                    self._advance_route_tier(job)
+                    job.status = "pending"
+                    job.started_at = None
+                    job.finished_at = None
+                    self._queue.append(job)
+                    requeued = True
+                else:
+                    job.status = (
+                        "completed_with_errors" if job.channel_errors
+                        else "completed"
                     )
-                terminal_event = EVENT_FINISHED
+                    if job.channel_errors:
+                        job.error = "; ".join(
+                            f"{channel}: {error}"
+                            for channel, error in job.channel_errors.items()
+                        )
+                    terminal_event = EVENT_FINISHED
             finally:
                 self._cancel_requested.discard(job.job_id)
                 self._current = None
@@ -2082,6 +2097,45 @@ class AnnouncementManager:
             or self._job_has_ready_companion_tts(job)
         )
 
+    def _advance_route_tier(self, job: AnnouncementJob) -> bool:
+        """Advance only a room-targeted job; never broadcast its source room."""
+        if not job.fallback_routes:
+            return False
+        route = job.fallback_routes.pop(0)
+        for key in (
+            "tts_engines", "notify_outputs", "room_tts_players",
+            "snapcast_clients", "companion_tts_entries", "outputs",
+        ):
+            setattr(job, key, tuple(route.get(key, ())))
+        for key in (
+            "room_tts_player_areas", "notify_output_areas",
+            "notify_output_profiles", "snapcast_client_areas",
+            "companion_tts_entry_areas",
+        ):
+            setattr(job, key, dict(route.get(key, {})))
+        job.server_tts_enabled = bool(route.get("server_tts_enabled"))
+        job.tts_text = route.get("tts_text")
+        job.notify_text = route.get("notify_text")
+        job.route_tier = str(route["tier"])
+        job.route_since = utcnow_iso()
+        job.started_at = None
+        job.finished_at = None
+        job.error = None
+        job.channel_errors.clear()
+        job.successful_channels.clear()
+        task = self._prefetch_tasks.pop(job.job_id, None)
+        if task:
+            task.cancel()
+        job.media_source_ids.clear()
+        self._schedule_prefetch(job)
+        self._schedule_save()
+        self._notify_update()
+        _LOGGER.info(
+            "Announcement %s advanced to delivery tier %s",
+            job.job_id, job.route_tier,
+        )
+        return True
+
     def _expire_waiting_job(self, job: AnnouncementJob) -> None:
         """Finish a never-runnable pending job silently after its wait window."""
         if job not in self._queue:
@@ -2107,6 +2161,24 @@ class AnnouncementManager:
         for job in tuple(self._queue):
             if self._job_runnable_now(job):
                 return job
+            if job.route_tier != "default":
+                try:
+                    since = datetime.fromisoformat(
+                        job.route_since or job.created_at
+                    )
+                    if since.tzinfo is None:
+                        since = since.replace(tzinfo=UTC)
+                    age = max(0.0, (datetime.now(UTC) - since).total_seconds())
+                except (ValueError, TypeError):
+                    age = self._pending_age_seconds(job)
+                if timeout <= 0 or age >= timeout:
+                    if self._advance_route_tier(job):
+                        if self._job_runnable_now(job):
+                            return job
+                    # Never discard a room announcement. The final stage
+                    # remains pending for a suitable configured output to
+                    # become available, or for the user to cancel it.
+                continue
             if timeout <= 0 or self._pending_age_seconds(job) >= timeout:
                 self._expire_waiting_job(job)
         return None
