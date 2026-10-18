@@ -149,6 +149,14 @@ class AnnouncementJob:
     notify_text: str | None
     server_tts_enabled: bool
     strict_targets: bool = False
+    # Persist the original source and routing tier for lossless room fallback.
+    room_fallback: bool = False
+    requested_area_ids: tuple[str, ...] = ()
+    routing_occupied_only: bool = False
+    routing_stage: str = "explicit"
+    routing_stage_started_at: str | None = None
+    routing_source_tts: str | None = None
+    routing_source_notify: str | None = None
     click_action: str | None = None
     tts_media_player: str | None = None
     tts_player_area: str | None = None
@@ -186,6 +194,13 @@ class AnnouncementJob:
         tts_cache: bool,
         plan: DeliveryPlan,
         strict_targets: bool = False,
+        room_fallback: bool = False,
+        requested_area_ids: Sequence[str] = (),
+        routing_occupied_only: bool = False,
+        routing_stage: str = "explicit",
+        routing_stage_started_at: str | None = None,
+        routing_source_tts: str | None = None,
+        routing_source_notify: str | None = None,
         ai: Mapping[str, Any] | None = None,
         click_action: str | None = None,
         tts_media_player: str | None = None,
@@ -221,6 +236,13 @@ class AnnouncementJob:
             notify_text=plan.notify_text,
             server_tts_enabled=plan.server_tts_enabled,
             strict_targets=bool(strict_targets),
+            room_fallback=bool(room_fallback),
+            requested_area_ids=_unique(tuple(requested_area_ids)),
+            routing_occupied_only=bool(routing_occupied_only),
+            routing_stage=routing_stage,
+            routing_stage_started_at=routing_stage_started_at,
+            routing_source_tts=routing_source_tts,
+            routing_source_notify=routing_source_notify,
             tts_media_player=tts_media_player or None,
             tts_player_area=tts_player_area or None,
             room_tts_player_areas=dict(room_tts_player_areas or {}),
@@ -244,6 +266,7 @@ class AnnouncementJob:
         for key in (
             "outputs",
             "requested_services",
+            "requested_area_ids",
             "tts_engines",
             "notify_outputs",
             "room_tts_players",
@@ -285,11 +308,19 @@ class AnnouncementJob:
         payload.setdefault("companion_tts_words_per_minute", 150.0)
         payload.setdefault("tts_suppressed_by_level", False)
         payload.setdefault("strict_targets", False)
+        payload.setdefault("room_fallback", False)
+        payload.setdefault("requested_area_ids", [])
+        payload.setdefault("routing_occupied_only", False)
+        payload.setdefault("routing_stage", "explicit")
+        payload.setdefault("routing_stage_started_at", None)
+        payload.setdefault("routing_source_tts", payload.get("text_tts"))
+        payload.setdefault("routing_source_notify", payload.get("text_notify"))
         payload.setdefault("ai", {})
 
         for key in (
             "outputs",
             "requested_services",
+            "requested_area_ids",
             "tts_engines",
             "notify_outputs",
             "room_tts_players",
@@ -320,6 +351,11 @@ class AnnouncementJob:
             "outputs": list(self.outputs),
             "requested_services": list(self.requested_services),
             "strict_targets": self.strict_targets,
+            "room_fallback": self.room_fallback,
+            "routing_stage": self.routing_stage if self.room_fallback else None,
+            "routing_stage_started_at": (
+                self.routing_stage_started_at if self.room_fallback else None
+            ),
             "tts_engines": list(self.tts_engines),
             "notify_outputs": list(self.notify_outputs),
             "room_tts_players": list(self.room_tts_players),
