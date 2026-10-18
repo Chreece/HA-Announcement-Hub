@@ -187,6 +187,7 @@ klass = next(
     if isinstance(node, ast.ClassDef) and node.name == "AnnouncementManager"
 )
 namespace = {
+    "_LOGGER": SimpleNamespace(debug=lambda *args, **kwargs: None),
     "STAGES": routing.STAGES,
     "next_stage": routing.next_stage,
     "select_stage_targets": routing.select_stage_targets,
@@ -400,7 +401,7 @@ def test_preferred_room_remains_first_when_it_has_ready_info_output(monkeypatch)
 def test_scheduler_does_not_drop_undelivered_jobs():
     scheduler = SRC[
         SRC.index("    def _next_runnable_job("):
-        SRC.index("    async def _async_process_job("),
+        SRC.index("    async def _async_process_job(")
     ]
     assert "self._expire_waiting_job(" not in SRC
     assert "return None" in scheduler
