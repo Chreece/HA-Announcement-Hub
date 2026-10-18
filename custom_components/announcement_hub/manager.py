@@ -2112,6 +2112,51 @@ class AnnouncementManager:
             or self._job_has_ready_companion_tts(job)
         )
 
+    def _try_last_resort_available_device(
+        self, job: AnnouncementJob
+    ) -> bool:
+        """Route to ONE available configured visual device after all tiers.
+
+        This is only used after the requested/occupied/fallback/general grace
+        windows. It never broadcasts or switches a muted-info announcement
+        to speech. If no configured device is available, keep the queued job.
+        """
+        configured = self._configured_outputs()
+        configured_profiles = self.settings.get(CONF_NOTIFY_PROFILES, {})
+        if not isinstance(configured_profiles, Mapping):
+            configured_profiles = {}
+        for output in resolve_notify_outputs(self.hass, configured[1]):
+            if not notify_output_available(self.hass, output):
+                continue
+            job.outputs = ()
+            job.notify_outputs = (output.ref,)
+            job.notify_output_areas = {output.ref: None}
+            job.notify_output_profiles = {
+                output.ref: resolve_notify_profile(
+                    configured_profiles, output.integration
+                )
+            }
+            job.tts_engines = ()
+            job.room_tts_players = ()
+            job.snapcast_clients = ()
+            job.companion_tts_entries = ()
+            job.server_tts_enabled = False
+            job.tts_text = None
+            job.notify_text = job.notify_text or job.text_notify or job.text_tts
+            job.route_tier = "last_resort_single_device"
+            job.route_since = utcnow_iso()
+            task = self._prefetch_tasks.pop(job.job_id, None)
+            if task:
+                task.cancel()
+            self._schedule_save()
+            self._notify_update()
+            _LOGGER.warning(
+                "Announcement %s reached one available general last-resort output %s",
+                job.job_id, output.ref,
+            )
+            return True
+        return False
+
     def _advance_route_tier(self, job: AnnouncementJob) -> bool:
         """Advance only a room-targeted job; never broadcast its source room."""
         if not job.fallback_routes:
@@ -2190,6 +2235,11 @@ class AnnouncementManager:
                     if self._advance_route_tier(job):
                         if self._job_runnable_now(job):
                             return job
+                    elif (
+                        job.route_tier != "last_resort_single_device"
+                        and self._try_last_resort_available_device(job)
+                    ):
+                        return job
                     # Never discard a room announcement. The final stage
                     # remains pending for a suitable configured output to
                     # become available, or for the user to cancel it.
