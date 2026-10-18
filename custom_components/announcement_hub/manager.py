@@ -1948,10 +1948,25 @@ class AnnouncementManager:
                 job.status = "cancelled"
                 terminal_event = EVENT_CANCELLED
             except Exception as err:  # noqa: BLE001
-                job.status = "failed"
-                job.error = str(err)
-                terminal_event = EVENT_FAILED
-                _LOGGER.exception("Announcement %s failed", job.job_id)
+                if job.route_tier != "default" and not job.successful_channels:
+                    # Failed delivery is another unavailable routing tier;
+                    # keep this room announcement durable rather than discard.
+                    _LOGGER.warning(
+                        "Announcement %s could not deliver on tier %s (%s); "
+                        "retaining for the next available output",
+                        job.job_id, job.route_tier, type(err).__name__,
+                    )
+                    self._advance_route_tier(job)
+                    job.status = "pending"
+                    job.started_at = None
+                    job.finished_at = None
+                    self._queue.append(job)
+                    requeued = True
+                else:
+                    job.status = "failed"
+                    job.error = str(err)
+                    terminal_event = EVENT_FAILED
+                    _LOGGER.exception("Announcement %s failed", job.job_id)
             else:
                 if (
                     job.route_tier != "default"
