@@ -149,6 +149,9 @@ class AnnouncementJob:
     notify_text: str | None
     server_tts_enabled: bool
     strict_targets: bool = False
+    route_tier: str = "default"
+    route_since: str | None = None
+    fallback_routes: list[dict[str, Any]] = field(default_factory=list)
     click_action: str | None = None
     tts_media_player: str | None = None
     tts_player_area: str | None = None
@@ -186,6 +189,8 @@ class AnnouncementJob:
         tts_cache: bool,
         plan: DeliveryPlan,
         strict_targets: bool = False,
+        route_tier: str = "default",
+        fallback_routes: Sequence[Mapping[str, Any]] = (),
         ai: Mapping[str, Any] | None = None,
         click_action: str | None = None,
         tts_media_player: str | None = None,
@@ -221,6 +226,9 @@ class AnnouncementJob:
             notify_text=plan.notify_text,
             server_tts_enabled=plan.server_tts_enabled,
             strict_targets=bool(strict_targets),
+            route_tier=route_tier,
+            route_since=utcnow_iso(),
+            fallback_routes=[dict(route) for route in fallback_routes],
             tts_media_player=tts_media_player or None,
             tts_player_area=tts_player_area or None,
             room_tts_player_areas=dict(room_tts_player_areas or {}),
@@ -285,6 +293,9 @@ class AnnouncementJob:
         payload.setdefault("companion_tts_words_per_minute", 150.0)
         payload.setdefault("tts_suppressed_by_level", False)
         payload.setdefault("strict_targets", False)
+        payload.setdefault("route_tier", "default")
+        payload.setdefault("route_since", payload.get("created_at"))
+        payload.setdefault("fallback_routes", [])
         payload.setdefault("ai", {})
 
         for key in (
@@ -320,6 +331,10 @@ class AnnouncementJob:
             "outputs": list(self.outputs),
             "requested_services": list(self.requested_services),
             "strict_targets": self.strict_targets,
+            "route_tier": self.route_tier,
+            "remaining_fallback_tiers": [
+                item.get("tier") for item in self.fallback_routes
+            ],
             "tts_engines": list(self.tts_engines),
             "notify_outputs": list(self.notify_outputs),
             "room_tts_players": list(self.room_tts_players),
