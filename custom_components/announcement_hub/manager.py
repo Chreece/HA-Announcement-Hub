@@ -2026,6 +2026,14 @@ class AnnouncementManager:
 
     def _staged_route_ready(self, job: AnnouncementJob) -> bool:
         """Offer each tier its grace period, then search safer alternatives."""
+        if job.routing_retry_after:
+            try:
+                retry_at = datetime.fromisoformat(job.routing_retry_after)
+                if datetime.now(UTC) < retry_at:
+                    return False
+            except (TypeError, ValueError):
+                pass
+            job.routing_retry_after = None
         timeout = self._availability_timeout
         for _ in range(len(STAGES) + 1):
             has_configured_output = self._prepare_staged_route(job)
@@ -2065,6 +2073,28 @@ class AnnouncementManager:
             return max(0.0, (datetime.now(UTC) - started).total_seconds())
         except (TypeError, ValueError):
             return 0.0
+
+    def _requeue_undelivered_stage(
+        self, job: AnnouncementJob, reason: str
+    ) -> None:
+        """Retry after provider failures; do not mark undelivered jobs complete."""
+        if job.routing_stage != "general":
+            self._advance_staged_route(job, reason)
+        else:
+            # A failing general notification action must not generate a busy
+            # loop; give its transport at least five seconds before retrying.
+            wait = max(self._availability_timeout, 5.0)
+            job.routing_retry_after = (
+                datetime.now(UTC) + timedelta(seconds=wait)
+            ).isoformat()
+            job.routing_history.append(f"general: {reason}")
+            job.routing_history = job.routing_history[-24:]
+        job.status = "pending"
+        job.started_at = None
+        job.finished_at = None
+        job.error = None
+        job.channel_errors.clear()
+        self._queue.appendleft(job)
 
     def _pending_age_seconds(self, job: AnnouncementJob) -> float:
         """Return how long a pending job has been waiting."""
