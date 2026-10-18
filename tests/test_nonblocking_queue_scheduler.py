@@ -18,10 +18,11 @@ def test_waiting_jobs_remain_pending_without_blocking_ready_jobs() -> None:
     source = MANAGER.read_text(encoding="utf-8")
     selector = source[
         source.index("def _next_runnable_job("):
-        source.index("def _requeue_undelivered_room_job(")
+        source.index("def _requeue_undelivered_job(")
     ]
     assert "if self._refresh_room_fallback(job):" in selector
-    assert "elif self._job_runnable_now(job):" in selector
+    assert "self._job_runnable_now(job)" in selector
+    assert "elapsed_seconds(job.routing_stage_started_at)" in selector
     assert "self._expire_waiting_job(job)" not in selector
     assert "return None" in selector
 

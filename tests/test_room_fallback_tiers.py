@@ -376,4 +376,60 @@ def test_source_prevents_rejected_and_expired_info_announcements():
         SOURCE.index("    def _next_runnable_job("):
         SOURCE.index("    async def _async_process_job(")
     ]
-    assert "self._requeue_undelivered_room_job(job)" in SOURCE
+    assert "self._requeue_undelivered_job(job)" in SOURCE
+
+def test_waiting_route_recovers_when_fallback_door_opens():
+    h = Harness()
+    h.add_notify("entity:notify.entry_tv", "eingang", ready=True)
+    h.door_open = False
+    job = new_job()
+    h._queue.append(job)
+    assert h._next_runnable_job() is None
+    assert job.routing_stage == "waiting"
+    h.door_open = True
+    assert h._next_runnable_job() is job
+    assert job.routing_stage == "fallback_room"
+    assert job.notify_outputs == ("entity:notify.entry_tv",)
+
+
+def test_strict_device_retries_with_cooldown_instead_of_expiring():
+    # This is a source contract for non-room explicit provider selections.
+    # The full manager continues to retain its exact recipient, never
+    # silently expands to some other integration or becomes completed.
+    assert "def _requeue_undelivered_job(" in SOURCE
+    assert "job.routing_stage_started_at = utcnow_iso()" in SOURCE
+    assert "if job.room_fallback:" in SOURCE
+    assert "max(\n                        1.0, self._availability_timeout" in SOURCE
+    selector = SOURCE[
+        SOURCE.index("    def _next_runnable_job("):
+        SOURCE.index("    async def _async_process_job(")
+    ]
+    assert "self._expire_waiting_job(job)" not in selector
+
+
+def test_real_area_name_kueche_resolves_to_ha_area_id():
+    import ast
+    tree = ast.parse(SOURCE)
+    cls = next(node for node in tree.body if isinstance(node, ast.ClassDef)
+               and node.name == "AnnouncementManager")
+    method = next(node for node in cls.body
+                  if isinstance(node, ast.FunctionDef)
+                  and node.name == "_resolve_area_ids")
+    area = SimpleNamespace(id="kouzina")
+    class Registry:
+        def async_get_area(self, value):
+            return None
+        def async_get_area_by_name(self, value):
+            return area if value == "Küche" else None
+        def async_list_areas(self):
+            return [area]
+    area_reg = SimpleNamespace(async_get=lambda hass: Registry())
+    code_ns = {
+        "ar": area_reg,
+        "ServiceValidationError": ValueError,
+    }
+    exec(compile("from __future__ import annotations\n" + ast.unparse(method),
+                 "area-name-resolution", "exec"), code_ns)
+    assert code_ns["_resolve_area_ids"](SimpleNamespace(hass=object()), ["Küche"]) == (
+        "kouzina",
+    )
