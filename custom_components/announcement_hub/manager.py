@@ -167,10 +167,12 @@ from .message_parts import (
 )
 from .models import (
     AnnouncementJob,
+    DeliveryPlan,
     build_delivery_plan,
     tts_allowed_for_level,
     utcnow_iso,
 )
+from .routing_fallback import STAGES, next_stage, select_stage_targets
 from .outputs import (
     CompanionTTSOutput,
     NotifyOutput,
@@ -832,10 +834,10 @@ class AnnouncementManager:
         requested_output_area_ids = self._resolve_area_ids(output_tokens)
         explicit_area_routing = bool(requested_output_area_ids)
         explicit_targeting = bool(requested) or explicit_area_routing
-        # An explicit service or output area is a hard delivery contract.
-        # It must not trigger room/channel/level fallback or route onto
-        # additional devices if a selected output is temporarily unavailable.
-        # Only the configured output-availability timeout may skip a target.
+        # A concrete service/entry/entity restriction remains absolute.
+        # An output *area* is instead the first preferred room, followed by
+        # occupied rooms, door-gated fallback room and finally general outputs.
+        # The queue, not the calling integration, owns that escalation.
 
         # occupied_only always means "restrict room-bound delivery to occupied
         # rooms". If explicit output rooms are also supplied, use their
@@ -861,6 +863,13 @@ class AnnouncementManager:
 
         area_filter_active = explicit_area_routing or occupancy_filter_active
         target_room_routing_active = bool(output_area_ids) and area_filter_active
+        room_fallback_routing = bool(
+            explicit_area_routing or (occupancy_filter_active and not requested)
+        )
+        if room_fallback_routing and requested_output_area_ids:
+            # A named room is preferred even when the occupancy sensor has no
+            # current occupied rooms; occupancy is the NEXT fallback tier.
+            output_area_ids = requested_output_area_ids
 
         configured = self._configured_outputs()
         selected = self._select_requested_outputs(
@@ -1514,6 +1523,17 @@ class AnnouncementManager:
                         fallback_area_id,
                     )
 
+        if room_fallback_routing:
+            # Let AI prepare both speech-ready and visual variants once,
+            # before queue persistence. Physical channels are selected later
+            # by the staged worker and never inferred from these text fields.
+            plan = DeliveryPlan(
+                tts_text=text_tts or text_notify,
+                notify_text=text_notify or text_tts,
+            )
+            selected = ((), (), (), (), ())
+            notify_records = ()
+            companion_records = ()
         notify_output_areas = {
             output.ref: (
                 None
@@ -1547,7 +1567,7 @@ class AnnouncementManager:
             output.entry_id: output.area_id for output in companion_records
         }
 
-        if not plan.has_output and not occupancy_filter_active:
+        if not plan.has_output and not occupancy_filter_active and not room_fallback_routing:
             if plan.tts_suppressed_by_level:
                 raise ServiceValidationError(
                     "TTS is muted for this level and no selected visual output "
@@ -1662,7 +1682,9 @@ class AnnouncementManager:
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
-            strict_targets=explicit_targeting,
+            strict_targets=bool(requested),
+            routing_mode="room_fallback" if room_fallback_routing else "normal",
+            preferred_areas=requested_output_area_ids,
             ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,
@@ -1683,6 +1705,8 @@ class AnnouncementManager:
                 )
             ),
         )
+        if room_fallback_routing:
+            self._prepare_staged_route(job)
         # AI awaits an external agent: another call may fill the queue in
         # the meantime. Recheck capacity immediately before insertion.
         if len(self._queue) + (1 if self._current else 0) >= queue_max:
