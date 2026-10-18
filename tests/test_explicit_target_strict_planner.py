@@ -123,7 +123,7 @@ def _planner(
         "text_notify": text_notify,
         "explicit_area_routing": explicit_area_routing,
         "explicit_targeting": explicit_targeting,
-        "strict_service_targeting": explicit_targeting,
+        "strict_service_targeting": explicit_targeting and not staged_room_routing,
         "staged_room_routing": staged_room_routing,
         "minimum_tts_level": minimum_tts_level,
         "LEVEL_CRITICAL": "critical",
