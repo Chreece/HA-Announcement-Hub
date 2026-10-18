@@ -1536,6 +1536,79 @@ class AnnouncementManager:
                         fallback_area_id,
                     )
 
+        # A room is the first preference, not a hard limit on whether the
+        # announcement may ever be delivered. Freeze successive, disjoint
+        # fallback tiers now so queued jobs survive HA restarts.
+        routing_stages: list[tuple[str, tuple[str, ...], Any]] = []
+        if staged_room_routing:
+            used_areas = set(output_area_ids)
+
+            def add_room_tier(
+                name: str, room_ids: tuple[str, ...]
+            ) -> None:
+                remaining = tuple(
+                    area_id for area_id in room_ids
+                    if area_id not in used_areas
+                )
+                used_areas.update(remaining)
+                if not remaining:
+                    return
+                route = routed_plan(
+                    remaining, filter_by_area=True,
+                    require_room_delivery=False,
+                )
+                if route[3].has_output:
+                    routing_stages.append((name, remaining, route))
+
+            if plan.has_output:
+                routing_stages.append((
+                    "requested_rooms", output_area_ids,
+                    (selected, notify_records, companion_records, plan),
+                ))
+            if occupied_area_ids:
+                add_room_tier("occupied_rooms", occupied_area_ids)
+            fallback_area_id = self._fallback_area_id()
+            if (
+                fallback_area_id
+                and self._fallback_door_allows(requested_output_area_ids)
+            ):
+                add_room_tier("door_fallback", (fallback_area_id,))
+
+            general = routed_plan(
+                (), filter_by_area=False,
+                only_general=True, require_room_delivery=False,
+            )
+            if general[3].has_output:
+                routing_stages.append((
+                    "general_devices", (), general,
+                ))
+
+            # Last-resort queue wait: if no general output is configured,
+            # do not drop the message. Prefer the first other configured
+            # room output that becomes available, one device at a time.
+            if not routing_stages:
+                for other in all_notify_records:
+                    if other.ref in set(selected[1]):
+                        continue
+                    route = routed_plan(
+                        (other.area_id,), filter_by_area=True,
+                    ) if other.area_id else general
+                    if route[3].has_output:
+                        routing_stages.append((
+                            "wait_any_device",
+                            (other.area_id,) if other.area_id else (),
+                            route,
+                        ))
+                        break
+
+            if routing_stages:
+                tier, output_area_ids, route = routing_stages[0]
+                selected, notify_records, companion_records, plan = route[:4]
+            else:
+                tier = "waiting_for_configured_device"
+        else:
+            tier = "default"
+
         notify_output_areas = {
             output.ref: (
                 None
@@ -1569,7 +1642,54 @@ class AnnouncementManager:
             output.entry_id: output.area_id for output in companion_records
         }
 
-        if not plan.has_output and not occupancy_filter_active:
+        fallback_routes: list[dict[str, Any]] = []
+        if staged_room_routing:
+            for fallback_tier, fallback_areas, fallback_result in routing_stages[1:]:
+                fallback_selected = fallback_result[0]
+                fallback_notify = fallback_result[1]
+                fallback_companion = fallback_result[2]
+                fallback_plan = fallback_result[3]
+                fallback_routes.append({
+                    "tier": fallback_tier,
+                    "outputs": list(fallback_areas),
+                    "tts_engines": list(fallback_plan.tts_engines),
+                    "notify_outputs": list(fallback_plan.notify_outputs),
+                    "room_tts_players": list(fallback_plan.room_tts_players),
+                    "snapcast_clients": list(fallback_plan.snapcast_clients),
+                    "companion_tts_entries": list(
+                        fallback_plan.companion_tts_entries
+                    ),
+                    "server_tts_enabled": fallback_plan.server_tts_enabled,
+                    "tts_text": fallback_plan.tts_text,
+                    "notify_text": fallback_plan.notify_text,
+                    "notify_output_areas": {
+                        item.ref: (
+                            None if self._notify_policy(item)[0]
+                            == NOTIFY_SCOPE_GENERAL else item.area_id
+                        )
+                        for item in fallback_notify
+                    },
+                    "notify_output_profiles": {
+                        item.ref: resolve_notify_profile(
+                            configured_profiles, item.integration
+                        )
+                        for item in fallback_notify
+                    },
+                    "room_tts_player_areas": {
+                        item: entity_area_id(self.hass, item)
+                        for item in fallback_selected[2]
+                    },
+                    "snapcast_client_areas": {
+                        item: entity_area_id(self.hass, item)
+                        for item in fallback_selected[3]
+                    },
+                    "companion_tts_entry_areas": {
+                        item.entry_id: item.area_id
+                        for item in fallback_companion
+                    },
+                })
+
+        if not plan.has_output and not occupancy_filter_active and not staged_room_routing:
             if plan.tts_suppressed_by_level:
                 raise ServiceValidationError(
                     "TTS is muted for this level and no selected visual output "
@@ -1671,6 +1791,15 @@ class AnnouncementManager:
                 # original delivery level, targets and metadata remain intact.
                 text_tts, text_notify = plan.tts_text, plan.notify_text
 
+        if fallback_routes and ai_info.get("status") in {
+            "rewritten", "accepted_unchanged"
+        }:
+            for route in fallback_routes:
+                if route.get("tts_text") is not None and text_tts is not None:
+                    route["tts_text"] = text_tts
+                if route.get("notify_text") is not None and text_notify is not None:
+                    route["notify_text"] = text_notify
+
         job = AnnouncementJob.create(
             text_tts=text_tts,
             text_notify=text_notify,
@@ -1684,7 +1813,9 @@ class AnnouncementManager:
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
-            strict_targets=explicit_targeting,
+            strict_targets=strict_service_targeting,
+            route_tier=tier,
+            fallback_routes=fallback_routes,
             ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,
