@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from collections import deque
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
@@ -1820,20 +1820,34 @@ class AnnouncementManager:
                 job.status = "cancelled"
                 terminal_event = EVENT_CANCELLED
             except Exception as err:  # noqa: BLE001
-                job.status = "failed"
-                job.error = str(err)
-                terminal_event = EVENT_FAILED
-                _LOGGER.exception("Announcement %s failed", job.job_id)
-            else:
-                job.status = (
-                    "completed_with_errors" if job.channel_errors else "completed"
-                )
-                if job.channel_errors:
-                    job.error = "; ".join(
-                        f"{channel}: {error}"
-                        for channel, error in job.channel_errors.items()
+                if job.routing_mode == "room_fallback" and not job.successful_channels:
+                    _LOGGER.warning(
+                        "Announcement %s route %s failed (%s); retaining for fallback",
+                        job.job_id, job.routing_stage, type(err).__name__,
                     )
-                terminal_event = EVENT_FINISHED
+                    self._requeue_undelivered_stage(job, "provider failure")
+                    requeued = True
+                else:
+                    job.status = "failed"
+                    job.error = str(err)
+                    terminal_event = EVENT_FAILED
+                    _LOGGER.exception("Announcement %s failed", job.job_id)
+            else:
+                if job.routing_mode == "room_fallback" and not job.successful_channels:
+                    self._requeue_undelivered_stage(
+                        job, "selected outputs did not deliver"
+                    )
+                    requeued = True
+                else:
+                    job.status = (
+                        "completed_with_errors" if job.channel_errors else "completed"
+                    )
+                    if job.channel_errors:
+                        job.error = "; ".join(
+                            f"{channel}: {error}"
+                            for channel, error in job.channel_errors.items()
+                        )
+                    terminal_event = EVENT_FINISHED
             finally:
                 self._cancel_requested.discard(job.job_id)
                 self._current = None
