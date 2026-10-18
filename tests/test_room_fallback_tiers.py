@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 from collections import deque
+from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 import importlib.util
@@ -70,6 +71,7 @@ def load_real_methods():
                 if isinstance(x, ast.FunctionDef) and x.name in methods]
     assert len(selected) == len(methods)
     namespace = {
+        "Mapping": Mapping,
         "STAGES": STAGES,
         "next_stage": next_stage,
         "elapsed_seconds": elapsed_seconds,
@@ -208,6 +210,7 @@ def age_stage(job):
 
 def test_kitchen_has_matching_info_notify_and_does_not_broadcast():
     h = Harness()
+    h.occupied = ("kouzina",)
     h.add_notify("entity:notify.kitchen_tv", "kouzina", ready=True)
     h.add_notify("entity:notify.phone", None, ready=True)
     job = new_job()
@@ -232,6 +235,7 @@ def test_missing_kitchen_device_moves_immediately_to_occupied_room():
 
 def test_room_device_below_info_threshold_falls_back_without_forcing_tts():
     h = Harness()
+    h.occupied = ("kouzina", "wohnzimmer")
     h.add_notify("entity:notify.kitchen_tv", "kouzina",
                  minimum="warning", ready=True)
     h.add_notify("entity:notify.living_tv", "wohnzimmer", ready=True)
@@ -245,6 +249,7 @@ def test_room_device_below_info_threshold_falls_back_without_forcing_tts():
 
 def test_unavailable_kitchen_waits_grace_before_occupied_fallback():
     h = Harness()
+    h.occupied = ("kouzina", "wohnzimmer")
     h.add_notify("entity:notify.kitchen_tv", "kouzina", ready=False)
     h.add_notify("entity:notify.living_tv", "wohnzimmer", ready=True)
     job = new_job()

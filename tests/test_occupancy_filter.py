@@ -22,7 +22,8 @@ def test_occupancy_filter_is_applied_before_job_is_frozen() -> None:
     assert "output.area_id is not None" in manager
     assert "output.area_id in effective_areas" in manager
     assert "server_tts_enabled = bool(routed_selected[3])" in manager
-    assert "if not plan.has_output and not occupancy_filter_active:" in manager
+    assert "if not plan.has_output and not occupancy_filter_active and not room_fallback:" in manager
+    assert "if occupancy_filter_active and not requested:" in manager
 
 
 def test_occupied_only_defaults_true_and_does_not_touch_task_lifecycle() -> None:

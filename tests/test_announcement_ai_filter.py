@@ -707,10 +707,10 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert "resolve_ai_enabled(" in manager
     assert "if ai_enabled:" in manager
     assert manager.count("Announcement queue is full") == 2
-    assert "plan.tts_text, plan.notify_text = await async_filter_announcement(" in manager
-    assert "text_tts=plan.tts_text," in manager
-    assert "text_notify=plan.notify_text," in manager
-    assert "text_tts, text_notify = plan.tts_text, plan.notify_text" in manager
+    assert "ai_tts, ai_notify = await async_filter_announcement(" in manager
+    assert "text_tts=ai_tts," in manager
+    assert "text_notify=ai_notify," in manager
+    assert "routing_source_tts, routing_source_notify" in manager
     fields = service["send"]["fields"]["ai"]["fields"]
     assert "boolean" in fields["use_ai"]["selector"]
     assert "conversation_agent" in fields["ai_agent"]["selector"]
