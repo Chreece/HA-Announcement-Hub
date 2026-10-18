@@ -46,6 +46,7 @@ required = {
     "manifest.json",
     "message_parts.py",
     "message_text.py",
+    "routing_fallback.py",
     "models.py",
     "outputs.py",
     "sensor.py",

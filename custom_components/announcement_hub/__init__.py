@@ -343,6 +343,9 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             "companion_tts_entries": list(job.companion_tts_entries),
             "tts_suppressed_by_level": job.tts_suppressed_by_level,
             "strict_targets": job.strict_targets,
+            "routing_mode": job.routing_mode,
+            "routing_stage": job.routing_stage,
+            "preferred_areas": [area_name(hass, a) for a in job.preferred_areas],
             "ai": dict(job.ai),
         }
         return response if call.return_response else None

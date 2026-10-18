@@ -14,12 +14,17 @@ def test_worker_scans_for_runnable_jobs_instead_of_popping_fifo_head() -> None:
     assert "self._queue.remove(job)" in worker
 
 
-def test_waiting_jobs_expire_without_blocking_newer_ready_jobs() -> None:
+def test_unavailable_jobs_remain_pending_without_blocking_ready_jobs() -> None:
     source = MANAGER.read_text(encoding="utf-8")
-    assert "def _next_runnable_job(" in source
-    assert "if self._job_runnable_now(job):" in source
-    assert "self._pending_age_seconds(job) >= timeout" in source
-    assert "def _expire_waiting_job(" in source
+    scheduler = source[
+        source.index("    def _next_runnable_job("):
+        source.index("    async def _async_process_job(", source.index("    def _next_runnable_job("))
+    ]
+    assert "if job.routing_mode == \"room_fallback\":" in scheduler
+    assert "self._staged_route_ready(job)" in scheduler
+    assert "elif self._job_runnable_now(job):" in scheduler
+    assert "self._expire_waiting_job(" not in source
+    assert "return None" in scheduler
 
 
 def test_scheduler_readiness_covers_visual_server_and_companion_outputs() -> None:

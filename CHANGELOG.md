@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased
+
+- Fixed Air Quality Advisor Info-level announcements targeting real HA rooms
+  such as `Küche` being rejected when the room had no eligible visual output
+  and TTS was below its configured severity threshold.
+- Added staged, persistent room routing: explicit preferred rooms, remaining
+  occupied rooms, the configured fallback room only when its door rule allows,
+  and finally eligible General/non-room outputs.
+- Each stage with configured but unavailable targets waits the configured
+  output-availability grace period before escalation; empty/ineligible stages
+  advance immediately. Minimum TTS and notification levels remain enforced.
+- Stopped silently completing/discarding queued announcements after the
+  availability timeout. Jobs stay persisted and retry permitted routes until
+  some output can receive them, without blocking newer runnable jobs.
+- Recover from failed staged provider deliveries by requeueing instead of
+  discarding undelivered messages; throttle retries of failing General
+  providers to prevent busy loops.
+- Preserved explicit service/device allowlists across all routing stages,
+  occupied_only behavior, room bindings, and no-broadcast safety. No changes
+  to Air Quality Advisor or its message/routing inputs.
+- Added routing stage/priority diagnostics to action responses and persistent
+  queue status, with executable regressions for Info-level Küche,
+  unavailable/unknown room devices, timeout, occupied-room alternatives,
+  door-open/closed fallback, General delivery, and indefinite pending jobs.
+
 ## 0.9.27 - 2026-10-17
 
 - Fixed the Announcement Hub banner failing to display in the HACS repository

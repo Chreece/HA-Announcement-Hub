@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from collections import deque
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
@@ -167,10 +167,12 @@ from .message_parts import (
 )
 from .models import (
     AnnouncementJob,
+    DeliveryPlan,
     build_delivery_plan,
     tts_allowed_for_level,
     utcnow_iso,
 )
+from .routing_fallback import STAGES, next_stage, select_stage_targets
 from .outputs import (
     CompanionTTSOutput,
     NotifyOutput,
@@ -832,10 +834,10 @@ class AnnouncementManager:
         requested_output_area_ids = self._resolve_area_ids(output_tokens)
         explicit_area_routing = bool(requested_output_area_ids)
         explicit_targeting = bool(requested) or explicit_area_routing
-        # An explicit service or output area is a hard delivery contract.
-        # It must not trigger room/channel/level fallback or route onto
-        # additional devices if a selected output is temporarily unavailable.
-        # Only the configured output-availability timeout may skip a target.
+        # A concrete service/entry/entity restriction remains absolute.
+        # An output *area* is instead the first preferred room, followed by
+        # occupied rooms, door-gated fallback room and finally general outputs.
+        # The queue, not the calling integration, owns that escalation.
 
         # occupied_only always means "restrict room-bound delivery to occupied
         # rooms". If explicit output rooms are also supplied, use their
@@ -861,6 +863,13 @@ class AnnouncementManager:
 
         area_filter_active = explicit_area_routing or occupancy_filter_active
         target_room_routing_active = bool(output_area_ids) and area_filter_active
+        room_fallback_routing = bool(
+            explicit_area_routing or (occupancy_filter_active and not requested)
+        )
+        if room_fallback_routing and requested_output_area_ids:
+            # A named room is preferred even when the occupancy sensor has no
+            # current occupied rooms; occupancy is the NEXT fallback tier.
+            output_area_ids = requested_output_area_ids
 
         configured = self._configured_outputs()
         selected = self._select_requested_outputs(
@@ -1514,6 +1523,17 @@ class AnnouncementManager:
                         fallback_area_id,
                     )
 
+        if room_fallback_routing:
+            # Let AI prepare both speech-ready and visual variants once,
+            # before queue persistence. Physical channels are selected later
+            # by the staged worker and never inferred from these text fields.
+            plan = DeliveryPlan(
+                tts_text=text_tts or text_notify,
+                notify_text=text_notify or text_tts,
+            )
+            selected = ((), (), (), (), ())
+            notify_records = ()
+            companion_records = ()
         notify_output_areas = {
             output.ref: (
                 None
@@ -1547,7 +1567,7 @@ class AnnouncementManager:
             output.entry_id: output.area_id for output in companion_records
         }
 
-        if not plan.has_output and not occupancy_filter_active:
+        if not plan.has_output and not occupancy_filter_active and not room_fallback_routing:
             if plan.tts_suppressed_by_level:
                 raise ServiceValidationError(
                     "TTS is muted for this level and no selected visual output "
@@ -1662,7 +1682,11 @@ class AnnouncementManager:
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
-            strict_targets=explicit_targeting,
+            strict_targets=bool(requested),
+            routing_mode="room_fallback" if room_fallback_routing else "normal",
+            preferred_areas=requested_output_area_ids,
+            companion_tts_requested=companion_tts,
+            occupancy_requested=occupied_only,
             ai=ai_info,
             tts_media_player=player,
             tts_player_area=None,
@@ -1683,6 +1707,8 @@ class AnnouncementManager:
                 )
             ),
         )
+        if room_fallback_routing:
+            self._prepare_staged_route(job)
         # AI awaits an external agent: another call may fill the queue in
         # the meantime. Recheck capacity immediately before insertion.
         if len(self._queue) + (1 if self._current else 0) >= queue_max:
@@ -1795,20 +1821,35 @@ class AnnouncementManager:
                 job.status = "cancelled"
                 terminal_event = EVENT_CANCELLED
             except Exception as err:  # noqa: BLE001
-                job.status = "failed"
-                job.error = str(err)
-                terminal_event = EVENT_FAILED
-                _LOGGER.exception("Announcement %s failed", job.job_id)
-            else:
-                job.status = (
-                    "completed_with_errors" if job.channel_errors else "completed"
-                )
-                if job.channel_errors:
-                    job.error = "; ".join(
-                        f"{channel}: {error}"
-                        for channel, error in job.channel_errors.items()
+                if not job.successful_channels:
+                    _LOGGER.warning(
+                        "Announcement %s had no successful output (%s); "
+                        "retaining the job for retry",
+                        job.job_id, type(err).__name__,
                     )
-                terminal_event = EVENT_FINISHED
+                    self._requeue_undelivered_job(job, "provider failure")
+                    requeued = True
+                else:
+                    job.status = "failed"
+                    job.error = str(err)
+                    terminal_event = EVENT_FAILED
+                    _LOGGER.exception("Announcement %s failed", job.job_id)
+            else:
+                if not job.successful_channels:
+                    self._requeue_undelivered_job(
+                        job, "selected outputs did not deliver"
+                    )
+                    requeued = True
+                else:
+                    job.status = (
+                        "completed_with_errors" if job.channel_errors else "completed"
+                    )
+                    if job.channel_errors:
+                        job.error = "; ".join(
+                            f"{channel}: {error}"
+                            for channel, error in job.channel_errors.items()
+                        )
+                    terminal_event = EVENT_FINISHED
             finally:
                 self._cancel_requested.discard(job.job_id)
                 self._current = None
@@ -1821,6 +1862,284 @@ class AnnouncementManager:
                         self._fire_event(terminal_event, job)
                 self._schedule_save()
                 self._notify_update()
+
+    def _staged_areas(
+        self, job: AnnouncementJob, stage: str
+    ) -> tuple[str, ...]:
+        """Resolve preferred, currently occupied and door-gated fallback areas."""
+        preferred = tuple(job.preferred_areas)
+        occupied = tuple(
+            area
+            for area in (
+                (self._occupied_area_ids() or ())
+                if job.occupancy_requested else ()
+            )
+            if area not in set(preferred)
+        )
+        if stage == "primary":
+            return preferred
+        if stage == "occupied":
+            return occupied
+        if stage == "fallback":
+            fallback = self._fallback_area_id()
+            source = preferred or occupied
+            if (
+                fallback
+                and fallback not in set((*preferred, *occupied))
+                and self._fallback_door_allows(source)
+            ):
+                return (fallback,)
+        return ()
+
+    def _prepare_staged_route(self, job: AnnouncementJob) -> bool:
+        """Select only configured, severity-eligible outputs for this stage.
+
+        Read availability separately: an unavailable device is still a
+        configured candidate and earns its full grace period. An info-level
+        message does not bypass the TTS or visual minimum level; if speech is
+        muted, other suitable visual outputs remain eligible. Service
+        restrictions are never expanded during fallback.
+        """
+        stage = job.routing_stage
+        areas = self._staged_areas(job, stage)
+        stage_kind = stage if stage in STAGES else STAGES[0]
+        configured = self._configured_outputs()
+        try:
+            selected = self._select_requested_outputs(
+                job.requested_services,
+                level=job.level,
+                tts_engines=configured[0],
+                notify_outputs=configured[1],
+                room_tts_players=configured[2],
+                snapcast_clients=configured[3],
+                companion_entries=configured[4],
+                companion_tts=job.companion_tts_requested,
+            )
+        except ServiceValidationError:
+            # A previously configured output/integration may be temporarily
+            # absent after a restart. Preserve the queued job; retry discovery
+            # during the next polling cycle rather than broaden the selection.
+            selected = ((), (), (), (), ())
+
+        notifications = resolve_notify_outputs(self.hass, selected[1])
+        companion = resolve_companion_tts_outputs(self.hass, selected[4])
+        speech_allowed = bool(
+            tts_allowed_for_level(
+                job.level,
+                str(
+                    self.settings.get(
+                        CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL
+                    )
+                ),
+            )
+        )
+        level_priority = LEVEL_PRIORITY.get(job.level, LEVEL_PRIORITY[LEVEL_INFO])
+        notify_policy = {
+            output.ref: self._notify_policy(output)
+            for output in notifications
+        }
+        targets = select_stage_targets(
+            stage=stage_kind,
+            areas=areas,
+            level_priority=level_priority,
+            notifications=(
+                (
+                    output.ref,
+                    output.area_id,
+                    notify_policy[output.ref][0],
+                    LEVEL_PRIORITY.get(
+                        notify_policy[output.ref][1],
+                        LEVEL_PRIORITY[DEFAULT_NOTIFY_MIN_LEVEL],
+                    ),
+                )
+                for output in notifications
+            ),
+            room_tts=(
+                (
+                    entity_id,
+                    entity_area_id(self.hass, entity_id),
+                    self._tts_player_scope(entity_id),
+                )
+                for entity_id in selected[2] if selected[0]
+            ),
+            snapcast=(
+                (entity_id, entity_area_id(self.hass, entity_id))
+                for entity_id in selected[3] if selected[0]
+            ),
+            companion_tts=(
+                (output.entry_id, output.area_id) for output in companion
+            ),
+            speech_allowed=speech_allowed,
+        )
+
+        job.outputs = tuple(areas)
+        job.notify_outputs = targets.notify
+        job.room_tts_players = targets.room_tts
+        job.snapcast_clients = targets.snapcast
+        job.companion_tts_entries = targets.companion_tts
+        job.server_tts_enabled = bool(
+            targets.snapcast and selected[0] and job.tts_media_player
+        )
+        job.tts_engines = (
+            tuple(selected[0][:1])
+            if (targets.room_tts or job.server_tts_enabled)
+            else ()
+        )
+        audible = bool(
+            job.room_tts_players or job.server_tts_enabled
+            or job.companion_tts_entries
+        )
+        job.tts_text = (job.text_tts or job.text_notify) if audible else None
+        job.notify_text = (
+            (job.text_notify or job.text_tts)
+            if job.notify_outputs else None
+        )
+        job.tts_suppressed_by_level = bool(
+            job.text_tts and not speech_allowed
+        )
+        active_notifications = {
+            output.ref: output for output in notifications
+            if output.ref in set(targets.notify)
+        }
+        job.notify_output_areas = {
+            ref: None if stage_kind == "general" else output.area_id
+            for ref, output in active_notifications.items()
+        }
+        configured_profiles = self.settings.get(CONF_NOTIFY_PROFILES, {})
+        if not isinstance(configured_profiles, Mapping):
+            configured_profiles = {}
+        job.notify_output_profiles = {
+            ref: resolve_notify_profile(
+                configured_profiles, output.integration
+            )
+            for ref, output in active_notifications.items()
+        }
+        job.room_tts_player_areas = {
+            entity_id: entity_area_id(self.hass, entity_id)
+            for entity_id in targets.room_tts
+        }
+        job.snapcast_client_areas = {
+            entity_id: entity_area_id(self.hass, entity_id)
+            for entity_id in targets.snapcast
+        }
+        job.companion_tts_entry_areas = {
+            output.entry_id: output.area_id for output in companion
+            if output.entry_id in set(targets.companion_tts)
+        }
+        return targets.has_output
+
+    def _advance_staged_route(
+        self, job: AnnouncementJob, reason: str
+    ) -> None:
+        """Move to another priority tier without completing/discarding the job."""
+        old_stage = job.routing_stage
+        job.routing_stage = next_stage(job.routing_stage)
+        job.routing_stage_started_at = utcnow_iso()
+        job.routing_history.append(f"{old_stage}: {reason}")
+        job.routing_history = job.routing_history[-24:]
+        _LOGGER.debug(
+            "Announcement %s routing %s -> %s: %s",
+            job.job_id, old_stage, job.routing_stage, reason,
+        )
+        self._schedule_save()
+        self._notify_update()
+
+    def _staged_route_ready(self, job: AnnouncementJob) -> bool:
+        """Offer each tier its grace period, then search safer alternatives."""
+        if job.routing_retry_after:
+            try:
+                retry_at = datetime.fromisoformat(job.routing_retry_after)
+                if datetime.now(UTC) < retry_at:
+                    return False
+            except (TypeError, ValueError):
+                pass
+            job.routing_retry_after = None
+        timeout = self._availability_timeout
+        for _ in range(len(STAGES) + 1):
+            has_configured_output = self._prepare_staged_route(job)
+            if has_configured_output and self._job_runnable_now(job):
+                self._schedule_prefetch(job)
+                return True
+            if job.routing_stage == "general":
+                # Final general outputs remain pending forever, even when no
+                # device is currently configured. Periodically revisit the
+                # preferred/occupied/fallback rooms in case availability or
+                # configuration changed; never broadcast to unrelated rooms.
+                revisit_after = timeout if timeout > 0 else 10.0
+                if self._routing_stage_age(job) >= revisit_after:
+                    job.routing_history.append("general: retry permitted rooms")
+                    job.routing_history = job.routing_history[-24:]
+                    job.routing_stage = "primary"
+                    job.routing_stage_started_at = utcnow_iso()
+                    continue
+                return False
+            if has_configured_output and timeout > 0:
+                if self._routing_stage_age(job) < timeout:
+                    return False
+            reason = (
+                "unavailable after grace period"
+                if has_configured_output else "no severity-eligible output"
+            )
+            self._advance_staged_route(job, reason)
+        return False
+
+    def _routing_stage_age(self, job: AnnouncementJob) -> float:
+        """Elapsed wall time survives HA restarts without resetting deadlines."""
+        try:
+            stamp = job.routing_stage_started_at or job.created_at
+            started = datetime.fromisoformat(stamp)
+            if started.tzinfo is None:
+                started = started.replace(tzinfo=UTC)
+            return max(0.0, (datetime.now(UTC) - started).total_seconds())
+        except (TypeError, ValueError):
+            return 0.0
+
+    def _requeue_undelivered_stage(
+        self, job: AnnouncementJob, reason: str
+    ) -> None:
+        """Retry after provider failures; do not mark undelivered jobs complete."""
+        if job.routing_stage != "general":
+            self._advance_staged_route(job, reason)
+        else:
+            # A failing general notification action must not generate a busy
+            # loop; give its transport at least five seconds before retrying.
+            wait = max(self._availability_timeout, 5.0)
+            job.routing_retry_after = (
+                datetime.now(UTC) + timedelta(seconds=wait)
+            ).isoformat()
+            job.routing_history.append(f"general: {reason}")
+            job.routing_history = job.routing_history[-24:]
+        job.status = "pending"
+        job.started_at = None
+        job.finished_at = None
+        job.error = None
+        job.channel_errors.clear()
+        self._queue.appendleft(job)
+
+    def _requeue_undelivered_job(
+        self, job: AnnouncementJob, reason: str
+    ) -> None:
+        """Keep every accepted but undelivered job until an output succeeds.
+
+        Room-aware jobs advance their fallback tier. Hard service-targeted
+        and legacy non-room jobs retain their original allowed devices and
+        only retry after a bounded cooldown. The caller may explicitly cancel
+        an unwanted waiting job using announcement_hub.cancel.
+        """
+        if job.routing_mode == "room_fallback":
+            self._requeue_undelivered_stage(job, reason)
+        else:
+            delay = max(self._availability_timeout, 5.0)
+            job.routing_retry_after = (
+                datetime.now(UTC) + timedelta(seconds=delay)
+            ).isoformat()
+            job.status = "pending"
+            job.started_at = None
+            job.finished_at = None
+            job.error = None
+            job.channel_errors.clear()
+            self._queue.append(job)
+        self._wake.set()
 
     def _pending_age_seconds(self, job: AnnouncementJob) -> float:
         """Return how long a pending job has been waiting."""
@@ -1929,33 +2248,31 @@ class AnnouncementManager:
             or self._job_has_ready_companion_tts(job)
         )
 
-    def _expire_waiting_job(self, job: AnnouncementJob) -> None:
-        """Finish a never-runnable pending job silently after its wait window."""
-        if job not in self._queue:
-            return
-        self._queue.remove(job)
-        job.status = "completed"
-        job.finished_at = utcnow_iso()
-        job.error = None
-        self._prefetch_tasks.pop(job.job_id, None)
-        self._last = job
-        self._fire_event(EVENT_FINISHED, job)
-        _LOGGER.debug(
-            "Announcement %s expired after waiting %ss for a runnable output",
-            job.job_id,
-            f"{self._availability_timeout:g}",
-        )
-        self._schedule_save()
-        self._notify_update()
-
     def _next_runnable_job(self) -> AnnouncementJob | None:
-        """Pick the oldest runnable job without letting waiters block the queue."""
-        timeout = self._availability_timeout
+        """Give each room tier its grace; never discard an undelivered message.
+
+        Unavailable jobs stay persisted and do not block newer ready jobs.
+        Explicit service targets remain hard restrictions; an unavailable
+        service is retried indefinitely until it comes online or is cancelled.
+        """
         for job in tuple(self._queue):
-            if self._job_runnable_now(job):
+            if job.routing_mode == "room_fallback":
+                if self._staged_route_ready(job):
+                    return job
+            elif self._job_runnable_now(job):
+                # A provider can be available but repeatedly reject or
+                # fail delivery. Avoid a tight infinite retry loop without
+                # silently dropping the message or changing its recipients.
+                if job.routing_retry_after:
+                    try:
+                        if datetime.now(UTC) < datetime.fromisoformat(
+                            job.routing_retry_after
+                        ):
+                            continue
+                    except (TypeError, ValueError):
+                        pass
+                    job.routing_retry_after = None
                 return job
-            if timeout <= 0 or self._pending_age_seconds(job) >= timeout:
-                self._expire_waiting_job(job)
         return None
 
     async def _async_process_job(self, job: AnnouncementJob) -> None:
