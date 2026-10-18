@@ -121,6 +121,8 @@ def _planner(
         "text_notify": text_notify,
         "explicit_area_routing": explicit_area_routing,
         "explicit_targeting": explicit_targeting,
+        "strict_service_targeting": explicit_targeting,
+        "staged_room_routing": False,
         "minimum_tts_level": "debug",
         "LEVEL_CRITICAL": "critical",
         "LEVEL_INFO": "info",
@@ -240,7 +242,7 @@ def test_explicit_service_and_output_disable_cross_room_fallback():
     fallback = SOURCE[start:end]
     assert "fallback_area_id = self._fallback_area_id()" in fallback
     assert "and not target_room_candidate_exists" in fallback
-    strict_start = SOURCE.index("            if explicit_targeting:")
+    strict_start = SOURCE.index("            if strict_service_targeting:")
     strict_end = SOURCE.index(
         "            room_candidates = [", strict_start + 35
     )
@@ -252,7 +254,7 @@ def test_explicit_service_and_output_disable_cross_room_fallback():
 def test_action_response_reports_authoritative_strict_target_mode() -> None:
     action = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
     assert '"strict_targets": job.strict_targets' in action
-    assert "strict_targets=explicit_targeting" in SOURCE
+    assert "strict_targets=strict_service_targeting" in SOURCE
 
 def test_empty_explicit_selector_must_not_become_critical_broadcast() -> None:
     assert "if outputs is not None and not any(" in SOURCE
