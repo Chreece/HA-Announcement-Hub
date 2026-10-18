@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+- Fixed room-targeted `info` announcements from Air Quality Advisor being
+  rejected when Küche had no eligible visual output and TTS was suppressed by
+  the configured minimum: Announcement Hub now owns the routing fallback.
+- An explicit room without a specific service uses ordered, persisted delivery
+  tiers: requested room, occupied rooms, door-approved fallback room, general
+  non-room outputs, then one available configured visual destination.
+- Unavailable tier targets wait through the existing grace period. If no
+  output is currently usable the message remains queued rather than expiring,
+  even across Home Assistant restarts or after delivery exceptions.
+- Respect occupied-only routing and TTS minimums; do not switch an info
+  notification to spoken output solely because its room has no visual output.
+  Explicit integration/device `service` restrictions remain strict.
+- Add queue diagnostics for active `route_tier` and remaining tiers, and
+  executable regressions for waiting, tier transitions and muted TTS.
+- Air Quality Advisor is unchanged.
+
 ## 0.9.27 - 2026-10-17
 
 - Fixed the Announcement Hub banner failing to display in the HACS repository

@@ -404,3 +404,49 @@ def test_strict_targets_persist_in_job_and_legacy_jobs_default_false() -> None:
     old_job = job.to_dict()
     old_job.pop("strict_targets")
     assert AnnouncementJob.from_dict(old_job).strict_targets is False
+
+def test_staged_room_route_survives_storage_and_old_jobs() -> None:
+    plan = build_delivery_plan(
+        text_tts=None,
+        text_notify="Please open kitchen windows",
+        level="info",
+        minimum_tts_level="warning",
+        tts_engines=[],
+        notify_outputs=["entity:notify.kitchen"],
+        snapcast_clients=[],
+        companion_tts_entries=[],
+        server_tts_enabled=False,
+    )
+    stages = [{
+        "tier": "occupied_rooms",
+        "outputs": ["bad"],
+        "notify_outputs": ["entity:notify.bathroom"],
+        "notify_text": "Please open kitchen windows",
+        "tts_text": None,
+    }]
+    job = AnnouncementJob.create(
+        text_tts="Please open kitchen windows",
+        text_notify="Please open kitchen windows",
+        outputs=["kouzina"],
+        requested_services=[],
+        level="info",
+        title="Air Quality Advisor",
+        notify_data={},
+        language=None,
+        tts_options={},
+        tts_cache=True,
+        plan=plan,
+        route_tier="requested_rooms",
+        fallback_routes=stages,
+    )
+    restored = AnnouncementJob.from_dict(job.to_dict())
+    assert restored.route_tier == "requested_rooms"
+    assert restored.fallback_routes[0]["tier"] == "occupied_rooms"
+    assert restored.route_since
+    assert restored.public_dict()["remaining_fallback_tiers"] == ["occupied_rooms"]
+    old_data = job.to_dict()
+    for key in ("route_tier", "route_since", "fallback_routes"):
+        old_data.pop(key)
+    old = AnnouncementJob.from_dict(old_data)
+    assert old.route_tier == "default"
+    assert old.fallback_routes == []

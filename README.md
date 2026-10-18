@@ -528,12 +528,13 @@ all configured matching outputs enabled for that call are candidates
 → remaining outputs are recorded with their final timeout/error
 ```
 
-When one or more `output` areas are supplied, **only physical outputs in
-those areas** are eligible; global/unassigned devices and configured fallback
-rooms are not added. With `occupied_only: true`, the areas are further
-restricted to the currently occupied areas. With `occupied_only: false`,
-the specified areas are authoritative. Without explicit areas, the existing
-room-presence and general/global delivery policy remains available.
+When one or more `output` areas are supplied, they are the **first delivery
+priority**, not a reason to reject or lose an announcement. With
+`occupied_only: true`, room candidates are still restricted by occupancy;
+with `occupied_only: false`, the stated rooms are tried directly. Room-based
+fallback waits the configured output-availability grace period before moving
+to the next destination. An explicit `service` integration/device selector,
+by contrast, remains a hard authorization boundary.
 
 For TTS, selected targets are never dropped merely because they are currently
 `unavailable` or `unknown`. They remain pending and are retried until the
@@ -542,11 +543,11 @@ configured output-availability timeout expires.
 ### Provider-targeted notifications and tap actions
 
 The existing `service` action field selects **which configured integrations
-or devices** may be used at **every severity**, including Critical. `output`
-restricts **where** (areas). These selectors are strict when supplied: an
-unavailable selected device waits until its configured availability timeout,
-then is skipped. **No other device, channel, integration or fallback room is
-substituted.** For example, target only Companion App visual
+or devices** may be used at **every severity**, including Critical. It is
+strict: an unselected provider never receives the message. By contrast,
+`output` expresses the preferred room(s) and activates staged room fallback
+when no explicit `service` filter is supplied. For example, target only
+Companion App visual
 notifications with a tap-through dashboard link:
 
 ```yaml
@@ -588,18 +589,32 @@ an explicitly supplied `click_action` takes precedence over
 Notifications routed through generic `notify.send_message` cannot carry
 provider-specific click metadata if no advanced mobile_app action is present.
 
-**Strict routing:** Explicit `service` and/or `output` targets are honored
-even with `level: critical`. A Critical notification directed only to
-`mobile_app` does **not** activate Piper, Snapcast or other visual providers.
-Unavailable selected targets are frozen and retried only until the output
-availability timeout. Omitting both selectors preserves the original automatic
-routing/broadcast behavior. Click actions never change routing.
+**Routing rules:** Explicit `service` selections stay strict even for
+Critical; `service: [mobile_app]` cannot activate Piper, Snapcast or Android
+TV. An `output` area (for example `output: ["Küche"]`) instead activates the
+following priority order when `service` is omitted:
 
-The send response now includes `strict_targets: true` whenever either
-selector is explicitly set; queue status preserves this flag across restarts.
-An explicitly supplied **empty** `service: []` or `output: []` raises a
-validation error rather than accidentally broadcasting a Critical alert.
-Omit the selector entirely to request automatic routing.
+1. Configured notification or permitted audible outputs in the requested room,
+   respecting `occupied_only` and the TTS threshold.
+2. Other currently occupied rooms, if they have eligible outputs.
+3. The configured fallback room, only when the door condition allows it.
+4. Configured **general/non-room notifications**.
+5. After the grace period, **one** currently available configured visual
+   destination as a last resort. If none is available, the announcement
+   remains pending until a compatible output returns or it is cancelled.
+
+A tier with no eligible devices is skipped immediately. A tier with temporarily
+unavailable devices waits until the configured output availability timeout
+before moving on. No premature all-room broadcast or forced speech occurs for
+an `info` announcement whose TTS minimum is higher. The queue persists tier
+state over Home Assistant restarts; individual delivery failures also advance
+without discarding an undelivered room announcement.
+
+The response and queue sensor expose `route_tier` and
+`remaining_fallback_tiers`, while `strict_targets` identifies a hard
+provider/device restriction. Explicitly empty `service: []` or
+`output: []` is rejected rather than treated as a broadcast. Click actions
+do not change delivery routing.
 
 ### Specific outputs or integrations
 
