@@ -848,6 +848,10 @@ class AnnouncementManager:
         # output rooms are authoritative.
         occupied_area_ids = self._occupied_area_ids() if occupied_only else None
         occupancy_filter_active = occupied_area_ids is not None
+        if occupancy_filter_active and not requested:
+            # An occupancy-routed announcement also needs durable room-level
+            # fallback, even when no explicit output areas were supplied.
+            room_fallback = True
         if occupancy_filter_active:
             occupied_set = set(occupied_area_ids)
             output_area_ids = (
@@ -1447,6 +1451,10 @@ class AnnouncementManager:
             filter_by_area=area_filter_active,
             require_room_delivery=target_room_routing_active,
         )
+        if not requested and not plan.has_output:
+            # Automatic announcements without any eligible immediate route
+            # must also enter the lossless fallback queue, not fail enqueue.
+            room_fallback = True
 
         tts_must_output = bool(
             (text_tts or level == LEVEL_CRITICAL)
