@@ -92,20 +92,11 @@ def build_delivery_plan(
     """Apply critical and audible-threshold semantics to selected outputs."""
     audible = tts_allowed_for_level(level, minimum_tts_level)
 
-    if level == LEVEL_CRITICAL:
-        tts_text = text_tts or text_notify
-        notify_text = text_notify or text_tts
-    else:
-        tts_text = (
-            text_tts or text_notify
-            if force_tts
-            else (text_tts if audible else None)
-        )
-        notify_text = (
-            text_notify or text_tts
-            if force_notify or not audible
-            else text_notify
-        )
+    # Input channel selection is authoritative. A visual-only message never
+    # becomes TTS, and a speech-only message never becomes written content.
+    # The common 'text' field already fills both channels during validation.
+    tts_text = text_tts if (audible or force_tts) else None
+    notify_text = text_notify
 
     return DeliveryPlan(
         # Announcement Hub has exactly one active TTS engine. Keep the tuple
@@ -162,6 +153,10 @@ class AnnouncementJob:
     occupancy_requested: bool = True
     routing_retry_after: str | None = None
     routing_audio_retry: bool = False
+    channel_services: tuple[str, ...] = ()
+    excluded_physical: tuple[str, ...] = ()
+    related_job_ids: tuple[str, ...] = ()
+    group_id: str | None = None
     tts_media_player: str | None = None
     tts_player_area: str | None = None
     room_tts_player_areas: dict[str, str | None] = field(default_factory=dict)
@@ -213,6 +208,8 @@ class AnnouncementJob:
         companion_tts_entry_areas: Mapping[str, str | None] | None = None,
         companion_tts_media_stream: str = "default",
         companion_tts_words_per_minute: float = 150.0,
+        channel_services: Sequence[str] = (),
+        excluded_physical: Sequence[str] = (),
     ) -> "AnnouncementJob":
         return cls(
             job_id=uuid4().hex,
@@ -221,6 +218,8 @@ class AnnouncementJob:
             text_notify=text_notify,
             outputs=_unique(tuple(outputs)),
             requested_services=_unique(tuple(requested_services)),
+            channel_services=_unique(tuple(channel_services)),
+            excluded_physical=_unique(tuple(excluded_physical)),
             level=level or LEVEL_INFO,
             title=title,
             notify_data=dict(notify_data or {}),
@@ -272,6 +271,9 @@ class AnnouncementJob:
             "snapcast_clients",
             "companion_tts_entries",
             "preferred_areas",
+            "channel_services",
+            "excluded_physical",
+            "related_job_ids",
         ):
             data[key] = list(data[key])
         return data
@@ -317,6 +319,10 @@ class AnnouncementJob:
         payload.setdefault("occupancy_requested", True)
         payload.setdefault("routing_retry_after", None)
         payload.setdefault("routing_audio_retry", False)
+        payload.setdefault("channel_services", ())
+        payload.setdefault("excluded_physical", ())
+        payload.setdefault("related_job_ids", ())
+        payload.setdefault("group_id", None)
         payload.setdefault("ai", {})
 
         for key in (
@@ -328,6 +334,9 @@ class AnnouncementJob:
             "snapcast_clients",
             "companion_tts_entries",
             "preferred_areas",
+            "channel_services",
+            "excluded_physical",
+            "related_job_ids",
         ):
             payload[key] = tuple(payload.get(key, ()))
         payload.setdefault("media_source_ids", {})
@@ -353,6 +362,9 @@ class AnnouncementJob:
             "outputs": list(self.outputs),
             "requested_services": list(self.requested_services),
             "strict_targets": self.strict_targets,
+            "channel_services": list(self.channel_services),
+            "related_job_ids": list(self.related_job_ids),
+            "group_id": self.group_id,
             "routing_mode": self.routing_mode,
             "routing_stage": self.routing_stage,
             "preferred_areas": list(self.preferred_areas),
