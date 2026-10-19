@@ -237,7 +237,8 @@ def test_explicit_visual_does_not_convert_spoken_only_source():
 
 def test_explicit_integration_entity_and_service_use_independent_filters():
     assert "explicit_targeting = bool(requested) or bool(channel_tokens)" in SOURCE
-    assert "room_fallback_routing = explicit_area_routing" in SOURCE
+    assert "room_fallback_routing = bool(" in SOURCE
+    assert "explicit_area_routing or occupancy_filter_active" in SOURCE
     assert "selected = filter_selected_outputs(" in SOURCE
     assert "if explicit_targeting:" in SOURCE
     assert "force_tts=strict_tts" in SOURCE
