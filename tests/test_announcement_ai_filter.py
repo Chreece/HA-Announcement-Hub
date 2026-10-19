@@ -371,22 +371,67 @@ def test_faulty_numeric_or_refusal_without_backup_uses_original() -> None:
         assert got == ("The temperature is 23°C", None)
 
 
-def test_timeout_uses_backup_then_original(monkeypatch) -> None:
-    monkeypatch.setattr(ai, "AI_FILTER_TIMEOUT_SECONDS", 0.005)
-    class SlowServices:
+def test_slow_primary_finishes_without_hub_timeout_or_backup(monkeypatch, caplog) -> None:
+    """A cold-started model must get its response even after the advisory minute."""
+    monkeypatch.setattr(ai, "AI_FILTER_SLOW_REQUEST_SECONDS", 0.01)
+
+    class ColdStartServices:
         def __init__(self):
-            self.calls = 0
+            self.calls = []
+
         async def async_call(self, *args, **kwargs):
-            self.calls += 1
-            await asyncio.sleep(1)
+            self.calls.append((args, kwargs))
+            await asyncio.sleep(0.06)
+            return ha_reply("Door is open.", None)
+
+    hass = Hass()
+    hass.services = ColdStartServices()
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify=None,
+        agent_id="conversation.primary", fallback_agent_id="conversation.backup",
+        diagnostics=diag,
+    ))
+    assert got == ("Door is open.", None)
+    assert len(hass.services.calls) == 1
+    assert diag["status"] == "rewritten"
+    assert diag["attempt_duration_seconds"]["conversation.primary"] >= 0.05
+    assert "continuing to await conversation.process" in caplog.text
+
+
+def test_backend_timeout_is_reported_as_provider_failure_not_local_cutoff() -> None:
+    """If a provider itself aborts the request, its error may trigger backup."""
+    hass = Hass(responses=[
+        TimeoutError("backend disconnected"),
+        ha_reply("Door is open.", None),
+    ])
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify=None,
+        agent_id="conversation.primary", fallback_agent_id="conversation.backup",
+        diagnostics=diag,
+    ))
+    assert got == ("Door is open.", None)
+    assert len(hass.services.calls) == 2
+    assert diag["attempts"][0]["outcome"] == "provider_timeout"
+    assert diag["attempts"][1]["outcome"] == "rewritten"
+
+
+def test_no_hub_timeout_even_without_backup(monkeypatch) -> None:
+    monkeypatch.setattr(ai, "AI_FILTER_SLOW_REQUEST_SECONDS", 0.001)
+
+    class SlowServices:
+        async def async_call(self, *_args, **_kwargs):
+            await asyncio.sleep(0.02)
+            return ha_reply(None, "✅ Window is open.")
+
     hass = Hass()
     hass.services = SlowServices()
     got = asyncio.run(ai.async_filter_announcement(
-        hass, text_tts="Original", text_notify=None,
-        agent_id="conversation.primary", fallback_agent_id="conversation.backup",
+        hass, text_tts=None, text_notify="Window open",
+        agent_id="conversation.ollama",
     ))
-    assert got == ("Original", None)
-    assert hass.services.calls == 2
+    assert got == (None, "✅ Window is open.")
 
 
 def test_cancelled_request_is_not_swallowed() -> None:

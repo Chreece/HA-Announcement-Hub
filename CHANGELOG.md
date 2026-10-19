@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.9.29 - 2026-10-19
+
+- Removed Announcement Hub's fixed 12-second AI request timeout, which
+  prematurely discarded slow responses while local language models were
+  loading. Await the actual result of each selected Home Assistant
+  conversation agent, including cloud and third-party providers.
+- Record an advisory warning if an AI call is still pending after 60 seconds,
+  without cancelling it or submitting a duplicate request. Include AI
+  processing time and per-attempt duration in response diagnostics.
+- Keep the existing backup-agent/original-text fallback for actual provider
+  failures (including provider-owned timeouts), invalid replies and unsafe
+  outputs. Preserve cancellation propagation, channel integrity, queue
+  ordering, severity and area-routing rules.
+- Add regressions proving a slow but successful agent response is accepted,
+  no backup is contacted, and native provider errors remain distinguishable
+  from the removed Hub-side timeout.
+
+
 ## 0.9.28 - 2026-10-18
 
 - Fixed Air Quality Advisor Info-level announcements targeting real HA rooms
