@@ -172,7 +172,12 @@ from .models import (
     tts_allowed_for_level,
     utcnow_iso,
 )
-from .routing_fallback import STAGES, next_stage, select_stage_targets
+from .routing_fallback import (
+    STAGES,
+    next_stage,
+    prioritize_stage_targets,
+    select_stage_targets,
+)
 from .outputs import (
     CompanionTTSOutput,
     NotifyOutput,
@@ -1917,14 +1922,45 @@ class AnnouncementManager:
                 return (fallback,)
         return ()
 
-    def _prepare_staged_route(self, job: AnnouncementJob) -> bool:
-        """Select only configured, severity-eligible outputs for this stage.
+    def _staged_audio_ready(
+        self,
+        *,
+        targets: Any,
+        engines: Sequence[str],
+        shared_player: str | None,
+        companion_records: Sequence[CompanionTTSOutput],
+    ) -> bool:
+        """Probe only authorized physical room audio paths; never global TTS."""
+        if any(
+            companion_output_available(self.hass, output)
+            for output in companion_records
+            if output.entry_id in set(targets.companion_tts)
+        ):
+            return True
+        if any(
+            self._direct_tts_available_now(entity_id, engines)
+            for entity_id in targets.room_tts
+        ):
+            return True
+        return bool(
+            targets.snapcast
+            and self._server_tts_available_now(
+                engines=engines,
+                player=shared_player,
+                snapcast_clients=targets.snapcast,
+            )
+        )
 
-        Read availability separately: an unavailable device is still a
-        configured candidate and earns its full grace period. An info-level
-        message does not bypass the TTS or visual minimum level; if speech is
-        muted, other suitable visual outputs remain eligible. Service
-        restrictions are never expanded during fallback.
+    def _prepare_staged_route(self, job: AnnouncementJob) -> bool:
+        """Choose a room's working visual/audio path before any other room.
+
+        Notification minimum severity is always respected. TTS minimum
+        severity is a *preference*: below threshold, prefer visual delivery
+        inside the requested room, but use an eligible room speaker when visual
+        cannot deliver. In later occupied/door-gated fallback rooms, prefer
+        audible output so the person can hear the announcement. An explicit
+        TTS "Never" still forbids these relaxations (except Critical).
+        Strict per-action output restrictions and door checks remain mandatory.
         """
         stage = job.routing_stage
         areas = self._staged_areas(job, stage)
@@ -1949,15 +1985,17 @@ class AnnouncementManager:
 
         notifications = resolve_notify_outputs(self.hass, selected[1])
         companion = resolve_companion_tts_outputs(self.hass, selected[4])
-        speech_allowed = bool(
-            tts_allowed_for_level(
-                job.level,
-                str(
-                    self.settings.get(
-                        CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL
-                    )
-                ),
-            )
+        minimum_tts_level = str(
+            self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
+        )
+        speech_allowed = tts_allowed_for_level(job.level, minimum_tts_level)
+        is_room_stage = stage_kind in {"primary", "occupied", "fallback"}
+        # For room delivery the minimum TTS level is a soft preference,
+        # not permission to skip the room and broadcast a General message.
+        # "Never" is an explicit absolute opt-out except for Critical.
+        stage_speech_allowed = bool(
+            speech_allowed
+            or (is_room_stage and minimum_tts_level != TTS_LEVEL_NEVER)
         )
         level_priority = LEVEL_PRIORITY.get(job.level, LEVEL_PRIORITY[LEVEL_INFO])
         notify_policy = {
@@ -1990,12 +2028,35 @@ class AnnouncementManager:
             ),
             snapcast=(
                 (entity_id, entity_area_id(self.hass, entity_id))
-                for entity_id in selected[3] if selected[0]
+                for entity_id in selected[3]
+                if selected[0] and job.tts_media_player
             ),
             companion_tts=(
                 (output.entry_id, output.area_id) for output in companion
             ),
-            speech_allowed=speech_allowed,
+            speech_allowed=stage_speech_allowed,
+        )
+        active_notifications = {
+            output.ref: output for output in notifications
+            if output.ref in set(targets.notify)
+        }
+        visual_ready = any(
+            notify_output_available(self.hass, output)
+            for output in active_notifications.values()
+        )
+        audio_ready = self._staged_audio_ready(
+            targets=targets,
+            engines=selected[0],
+            shared_player=job.tts_media_player,
+            companion_records=companion,
+        ) if targets.has_audio else False
+        targets = prioritize_stage_targets(
+            stage=stage_kind,
+            candidates=targets,
+            normal_speech_allowed=bool(speech_allowed),
+            visual_ready=visual_ready,
+            audio_ready=audio_ready,
+            audio_retry=job.routing_audio_retry,
         )
 
         job.outputs = tuple(areas)
@@ -2021,7 +2082,7 @@ class AnnouncementManager:
             if job.notify_outputs else None
         )
         job.tts_suppressed_by_level = bool(
-            job.text_tts and not speech_allowed
+            job.text_tts and not speech_allowed and not audible
         )
         active_notifications = {
             output.ref: output for output in notifications
@@ -2060,6 +2121,7 @@ class AnnouncementManager:
         """Move to another priority tier without completing/discarding the job."""
         old_stage = job.routing_stage
         job.routing_stage = next_stage(job.routing_stage)
+        job.routing_audio_retry = False
         job.routing_stage_started_at = utcnow_iso()
         job.routing_history.append(f"{old_stage}: {reason}")
         job.routing_history = job.routing_history[-24:]
@@ -2096,6 +2158,7 @@ class AnnouncementManager:
                     job.routing_history.append("general: retry permitted rooms")
                     job.routing_history = job.routing_history[-24:]
                     job.routing_stage = "primary"
+                    job.routing_audio_retry = False
                     job.routing_stage_started_at = utcnow_iso()
                     continue
                 return False
@@ -2124,7 +2187,31 @@ class AnnouncementManager:
         self, job: AnnouncementJob, reason: str
     ) -> None:
         """Retry after provider failures; do not mark undelivered jobs complete."""
-        if job.routing_stage != "general":
+        minimum_tts_level = str(
+            self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
+        )
+        can_retry_same_room_audio = bool(
+            job.routing_stage in {"primary", "occupied", "fallback"}
+            and job.notify_outputs
+            and not (
+                job.room_tts_players or job.snapcast_clients
+                or job.companion_tts_entries
+            )
+            and not job.routing_audio_retry
+            and minimum_tts_level != TTS_LEVEL_NEVER
+            and not tts_allowed_for_level(job.level, minimum_tts_level)
+        )
+        if can_retry_same_room_audio:
+            # A visual provider can fail after initially reporting "ready".
+            # Try available room audio next, before moving elsewhere. If none
+            # exists, the stage advances immediately without an extra wait.
+            job.routing_audio_retry = True
+            job.routing_stage_started_at = utcnow_iso()
+            job.routing_history.append(
+                f"{job.routing_stage}: visual failed; trying same-room audio"
+            )
+            job.routing_history = job.routing_history[-24:]
+        elif job.routing_stage != "general":
             self._advance_staged_route(job, reason)
         else:
             # A failing general notification action must not generate a busy

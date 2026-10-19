@@ -27,6 +27,61 @@ class StageTargets:
     def has_output(self) -> bool:
         return bool(self.notify or self.room_tts or self.snapcast or self.companion_tts)
 
+    @property
+    def has_audio(self) -> bool:
+        return bool(self.room_tts or self.snapcast or self.companion_tts)
+
+
+def prioritize_stage_targets(
+    *,
+    stage: str,
+    candidates: StageTargets,
+    normal_speech_allowed: bool,
+    visual_ready: bool,
+    audio_ready: bool,
+    audio_retry: bool = False,
+) -> StageTargets:
+    """Prioritize *in-room* receipt over a soft TTS severity preference.
+
+    Below the configured minimum TTS level, a ready visual endpoint suppresses
+    speech in the requested room. If visual delivery is not currently possible,
+    use that same room's ready speaker. In other occupied/door-gated fallback
+    rooms, spoken delivery wins so occupants can hear the announcement.
+    Unready room devices remain candidates for the stage's availability grace.
+
+    "Never" is a separate hard user opt-out; the caller must not include speech
+    candidates at all when that is configured (except Critical).
+    """
+    if stage == "general":
+        return candidates
+    audio = StageTargets(
+        room_tts=candidates.room_tts,
+        snapcast=candidates.snapcast,
+        companion_tts=candidates.companion_tts,
+    )
+    visual = StageTargets(notify=candidates.notify)
+
+    # A delivery provider may have acknowledged no output. Retry a different
+    # channel in the *same room* before escalating to another room.
+    if audio_retry:
+        return audio
+    if normal_speech_allowed:
+        return candidates
+    if stage == "primary":
+        if visual_ready:
+            return visual
+        if audio_ready:
+            return audio
+        return candidates
+
+    # Once a message has moved away from the explicitly requested room,
+    # audible delivery is the preferred way to reach the person.
+    if audio_ready:
+        return audio
+    if visual_ready:
+        return visual
+    return candidates
+
 
 def next_stage(stage: str) -> str:
     """Advance a route priority without ever skipping past general outputs."""
@@ -52,9 +107,10 @@ def select_stage_targets(
 
     Room tiers never include general/unassigned devices or unrelated rooms.
     General tier never includes room-bound devices, even when they are ready.
-    A muted TTS level eliminates *only* speech; visual info-level outputs are
-    still eligible. Unavailable outputs are included; readiness is a separate
-    concern in the worker, which owns the grace timer.
+    The manager may relax its *soft* TTS minimum for room-local delivery when
+    no visual output can receive the message. "Never" remains a hard opt-out
+    except for Critical. Unavailable outputs remain candidates for the worker's
+    availability grace window.
     """
     is_general = stage == "general"
     area_set = set(areas)

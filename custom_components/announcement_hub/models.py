@@ -161,6 +161,7 @@ class AnnouncementJob:
     companion_tts_requested: bool = False
     occupancy_requested: bool = True
     routing_retry_after: str | None = None
+    routing_audio_retry: bool = False
     tts_media_player: str | None = None
     tts_player_area: str | None = None
     room_tts_player_areas: dict[str, str | None] = field(default_factory=dict)
@@ -315,6 +316,7 @@ class AnnouncementJob:
         payload.setdefault("companion_tts_requested", False)
         payload.setdefault("occupancy_requested", True)
         payload.setdefault("routing_retry_after", None)
+        payload.setdefault("routing_audio_retry", False)
         payload.setdefault("ai", {})
 
         for key in (
@@ -356,6 +358,7 @@ class AnnouncementJob:
             "preferred_areas": list(self.preferred_areas),
             "routing_history": list(self.routing_history[-12:]),
             "routing_retry_after": self.routing_retry_after,
+            "routing_audio_retry": self.routing_audio_retry,
             "tts_engines": list(self.tts_engines),
             "notify_outputs": list(self.notify_outputs),
             "room_tts_players": list(self.room_tts_players),

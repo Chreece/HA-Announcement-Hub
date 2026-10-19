@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.31 - 2026-10-19
+
+- Prioritize actual room delivery over the soft minimum TTS severity. At Info
+  or Success, a ready visual notification suppresses speech in the requested
+  room, but if no visual can run, a configured room TTS/Snapcast/opted-in
+  Companion audio path can speak at any non-Never level.
+- For occupied-room and door-gated alternate-room fallback, prefer audible
+  delivery when available even below the usual TTS threshold, so the person
+  can hear the announcement. A ready visual device remains usable if audio
+  cannot run; otherwise wait within the configured room availability grace
+  before moving to the next permitted tier.
+- If a ready visual provider fails and no output succeeded, retry eligible
+  spoken output in the SAME room before escalating to another room. Preserve
+  TTS "Never" (except Critical), notification severity thresholds, explicit
+  service allowlists, occupancy and door gates, and General-only scope.
+- Persist the same-room audio retry flag, and add executable regressions for
+  ready/unready room Snapcast, visual preference, occupied-area speech,
+  door-open/closed alternate areas, provider failures and restrictions.
+
+
 ## 0.9.30 - 2026-10-19
 
 - Make AI announcements durable before requesting AI: queue and persist the

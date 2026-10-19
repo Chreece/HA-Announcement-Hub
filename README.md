@@ -326,12 +326,24 @@ unready, retain that tier for **Output availability timeout** before advancing.
 If some selected devices succeed, the announcement is delivered there; there
 is no need to broadcast it to later tiers.
 
-**Info-level window-opening alerts:** when Piper/TTS starts at Warning, it
-remains muted for Info. Announcement Hub first seeks a visual notification
-configured for Info in the requested room; otherwise it considers occupied
-rooms, the permitted fallback room, and General notifications. It never turns
-an Info announcement into unrequested TTS or bypasses the configured minimum
-notification severity.
+**Room-first delivery, including Info and Success:** the configured minimum
+TTS level is a preference for **how** to announce, not permission to skip an
+available speaker in a requested room. With Piper set to Warning, a ready
+Info-level room notification stays visual-only. If no eligible visual output
+is ready in that room, Announcement Hub tries its configured and authorized
+direct TTS, Snapcast or opted-in Companion audio instead, even for Info. If a
+visual provider fails, it also retries the same room's audio before moving
+on. When the request must move to an occupied room, or to the configured
+alternate room with its door check satisfied, audible delivery is preferred
+at all normal severity levels so the person can hear the message. If neither
+channel is ready, the configured availability grace applies before moving
+to another permitted room, and General outputs remain last.
+
+**Safety:** an explicit TTS minimum of **Never** remains an absolute speech
+opt-out except for Critical. Notification minimum levels and explicit service
+or entity allowlists are never bypassed. Only physically room-bound audio
+can provide the room fallback; global TTS infrastructure cannot cause audio
+in an unrelated area.
 
 **No silent expiry:** if all eligible outputs are unavailable (or none are
 configured yet), the announcement stays queued and persisted. A newer
