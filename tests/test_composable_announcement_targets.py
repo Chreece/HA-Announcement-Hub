@@ -118,7 +118,8 @@ def test_mixed_area_recipient_request_is_fanned_out_as_independent_jobs():
     assert "area_job = await self.async_enqueue(" in outer
     assert "explicit_job = await self.async_enqueue(" in outer
     assert "area_job.related_job_ids = (explicit_job.job_id,)" in outer
-    assert "explicit_job.group_id = area_job.job_id" in outer
+    assert "_group_token=group_token" in outer
+    assert "job.group_id = _group_token" in outer
     assert "_group_token=group_token" in outer
     assert "area_job = await self.async_enqueue(" in outer
     assert "_excluded_physical=physical_keys(static)" not in outer
