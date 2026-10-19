@@ -599,6 +599,7 @@ def test_room_speech_respects_never_and_restricted_notify_service(monkeypatch):
     global manager
     manager = FakeManager(
         kitchen_min="warning", kitchen_snapcast=True,
+        occupied=(), door_open=False,
         available={
             "media_player.kitchen_snapcast": True,
             "entity:notify.phone": True,
