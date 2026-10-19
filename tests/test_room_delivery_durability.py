@@ -70,6 +70,7 @@ def make_job(*, routing_mode="normal", ready=True):
         error="previous error",
         channel_errors={"old": "failed"},
         ready=ready,
+        ai={},
     )
 
 
@@ -100,6 +101,19 @@ def test_unavailable_nonroom_output_keeps_waiting_until_available():
     assert h._queue == deque([job])
     job.ready = True
     assert h._next_runnable_job() is job
+
+
+def test_pending_ai_never_blocks_next_ready_delivery():
+    h = Harness()
+    pending = make_job(ready=True)
+    pending.ai["pending_preprocessing"] = True
+    pending.job_id = "cold-model"
+    ready = make_job(ready=True)
+    ready.job_id = "urgent-ready"
+    h._queue.extend((pending, ready))
+    assert h._next_runnable_job() is ready
+    pending.ai["pending_preprocessing"] = False
+    assert h._next_runnable_job() is pending
 
 
 def test_staged_room_errors_delegate_to_tier_progression():

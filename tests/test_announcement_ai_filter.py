@@ -724,7 +724,7 @@ def test_manager_passes_default_marker_instead_of_none() -> None:
     assert "agent_id = (" in source
     assert '"preferred_assist" if agent_id == DEFAULT_AI_AGENT else "explicit"' in source
     assert "else fallback_setting" in source
-    assert "diagnostics=ai_info" in source
+    assert "diagnostics=ai" in source
     flow = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
     assert "resolve_preferred_assist_agent(" in flow
     assert "Preferred Assist pipeline:" in flow
@@ -740,7 +740,7 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert 'DEFAULT_FALLBACK_AI_AGENT: Final = "original"' in const
     assert "CONF_FALLBACK_AI_AGENT" in flow
     assert "options=self._ai_fallback_agent_options()" in flow
-    assert "fallback_agent_id=fallback_agent_id" in manager
+    assert '"requested_fallback_agent_id": fallback_agent_id' in manager
     assert 'self.hass.states.async_all("conversation")' in flow
     assert "get_agent_manager(self.hass).async_get_agent_info()" in flow
     assert "CONF_DEFAULT_USE_AI" in flow and "CONF_DEFAULT_AI_AGENT" in flow
@@ -751,11 +751,12 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert "ai_agent=call.data.get(ATTR_AI_AGENT)" in init
     assert "resolve_ai_enabled(" in manager
     assert "if ai_enabled:" in manager
-    assert manager.count("Announcement queue is full") == 2
-    assert "plan.tts_text, plan.notify_text = await async_filter_announcement(" in manager
-    assert "text_tts=plan.tts_text," in manager
-    assert "text_notify=plan.notify_text," in manager
-    assert "text_tts, text_notify = plan.tts_text, plan.notify_text" in manager
+    assert manager.count("Announcement queue is full") == 1
+    assert "rewritten_tts, rewritten_notify = await async_filter_announcement(" in manager
+    assert "text_tts=original_tts," in manager
+    assert "text_notify=original_notify," in manager
+    assert "job.text_tts, job.text_notify = rewritten_tts, rewritten_notify" in manager
+    assert "self._queue.append(job)" in manager
     fields = service["send"]["fields"]["ai"]["fields"]
     assert "boolean" in fields["use_ai"]["selector"]
     assert "conversation_agent" in fields["ai_agent"]["selector"]

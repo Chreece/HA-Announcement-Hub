@@ -446,8 +446,14 @@ out, rejects the request, or returns an invalid response, Announcement Hub
 tries the optional backup agent once. If that fails too (or if no backup agent
 is selected), the original text is delivered unchanged. Unsafe-looking responses,
 including changed numerical readings and obvious AI refusals, are also rejected.
-AI runs only before an announcement enters the persistent queue. Announcement Hub does not cancel an in-flight Home Assistant conversation
-request after an arbitrary timeout. Cold-started local models and slower cloud
+Announcement Hub first queues and persists the **original message** and
+returns an acknowledgement immediately. AI rewriting then runs in a
+separate, integration-owned background task while other ready announcements
+continue through the delivery queue. A queued job is not dispatched until
+its own AI processing completes; on a provider error, the original text is
+used. If Home Assistant restarts during AI loading, the persisted original is
+processed again rather than silently lost. Announcement Hub does not cancel
+an in-flight Home Assistant conversation request after an arbitrary timeout. Cold-started local models and slower cloud
 agents are allowed to finish; after 60 seconds the Hub logs that it is still
 waiting, rather than treating the delay as a failure. This works with every
 conversation agent because it awaits `conversation.process`, not a
@@ -457,7 +463,10 @@ A real provider exception (including a timeout raised by the provider itself)
 or invalid/unsafe AI result triggers the configured backup, then the original
 announcement if necessary. Waiting for an unresponsive provider can delay
 enqueueing indefinitely; disable AI per action for time-critical alerts.
-The action response reports elapsed AI-processing seconds.
+The action response reports immediate queue acceptance and AI status
+`pending` for requests that need rewriting. The queue diagnostic sensor
+later exposes the final AI outcome and elapsed processing time; the initial
+service response cannot contain the result of asynchronous rewriting.
 
 To override AI for an individual announcement:
 
