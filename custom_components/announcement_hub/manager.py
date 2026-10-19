@@ -977,6 +977,14 @@ class AnnouncementManager:
                 integration_tokens, device_tokens, entity_tokens
             ),
         )))
+        if channel_tokens and not requested and not explicit_area_routing:
+            # service describes HOW to deliver, never WHERE. Do not turn
+            # "TTS" alone into push speech on every configured phone or a
+            # whole-house notification broadcast.
+            raise ServiceValidationError(
+                "service selects a channel, not recipients; specify area, "
+                "integration, device or entity"
+            )
 
         if explicit_area_routing and requested and not _fanout:
             # Mixed selectors are a union of two independent obligations:
