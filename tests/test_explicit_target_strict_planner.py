@@ -218,7 +218,8 @@ def test_explicit_room_excludes_global_unselected_notifications():
     assert not plan.has_audible_output
 
 
-def test_noncritical_explicit_visual_uses_spoken_source_in_same_channel():
+
+def test_explicit_visual_does_not_convert_spoken_only_source():
     planner = _planner(
         notify_refs=("entity:notify.mobile_app_phone",),
         notification_areas={"entity:notify.mobile_app_phone": None},
@@ -228,26 +229,20 @@ def test_noncritical_explicit_visual_uses_spoken_source_in_same_channel():
     )
     selected, _, _, plan, *_ = planner((), filter_by_area=False)
     assert selected[1] == ("entity:notify.mobile_app_phone",)
-    assert plan.notify_text == "Door open"
+    assert plan.notify_text is None
     assert plan.tts_text is None
+    assert not plan.has_visual_output
     assert not plan.has_audible_output
 
 
-def test_explicit_service_and_output_disable_cross_room_fallback():
-    assert "explicit_targeting = bool(requested) or explicit_area_routing" in SOURCE
-    start = SOURCE.index("        if (\n            not explicit_targeting")
-    end = SOURCE.index("        notify_output_areas = {", start)
-    fallback = SOURCE[start:end]
-    assert "fallback_area_id = self._fallback_area_id()" in fallback
-    assert "and not target_room_candidate_exists" in fallback
-    strict_start = SOURCE.index("            if explicit_targeting:")
-    strict_end = SOURCE.index(
-        "            room_candidates = [", strict_start + 35
-    )
-    strict = SOURCE[strict_start:strict_end]
-    assert "route_plan = build_delivery_plan(" in strict
-    assert "force_tts=strict_tts" in strict
-    assert "force_notify=strict_visual" in strict
+def test_explicit_integration_entity_and_service_use_independent_filters():
+    assert "explicit_targeting = bool(requested) or bool(channel_tokens)" in SOURCE
+    assert "room_fallback_routing = explicit_area_routing" in SOURCE
+    assert "selected = filter_selected_outputs(" in SOURCE
+    assert "if explicit_targeting:" in SOURCE
+    assert "force_tts=strict_tts" in SOURCE
+    assert "force_notify=strict_visual" in SOURCE
+    assert "if selected_tts and not selected_room_tts and not selected_snapcast" not in SOURCE
 
 def test_action_response_reports_authoritative_strict_target_mode() -> None:
     action = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
@@ -255,13 +250,15 @@ def test_action_response_reports_authoritative_strict_target_mode() -> None:
     assert "strict_targets=bool(requested)" in SOURCE
     assert "routing_mode=\"room_fallback\" if room_fallback_routing else \"normal\"" in SOURCE
 
-def test_empty_explicit_selector_must_not_become_critical_broadcast() -> None:
-    assert "if outputs is not None and not any(" in SOURCE
-    assert "if requested_services is not None and not any(" in SOURCE
-    assert "Explicit output selector is empty" in SOURCE
-    assert "Explicit service selector is empty" in SOURCE
-    # These guards must run before the implicit Critical broadcast selector.
-    entry = SOURCE.index("    async def async_enqueue(")
-    checks = SOURCE.index("if requested_services is not None and not any(", entry)
-    selector = SOURCE.index("selected = self._select_requested_outputs(", entry)
+
+def test_empty_selectors_fail_closed_before_broadcast() -> None:
+    assert '("area", areas if areas is not None else outputs, area_tokens)' in SOURCE
+    assert '("integration", integrations, integration_tokens)' in SOURCE
+    assert '("device", devices, device_tokens)' in SOURCE
+    assert '("entity", entities, entity_tokens)' in SOURCE
+    assert '("service", channels, channel_tokens)' in SOURCE
+    assert "Explicit {name} selector is empty" in SOURCE
+    checks = SOURCE.index("for name, supplied, values in (")
+    selector = SOURCE.index("selected = filter_selected_outputs(")
     assert checks < selector
+
