@@ -35,6 +35,10 @@ from .const import (
     ATTR_USE_AI,
     ATTR_AI_AGENT,
     ATTR_OUTPUT,
+    ATTR_AREA,
+    ATTR_INTEGRATION,
+    ATTR_DEVICE,
+    ATTR_ENTITY,
     ATTR_SERVICE,
     ATTR_TEXT_NOTIFY,
     ATTR_TEXT,
@@ -143,7 +147,20 @@ SEND_SCHEMA = probatio.All(
             probatio.Optional(ATTR_TEXT): cv.string,
             probatio.Optional(ATTR_TEXT_TTS): cv.string,
             probatio.Optional(ATTR_TEXT_NOTIFY): cv.string,
+            # Hidden compatibility for existing output-target automations.
             probatio.Optional(ATTR_OUTPUT): probatio.All(
+                probatio.EnsureList(), [cv.string]
+            ),
+            probatio.Optional(ATTR_AREA): probatio.All(
+                probatio.EnsureList(), [cv.string]
+            ),
+            probatio.Optional(ATTR_INTEGRATION): probatio.All(
+                probatio.EnsureList(), [cv.string]
+            ),
+            probatio.Optional(ATTR_DEVICE): probatio.All(
+                probatio.EnsureList(), [cv.string]
+            ),
+            probatio.Optional(ATTR_ENTITY): probatio.All(
                 probatio.EnsureList(), [cv.string]
             ),
             probatio.Optional(ATTR_SERVICE): probatio.All(
@@ -308,7 +325,12 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             text_tts=call.data.get(ATTR_TEXT_TTS),
             text_notify=call.data.get(ATTR_TEXT_NOTIFY),
             outputs=call.data.get(ATTR_OUTPUT),
-            requested_services=call.data.get(ATTR_SERVICE),
+            requested_services=None,
+            areas=call.data.get(ATTR_AREA),
+            integrations=call.data.get(ATTR_INTEGRATION),
+            devices=call.data.get(ATTR_DEVICE),
+            entities=call.data.get(ATTR_ENTITY),
+            channels=call.data.get(ATTR_SERVICE),
             level=call.data[ATTR_LEVEL],
             title=call.data.get(ATTR_TITLE),
             notify_data=call.data.get(ATTR_NOTIFY_DATA),
@@ -343,6 +365,8 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             "companion_tts_entries": list(job.companion_tts_entries),
             "tts_suppressed_by_level": job.tts_suppressed_by_level,
             "strict_targets": job.strict_targets,
+            "related_job_ids": list(job.related_job_ids),
+            "channel_services": list(job.channel_services),
             "routing_mode": job.routing_mode,
             "routing_stage": job.routing_stage,
             "preferred_areas": [area_name(hass, a) for a in job.preferred_areas],
