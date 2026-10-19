@@ -172,6 +172,7 @@ class AnnouncementJob:
     prefetch_errors: dict[str, str] = field(default_factory=dict)
     channel_errors: dict[str, str] = field(default_factory=dict)
     successful_channels: list[str] = field(default_factory=list)
+    delivered_physical: list[str] = field(default_factory=list)
     status: str = "pending"
     started_at: str | None = None
     finished_at: str | None = None
@@ -343,6 +344,7 @@ class AnnouncementJob:
         payload.setdefault("prefetch_errors", {})
         payload.setdefault("channel_errors", {})
         payload.setdefault("successful_channels", [])
+        payload.setdefault("delivered_physical", [])
         payload.setdefault("notify_data", {})
         payload.setdefault("click_action", None)
         payload.setdefault("tts_options", {})
@@ -407,6 +409,7 @@ class AnnouncementJob:
             "prefetch_errors": dict(self.prefetch_errors),
             "channel_errors": dict(self.channel_errors),
             "successful_channels": list(self.successful_channels),
+            "delivered_physical": list(self.delivered_physical),
         }
         if include_text:
             result["title"] = self.title
