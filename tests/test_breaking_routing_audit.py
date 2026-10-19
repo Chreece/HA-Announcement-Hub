@@ -10,8 +10,8 @@ C = ROOT / "custom_components" / "announcement_hub"
 def test_area_preference_alone_owns_room_escalation():
     manager = (C / "manager.py").read_text(encoding="utf-8")
     assert "requested_output_area_ids = self._resolve_area_ids(area_tokens)" in manager
-    assert "room_fallback_routing = explicit_area_routing" in manager
-    assert "area_filter_active = explicit_area_routing" in manager
+    assert "room_fallback_routing = bool(" in manager
+    assert "area_filter_active = explicit_area_routing or occupancy_filter_active" in manager
     assert "self._staged_areas(job, stage)" in manager
     assert "filter_by_area=area_filter_active" in manager
 
@@ -48,9 +48,9 @@ def test_same_player_cannot_run_direct_and_shared_tts_concurrently() -> None:
 
 def test_explicit_recipients_ignore_occupancy_restrictions():
     manager = (C / "manager.py").read_text(encoding="utf-8")
-    assert "occupancy_filter_active = False" in manager
+    assert "if occupied_only and not explicit_area_routing and not requested" in manager
     assert "explicit_targeting = bool(requested) or bool(channel_tokens)" in manager
-    assert "room_fallback_routing = explicit_area_routing" in manager
+    assert "room_fallback_routing = bool(" in manager
     assert "requested = tuple(dict.fromkeys((" in manager
     assert "self._explicit_recipient_tokens(" in manager
 
