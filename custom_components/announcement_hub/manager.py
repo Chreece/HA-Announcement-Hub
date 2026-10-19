@@ -2238,7 +2238,8 @@ class AnnouncementManager:
             if output.ref in set(targets.notify)
         }
         visual_ready = any(
-            notify_output_available(self.hass, output)
+            self._group_already_delivered(job, f"notify:{output.ref}")
+            or notify_output_available(self.hass, output)
             for output in active_notifications.values()
         )
         audio_ready = self._staged_audio_ready(
@@ -2462,7 +2463,8 @@ class AnnouncementManager:
         if not job.notify_text or not job.notify_outputs:
             return False
         return any(
-            notify_output_available(self.hass, output)
+            self._group_already_delivered(job, f"notify:{output.ref}")
+            or notify_output_available(self.hass, output)
             for output in resolve_notify_outputs(self.hass, job.notify_outputs)
             if output_matches_areas(
                 job.notify_output_areas.get(output.ref, output.area_id),
@@ -2670,6 +2672,10 @@ class AnnouncementManager:
     ) -> None:
         channel = output.ref
         self._raise_if_cancelled(job)
+        physical = f"notify:{channel}"
+        if self._group_already_delivered(job, physical):
+            self._record_channel_success(job, channel)
+            return
         self._fire_channel_event(EVENT_CHANNEL_STARTED, job, channel)
         integration = output.integration or PROFILE_DEFAULT
         profile = normalise_notify_profile(
@@ -2731,6 +2737,7 @@ class AnnouncementManager:
         except asyncio.CancelledError:
             raise
         else:
+            self._mark_group_physical(job, physical)
             self._record_channel_success(job, channel)
 
     async def _async_deliver_notification_part(
@@ -3066,6 +3073,11 @@ class AnnouncementManager:
             }
 
         async def deliver(player: str) -> None:
+            physical = f"room_tts:{player}"
+            if self._group_already_delivered(job, physical):
+                engine = job.tts_engines[0]
+                self._record_channel_success(job, f"room_tts:{player}:{engine}")
+                return
             self._active_tts_players.add(player)
             try:
                 await self._await_prefetch(job)
@@ -3097,6 +3109,7 @@ class AnnouncementManager:
                         await self._async_stop_player(player)
                         self._record_channel_failure(job, channel, err)
                         continue
+                    self._mark_group_physical(job, physical)
                     self._record_channel_success(job, channel)
                     return
                 raise HomeAssistantError(
@@ -3163,12 +3176,31 @@ class AnnouncementManager:
             matching_clients = [
                 entity_id
                 for entity_id in job.snapcast_clients
-                if not job.outputs
-                or job.snapcast_client_areas.get(
-                    entity_id, entity_area_id(self.hass, entity_id)
+                if (
+                    not job.outputs
+                    or job.snapcast_client_areas.get(
+                        entity_id, entity_area_id(self.hass, entity_id)
+                    ) in set(job.outputs)
                 )
-                in set(job.outputs)
+                and not self._group_already_delivered(
+                    job, f"snapcast:{entity_id}"
+                )
             ]
+            if (
+                job.snapcast_clients
+                and not matching_clients
+                and all(
+                    self._group_already_delivered(job, f"snapcast:{client}")
+                    for client in job.snapcast_clients
+                )
+            ):
+                # The selected Snapcast clients were already reached by the
+                # other leg of this exact announcement: count receipt without
+                # routing the shared TTS source twice.
+                self._record_channel_success(
+                    job, f"server_tts:{job.tts_engines[0]}"
+                )
+                return
             if job.snapcast_clients and not matching_clients:
                 self._record_channel_failure(
                     job,
@@ -3294,6 +3326,8 @@ class AnnouncementManager:
                     await self._async_stop_player(player)
                     self._record_channel_failure(job, channel, err)
                     continue
+                for client in route_targets:
+                    self._mark_group_physical(job, f"snapcast:{client}")
                 self._record_channel_success(job, channel)
                 break
             else:
@@ -3422,6 +3456,9 @@ class AnnouncementManager:
     ) -> None:
         channel = f"companion_tts:{output.entry_id}"
         self._raise_if_cancelled(job)
+        if self._group_already_delivered(job, channel):
+            self._record_channel_success(job, channel)
+            return
         self._fire_channel_event(EVENT_CHANNEL_STARTED, job, channel)
         try:
             webhook_id = mobile_app_webhook_id(self.hass, output.entry_id)
@@ -3451,6 +3488,7 @@ class AnnouncementManager:
         except asyncio.CancelledError:
             raise
         else:
+            self._mark_group_physical(job, channel)
             self._record_channel_success(job, channel)
 
     def _companion_tts_hold_time(self, text: str, configured_wpm: float) -> float:
@@ -4308,6 +4346,22 @@ class AnnouncementManager:
 
     def _notify_update(self) -> None:
         async_dispatcher_send(self.hass, SIGNAL_UPDATE)
+
+    def _group_already_delivered(self, job: AnnouncementJob, physical: str) -> bool:
+        """True only when another leg of the SAME combined action sent it."""
+        return bool(
+            job.group_id
+            and physical in self._group_success.get(job.group_id, set())
+        )
+
+    def _mark_group_physical(self, job: AnnouncementJob, physical: str) -> None:
+        """Persist actual successful endpoints, not attempted/available devices."""
+        if not job.group_id:
+            return
+        self._group_success.setdefault(job.group_id, set()).add(physical)
+        if physical not in job.delivered_physical:
+            job.delivered_physical.append(physical)
+        self._schedule_save()
 
     def _record_channel_success(self, job: AnnouncementJob, channel: str) -> None:
         if channel not in job.successful_channels:
