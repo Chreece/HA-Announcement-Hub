@@ -2476,7 +2476,8 @@ class AnnouncementManager:
         if not job.tts_text or not job.companion_tts_entries:
             return False
         return any(
-            companion_output_available(self.hass, output)
+            self._group_already_delivered(job, f"companion_tts:{output.entry_id}")
+            or companion_output_available(self.hass, output)
             for output in resolve_companion_tts_outputs(
                 self.hass, job.companion_tts_entries
             )
@@ -2492,6 +2493,11 @@ class AnnouncementManager:
         """Return whether an area-bound direct TTS player can run now."""
         if not job.tts_text or not job.room_tts_players:
             return False
+        if any(
+            self._group_already_delivered(job, f"room_tts:{player}")
+            for player in job.room_tts_players
+        ):
+            return True
         if not any(
             tts_engine_available(self.hass, engine)
             for engine in job.tts_engines
@@ -2528,6 +2534,11 @@ class AnnouncementManager:
             or not job.tts_media_player
         ):
             return False
+        if job.snapcast_clients and all(
+            self._group_already_delivered(job, f"snapcast:{client}")
+            for client in job.snapcast_clients
+        ):
+            return True
         player = self.hass.states.get(job.tts_media_player)
         if player is None or player.state in {STATE_UNAVAILABLE, STATE_UNKNOWN}:
             return False
@@ -2661,7 +2672,10 @@ class AnnouncementManager:
         await self._deliver_available_then_wait(
             job,
             outputs,
-            is_available=lambda item: notify_output_available(self.hass, item),
+            is_available=lambda item: (
+                notify_output_available(self.hass, item)
+                or self._group_already_delivered(job, f"notify:{item.ref}")
+            ),
             deliver=lambda item: self._async_deliver_notification(job, item),
             channel=lambda item: item.ref,
             parallel=True,
@@ -3128,7 +3142,8 @@ class AnnouncementManager:
             ready = [
                 player
                 for player in pending
-                if (
+                if self._group_already_delivered(job, f"room_tts:{player}")
+                or (
                     (state := self.hass.states.get(player)) is not None
                     and state.state not in {STATE_UNAVAILABLE, STATE_UNKNOWN}
                 )
@@ -3162,6 +3177,14 @@ class AnnouncementManager:
             )
 
     async def _async_send_server_tts(self, job: AnnouncementJob) -> None:
+        if job.snapcast_clients and all(
+            self._group_already_delivered(job, f"snapcast:{client}")
+            for client in job.snapcast_clients
+        ):
+            self._record_channel_success(
+                job, f"server_tts:{job.tts_engines[0]}"
+            )
+            return
         player = job.tts_media_player
         if not player:
             self._record_channel_failure(
@@ -3445,7 +3468,12 @@ class AnnouncementManager:
         await self._deliver_available_then_wait(
             job,
             outputs,
-            is_available=lambda item: companion_output_available(self.hass, item),
+            is_available=lambda item: (
+                companion_output_available(self.hass, item)
+                or self._group_already_delivered(
+                    job, f"companion_tts:{item.entry_id}"
+                )
+            ),
             deliver=lambda item: self._async_deliver_companion_tts(job, item),
             channel=lambda item: f"companion_tts:{item.entry_id}",
             parallel=True,
