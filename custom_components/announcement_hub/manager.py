@@ -730,6 +730,20 @@ class AnnouncementManager:
             else f"{TARGET_ENTITY_PREFIX}{value}"
             for value in entities
         )
+        # A configured legacy notification service may belong to a known
+        # integration even though it has no modern notify entity. Include it
+        # only when the provider identity is resolved, never by name guessing.
+        if integrations:
+            domains = {
+                value.removeprefix(TARGET_INTEGRATION_PREFIX)
+                for value in integrations
+            }
+            configured = self._configured_outputs()
+            tokens.extend(
+                output.ref
+                for output in resolve_notify_outputs(self.hass, configured[1])
+                if output.service and output.integration in domains
+            )
         if devices:
             device_reg = dr.async_get(self.hass)
             entity_reg = er.async_get(self.hass)
@@ -929,6 +943,19 @@ class AnnouncementManager:
             channel_selection(channel_tokens)
         except ValueError as error:
             raise ServiceValidationError(str(error)) from error
+        # Reject requests whose only supplied content cannot reach the
+        # selected service channel; never turn a TTS-only message into text
+        # for a visual endpoint or vice versa.
+        allowed = channel_selection(channel_tokens)
+        if channel_tokens and not (
+            (text_notify and "notification" in allowed)
+            or (text_tts and any(
+                kind in allowed for kind in ("tts", "snapcast", "companion_tts")
+            ))
+        ):
+            raise ServiceValidationError(
+                "No text was supplied for the selected service channel(s)"
+            )
         requested_output_area_ids = self._resolve_area_ids(area_tokens)
         explicit_area_routing = bool(requested_output_area_ids)
         # Legacy internal receiver restrictions remain supported, but the
