@@ -74,6 +74,6 @@ def test_service_passes_tristate_and_job_exposes_ai_result() -> None:
     assert "self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI)" in manager
     assert "diagnostics=ai" in manager
     assert "ai=ai_info" in manager
-    assert '"ai": dict(job.ai)' in init
+    assert '"ai": job.public_dict()["ai"]' in init
     assert "payload.setdefault(\"ai\", {})" in model
 

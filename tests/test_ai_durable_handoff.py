@@ -142,5 +142,12 @@ def test_queue_is_created_before_any_ai_request():
     assert "self._schedule_ai_rewrite(job)" in block
     assert "await self._store.async_save(self._serialize())" in block
     assert "await async_filter_announcement(" not in block
-    assert block.index("self._queue.append(job)") < block.index("self._schedule_ai_rewrite(job)")
-    assert block.index("self._schedule_ai_rewrite(job)") < block.index("await self._store.async_save(self._serialize())")
+    assert block.index("self._queue.append(job)") < block.index("await self._store.async_save(self._serialize())")
+    assert block.index("await self._store.async_save(self._serialize())") < block.index("self._schedule_ai_rewrite(job)")
+
+
+def test_queued_ai_source_is_redacted_from_public_diagnostics():
+    model = (ROOT / "custom_components" / "announcement_hub" / "models.py").read_text()
+    init = (ROOT / "custom_components" / "announcement_hub" / "__init__.py").read_text()
+    assert '"source_tts", "source_notify",' in model
+    assert '"ai": job.public_dict()["ai"]' in init

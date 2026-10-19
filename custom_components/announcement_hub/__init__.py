@@ -346,7 +346,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             "routing_mode": job.routing_mode,
             "routing_stage": job.routing_stage,
             "preferred_areas": [area_name(hass, a) for a in job.preferred_areas],
-            "ai": dict(job.ai),
+            "ai": job.public_dict()["ai"],
         }
         return response if call.return_response else None
 

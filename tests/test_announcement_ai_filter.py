@@ -740,7 +740,7 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert 'DEFAULT_FALLBACK_AI_AGENT: Final = "original"' in const
     assert "CONF_FALLBACK_AI_AGENT" in flow
     assert "options=self._ai_fallback_agent_options()" in flow
-    assert "fallback_agent_id=fallback_agent_id" in manager
+    assert '"requested_fallback_agent_id": fallback_agent_id' in manager
     assert 'self.hass.states.async_all("conversation")' in flow
     assert "get_agent_manager(self.hass).async_get_agent_info()" in flow
     assert "CONF_DEFAULT_USE_AI" in flow and "CONF_DEFAULT_AI_AGENT" in flow

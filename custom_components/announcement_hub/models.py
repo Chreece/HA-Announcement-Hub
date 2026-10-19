@@ -377,7 +377,15 @@ class AnnouncementJob:
                 for key, value in self.notify_output_profiles.items()
             },
             "tts_suppressed_by_level": self.tts_suppressed_by_level,
-            "ai": dict(self.ai),
+            # Queued originals and private agent-routing context are stored
+            # durably but must not leak through queue sensors or event payloads.
+            "ai": {
+                key: value for key, value in self.ai.items()
+                if key not in {
+                    "source_tts", "source_notify",
+                    "requested_agent_id", "requested_fallback_agent_id",
+                }
+            },
             "started_at": self.started_at,
             "finished_at": self.finished_at,
             "error": self.error,

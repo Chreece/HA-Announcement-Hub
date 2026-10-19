@@ -1729,21 +1729,19 @@ class AnnouncementManager:
             self._prepare_staged_route(job)
         self._queue.append(job)
         if job.ai.get("pending_preprocessing"):
+            # Save the original *before* starting external preprocessing.
+            # In particular, a caller being cancelled cannot leave an AI
+            # request running before its source message has been persisted.
+            async with self._save_lock:
+                await self._store.async_save(self._serialize())
             self._schedule_ai_rewrite(job)
         else:
             self._schedule_prefetch(job)
+            self._schedule_save()
         self._ensure_worker()
         self._wake.set()
         self._fire_event(EVENT_QUEUED, job)
         self._notify_update()
-        if job.ai.get("pending_preprocessing"):
-            # Return accepted=True only after the original has been persisted.
-            # Serialize concurrent AI-enabled submissions to prevent an older
-            # snapshot from overwriting a newer one.
-            async with self._save_lock:
-                await self._store.async_save(self._serialize())
-        else:
-            self._schedule_save()
         return job
 
     async def async_clear_queue(self, *, include_current: bool = False) -> int:
