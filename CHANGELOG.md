@@ -9,7 +9,8 @@
   General fallback only for area-based requests. Explicit recipients are
   never broadened into other integrations or devices.
 - Compose area and exact-recipient requests as linked, separately tracked
-  deliveries with de-duplicated physical outputs and a shared group ID.
+  deliveries with shared successful-output receipts, preventing duplicates
+  while preserving the requested room's original candidate set.
 - Never infer all Snapcast/direct room players from a selected TTS engine.
 - Preserve channel text boundaries: text_tts speaks only; text_notify
   displays only; shared text supplies both unless individually overridden.
