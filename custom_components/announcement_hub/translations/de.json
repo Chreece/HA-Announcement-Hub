@@ -472,12 +472,12 @@
       },
       "fields": {
         "text_tts": {
-          "name": "Abweichender gesprochener Text",
-          "description": "Optionale Fassung für die TTS-Ausgabe. Leer lassen, um text zu verwenden. Aktiviert keine zusätzlichen TTS-Ausgänge, wenn service oder output nur visuelle Benachrichtigungen auswählt."
+          "name": "Gesprochener Text (TTS)",
+          "description": "Ausschließlich für die Sprachausgabe. Wird niemals als schriftliche Benachrichtigung verwendet. Überschreibt die gesprochene Fassung des gemeinsamen Texts."
         },
         "text_notify": {
-          "name": "Abweichender Benachrichtigungstext",
-          "description": "Optionale Fassung für visuelle Benachrichtigungen. Leer lassen, um text zu verwenden. Emojis und Formatierung wirken sich nicht auf den gesprochenen Text aus."
+          "name": "Schriftlicher Benachrichtigungstext",
+          "description": "Ausschließlich für schriftliche Benachrichtigungen; wird nicht vorgelesen. Überschreibt die visuelle Fassung des gemeinsamen Texts."
         },
         "title": {
           "name": "Benachrichtigungstitel",
@@ -487,13 +487,9 @@
           "name": "Stufe",
           "description": "Prioritätsstufe. Kritisch verwendet alle passenden konfigurierten Ausgänge nur ohne ausdrückliches service- oder output-Ziel. Gewählte Ziele bleiben auch bei Kritisch bindend; keine unerwünschte TTS-Ausgabe."
         },
-        "output": {
-          "name": "Ausgabebereiche",
-          "description": "Bevorzugte Räume für diese Ankündigung. Zuerst die genannten Räume versuchen; ohne passenden Ausgang folgen belegte Räume, danach der konfigurierte Ersatzraum bei erfüllter Türregel und zuletzt allgemeine/nicht raumgebundene Geräte. Nicht verfügbare Geräte erhalten zuerst die eingestellte Wartefrist. service-Einschränkungen bleiben erhalten; keine Übertragung in fremde Räume."
-        },
         "service": {
-          "name": "Bestimmte Ausgänge",
-          "description": "Optionale feste Einschränkung auf konfigurierte Integrationen, Einträge, Notify-Geräte, bisherige Dienste und TTS-Kanäle (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). Die Einschränkung gilt auf allen Stufen und in jeder Fallback-Phase. Für automatische Gerätealternativen das Feld weglassen; output-Räume sind Präferenzen."
+          "name": "Ausgabekanäle",
+          "description": "Die Art der Zustellung: notification für schriftliche Benachrichtigungen, tts für Sprache oder gezielt snapcast, companion_tts oder all. Wählt niemals zusätzliche Empfänger aus."
         },
         "notify_data": {
           "name": "Benachrichtigungsdaten",
@@ -508,12 +504,12 @@
           "description": "Optionale Stimmen- oder Engine-Optionen für diesen Auftrag."
         },
         "companion_tts": {
-          "name": "Companion-App-TTS verwenden",
-          "description": "Android-Companion-App-Sprachausgabe zulassen, wenn keine explizite service-Auswahl die Ziele begrenzt. Bei explizitem service muss companion_tts (oder all) enthalten sein, um Companion-App-TTS zu ermöglichen. Kritisch umgeht explizite Einschränkungen nicht."
+          "name": "Companion-App-Sprachausgabe erlauben",
+          "description": "Optionale Freigabe für die Sprachausgabe auf zuvor ausgewählten Android-Companion-Geräten. Neue Aktionen können dies über den Ausgabekanal tts oder companion_tts wählen."
         },
         "occupied_only": {
-          "name": "Nur belegte Bereiche",
-          "description": "Wenn aktiviert, werden belegte Räume als zweite Routing-Stufe nach ausdrücklich genannten Räumen versucht. Angegebene Räume haben Vorrang, auch wenn sie aktuell nicht als belegt gelten. Deaktivieren, um diese Anwesenheitsstufe zu überspringen. Türabhängiger Ersatzraum und allgemeine Geräte bleiben danach möglich."
+          "name": "Belegte Bereiche als Ausweichziel verwenden",
+          "description": "Bei Bereichszielen nach dem bevorzugten Raum weitere belegte Räume versuchen. Explizit benannte Integrationen, Geräte und Entitäten bleiben davon unberührt."
         },
         "use_ai": {
           "name": "KI-Umformulierung überschreiben",
@@ -528,8 +524,24 @@
           "description": "Optionale URL, Home-Assistant-Dashboard-Pfad, app://-Link oder entityId:entity_id, der beim Tippen auf eine visuelle Companion-App-Benachrichtigung geöffnet wird. Android erhält clickAction, iOS/macOS url. Keine Weitergabe an Android TV/Fire TV, TTS oder nicht unterstützte Dienste. Überschreibt entsprechende Schlüssel in notify_data."
         },
         "text": {
-          "name": "Ankündigungstext (für neue Aktionen erforderlich)",
-          "description": "Haupttext der Ankündigung. Wird für Sprachausgabe und visuelle Benachrichtigungen verwendet, sofern text_tts bzw. text_notify keine abweichende Fassung enthalten. Bisherige Aktionen mit nur text_tts oder text_notify bleiben kompatibel."
+          "name": "Mitteilungstext",
+          "description": "Gemeinsamer Text für Sprachausgabe und schriftliche Benachrichtigung. Optional, wenn ein Text für einen bestimmten Kanal vorhanden ist; dieser überschreibt die entsprechende Fassung."
+        },
+        "area": {
+          "name": "Bevorzugte Bereiche",
+          "description": "Zuerst die angegebenen Räume bedienen, dann weitere belegte Bereiche, einen per Türprüfung erlaubten Ausweichraum und zuletzt allgemeine Ausgaben. Explizite Empfänger werden unabhängig berücksichtigt."
+        },
+        "integration": {
+          "name": "Integrationen (explizit)",
+          "description": "Nur die konfigurierten Ausgaben dieser Integrationen verwenden. Keine fremden Geräte oder Integrationen hinzufügen. Mit Bereich und konkreten Geräten kombinierbar."
+        },
+        "device": {
+          "name": "Geräte (explizit)",
+          "description": "Nur konfigurierte Ausgabe-Entitäten auf den ausgewählten Home-Assistant-Geräten verwenden. Keine fremden Geräte und keine zusätzlichen Lautsprecher auswählen."
+        },
+        "entity": {
+          "name": "Entitäten (explizit)",
+          "description": "Nur die angegebenen Benachrichtigungs- oder Media-Player-Entitäten verwenden. Keine anderen Empfänger hinzufügen. Mit Integrationen und Bereichen kombinierbar."
         }
       }
     },

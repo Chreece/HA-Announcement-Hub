@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.9.31"
+VERSION: Final = "0.9.32"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -19,8 +19,12 @@ SERVICE_CANCEL: Final = "cancel"
 ATTR_TEXT: Final = "text"
 ATTR_TEXT_TTS: Final = "text_tts"
 ATTR_TEXT_NOTIFY: Final = "text_notify"
-ATTR_OUTPUT: Final = "output"
-ATTR_SERVICE: Final = "service"
+ATTR_OUTPUT: Final = "output"  # Hidden legacy alias; use area for new actions.
+ATTR_AREA: Final = "area"
+ATTR_INTEGRATION: Final = "integration"
+ATTR_DEVICE: Final = "device"
+ATTR_ENTITY: Final = "entity"
+ATTR_SERVICE: Final = "service"  # Delivery channel only.
 ATTR_LEVEL: Final = "level"
 ATTR_TITLE: Final = "title"
 ATTR_NOTIFY_DATA: Final = "notify_data"

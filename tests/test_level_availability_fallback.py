@@ -20,13 +20,12 @@ def test_selector_uses_nearest_available_level_without_waiting() -> None:
     assert "unavailable preferred" in manager
 
 
-def test_cross_channel_fallback_can_reuse_other_text() -> None:
-    models=(C/"models.py").read_text(encoding="utf-8")
-    assert "force_tts: bool = False" in models
-    assert "force_notify: bool = False" in models
-    assert "text_tts or text_notify" in models
-    assert "text_notify or text_tts" in models
 
+def test_channel_fallback_does_not_convert_message_text() -> None:
+    models=(C/"models.py").read_text(encoding="utf-8")
+    assert "tts_text = text_tts if (audible or force_tts) else None" in models
+    assert "notify_text = text_notify" in models
+    assert "text_tts or text_notify" not in models
 
 def test_server_tts_keeps_unavailable_snapclients_for_timeout_wait() -> None:
     manager=(C/"manager.py").read_text(encoding="utf-8")

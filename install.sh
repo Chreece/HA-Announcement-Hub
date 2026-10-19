@@ -47,6 +47,7 @@ required = {
     "message_parts.py",
     "message_text.py",
     "routing_fallback.py",
+    "targeting.py",
     "models.py",
     "outputs.py",
     "sensor.py",

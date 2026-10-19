@@ -26,6 +26,12 @@ spec = importlib.util.spec_from_file_location(
 )
 assert spec is not None and spec.loader is not None
 routing = importlib.util.module_from_spec(spec)
+targeting_spec = importlib.util.spec_from_file_location(
+    "announcement_hub_targeting_routing_test", C / "targeting.py"
+)
+assert targeting_spec is not None and targeting_spec.loader is not None
+targeting = importlib.util.module_from_spec(targeting_spec)
+targeting_spec.loader.exec_module(targeting)
 import sys
 sys.modules[spec.name] = routing
 spec.loader.exec_module(routing)
@@ -182,7 +188,11 @@ class FakeManager:
             )
         )
 
-    def _staged_audio_ready(self, *, targets, engines, shared_player, companion_records):
+    @staticmethod
+    def _group_already_delivered(job, physical):
+        return False
+
+    def _staged_audio_ready(self, *, targets, engines, shared_player, companion_records, job=None):
         return bool(
             shared_player and engines
             and any(self.available.get(ref, False) for ref in targets.snapcast)
@@ -217,6 +227,9 @@ namespace = {
     "next_stage": routing.next_stage,
     "select_stage_targets": routing.select_stage_targets,
     "prioritize_stage_targets": routing.prioritize_stage_targets,
+    "StageTargets": routing.StageTargets,
+    "filter_selected_outputs": targeting.filter_selected_outputs,
+    "restrict_physical_keys": targeting.restrict_physical_keys,
     "LEVEL_INFO": "info",
     "LEVEL_PRIORITY": {
         "debug": 0, "info": 1, "success": 1, "warning": 2,
@@ -272,6 +285,8 @@ def job(*, preferred=("kueche",), services=(), level="info", age=0):
         error=None, channel_errors={},
         preferred_areas=tuple(preferred),
         requested_services=tuple(services),
+        channel_services=(),
+        excluded_physical=(),
         companion_tts_requested=False,
         occupancy_requested=True,
         level=level, text_tts="Παρακαλώ ανοίξτε το παράθυρο",

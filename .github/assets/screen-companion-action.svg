@@ -23,15 +23,16 @@
 <text x="301" y="221" fill="#f6faff" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="750" letter-spacing="0">Send a spoken announcement</text>
 <text x="302" y="249" fill="#a4bdd8" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="400" letter-spacing="0">Use notify.announcement_hub with a Companion App TTS selector</text>
 <rect x="287" y="270" width="935" height="1" rx="0" fill="#2b425d"/>
-<rect x="303" y="288" width="900" height="347" rx="12" fill="#101f31" stroke="#31485e" stroke-width="1"/>
+<rect x="303" y="288" width="900" height="385" rx="12" fill="#101f31" stroke="#31485e" stroke-width="1"/>
 <text x="328" y="322" fill="#a0dfaa" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="550" letter-spacing="0">action: notify.announcement_hub</text>
 <text x="328" y="362" fill="#7dbbff" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="550" letter-spacing="0">data:</text>
 <text x="353" y="399" fill="#f7d38a" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">text_tts: &quot;The garage door is still open.&quot;</text>
-<text x="353" y="439" fill="#bed1ec" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">level: warning</text>
-<text x="353" y="479" fill="#7dbbff" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">service:</text>
-<text x="382" y="519" fill="#a0dfaa" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">- companion_tts</text>
-<rect x="352" y="558" width="192" height="46" rx="12" fill="#05a9e9"/>
-<text x="397" y="588" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="0">Run action</text>
-<text x="568" y="588" fill="#a8c7de" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="400" letter-spacing="0">Companion App TTS must be configured first.</text>
+<text x="353" y="432" fill="#bed1ec" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">integration:</text>
+<text x="382" y="466" fill="#a0dfaa" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">- mobile_app</text>
+<text x="353" y="503" fill="#7dbbff" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">service:</text>
+<text x="382" y="538" fill="#a0dfaa" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">- companion_tts</text>
+<rect x="352" y="588" width="192" height="46" rx="12" fill="#05a9e9"/>
+<text x="397" y="618" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="0">Run action</text>
+<text x="568" y="618" fill="#a8c7de" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="400" letter-spacing="0">Configure eligible Companion App devices first.</text>
 <rect x="0" y="695" width="1280" height="25" rx="0" fill="#0b1726"/><text x="24" y="712" fill="#91aac5" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" letter-spacing="0.35">Conceptual configuration preview based on Announcement Hub&apos;s English setup fields · not a live Home Assistant capture</text>
 </svg>

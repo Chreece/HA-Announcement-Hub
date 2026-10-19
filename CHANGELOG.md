@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.9.32 - 2026-10-19
+
+- Separate recipients and channels in announcement actions: area, integration,
+  device, and entity select the actual physical destinations, while service
+  restricts to written notifications, TTS, Snapcast or Companion TTS.
+- Preserve requested-room, occupied-room, open-door alternate room and
+  General fallback only for area-based requests. Explicit recipients are
+  never broadened into other integrations or devices.
+- Compose area and exact-recipient requests as linked, separately tracked
+  deliveries with shared successful-output receipts, preventing duplicates
+  while preserving the requested room's original candidate set.
+- Never infer all Snapcast/direct room players from a selected TTS engine.
+- Preserve channel text boundaries: text_tts speaks only; text_notify
+  displays only; shared text supplies both unless individually overridden.
+  This remains true at Critical level and on provider failure.
+- Display area instead of output in the action interface, preserving the
+  old output key as a hidden compatibility alias for existing automations.
+- Add registry-backed device selection, selectors in the service description,
+  test coverage for service filtering and union targeting, and English docs.
+
+
 ## 0.9.31 - 2026-10-19
 
 - Prioritize actual room delivery over the soft minimum TTS severity. At Info

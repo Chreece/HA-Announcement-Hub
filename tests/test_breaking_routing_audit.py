@@ -6,22 +6,14 @@ ROOT = Path(__file__).resolve().parents[1]
 C = ROOT / "custom_components" / "announcement_hub"
 
 
-def test_explicit_action_areas_filter_candidate_planning_without_occupancy() -> None:
-    manager = (C / "manager.py").read_text(encoding="utf-8")
-    block = manager[
-        manager.index("requested_output_area_ids = self._resolve_area_ids"):
-        manager.index(
-            "configured = self._configured_outputs()",
-            manager.index("requested_output_area_ids = self._resolve_area_ids"),
-        )
-    ]
-    assert "explicit_area_routing = bool(requested_output_area_ids)" in block
-    assert "occupied_area_ids = self._occupied_area_ids() if occupied_only else None" in block
-    assert "elif explicit_area_routing:" in block
-    assert "output_area_ids = requested_output_area_ids" in block
-    assert "area_filter_active = explicit_area_routing or occupancy_filter_active" in block
-    assert "filter_by_area=area_filter_active" in manager
 
+def test_area_preference_alone_owns_room_escalation():
+    manager = (C / "manager.py").read_text(encoding="utf-8")
+    assert "requested_output_area_ids = self._resolve_area_ids(area_tokens)" in manager
+    assert "room_fallback_routing = bool(" in manager
+    assert "area_filter_active = explicit_area_routing or occupancy_filter_active" in manager
+    assert "self._staged_areas(job, stage)" in manager
+    assert "filter_by_area=area_filter_active" in manager
 
 def test_empty_or_unavailable_occupancy_keeps_general_outputs_eligible() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
@@ -53,28 +45,24 @@ def test_same_player_cannot_run_direct_and_shared_tts_concurrently() -> None:
             assert "tts_player_role_overlap" in data[section]["error"]
 
 
-def test_explicit_rooms_intersect_occupancy_when_occupied_only() -> None:
+
+def test_explicit_recipients_ignore_occupancy_restrictions():
     manager = (C / "manager.py").read_text(encoding="utf-8")
-    block = manager[
-        manager.index("requested_output_area_ids = self._resolve_area_ids"):
-        manager.index("configured = self._configured_outputs()")
-    ]
-    assert "occupied_area_ids = self._occupied_area_ids() if occupied_only else None" in block
-    assert "occupied_set = set(occupied_area_ids)" in block
-    assert "for area_id in requested_output_area_ids" in block
-    assert "if area_id in occupied_set" in block
-    assert "if explicit_area_routing" in block
+    assert "if occupied_only and not explicit_area_routing and not requested" in manager
+    assert "explicit_targeting = bool(requested) or bool(channel_tokens)" in manager
+    assert "room_fallback_routing = bool(" in manager
+    assert "requested = tuple(dict.fromkeys((" in manager
+    assert "self._explicit_recipient_tokens(" in manager
 
 
-def test_explicit_rooms_are_authoritative_when_occupied_only_is_false() -> None:
+def test_room_recipient_union_has_two_jobs_and_separate_physical_targets():
     manager = (C / "manager.py").read_text(encoding="utf-8")
-    block = manager[
-        manager.index("requested_output_area_ids = self._resolve_area_ids"):
-        manager.index("configured = self._configured_outputs()")
-    ]
-    assert "elif explicit_area_routing:" in block
-    assert "output_area_ids = requested_output_area_ids" in block
-
+    assert "if explicit_area_routing and requested and not _fanout:" in manager
+    assert "related_job_ids = (explicit_job.job_id,)" in manager
+    assert "_group_token=group_token" in manager
+    assert "job.group_id = _group_token" in manager
+    assert "_group_token=group_token" in manager
+    assert "_excluded_physical=physical_keys(static)" not in manager
 
 def test_tts_targets_are_frozen_even_when_currently_unavailable() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")

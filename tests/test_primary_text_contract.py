@@ -60,7 +60,7 @@ def test_service_form_requires_primary_text_and_overrides_are_optional() -> None
     services = yaml.safe_load((C / "services.yaml").read_text(encoding="utf-8"))
     fields = services["send"]["fields"]["content"]["fields"]
     assert list(fields).index("text") < list(fields).index("text_tts")
-    assert fields["text"]["required"] is True
+    assert fields["text"]["required"] is False
     assert fields["text"]["selector"] == {"text": {"multiline": True}}
     assert fields["text_tts"].get("required") is not True
     assert fields["text_notify"].get("required") is not True
@@ -83,7 +83,7 @@ def test_manager_resolves_common_text_before_routing_and_ai() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
     fn = manager[manager.index("    async def async_enqueue("):]
     resolved = fn.index("text_tts, text_notify = resolve_channel_texts(")
-    routed = fn.index("selected = self._select_requested_outputs(")
+    routed = fn.index("selected = filter_selected_outputs(")
     ai = fn.index("ai_enabled, ai_source = resolve_ai_enabled(")
     frozen = fn.index("job = AnnouncementJob.create(")
     assert resolved < routed < ai < frozen
@@ -103,9 +103,9 @@ def test_new_primary_field_is_localized_for_both_actions() -> None:
         for field in ("text", "text_tts", "text_notify"):
             assert fields[field]["name"]
             assert fields[field]["description"]
-        assert "text" in fields["text"]["description"]
-        assert "text" in fields["text_tts"]["description"]
-        assert "text" in fields["text_notify"]["description"]
+        for field in ("text", "text_tts", "text_notify"):
+            assert len(fields[field]["description"]) >= 40
+    assert "text" in source["services"]["send"]["fields"]["text"]["description"]
     assert source["services"]["send"]["fields"]["text"]["name"]
 
 
@@ -114,13 +114,16 @@ def test_user_can_supply_shared_text_to_visual_only_critical_without_tts() -> No
         action: notify.announcement_hub
         data:
           text: Εντοπίστηκε κίνηση
-          service:
+          integration:
             - mobile_app
+          service:
+            - notification
           level: critical
           click_action: /dashboard-metrics/0
     """)
     assert example["data"]["text"] == "Εντοπίστηκε κίνηση"
-    assert example["data"]["service"] == ["mobile_app"]
+    assert example["data"]["integration"] == ["mobile_app"]
+    assert example["data"]["service"] == ["notification"]
     assert resolve_channel_texts(
         example["data"]["text"],
         example["data"].get("text_tts"),

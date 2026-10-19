@@ -3,7 +3,7 @@ send:
     content:
       fields:
         text:
-          required: true
+          required: false
           example: The washing machine has finished.
           selector:
             text:
@@ -39,19 +39,38 @@ send:
               translation_key: level
     routing:
       fields:
-        output:
+        area:
           selector:
             area:
               multiple: true
-        service:
+        integration:
           example:
             - mobile_app
-            - entry:0123456789abcdef
-            - entity:notify.living_room_tv
-            - snapcast
+            - nfandroidtv
           selector:
             text:
               multiple: true
+        device:
+          selector:
+            device:
+              multiple: true
+        entity:
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: notify
+                - domain: media_player
+        service:
+          selector:
+            select:
+              multiple: true
+              options:
+                - notification
+                - tts
+                - snapcast
+                - companion_tts
+                - all
         companion_tts:
           default: false
           selector:
