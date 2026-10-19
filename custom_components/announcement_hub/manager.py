@@ -1657,6 +1657,7 @@ class AnnouncementManager:
             # plain words and displays get their independent visual version.
             # Do not introduce a new channel that the planner did not select.
             if plan.tts_text is not None or plan.notify_text is not None:
+                ai_started = asyncio.get_running_loop().time()
                 plan.tts_text, plan.notify_text = await async_filter_announcement(
                     self.hass,
                     text_tts=plan.tts_text,
@@ -1664,6 +1665,9 @@ class AnnouncementManager:
                     agent_id=agent_id,
                     fallback_agent_id=fallback_agent_id,
                     diagnostics=ai_info,
+                )
+                ai_info["elapsed_seconds"] = round(
+                    asyncio.get_running_loop().time() - ai_started, 3
                 )
                 # Persist effective output copy alongside the frozen plan;
                 # original delivery level, targets and metadata remain intact.

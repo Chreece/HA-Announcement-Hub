@@ -12,7 +12,9 @@ import re
 from typing import Any
 
 _LOGGER = logging.getLogger(__name__)
-AI_FILTER_TIMEOUT_SECONDS = 12
+# Advisory log interval only: model cold starts are not AI failures.
+# Home Assistant conversation.process has no portable generation-progress API.
+AI_FILTER_SLOW_REQUEST_SECONDS = 60.0
 
 # Numerical readings, time, dates and quantities must never be silently changed.
 _NUMBER_PATTERN = re.compile(r"(?<![0-9])[-+]?[0-9]+(?:[.,][0-9]+)*")
@@ -328,19 +330,33 @@ async def async_filter_announcement(
             payload["agent_id"] = candidate
         if preferred_language:
             payload["language"] = preferred_language
+        # Await the *same* in-flight request for as long as the agent needs.
+        # Do not cancel generation just because a local model is loading.
+        loop = asyncio.get_running_loop()
+        attempt_started = loop.time()
+        pending_notice = loop.call_later(
+            AI_FILTER_SLOW_REQUEST_SECONDS,
+            _LOGGER.warning,
+            "Announcement AI agent %s has not responded after %.0f seconds; "
+            "continuing to await conversation.process (no Hub timeout)",
+            agent_label,
+            AI_FILTER_SLOW_REQUEST_SECONDS,
+        )
         try:
-            async with asyncio.timeout(AI_FILTER_TIMEOUT_SECONDS):
-                response = await hass.services.async_call(
-                    "conversation",
-                    "process",
-                    payload,
-                    blocking=True,
-                    return_response=True,
-                )
+            response = await hass.services.async_call(
+                "conversation",
+                "process",
+                payload,
+                blocking=True,
+                return_response=True,
+            )
         except Exception as error:
             # Error class only: never return provider secrets or original text.
+            # A TimeoutError raised by the provider itself is different from
+            # Hub cancelling an otherwise active request (which we never do).
             reason = (
-                "timeout" if isinstance(error, TimeoutError) else "agent_error"
+                "provider_timeout"
+                if isinstance(error, TimeoutError) else "agent_error"
             )
             if diagnostics is not None:
                 diagnostics["attempts"].append(
@@ -354,6 +370,12 @@ async def async_filter_announcement(
                 type(error).__name__,
             )
             continue
+        finally:
+            pending_notice.cancel()
+            if diagnostics is not None:
+                diagnostics.setdefault("attempt_duration_seconds", {})[
+                    agent_label
+                ] = round(loop.time() - attempt_started, 3)
 
         try:
             edited = _parse_reply(response, originals)
