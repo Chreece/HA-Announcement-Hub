@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import ast
 from datetime import UTC, datetime, timedelta
+from collections import deque
 import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
@@ -87,6 +88,9 @@ class FakeManager:
         timeout=10,
         occupied=("wohnzimmer",),
         available=None,
+        kitchen_snapcast=False,
+        living_snapcast=False,
+        entrance_snapcast=False,
     ):
         self.hass = SimpleNamespace()
         self.settings = {
@@ -97,6 +101,14 @@ class FakeManager:
         self.occupied = tuple(occupied)
         self.door_open = door_open
         self.available = available or {}
+        self._queue = deque()
+        self.snapcast_outputs = tuple(
+            name for name, included in (
+                ("media_player.kitchen_snapcast", kitchen_snapcast),
+                ("media_player.living_snapcast", living_snapcast),
+                ("media_player.entrance_snapcast", entrance_snapcast),
+            ) if included
+        )
         self.notifications = {
             "entity:notify.kitchen": SimpleNamespace(
                 ref="entity:notify.kitchen", area_id="kueche",
@@ -131,8 +143,8 @@ class FakeManager:
         return (
             ("tts.piper",),
             self.configured_notifies,
-            ("media_player.kitchen",),
-            ("media_player.kitchen_snapcast",),
+            (),
+            self.snapcast_outputs,
             (),
         )
 
@@ -160,8 +172,20 @@ class FakeManager:
 
     def _job_runnable_now(self, job):
         return bool(
-            job.notify_text
-            and any(self.available.get(ref, False) for ref in job.notify_outputs)
+            (
+                job.notify_text
+                and any(self.available.get(ref, False) for ref in job.notify_outputs)
+            )
+            or (
+                job.tts_text
+                and any(self.available.get(ref, False) for ref in job.snapcast_clients)
+            )
+        )
+
+    def _staged_audio_ready(self, *, targets, engines, shared_player, companion_records):
+        return bool(
+            shared_player and engines
+            and any(self.available.get(ref, False) for ref in targets.snapcast)
         )
 
     def _schedule_prefetch(self, job):
@@ -180,6 +204,7 @@ METHODS = (
     "_advance_staged_route",
     "_staged_route_ready",
     "_routing_stage_age",
+    "_requeue_undelivered_stage",
 )
 tree = ast.parse(SRC)
 klass = next(
@@ -191,12 +216,14 @@ namespace = {
     "STAGES": routing.STAGES,
     "next_stage": routing.next_stage,
     "select_stage_targets": routing.select_stage_targets,
+    "prioritize_stage_targets": routing.prioritize_stage_targets,
     "LEVEL_INFO": "info",
     "LEVEL_PRIORITY": {
         "debug": 0, "info": 1, "success": 1, "warning": 2,
         "error": 3, "critical": 4,
     },
     "DEFAULT_NOTIFY_MIN_LEVEL": "info",
+    "TTS_LEVEL_NEVER": "never",
     "CONF_TTS_MIN_LEVEL": "tts_min_level",
     "DEFAULT_TTS_MIN_LEVEL": "debug",
     "CONF_NOTIFY_PROFILES": "notify_profiles",
@@ -212,12 +239,17 @@ namespace = {
     ),
     "resolve_companion_tts_outputs": lambda hass, ids: (),
     "entity_area_id": lambda hass, entity_id: (
-        "kueche" if "kitchen" in entity_id else None
+        "kueche" if "kitchen" in entity_id else
+        "wohnzimmer" if "living" in entity_id else
+        "eingang" if "entrance" in entity_id else None
     ),
     "resolve_notify_profile": lambda profiles, integration: {},
     "tts_allowed_for_level": lambda level, minimum: (
-        namespace["LEVEL_PRIORITY"][level]
-        >= namespace["LEVEL_PRIORITY"][minimum]
+        level == "critical" or (
+            minimum != "never"
+            and namespace["LEVEL_PRIORITY"][level]
+            >= namespace["LEVEL_PRIORITY"][minimum]
+        )
     ),
     "timedelta": timedelta,
 }
@@ -235,6 +267,9 @@ def job(*, preferred=("kueche",), services=(), level="info", age=0):
         routing_mode="room_fallback", routing_stage="primary",
         routing_stage_started_at=start, routing_history=[],
         routing_retry_after=None,
+        routing_audio_retry=False,
+        status="pending", started_at=None, finished_at=None,
+        error=None, channel_errors={},
         preferred_areas=tuple(preferred),
         requested_services=tuple(services),
         companion_tts_requested=False,
@@ -414,6 +449,173 @@ def test_occupied_only_false_skips_occupied_room_fallback(monkeypatch):
     assert manager._staged_route_ready(j)
     assert j.routing_stage == "general"
     assert j.notify_outputs == ("entity:notify.phone",)
+
+
+def test_info_uses_same_room_snapcast_before_occupied_or_general(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_min="warning", kitchen_snapcast=True,
+        available={
+            "media_player.kitchen_snapcast": True,
+            "entity:notify.living": True,
+            "entity:notify.phone": True,
+        },
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.outputs == ("kueche",)
+    assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
+    assert j.notify_outputs == ()
+    assert j.tts_text
+    assert not j.tts_suppressed_by_level
+
+
+def test_info_prefers_ready_visual_over_same_room_snapcast(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "media_player.kitchen_snapcast": True,
+            "entity:notify.phone": True,
+        },
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    assert j.snapcast_clients == ()
+    assert j.tts_text is None
+
+
+def test_unavailable_visual_does_not_block_ready_same_room_snapcast(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True,
+        available={
+            "entity:notify.kitchen": False,
+            "media_player.kitchen_snapcast": True,
+            "entity:notify.phone": True,
+        },
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
+    assert j.notify_outputs == ()
+
+
+def test_moved_to_occupied_room_prefers_speech_even_with_visual(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_min="warning", living_snapcast=True,
+        available={
+            "entity:notify.living": True,
+            "media_player.living_snapcast": True,
+            "entity:notify.phone": True,
+        },
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "occupied"
+    assert j.outputs == ("wohnzimmer",)
+    assert j.snapcast_clients == ("media_player.living_snapcast",)
+    assert j.notify_outputs == ()
+
+
+def test_door_gated_fallback_uses_room_speech_at_info_all_levels(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_min="warning", occupied=(), entrance_snapcast=True,
+        available={
+            "entity:notify.entrance": True,
+            "media_player.entrance_snapcast": True,
+            "entity:notify.phone": True,
+        },
+        door_open=True,
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "fallback"
+    assert j.outputs == ("eingang",)
+    assert j.snapcast_clients == ("media_player.entrance_snapcast",)
+    assert j.notify_outputs == ()
+    manager.door_open = False
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
+    assert not j.snapcast_clients
+
+
+def test_failed_visual_retries_audio_in_same_room_before_next_stage(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "media_player.kitchen_snapcast": True,
+            "entity:notify.living": True,
+        },
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    manager._requeue_undelivered_stage(j, "provider failure")
+    assert j.routing_stage == "primary"
+    assert j.routing_audio_retry
+    assert manager._staged_route_ready(j)
+    assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
+    assert j.notify_outputs == ()
+    assert any("trying same-room audio" in entry for entry in j.routing_history)
+
+
+def test_both_room_channels_unavailable_wait_before_other_room(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True, timeout=5,
+        available={"entity:notify.living": True, "entity:notify.phone": True},
+    )
+    configure_manager(monkeypatch, manager)
+    j = job(age=2)
+    assert not manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
+    j.routing_stage_started_at = (
+        datetime.now(UTC) - timedelta(seconds=6)
+    ).isoformat()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "occupied"
+
+
+def test_room_speech_respects_never_and_restricted_notify_service(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_min="warning", kitchen_snapcast=True,
+        occupied=(), door_open=False,
+        available={
+            "media_player.kitchen_snapcast": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["tts_min_level"] = "never"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.snapcast_clients == ()
+    manager.settings["tts_min_level"] = "warning"
+    j = job(services=("mobile_app",))
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.snapcast_clients == ()
 
 
 def test_scheduler_does_not_drop_undelivered_jobs():
