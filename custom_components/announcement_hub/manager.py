@@ -1003,8 +1003,9 @@ class AnnouncementManager:
                     notify_outputs=cfg[1], room_tts_players=cfg[2],
                     snapcast_clients=cfg[3], companion_entries=cfg[4],
                     companion_tts=bool(
-                        companion_tts or "tts" in channel_tokens
-                        or "companion_tts" in channel_tokens
+                        companion_tts or (
+                            bool(channel_tokens) and "companion_tts" in allowed
+                        )
                     ),
                 ),
                 channel_tokens,
@@ -1061,8 +1062,9 @@ class AnnouncementManager:
                 notify_outputs=configured[1], room_tts_players=configured[2],
                 snapcast_clients=configured[3], companion_entries=configured[4],
                 companion_tts=bool(
-                    companion_tts or "tts" in channel_tokens
-                    or "companion_tts" in channel_tokens
+                    companion_tts or (
+                        bool(channel_tokens) and "companion_tts" in allowed
+                    )
                 ),
             ),
             channel_tokens,
@@ -1073,8 +1075,9 @@ class AnnouncementManager:
             selected = (
                 (), selected[1], (), (),
                 selected[4] if (
-                    companion_tts or "tts" in channel_tokens
-                    or "companion_tts" in channel_tokens
+                    companion_tts or (
+                        bool(channel_tokens) and "companion_tts" in allowed
+                    )
                 ) else (),
             )
         if requested and not physical_keys(selected):
@@ -2189,9 +2192,12 @@ class AnnouncementManager:
                         room_tts_players=configured[2], snapcast_clients=configured[3],
                         companion_entries=configured[4],
                         companion_tts=bool(
-                            job.companion_tts_requested
-                            or "tts" in job.channel_services
-                            or "companion_tts" in job.channel_services
+                            job.companion_tts_requested or (
+                                bool(job.channel_services)
+                                and "companion_tts" in channel_selection(
+                                    job.channel_services
+                                )
+                            )
                         ),
                     ),
                     job.channel_services,
