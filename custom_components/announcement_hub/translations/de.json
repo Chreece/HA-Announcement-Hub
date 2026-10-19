@@ -472,12 +472,12 @@
       },
       "fields": {
         "text_tts": {
-          "name": "Abweichender gesprochener Text",
-          "description": "Optionale Fassung für die TTS-Ausgabe. Leer lassen, um text zu verwenden. Aktiviert keine zusätzlichen TTS-Ausgänge, wenn service oder output nur visuelle Benachrichtigungen auswählt."
+          "name": "Spoken TTS text",
+          "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
         },
         "text_notify": {
-          "name": "Abweichender Benachrichtigungstext",
-          "description": "Optionale Fassung für visuelle Benachrichtigungen. Leer lassen, um text zu verwenden. Emojis und Formatierung wirken sich nicht auf den gesprochenen Text aus."
+          "name": "Written notification text",
+          "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
         },
         "title": {
           "name": "Benachrichtigungstitel",
@@ -487,13 +487,9 @@
           "name": "Stufe",
           "description": "Prioritätsstufe. Kritisch verwendet alle passenden konfigurierten Ausgänge nur ohne ausdrückliches service- oder output-Ziel. Gewählte Ziele bleiben auch bei Kritisch bindend; keine unerwünschte TTS-Ausgabe."
         },
-        "output": {
-          "name": "Ausgabebereiche",
-          "description": "Bevorzugte Räume für diese Ankündigung. Zuerst die genannten Räume versuchen; ohne passenden Ausgang folgen belegte Räume, danach der konfigurierte Ersatzraum bei erfüllter Türregel und zuletzt allgemeine/nicht raumgebundene Geräte. Nicht verfügbare Geräte erhalten zuerst die eingestellte Wartefrist. service-Einschränkungen bleiben erhalten; keine Übertragung in fremde Räume."
-        },
         "service": {
-          "name": "Bestimmte Ausgänge",
-          "description": "Optionale feste Einschränkung auf konfigurierte Integrationen, Einträge, Notify-Geräte, bisherige Dienste und TTS-Kanäle (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). Die Einschränkung gilt auf allen Stufen und in jeder Fallback-Phase. Für automatische Gerätealternativen das Feld weglassen; output-Räume sind Präferenzen."
+          "name": "Delivery service channels",
+          "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
         },
         "notify_data": {
           "name": "Benachrichtigungsdaten",
@@ -508,12 +504,12 @@
           "description": "Optionale Stimmen- oder Engine-Optionen für diesen Auftrag."
         },
         "companion_tts": {
-          "name": "Companion-App-TTS verwenden",
-          "description": "Android-Companion-App-Sprachausgabe zulassen, wenn keine explizite service-Auswahl die Ziele begrenzt. Bei explizitem service muss companion_tts (oder all) enthalten sein, um Companion-App-TTS zu ermöglichen. Kritisch umgeht explizite Einschränkungen nicht."
+          "name": "Allow Companion App speech",
+          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
         },
         "occupied_only": {
-          "name": "Nur belegte Bereiche",
-          "description": "Wenn aktiviert, werden belegte Räume als zweite Routing-Stufe nach ausdrücklich genannten Räumen versucht. Angegebene Räume haben Vorrang, auch wenn sie aktuell nicht als belegt gelten. Deaktivieren, um diese Anwesenheitsstufe zu überspringen. Türabhängiger Ersatzraum und allgemeine Geräte bleiben danach möglich."
+          "name": "Use occupied-room fallback",
+          "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
         },
         "use_ai": {
           "name": "KI-Umformulierung überschreiben",
@@ -528,8 +524,24 @@
           "description": "Optionale URL, Home-Assistant-Dashboard-Pfad, app://-Link oder entityId:entity_id, der beim Tippen auf eine visuelle Companion-App-Benachrichtigung geöffnet wird. Android erhält clickAction, iOS/macOS url. Keine Weitergabe an Android TV/Fire TV, TTS oder nicht unterstützte Dienste. Überschreibt entsprechende Schlüssel in notify_data."
         },
         "text": {
-          "name": "Ankündigungstext (für neue Aktionen erforderlich)",
-          "description": "Haupttext der Ankündigung. Wird für Sprachausgabe und visuelle Benachrichtigungen verwendet, sofern text_tts bzw. text_notify keine abweichende Fassung enthalten. Bisherige Aktionen mit nur text_tts oder text_notify bleiben kompatibel."
+          "name": "Announcement text",
+          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+        },
+        "area": {
+          "name": "Preferred areas",
+          "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
+        },
+        "integration": {
+          "name": "Explicit integrations",
+          "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
+        },
+        "device": {
+          "name": "Explicit devices",
+          "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
+        },
+        "entity": {
+          "name": "Explicit entities",
+          "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
         }
       }
     },
