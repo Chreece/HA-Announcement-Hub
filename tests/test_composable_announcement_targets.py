@@ -130,6 +130,11 @@ def test_mixed_area_recipient_request_is_fanned_out_as_independent_jobs():
     assert "restrict_physical_keys(" in MANAGER
 
 
+def test_service_only_cannot_broadcast_to_unrequested_devices():
+    assert "if channel_tokens and not requested and not explicit_area_routing:" in MANAGER
+    assert "service selects a channel, not recipients" in MANAGER
+
+
 def test_group_id_cancels_related_job_and_survives_restarts():
     manager = MANAGER[
         MANAGER.index("    async def async_cancel("):
