@@ -230,7 +230,7 @@ room devices.
 
 ### Room routing order
 
-For a call with `output` specifying a preferred area, Announcement Hub
+For a call with `area` specifying a preferred room, Announcement Hub
 considers the following stages **one at a time**:
 
 ```text
@@ -260,9 +260,9 @@ General/non-room notification outputs
 - A successful output stops escalation to later stages. A failed provider
   can trigger another eligible channel in the same room first.
 
-A `service` restriction is a **hard allowlist**, not a request to broadcast.
-If you specify `service: [mobile_app]`, for example, the message cannot be
-converted into server TTS or Snapcast as a fallback.
+A `service` selector is **only a delivery-channel filter**. Use
+`integration`, `device` and `entity` to choose exact recipients;
+`area` chooses preferred room devices and permitted room fallback.
 
 ### Room-first channel selection
 
@@ -288,9 +288,8 @@ Severity order:
 debug < info / success < warning < error < critical
 ```
 
-An unrestricted Critical message is allowed to use every configured matching
-output. A Critical message with explicit service/device restrictions cannot
-enable devices outside those restrictions.
+Critical never expands a selected integration, device, entity or channel
+restriction. Without a room, it cannot invent a room speaker.
 
 ### Snapcast routing and playback
 
@@ -341,9 +340,10 @@ data:
   level: info
 ```
 
-`text` is the shared message. `text_tts` and `text_notify` override the spoken
-and visual variants independently. Omitting the overrides inherits the main
-text; older automations containing only channel-specific text remain valid.
+`text` fills both speech and written-notification channels unless
+`text_tts` or `text_notify` overrides that channel. If `text` is omitted,
+one or both optional channel texts can be supplied. A speech-only message
+never becomes visual and a visual-only message never becomes speech.
 
 ### Prefer a specific room
 
@@ -352,12 +352,12 @@ action: notify.announcement_hub
 data:
   text: "Please check the window."
   level: info
-  output:
+  area:
     - Kitchen
   occupied_only: true
 ```
 
-`output` accepts Home Assistant area names or IDs. It indicates a **preferred
+`area` accepts Home Assistant area names or IDs. It indicates a **preferred
 room**, not a hard device allowlist. If you intentionally want to skip the
 other occupied rooms, set `occupied_only: false`; the door-gated alternate
 room and General outputs can still be considered.
@@ -432,8 +432,10 @@ action: notify.announcement_hub
 data:
   text_notify: "Movement detected at the front door."
   title: "Doorbell"
-  service:
+  integration:
     - mobile_app
+  service:
+    - notification
   click_action: /lovelace/cameras
   level: warning
 ```
@@ -452,8 +454,10 @@ data:
   text_notify: "The dryer is finished."
   title: "Laundry"
   level: info
-  service:
+  integration:
     - nfandroidtv
+  service:
+    - notification
 ```
 
 Styling comes from the provider's saved output profile.
@@ -465,7 +469,7 @@ action: notify.announcement_hub
 data:
   text_tts: "Dinner is ready."
   level: warning
-  output:
+  area:
     - Kitchen
   service:
     - snapcast
@@ -484,31 +488,97 @@ data:
   level: critical
 ```
 
-With no explicit output or provider restriction, Critical considers all
-configured eligible outputs. To limit recipients even for Critical, provide
-`service` and/or a preferred `output` with the documented room-routing
-rules.
+Critical overrides the soft TTS minimum but never authorizes unrelated
+recipients or unrequested services. Without an area or explicit physical
+recipient, Hub does not infer a room's Snapcast speakers.
 
-### Choose exact integrations or devices
+### Combine areas, integrations, exact devices and services
 
-The optional `service` field accepts configured selections such as:
+Announcement Hub distinguishes **recipients** from **delivery channels**:
 
-| Selector | Meaning |
-| --- | --- |
-| `notify` | All configured visual notification devices |
-| `tts` | Configured server/direct TTS paths |
-| `snapcast` | Server TTS through configured Snapcast clients |
-| `companion_tts` | Configured Android Companion App spoken output |
-| `mobile_app` | Visual output from the mobile_app integration |
-| `nfandroidtv` | Visual output from Notifications for Android TV |
-| `entry:<config_entry_id>` | Outputs from a configured integration entry |
-| `entity:notify.living_room_tv` | One configured notify entity |
-| `entity:tts.piper` | One configured TTS entity |
-| `service:notify.some_service` | One configured legacy notification action |
-| `all` | All configured output classes |
+| Field | Meaning | Automatic room fallback |
+| --- | --- | --- |
+| `area` | Preferred Home Assistant rooms. Hub selects configured room devices and uses occupied / permitted fallback areas when needed | Yes |
+| `integration` | All configured output devices belonging to the named integration, such as `mobile_app` or `nfandroidtv` | No unrelated integration |
+| `device` | Only configured outputs on those exact Home Assistant devices | No other devices |
+| `entity` | Only the specified `notify.*` or `media_player.*` entities | No other entities |
+| `service` | Channel filter: `notification` (written), `tts` (spoken), `snapcast`, `companion_tts`, or `all` | Never adds recipients |
 
-Plain selected entity IDs are also accepted. An explicit empty `service: []`
-or `output: []` is invalid; omit the field for automatic selection.
+`integration`, `device`, and `entity` form a **union** of explicitly
+selected recipients. When combined with `area`, Hub creates two independently
+tracked queue jobs: one for the preferred-room route and one for the exact
+recipients. The action response includes `related_job_ids` for the second
+job, and cancelling the returned group ID cancels its waiting related job.
+Physical recipients that overlap are excluded from duplicate room delivery.
+
+**Only one entity:**
+
+```yaml
+action: notify.announcement_hub
+data:
+  entity:
+    - notify.living_room_tv
+  service:
+    - notification
+  text_notify: "The dishwasher has finished."
+```
+
+This does not activate Snapcast, Companion App TTS, or other devices.
+
+**All configured endpoints of one integration:**
+
+```yaml
+action: notify.announcement_hub
+data:
+  integration:
+    - nfandroidtv
+  service:
+    - notification
+  text: "The washing machine has finished."
+```
+
+**Both a room route and an additional exact recipient:**
+
+```yaml
+action: notify.announcement_hub
+data:
+  area:
+    - Kitchen
+  entity:
+    - notify.mobile_phone
+  service:
+    - notification
+  text_notify: "Please check the kitchen window."
+```
+
+The phone is notified as an explicit recipient, and the Kitchen route follows
+its own configured room fallback. Neither leg silently substitutes an
+unselected device for an exact recipient.
+
+**TTS through the selected targets:**
+
+```yaml
+action: notify.announcement_hub
+data:
+  area:
+    - Living Room
+  device:
+    - YOUR_HOME_ASSISTANT_DEVICE_ID
+  service:
+    - tts
+  text_tts: "The timer has ended."
+```
+
+The `service` filter never creates a speaker on its own. A matching,
+configured, authorized TTS-capable physical output must exist.
+
+**Channel-specific text:** `text_tts` goes only to speech,
+`text_notify` goes only to written notifications. Shared `text`
+fills both channels unless individually overridden. A missing channel is
+never manufactured, even at Critical level or after an output failure.
+
+`output` remains recognized internally for existing YAML compatibility,
+but the action editor exposes only `area`. New calls should use `area`.
 
 ## AI rewriting
 
