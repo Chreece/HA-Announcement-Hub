@@ -179,6 +179,7 @@ from .routing_fallback import (
     next_stage,
     prioritize_stage_targets,
     select_stage_targets,
+    StageTargets,
 )
 from .outputs import (
     CompanionTTSOutput,
@@ -2137,6 +2138,17 @@ class AnnouncementManager:
             ),
             speech_allowed=stage_speech_allowed,
         )
+        # A declared channel has no recipients unless that channel's input
+        # text was supplied. Never send text_tts to a written notification,
+        # or text_notify to a speaker.
+        if not job.text_tts:
+            targets = StageTargets(notify=targets.notify)
+        if not job.text_notify:
+            targets = StageTargets(
+                room_tts=targets.room_tts,
+                snapcast=targets.snapcast,
+                companion_tts=targets.companion_tts,
+            )
         active_notifications = {
             output.ref: output for output in notifications
             if output.ref in set(targets.notify)
