@@ -2108,8 +2108,24 @@ class AnnouncementManager:
         engines: Sequence[str],
         shared_player: str | None,
         companion_records: Sequence[CompanionTTSOutput],
+        job: AnnouncementJob | None = None,
     ) -> bool:
         """Probe only authorized physical room audio paths; never global TTS."""
+        if job and (
+            any(
+                self._group_already_delivered(job, f"room_tts:{player}")
+                for player in targets.room_tts
+            )
+            or any(
+                self._group_already_delivered(job, f"snapcast:{client}")
+                for client in targets.snapcast
+            )
+            or any(
+                self._group_already_delivered(job, f"companion_tts:{entry}")
+                for entry in targets.companion_tts
+            )
+        ):
+            return True
         if any(
             companion_output_available(self.hass, output)
             for output in companion_records
@@ -2247,6 +2263,7 @@ class AnnouncementManager:
             engines=selected[0],
             shared_player=job.tts_media_player,
             companion_records=companion,
+            job=job,
         ) if targets.has_audio else False
         targets = prioritize_stage_targets(
             stage=stage_kind,
