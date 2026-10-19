@@ -472,12 +472,12 @@
       },
       "fields": {
         "text_tts": {
-          "name": "Spoken TTS text",
-          "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
+          "name": "Gesprochener Text (TTS)",
+          "description": "Ausschließlich für die Sprachausgabe. Wird niemals als schriftliche Benachrichtigung verwendet. Überschreibt die gesprochene Fassung des gemeinsamen Texts."
         },
         "text_notify": {
-          "name": "Written notification text",
-          "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
+          "name": "Schriftlicher Benachrichtigungstext",
+          "description": "Ausschließlich für schriftliche Benachrichtigungen; wird nicht vorgelesen. Überschreibt die visuelle Fassung des gemeinsamen Texts."
         },
         "title": {
           "name": "Benachrichtigungstitel",
@@ -488,8 +488,8 @@
           "description": "Prioritätsstufe. Kritisch verwendet alle passenden konfigurierten Ausgänge nur ohne ausdrückliches service- oder output-Ziel. Gewählte Ziele bleiben auch bei Kritisch bindend; keine unerwünschte TTS-Ausgabe."
         },
         "service": {
-          "name": "Delivery service channels",
-          "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
+          "name": "Ausgabekanäle",
+          "description": "Die Art der Zustellung: notification für schriftliche Benachrichtigungen, tts für Sprache oder gezielt snapcast, companion_tts oder all. Wählt niemals zusätzliche Empfänger aus."
         },
         "notify_data": {
           "name": "Benachrichtigungsdaten",
@@ -504,12 +504,12 @@
           "description": "Optionale Stimmen- oder Engine-Optionen für diesen Auftrag."
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
-          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
+          "name": "Companion-App-Sprachausgabe erlauben",
+          "description": "Optionale Freigabe für die Sprachausgabe auf zuvor ausgewählten Android-Companion-Geräten. Neue Aktionen können dies über den Ausgabekanal tts oder companion_tts wählen."
         },
         "occupied_only": {
-          "name": "Use occupied-room fallback",
-          "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
+          "name": "Belegte Bereiche als Ausweichziel verwenden",
+          "description": "Bei Bereichszielen nach dem bevorzugten Raum weitere belegte Räume versuchen. Explizit benannte Integrationen, Geräte und Entitäten bleiben davon unberührt."
         },
         "use_ai": {
           "name": "KI-Umformulierung überschreiben",
@@ -524,24 +524,24 @@
           "description": "Optionale URL, Home-Assistant-Dashboard-Pfad, app://-Link oder entityId:entity_id, der beim Tippen auf eine visuelle Companion-App-Benachrichtigung geöffnet wird. Android erhält clickAction, iOS/macOS url. Keine Weitergabe an Android TV/Fire TV, TTS oder nicht unterstützte Dienste. Überschreibt entsprechende Schlüssel in notify_data."
         },
         "text": {
-          "name": "Announcement text",
-          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+          "name": "Mitteilungstext",
+          "description": "Gemeinsamer Text für Sprachausgabe und schriftliche Benachrichtigung. Optional, wenn ein Text für einen bestimmten Kanal vorhanden ist; dieser überschreibt die entsprechende Fassung."
         },
         "area": {
-          "name": "Preferred areas",
-          "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
+          "name": "Bevorzugte Bereiche",
+          "description": "Zuerst die angegebenen Räume bedienen, dann weitere belegte Bereiche, einen per Türprüfung erlaubten Ausweichraum und zuletzt allgemeine Ausgaben. Explizite Empfänger werden unabhängig berücksichtigt."
         },
         "integration": {
-          "name": "Explicit integrations",
-          "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
+          "name": "Integrationen (explizit)",
+          "description": "Nur die konfigurierten Ausgaben dieser Integrationen verwenden. Keine fremden Geräte oder Integrationen hinzufügen. Mit Bereich und konkreten Geräten kombinierbar."
         },
         "device": {
-          "name": "Explicit devices",
-          "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
+          "name": "Geräte (explizit)",
+          "description": "Nur konfigurierte Ausgabe-Entitäten auf den ausgewählten Home-Assistant-Geräten verwenden. Keine fremden Geräte und keine zusätzlichen Lautsprecher auswählen."
         },
         "entity": {
-          "name": "Explicit entities",
-          "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
+          "name": "Entitäten (explizit)",
+          "description": "Nur die angegebenen Benachrichtigungs- oder Media-Player-Entitäten verwenden. Keine anderen Empfänger hinzufügen. Mit Integrationen und Bereichen kombinierbar."
         }
       }
     },
