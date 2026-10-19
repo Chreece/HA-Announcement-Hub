@@ -188,7 +188,7 @@ class FakeManager:
             )
         )
 
-    def _staged_audio_ready(self, *, targets, engines, shared_player, companion_records):
+    def _staged_audio_ready(self, *, targets, engines, shared_player, companion_records, job=None):
         return bool(
             shared_player and engines
             and any(self.available.get(ref, False) for ref in targets.snapcast)
