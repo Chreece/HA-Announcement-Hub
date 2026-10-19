@@ -37,11 +37,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
 
 from .ai_filter import async_filter_announcement
 from .ai_settings import resolve_ai_enabled
+from .targeting import channel_selection, filter_selected_outputs, physical_keys, restrict_physical_keys
 from .notify_click_action import mobile_click_action_data
 from .const import (
     COMPANION_STREAM_DEFAULT,
@@ -702,13 +704,8 @@ class AnnouncementManager:
         # service is omitted. An explicit service list instead specifies the
         # complete permitted set: it must never silently append Companion TTS.
 
-        # Selecting a server TTS engine chooses the voice/provider, not a room.
-        # Preserve the configured Snapcast physical outputs unless the call also
-        # narrowed them to one or more concrete clients/entries.
-        if selected_tts and not selected_room_tts and not selected_snapcast:
-            selected_room_tts.extend(room_tts_players)
-            selected_snapcast.extend(snapcast_clients)
-
+        # An explicitly selected TTS engine is infrastructure, not permission
+        # to send speech to every direct player or Snapcast client.
         return (
             tuple(dict.fromkeys(selected_tts)),
             tuple(dict.fromkeys(selected_notify)),
@@ -716,6 +713,37 @@ class AnnouncementManager:
             tuple(dict.fromkeys(selected_snapcast)),
             tuple(dict.fromkeys(selected_companion)),
         )
+
+    def _explicit_recipient_tokens(
+        self, integrations: Sequence[str], devices: Sequence[str],
+        entities: Sequence[str],
+    ) -> tuple[str, ...]:
+        """Resolve physical recipients using HA registry identity, not areas."""
+        tokens = [
+            value if value.startswith(TARGET_INTEGRATION_PREFIX)
+            else f"{TARGET_INTEGRATION_PREFIX}{value}"
+            for value in integrations
+        ]
+        tokens.extend(
+            value if value.startswith(TARGET_ENTITY_PREFIX)
+            else f"{TARGET_ENTITY_PREFIX}{value}"
+            for value in entities
+        )
+        if devices:
+            device_reg = dr.async_get(self.hass)
+            entity_reg = er.async_get(self.hass)
+            for value in devices:
+                device_id = value.removeprefix("device:")
+                if device_reg.async_get(device_id) is None:
+                    raise ServiceValidationError(f"Unknown device: {device_id}")
+                tokens.extend(
+                    f"{TARGET_ENTITY_PREFIX}{item.entity_id}"
+                    for item in entity_reg.entities.values()
+                    if item.device_id == device_id
+                    and item.entity_id.startswith(("notify.", "media_player."))
+                    and getattr(item, "disabled_by", None) is None
+                )
+        return tuple(dict.fromkeys(tokens))
 
     def _tts_player_scope(self, entity_id: str) -> str:
         """Return room/general scope for one direct TTS media player."""
@@ -825,6 +853,13 @@ class AnnouncementManager:
         use_ai: bool | None = None,
         ai_agent: str | None = None,
         text: str | None = None,
+        areas: Sequence[str] | str | None = None,
+        integrations: Sequence[str] | str | None = None,
+        devices: Sequence[str] | str | None = None,
+        entities: Sequence[str] | str | None = None,
+        channels: Sequence[str] | str | None = None,
+        _fanout: bool = False,
+        _excluded_physical: Sequence[str] = (),
     ) -> AnnouncementJob:
         # Resolve the primary message into two independent inputs BEFORE
         # severity/room routing and the optional AI rewrite. Channel-specific
@@ -844,74 +879,128 @@ class AnnouncementManager:
                 f"Announcement queue is full ({queue_max} items)"
             )
 
-        output_tokens = self._ensure_list(outputs)
-        requested = self._ensure_list(requested_services)
-        # Do not interpret explicitly supplied empty selector lists as
-        # unrestricted: for Critical that would accidentally broadcast
-        # to every configured device instead of zero selected devices.
-        if outputs is not None and not any(
-            str(token).strip() for token in output_tokens
+        # The public area field supersedes the historical output alias.
+        area_tokens = self._ensure_list(areas if areas is not None else outputs)
+        integration_tokens = self._ensure_list(integrations)
+        device_tokens = self._ensure_list(devices)
+        entity_tokens = self._ensure_list(entities)
+        channel_tokens = self._ensure_list(channels)
+        if areas is not None and outputs is not None:
+            raise ServiceValidationError("Specify area, not area and output")
+        for name, supplied, values in (
+            ("area", areas if areas is not None else outputs, area_tokens),
+            ("integration", integrations, integration_tokens),
+            ("device", devices, device_tokens),
+            ("entity", entities, entity_tokens),
+            ("service", channels, channel_tokens),
         ):
-            raise ServiceValidationError(
-                "Explicit output selector is empty; omit output for automatic routing"
-            )
-        if requested_services is not None and not any(
-            str(token).strip() for token in requested
-        ):
-            raise ServiceValidationError(
-                "Explicit service selector is empty; omit service for automatic routing"
-            )
-        requested_output_area_ids = self._resolve_area_ids(output_tokens)
-        explicit_area_routing = bool(requested_output_area_ids)
-        explicit_targeting = bool(requested) or explicit_area_routing
-        # A concrete service/entry/entity restriction remains absolute.
-        # An output *area* is instead the first preferred room, followed by
-        # occupied rooms, door-gated fallback room and finally general outputs.
-        # The queue, not the calling integration, owns that escalation.
-
-        # occupied_only always means "restrict room-bound delivery to occupied
-        # rooms". If explicit output rooms are also supplied, use their
-        # intersection with occupancy. With occupied_only disabled, explicit
-        # output rooms are authoritative.
-        occupied_area_ids = self._occupied_area_ids() if occupied_only else None
-        occupancy_filter_active = occupied_area_ids is not None
-        if occupancy_filter_active:
-            occupied_set = set(occupied_area_ids)
-            output_area_ids = (
-                tuple(
-                    area_id
-                    for area_id in requested_output_area_ids
-                    if area_id in occupied_set
+            if supplied is not None and not values:
+                raise ServiceValidationError(
+                    f"Explicit {name} selector is empty; omit it if unused"
                 )
-                if explicit_area_routing
-                else occupied_area_ids
-            )
-        elif explicit_area_routing:
-            output_area_ids = requested_output_area_ids
-        else:
-            output_area_ids = ()
+        try:
+            channel_selection(channel_tokens)
+        except ValueError as error:
+            raise ServiceValidationError(str(error)) from error
+        requested_output_area_ids = self._resolve_area_ids(area_tokens)
+        explicit_area_routing = bool(requested_output_area_ids)
+        # Legacy internal receiver restrictions remain supported, but the
+        # public service field is now *only* a delivery channel selector.
+        requested = tuple(dict.fromkeys((
+            *self._ensure_list(requested_services),
+            *self._explicit_recipient_tokens(
+                integration_tokens, device_tokens, entity_tokens
+            ),
+        )))
 
-        area_filter_active = explicit_area_routing or occupancy_filter_active
-        target_room_routing_active = bool(output_area_ids) and area_filter_active
-        room_fallback_routing = bool(
-            explicit_area_routing or (occupancy_filter_active and not requested)
-        )
-        if room_fallback_routing and requested_output_area_ids:
-            # A named room is preferred even when the occupancy sensor has no
-            # current occupied rooms; occupancy is the NEXT fallback tier.
-            output_area_ids = requested_output_area_ids
+        if explicit_area_routing and requested and not _fanout:
+            # Mixed selectors are a union of two independent obligations:
+            # preferred-room delivery plus exact integration/device delivery.
+            # Splitting them prevents either success from hiding a failure of
+            # the other, and allows the room part to keep its normal fallback.
+            capacity = int(self.settings.get(CONF_QUEUE_MAX, DEFAULT_QUEUE_MAX))
+            if len(self._queue) + (1 if self._current else 0) + 2 > capacity:
+                raise ServiceValidationError(
+                    "Combined area and explicit recipients require two queue slots"
+                )
+            cfg = self._configured_outputs()
+            static = filter_selected_outputs(
+                self._select_requested_outputs(
+                    requested, level=level, tts_engines=cfg[0],
+                    notify_outputs=cfg[1], room_tts_players=cfg[2],
+                    snapcast_clients=cfg[3], companion_entries=cfg[4],
+                    companion_tts=bool(
+                        companion_tts or "tts" in channel_tokens
+                        or "companion_tts" in channel_tokens
+                    ),
+                ),
+                channel_tokens,
+            )
+            if not physical_keys(static):
+                raise ServiceValidationError(
+                    "No configured device from integration/device/entity matches service"
+                )
+            common = dict(
+                text=text, text_tts=text_tts, text_notify=text_notify,
+                outputs=None, requested_services=None, level=level,
+                title=title, notify_data=notify_data,
+                click_action=click_action, language=language,
+                tts_options=tts_options, companion_tts=companion_tts,
+                occupied_only=occupied_only, use_ai=use_ai, ai_agent=ai_agent,
+                channels=channel_tokens, _fanout=True,
+            )
+            area_job = await self.async_enqueue(
+                **common, areas=area_tokens,
+                _excluded_physical=physical_keys(static),
+            )
+            try:
+                explicit_job = await self.async_enqueue(
+                    **common, areas=None, integrations=integration_tokens,
+                    devices=device_tokens, entities=entity_tokens,
+                )
+            except BaseException:
+                with suppress(ServiceValidationError):
+                    await self.async_cancel(area_job.job_id)
+                raise
+            area_job.related_job_ids = (explicit_job.job_id,)
+            explicit_job.group_id = area_job.job_id
+            self._schedule_save()
+            self._notify_update()
+            return area_job
+
+        # Only area triggers dynamic room/occupancy/door fallback. An explicit
+        # integration, device or entity does NOT inherit another room's outputs.
+        explicit_targeting = bool(requested) or bool(channel_tokens)
+        output_area_ids = requested_output_area_ids
+        occupied_area_ids = None
+        occupancy_filter_active = False
+        area_filter_active = explicit_area_routing
+        target_room_routing_active = bool(output_area_ids)
+        room_fallback_routing = explicit_area_routing
 
         configured = self._configured_outputs()
-        selected = self._select_requested_outputs(
-            requested,
-            level=level,
-            tts_engines=configured[0],
-            notify_outputs=configured[1],
-            room_tts_players=configured[2],
-            snapcast_clients=configured[3],
-            companion_entries=configured[4],
-            companion_tts=bool(companion_tts),
+        selected = filter_selected_outputs(
+            self._select_requested_outputs(
+                requested, level=level, tts_engines=configured[0],
+                notify_outputs=configured[1], room_tts_players=configured[2],
+                snapcast_clients=configured[3], companion_entries=configured[4],
+                companion_tts=bool(
+                    companion_tts or "tts" in channel_tokens
+                    or "companion_tts" in channel_tokens
+                ),
+            ),
+            channel_tokens,
         )
+        # Unaddressed messages can use configured General visuals, but do not
+        # automatically choose speakers from arbitrary rooms without an area.
+        if not explicit_area_routing and not requested:
+            selected = (
+                (), selected[1], (), (), selected[4] if companion_tts else ()
+            )
+        if requested and not physical_keys(selected):
+            raise ServiceValidationError(
+                "No configured recipient matches integration/device/entity and service"
+            )
         minimum_tts_level = str(
             self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
         )
@@ -1554,12 +1643,11 @@ class AnnouncementManager:
                     )
 
         if room_fallback_routing:
-            # Let AI prepare both speech-ready and visual variants once,
-            # before queue persistence. Physical channels are selected later
-            # by the staged worker and never inferred from these text fields.
+            # Text channels are independent. Routing never manufactures
+            # speech from text_notify or visual text from text_tts.
             plan = DeliveryPlan(
-                tts_text=text_tts or text_notify,
-                notify_text=text_notify or text_tts,
+                tts_text=text_tts,
+                notify_text=text_notify,
             )
             selected = ((), (), (), (), ())
             notify_records = ()
@@ -1708,6 +1796,8 @@ class AnnouncementManager:
             strict_targets=bool(requested),
             routing_mode="room_fallback" if room_fallback_routing else "normal",
             preferred_areas=requested_output_area_ids,
+            channel_services=tuple(channel_tokens),
+            excluded_physical=tuple(_excluded_physical),
             companion_tts_requested=companion_tts,
             occupancy_requested=occupied_only,
             ai=ai_info,
@@ -1967,15 +2057,22 @@ class AnnouncementManager:
         stage_kind = stage if stage in STAGES else STAGES[0]
         configured = self._configured_outputs()
         try:
-            selected = self._select_requested_outputs(
-                job.requested_services,
-                level=job.level,
-                tts_engines=configured[0],
-                notify_outputs=configured[1],
-                room_tts_players=configured[2],
-                snapcast_clients=configured[3],
-                companion_entries=configured[4],
-                companion_tts=job.companion_tts_requested,
+            selected = restrict_physical_keys(
+                filter_selected_outputs(
+                    self._select_requested_outputs(
+                        job.requested_services, level=job.level,
+                        tts_engines=configured[0], notify_outputs=configured[1],
+                        room_tts_players=configured[2], snapcast_clients=configured[3],
+                        companion_entries=configured[4],
+                        companion_tts=bool(
+                            job.companion_tts_requested
+                            or "tts" in job.channel_services
+                            or "companion_tts" in job.channel_services
+                        ),
+                    ),
+                    job.channel_services,
+                ),
+                job.excluded_physical,
             )
         except ServiceValidationError:
             # A previously configured output/integration may be temporarily
@@ -2076,11 +2173,8 @@ class AnnouncementManager:
             job.room_tts_players or job.server_tts_enabled
             or job.companion_tts_entries
         )
-        job.tts_text = (job.text_tts or job.text_notify) if audible else None
-        job.notify_text = (
-            (job.text_notify or job.text_tts)
-            if job.notify_outputs else None
-        )
+        job.tts_text = job.text_tts if audible else None
+        job.notify_text = job.text_notify if job.notify_outputs else None
         job.tts_suppressed_by_level = bool(
             job.text_tts and not speech_allowed and not audible
         )
@@ -4068,7 +4162,7 @@ class AnnouncementManager:
                 unknown.append(value)
         if unknown:
             raise ServiceValidationError(
-                "Unknown output area(s): " + ", ".join(unknown)
+                "Unknown area(s): " + ", ".join(unknown)
             )
         return tuple(dict.fromkeys(resolved))
 
