@@ -733,17 +733,41 @@ class AnnouncementManager:
         if devices:
             device_reg = dr.async_get(self.hass)
             entity_reg = er.async_get(self.hass)
+            configured = self._configured_outputs()
+            allowed = {
+                *(ref.removeprefix(TARGET_ENTITY_PREFIX) for ref in configured[1]
+                  if ref.startswith(TARGET_ENTITY_PREFIX)),
+                *configured[2], *configured[3],
+            }
+            # Companion TTS can be configured on an Android App entry even
+            # when its visual notification entity is not enabled separately.
+            companion = resolve_companion_tts_outputs(self.hass, configured[4])
+            allowed.update(
+                output.entity_id for output in companion if output.entity_id
+            )
+            companion_entries = {output.entry_id for output in companion}
             for value in devices:
                 device_id = value.removeprefix("device:")
-                if device_reg.async_get(device_id) is None:
+                item = device_reg.async_get(device_id)
+                if item is None:
                     raise ServiceValidationError(f"Unknown device: {device_id}")
-                tokens.extend(
-                    f"{TARGET_ENTITY_PREFIX}{item.entity_id}"
-                    for item in entity_reg.entities.values()
-                    if item.device_id == device_id
-                    and item.entity_id.startswith(("notify.", "media_player."))
-                    and getattr(item, "disabled_by", None) is None
+                matched = [
+                    f"{TARGET_ENTITY_PREFIX}{entry.entity_id}"
+                    for entry in entity_reg.entities.values()
+                    if entry.device_id == device_id
+                    and entry.entity_id in allowed
+                    and getattr(entry, "disabled_by", None) is None
+                ]
+                matched.extend(
+                    f"{TARGET_ENTRY_PREFIX}{entry_id}"
+                    for entry_id in getattr(item, "config_entries", set())
+                    if entry_id in companion_entries
                 )
+                if not matched:
+                    raise ServiceValidationError(
+                        f"Device {device_id} has no configured Announcement Hub output"
+                    )
+                tokens.extend(matched)
         return tuple(dict.fromkeys(tokens))
 
     def _tts_player_scope(self, entity_id: str) -> str:
@@ -885,7 +909,9 @@ class AnnouncementManager:
         integration_tokens = self._ensure_list(integrations)
         device_tokens = self._ensure_list(devices)
         entity_tokens = self._ensure_list(entities)
-        channel_tokens = self._ensure_list(channels)
+        channel_tokens = [
+            value.strip().casefold() for value in self._ensure_list(channels)
+        ]
         if areas is not None and outputs is not None:
             raise ServiceValidationError("Specify area, not area and output")
         for name, supplied, values in (
@@ -1868,7 +1894,23 @@ class AnnouncementManager:
         self._notify_update()
         return removed
 
-    async def async_cancel(self, job_id: str) -> str:
+    async def async_cancel(
+        self, job_id: str, *, _cascade: bool = True
+    ) -> str:
+        # One combined action creates two independently persisted jobs.
+        # Cancelling its returned group ID cancels both delivery obligations.
+        if _cascade:
+            group = next(
+                (item for item in (
+                    *self._queue,
+                    *((self._current,) if self._current else ()),
+                ) if item.job_id == job_id),
+                None,
+            )
+            if group:
+                for sibling_id in group.related_job_ids:
+                    with suppress(ServiceValidationError):
+                        await self.async_cancel(sibling_id, _cascade=False)
         if self._current and self._current.job_id == job_id:
             self._cancel_requested.add(job_id)
             active_players = tuple(self._active_tts_players)
