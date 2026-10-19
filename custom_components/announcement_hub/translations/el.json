@@ -472,12 +472,12 @@
       },
       "fields": {
         "text_tts": {
-          "name": "Προαιρετικό διαφορετικό κείμενο TTS",
-          "description": "Προαιρετική αντικατάσταση για την εκφωνούμενη ανακοίνωση. Άφησέ το κενό για να χρησιμοποιηθεί το text. Δεν ενεργοποιεί επιπλέον TTS όταν τα service ή output επιτρέπουν μόνο οπτικές ειδοποιήσεις."
+          "name": "Spoken TTS text",
+          "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
         },
         "text_notify": {
-          "name": "Προαιρετικό διαφορετικό κείμενο ειδοποίησης",
-          "description": "Προαιρετική αντικατάσταση για τις οπτικές ειδοποιήσεις. Άφησέ το κενό για να χρησιμοποιηθεί το text. Emoji και μορφοποίηση δεν επηρεάζουν το TTS."
+          "name": "Written notification text",
+          "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
         },
         "title": {
           "name": "Τίτλος ειδοποίησης",
@@ -487,13 +487,9 @@
           "name": "Επίπεδο",
           "description": "Σπουδαιότητα ανακοίνωσης. Το Critical χρησιμοποιεί όλες τις κατάλληλες ρυθμισμένες εξόδους μόνο όταν δεν έχει δοθεί ρητό service ή output. Οι ρητές επιλογές ισχύουν και στο Critical χωρίς ενεργοποίηση ανεπιθύμητου TTS."
         },
-        "output": {
-          "name": "Περιοχές εξόδου",
-          "description": "Προτιμώμενα δωμάτια ανακοίνωσης. Πρώτα δοκιμάζονται τα δηλωμένα δωμάτια, μετά όσα έχουν παρουσία, έπειτα το εφεδρικό δωμάτιο αν το επιτρέπει ο κανόνας της πόρτας και τέλος οι γενικές συσκευές χωρίς δωμάτιο. Μη διαθέσιμες συσκευές περιμένουν την περίοδο χάριτος πριν από αλλαγή στάδιου. Οι περιορισμοί service ισχύουν πάντα, χωρίς μετάδοση σε άσχετα δωμάτια."
-        },
         "service": {
-          "name": "Συγκεκριμένες έξοδοι",
-          "description": "Προαιρετικός αυστηρός περιορισμός σε ρυθμισμένες ενσωματώσεις, καταχωρίσεις, συσκευές notify, παλιές υπηρεσίες και κανάλια TTS (mobile_app, nfandroidtv, entry:ID, entity:notify.device, notify, tts, snapcast, companion_tts, all). Ο περιορισμός ισχύει σε κάθε επίπεδο και στάδιο εφεδρείας. Για αυτόματες εναλλακτικές συσκευές, παράλειψε το πεδίο· τα δωμάτια output είναι προτιμήσεις."
+          "name": "Delivery service channels",
+          "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
         },
         "notify_data": {
           "name": "Δεδομένα ειδοποίησης",
@@ -508,12 +504,12 @@
           "description": "Προαιρετικές επιλογές φωνής ή μηχανής για αυτή την εργασία."
         },
         "companion_tts": {
-          "name": "Χρήση TTS της Companion App",
-          "description": "Επιτρέπει ηχητικό TTS στην Android Companion App όταν δεν υπάρχει ρητή επιλογή service. Με ρητό service πρέπει να περιλαμβάνεται companion_tts (ή all) για να επιτρέπεται TTS της Companion App. Το Critical δεν παρακάμπτει ρητούς περιορισμούς."
+          "name": "Allow Companion App speech",
+          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
         },
         "occupied_only": {
-          "name": "Μόνο κατειλημμένες περιοχές",
-          "description": "Όταν ενεργοποιείται, τα δωμάτια με παρουσία αποτελούν το δεύτερο στάδιο μετά τα ρητά δωμάτια. Τα δωμάτια output έχουν πρώτη προτεραιότητα ακόμη κι αν δεν φαίνονται κατειλημμένα. Απενεργοποίησέ το για παράλειψη του σταδίου παρουσίας. Το εφεδρικό δωμάτιο με κανόνα πόρτας και οι γενικές συσκευές ακολουθούν."
+          "name": "Use occupied-room fallback",
+          "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
         },
         "use_ai": {
           "name": "Παράκαμψη χρήσης AI",
@@ -528,8 +524,24 @@
           "description": "Προαιρετικό URL, διαδρομή πίνακα Home Assistant, σύνδεσμος app:// ή entityId:entity_id που ανοίγει με πάτημα στην οπτική ειδοποίηση Companion App. Στο Android αποστέλλεται clickAction, σε iOS/macOS url. Αγνοείται σε Android TV/Fire TV, TTS και παρόχους χωρίς υποστήριξη. Υπερισχύει των αντίστοιχων πεδίων του notify_data."
         },
         "text": {
-          "name": "Κείμενο ανακοίνωσης (υποχρεωτικό για νέες ενέργειες)",
-          "description": "Κύριο κείμενο ανακοίνωσης. Χρησιμοποιείται τόσο για TTS όσο και για οπτικές ειδοποιήσεις, εκτός αν οριστεί ξεχωριστό text_tts ή text_notify. Οι παλιές ενέργειες που έχουν μόνο text_tts ή text_notify συνεχίζουν να λειτουργούν."
+          "name": "Announcement text",
+          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+        },
+        "area": {
+          "name": "Preferred areas",
+          "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
+        },
+        "integration": {
+          "name": "Explicit integrations",
+          "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
+        },
+        "device": {
+          "name": "Explicit devices",
+          "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
+        },
+        "entity": {
+          "name": "Explicit entities",
+          "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
         }
       }
     },
