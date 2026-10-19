@@ -60,7 +60,8 @@ def test_room_recipient_union_has_two_jobs_and_separate_physical_targets():
     assert "if explicit_area_routing and requested and not _fanout:" in manager
     assert "related_job_ids = (explicit_job.job_id,)" in manager
     assert "explicit_job.group_id = area_job.job_id" in manager
-    assert "_excluded_physical=physical_keys(static)" in manager
+    assert "_group_token=group_token" in manager
+    assert "_excluded_physical=physical_keys(static)" not in manager
 
 def test_tts_targets_are_frozen_even_when_currently_unavailable() -> None:
     manager = (C / "manager.py").read_text(encoding="utf-8")
