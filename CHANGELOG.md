@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.30 - 2026-10-19
+
+- Make AI announcements durable before requesting AI: queue and persist the
+  original notification, acknowledge the Hub action promptly, then rewrite
+  asynchronously in a separate config-entry background task. This prevents
+  cancelling an unqueued message when local model loading or provider errors
+  delay the caller.
+- A slow model never blocks newer ready announcements. The delivery worker
+  waits only for the given job's AI result; on provider failure, deliver its
+  preserved original text using the same configured room/severity rules.
+- Restore interrupted AI preprocessing from the persisted original after
+  Home Assistant restarts. Cancel preprocessing when a queued job is cleared,
+  and wait for all background tasks on integration shutdown.
+- Expose pending AI job IDs through queue diagnostics, and retain per-attempt
+  results on completion without changing notification recipients.
+- Add regression coverage for skipping AI-pending jobs and for the
+  queue-before-AI service handoff.
+
+
 ## 0.9.29 - 2026-10-19
 
 - Removed Announcement Hub's fixed 12-second AI request timeout, which

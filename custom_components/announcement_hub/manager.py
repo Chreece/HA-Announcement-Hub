@@ -231,6 +231,10 @@ class AnnouncementManager:
         self._last: AnnouncementJob | None = None
         self._worker_task: asyncio.Task[None] | None = None
         self._prefetch_tasks: dict[str, asyncio.Task[None]] = {}
+        # AI tasks are separate from the delivery worker: cold model loading
+        # cannot block a later, ready announcement from another room.
+        self._ai_tasks: dict[str, asyncio.Task[None]] = {}
+        self._save_lock = asyncio.Lock()
         self._wake = asyncio.Event()
         self._running = False
         self._cancel_requested: set[str] = set()
@@ -274,6 +278,10 @@ class AnnouncementManager:
             "prefetching": sorted(
                 job_id
                 for job_id, task in self._prefetch_tasks.items()
+                if not task.done()
+            ),
+            "ai_processing": sorted(
+                job_id for job_id, task in self._ai_tasks.items()
                 if not task.done()
             ),
             "worker_alive": bool(
@@ -359,7 +367,13 @@ class AnnouncementManager:
         self._running = True
         self._ensure_worker()
         for job in self._queue:
-            self._schedule_prefetch(job)
+            if job.ai.get("pending_preprocessing"):
+                # Restored requests retain their original text; retry rewriting
+                # only when needed and never dispatch a partially rewritten job.
+                job.ai["status"] = "pending"
+                self._schedule_ai_rewrite(job)
+            else:
+                self._schedule_prefetch(job)
         if self._queue:
             self._wake.set()
         self._notify_update()
@@ -407,6 +421,7 @@ class AnnouncementManager:
                 not self._running
                 and self._worker_task is None
                 and not self._prefetch_tasks
+                and not self._ai_tasks
             ):
                 return
 
@@ -423,6 +438,15 @@ class AnnouncementManager:
                 worker_task.cancel()
                 with suppress(asyncio.CancelledError):
                     await worker_task
+
+            # AI preprocessing must finish or cancel before persisting the
+            # queue. Cancelled jobs retain original text and retry after boot.
+            ai_tasks = tuple(self._ai_tasks.values())
+            self._ai_tasks.clear()
+            for task in ai_tasks:
+                task.cancel()
+            if ai_tasks:
+                await asyncio.gather(*ai_tasks, return_exceptions=True)
 
             # Prefetch operations are also entry-owned background tasks. Cancel
             # and await every one before the queue snapshot is written.
@@ -448,7 +472,8 @@ class AnnouncementManager:
                 self._queue.appendleft(self._current)
                 self._current = None
 
-            await self._store.async_save(self._serialize())
+            async with self._save_lock:
+                await self._store.async_save(self._serialize())
             self._notify_update()
 
     async def async_update_config(self) -> None:
@@ -1604,8 +1629,9 @@ class AnnouncementManager:
             **dict(tts_options or {}),
         }
 
-        # Run optional AI only after routing validation, before queue storage
-        # and prefetch. Restored queued jobs never need to call the agent.
+        # Resolve AI settings, but persist the ORIGINAL announcement before
+        # contacting any agent. Service acknowledgement must not depend on
+        # model cold-start time or response validity.
         ai_enabled, ai_source = resolve_ai_enabled(
             self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
             use_ai,
@@ -1613,7 +1639,7 @@ class AnnouncementManager:
         ai_info: dict[str, Any] = {
             "enabled": ai_enabled,
             "source": ai_source,
-            "status": "not_applicable" if ai_enabled else "disabled",
+            "status": "pending" if ai_enabled else "disabled",
             "attempted": False,
             "agent": None,
             "agent_used": None,
@@ -1626,8 +1652,6 @@ class AnnouncementManager:
                 if ai_agent is not None
                 else self.settings.get(CONF_DEFAULT_AI_AGENT, DEFAULT_AI_AGENT)
             )
-            # "default" follows the preferred Assist pipeline, NOT the
-            # built-in conversation.process intent-only default (agent_id=None).
             agent_id = (
                 DEFAULT_AI_AGENT
                 if not selected_agent or selected_agent == DEFAULT_AI_AGENT
@@ -1638,8 +1662,7 @@ class AnnouncementManager:
             )
             ai_info["agent"] = (
                 "Preferred Assist pipeline"
-                if agent_id == DEFAULT_AI_AGENT
-                else agent_id
+                if agent_id == DEFAULT_AI_AGENT else agent_id
             )
             fallback_setting = str(
                 self.settings.get(
@@ -1651,27 +1674,18 @@ class AnnouncementManager:
                 if fallback_setting == DEFAULT_FALLBACK_AI_AGENT
                 else fallback_setting
             )
-            # Critical delivery and room/level fallback may derive a spoken
-            # message from a visual input (or the reverse). AI must rewrite
-            # the *actual frozen channel texts* to guarantee that speech gets
-            # plain words and displays get their independent visual version.
-            # Do not introduce a new channel that the planner did not select.
             if plan.tts_text is not None or plan.notify_text is not None:
-                ai_started = asyncio.get_running_loop().time()
-                plan.tts_text, plan.notify_text = await async_filter_announcement(
-                    self.hass,
-                    text_tts=plan.tts_text,
-                    text_notify=plan.notify_text,
-                    agent_id=agent_id,
-                    fallback_agent_id=fallback_agent_id,
-                    diagnostics=ai_info,
-                )
-                ai_info["elapsed_seconds"] = round(
-                    asyncio.get_running_loop().time() - ai_started, 3
-                )
-                # Persist effective output copy alongside the frozen plan;
-                # original delivery level, targets and metadata remain intact.
-                text_tts, text_notify = plan.tts_text, plan.notify_text
+                # Capture exactly the planned AI channels, before the
+                # room-by-room worker temporarily narrows physical outputs.
+                ai_info.update({
+                    "pending_preprocessing": True,
+                    "source_tts": plan.tts_text,
+                    "source_notify": plan.notify_text,
+                    "requested_agent_id": agent_id,
+                    "requested_fallback_agent_id": fallback_agent_id,
+                })
+            else:
+                ai_info["status"] = "not_applicable"
 
         job = AnnouncementJob.create(
             text_tts=text_tts,
@@ -1713,19 +1727,23 @@ class AnnouncementManager:
         )
         if room_fallback_routing:
             self._prepare_staged_route(job)
-        # AI awaits an external agent: another call may fill the queue in
-        # the meantime. Recheck capacity immediately before insertion.
-        if len(self._queue) + (1 if self._current else 0) >= queue_max:
-            raise ServiceValidationError(
-                f"Announcement queue is full ({queue_max} items)"
-            )
         self._queue.append(job)
-        self._schedule_prefetch(job)
-        self._schedule_save()
+        if job.ai.get("pending_preprocessing"):
+            self._schedule_ai_rewrite(job)
+        else:
+            self._schedule_prefetch(job)
         self._ensure_worker()
         self._wake.set()
         self._fire_event(EVENT_QUEUED, job)
         self._notify_update()
+        if job.ai.get("pending_preprocessing"):
+            # Return accepted=True only after the original has been persisted.
+            # Serialize concurrent AI-enabled submissions to prevent an older
+            # snapshot from overwriting a newer one.
+            async with self._save_lock:
+                await self._store.async_save(self._serialize())
+        else:
+            self._schedule_save()
         return job
 
     async def async_clear_queue(self, *, include_current: bool = False) -> int:
@@ -1738,6 +1756,9 @@ class AnnouncementManager:
             task = self._prefetch_tasks.pop(job.job_id, None)
             if task:
                 task.cancel()
+            ai_task = self._ai_tasks.pop(job.job_id, None)
+            if ai_task:
+                ai_task.cancel()
             self._fire_event(EVENT_CANCELLED, job)
         if include_current and self._current:
             await self.async_cancel(self._current.job_id)
@@ -1770,6 +1791,9 @@ class AnnouncementManager:
             task = self._prefetch_tasks.pop(job.job_id, None)
             if task:
                 task.cancel()
+            ai_task = self._ai_tasks.pop(job.job_id, None)
+            if ai_task:
+                ai_task.cancel()
             self._last = job
             self._fire_event(EVENT_CANCELLED, job)
             self._schedule_save()
@@ -2260,6 +2284,10 @@ class AnnouncementManager:
         service is retried indefinitely until it comes online or is cancelled.
         """
         for job in tuple(self._queue):
+            if job.ai.get("pending_preprocessing"):
+                # AI is never awaited by the delivery worker. A later ready
+                # alert can proceed while an earlier model cold-starts.
+                continue
             if job.routing_mode == "room_fallback":
                 if self._staged_route_ready(job):
                     return job
@@ -3587,10 +3615,98 @@ class AnnouncementManager:
                 blocking=True,
             )
 
+    def _schedule_ai_rewrite(self, job: AnnouncementJob) -> None:
+        """Rewrite independently *after* accepting the durable original."""
+        if (
+            not self._running
+            or not job.ai.get("pending_preprocessing")
+            or job.job_id in self._ai_tasks
+        ):
+            return
+        task = self.entry.async_create_background_task(
+            self.hass,
+            self._async_rewrite_job(job),
+            f"{DOMAIN} AI {job.job_id}",
+        )
+        self._ai_tasks[job.job_id] = task
+
+        def _done(done_task: asyncio.Task[None]) -> None:
+            if self._ai_tasks.get(job.job_id) is done_task:
+                self._ai_tasks.pop(job.job_id, None)
+            if done_task.cancelled():
+                return
+            if error := done_task.exception():
+                _LOGGER.error(
+                    "Announcement AI preprocessing task failed for %s",
+                    job.job_id,
+                    exc_info=(type(error), error, error.__traceback__),
+                )
+            self._schedule_save()
+            self._wake.set()
+            self._notify_update()
+
+        task.add_done_callback(_done)
+
+    async def _async_rewrite_job(self, job: AnnouncementJob) -> None:
+        """Finish AI processing, preserving the original on actual failures.
+
+        On HA shutdown/cancellation the original stays queued and the pending
+        flag survives storage. At restart the same job is retried, never lost.
+        """
+        ai = job.ai
+        original_tts = ai.get("source_tts")
+        original_notify = ai.get("source_notify")
+        started = asyncio.get_running_loop().time()
+        try:
+            rewritten_tts, rewritten_notify = await async_filter_announcement(
+                self.hass,
+                text_tts=original_tts,
+                text_notify=original_notify,
+                agent_id=ai.get("requested_agent_id"),
+                fallback_agent_id=ai.get("requested_fallback_agent_id"),
+                diagnostics=ai,
+            )
+        except asyncio.CancelledError:
+            ai["status"] = "pending"
+            raise
+        except Exception:  # noqa: BLE001
+            _LOGGER.exception(
+                "Announcement AI preprocessing failed for %s; preserving original",
+                job.job_id,
+            )
+            rewritten_tts, rewritten_notify = original_tts, original_notify
+            ai["status"] = "fallback_original"
+            ai["failure_reason"] = "internal_error"
+        finally:
+            ai["elapsed_seconds"] = round(
+                asyncio.get_running_loop().time() - started, 3
+            )
+
+        # Cancellation or queue clearing can race with completion.
+        if job not in self._queue or not self._running:
+            return
+        job.text_tts, job.text_notify = rewritten_tts, rewritten_notify
+        if job.routing_mode == "room_fallback":
+            self._prepare_staged_route(job)
+        else:
+            job.tts_text, job.notify_text = rewritten_tts, rewritten_notify
+
+        ai["pending_preprocessing"] = False
+        for key in (
+            "source_tts", "source_notify",
+            "requested_agent_id", "requested_fallback_agent_id",
+        ):
+            ai.pop(key, None)
+        self._schedule_prefetch(job)
+        self._schedule_save()
+        self._wake.set()
+        self._notify_update()
+
     def _schedule_prefetch(self, job: AnnouncementJob) -> None:
         """Render queued speech immediately, independently of disk-cache policy."""
         if (
-            not job.tts_text
+            job.ai.get("pending_preprocessing")
+            or not job.tts_text
             or not job.tts_engines
             or not (job.server_tts_enabled or job.room_tts_players)
         ):

@@ -18,4 +18,4 @@ def test_worker_is_self_healing_and_send_checks_it() -> None:
 def test_worker_remains_a_config_entry_background_task() -> None:
     source = MANAGER.read_text(encoding="utf-8")
     assert "self.hass.async_create_task(" not in source
-    assert source.count("self.entry.async_create_background_task(") == 2
+    assert source.count("self.entry.async_create_background_task(") == 3
