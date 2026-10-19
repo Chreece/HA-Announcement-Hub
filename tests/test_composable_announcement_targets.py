@@ -123,8 +123,8 @@ def test_mixed_area_recipient_request_is_fanned_out_as_independent_jobs():
     assert "_group_token=group_token" in outer
     assert "area_job = await self.async_enqueue(" in outer
     assert "_excluded_physical=physical_keys(static)" not in outer
-    assert "room_fallback_routing = explicit_area_routing" in outer
-    assert "occupancy_filter_active = False" in outer
+    assert "room_fallback_routing = bool(" in outer
+    assert "if occupied_only and not explicit_area_routing and not requested" in outer
     # The dynamic worker may never expand a fixed recipient selection.
     assert "filter_selected_outputs(" in MANAGER
     assert "restrict_physical_keys(" in MANAGER
