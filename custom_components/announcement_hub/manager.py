@@ -995,7 +995,11 @@ class AnnouncementManager:
         # automatically choose speakers from arbitrary rooms without an area.
         if not explicit_area_routing and not requested:
             selected = (
-                (), selected[1], (), (), selected[4] if companion_tts else ()
+                (), selected[1], (), (),
+                selected[4] if (
+                    companion_tts or "tts" in channel_tokens
+                    or "companion_tts" in channel_tokens
+                ) else (),
             )
         if requested and not physical_keys(selected):
             raise ServiceValidationError(
