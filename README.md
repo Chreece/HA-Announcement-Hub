@@ -262,7 +262,9 @@ General/non-room notification outputs
 
 A `service` selector is **only a delivery-channel filter**. Use
 `integration`, `device` and `entity` to choose exact recipients;
-`area` chooses preferred room devices and permitted room fallback.
+`area` chooses preferred room devices and permitted room fallback. A
+service-only call with no recipient or room is rejected rather than
+broadcasting to all configured devices.
 
 ### Room-first channel selection
 
@@ -398,15 +400,17 @@ To restrict this announcement to Companion App **speech only**:
 action: notify.announcement_hub
 data:
   text_tts: "Your timer has finished."
-  level: warning
+  integration:
+    - mobile_app
   service:
     - companion_tts
 ```
 
-The explicit `companion_tts` service selector is sufficient; no additional
-`companion_tts: true` boolean is needed for that example. It selects only
-the configured, eligible Android Companion App speech targets allowed by
-the call's area routing.
+The explicit `companion_tts` service selector chooses the speech channel,
+while `integration: [mobile_app]` chooses the configured Android Companion
+App recipients. The additional `companion_tts: true` boolean is not needed.
+`service` alone is not a recipient and must be combined with an `area`,
+`integration`, `device` or `entity` target.
 
 **Important:** `integration: [mobile_app]` chooses the configured
 mobile devices, while `service: [notification]` requests written delivery
