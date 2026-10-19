@@ -30,7 +30,7 @@ CFG = (
 
 
 @pytest.mark.parametrize("services,expected", [
-    ([], ("tts.piper", ("entity:notify.tv", "entity:notify.phone"),
+    ([], (("tts.piper",), ("entity:notify.tv", "entity:notify.phone"),
           ("media_player.kitchen",), ("media_player.kitchen_snapcast",),
           ("phone-entry",))),
     (["notification"], ((), CFG[1], (), (), ())),
