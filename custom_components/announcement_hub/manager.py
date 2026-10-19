@@ -1045,15 +1045,26 @@ class AnnouncementManager:
             self._notify_update()
             return area_job
 
-        # Only area triggers dynamic room/occupancy/door fallback. An explicit
-        # integration, device or entity does NOT inherit another room's outputs.
+        # Exact integration/device/entity recipients never inherit occupancy
+        # or another room's outputs. Without ANY destination constraint,
+        # preserve the existing occupancy-based automatic room routing.
         explicit_targeting = bool(requested) or bool(channel_tokens)
-        output_area_ids = requested_output_area_ids
-        occupied_area_ids = None
-        occupancy_filter_active = False
-        area_filter_active = explicit_area_routing
+        occupied_area_ids = (
+            self._occupied_area_ids()
+            if occupied_only and not explicit_area_routing and not requested
+            else None
+        )
+        occupancy_filter_active = occupied_area_ids is not None
+        output_area_ids = (
+            requested_output_area_ids
+            if explicit_area_routing
+            else tuple(occupied_area_ids or ())
+        )
+        area_filter_active = explicit_area_routing or occupancy_filter_active
         target_room_routing_active = bool(output_area_ids)
-        room_fallback_routing = explicit_area_routing
+        room_fallback_routing = bool(
+            explicit_area_routing or occupancy_filter_active
+        )
 
         configured = self._configured_outputs()
         selected = filter_selected_outputs(
