@@ -19,8 +19,8 @@ def test_occupancy_source_supports_state_attribute_and_common_list_formats() -> 
 
 def test_occupancy_is_a_room_stage_not_an_explicit_device_filter() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
-    assert "occupancy_filter_active = False" in manager
-    assert "room_fallback_routing = explicit_area_routing" in manager
+    assert "if occupied_only and not explicit_area_routing and not requested" in manager
+    assert "room_fallback_routing = bool(" in manager
     assert "def _occupied_area_ids(" in manager
     assert "def _staged_areas(" in manager
     assert "self._staged_areas(job, stage)" in manager
