@@ -33,7 +33,7 @@ Snapserver installation, or new physical notification devices.
 
 | Capability | Behavior |
 | --- | --- |
-| Unified announcement action | `notify.announcement_hub` with `text`, optional spoken/visual variants, level, rooms and output restrictions |
+| Unified announcement action | `notify.announcement_hub` with `text`, independent speech/visual variants, levels, areas, exact recipients and delivery-service filters |
 | Room-first delivery | Requested area → other occupied areas → door-gated fallback area → General notification outputs |
 | Smart visual/audio choice | Prefer visual delivery for low-severity messages in the requested room; use that room's speaker when visual delivery cannot work |
 | Speech in alternate rooms | Prefer room-bound audio in occupied or permitted fallback rooms so a person can hear the announcement |
@@ -408,10 +408,11 @@ The explicit `companion_tts` service selector is sufficient; no additional
 the configured, eligible Android Companion App speech targets allowed by
 the call's area routing.
 
-**Important:** `service: [mobile_app]` is **visual-only**. Setting
-`companion_tts: true` alongside that explicit visual restriction does not
-expand the allowlist to spoken TTS. Use `service: [companion_tts]` or include
-`companion_tts` in the explicit service list.
+**Important:** `integration: [mobile_app]` chooses the configured
+mobile devices, while `service: [notification]` requests written delivery
+and `service: [companion_tts]` requests spoken Companion App delivery.
+Combining these selectors sends only the selected channel on the selected
+mobile devices. `service` never accepts an integration name.
 
 For a single selected Android Companion App entry, a configured entry may
 also be targeted by its `entry:<config_entry_id>` selector together with
@@ -682,8 +683,9 @@ as well.
 An accepted announcement with no currently usable output remains
 persisted and may be retried as availability, room occupancy and
 configuration permit. Unavailable jobs do not prevent newer runnable
-messages from progressing. A failed explicit device restriction is not
-silently replaced with a different, unrequested provider.
+messages from progressing. An explicit integration/device/entity selection
+is never widened to another recipient. A mixed area-plus-explicit call
+tracks the area and explicit-recipient jobs independently.
 
 ### Home Assistant events
 
@@ -708,7 +710,7 @@ explicit cancellations.
 | Symptom | Check |
 | --- | --- |
 | No Companion App speech | Android device selected under Companion TTS outputs; use `companion_tts: true` or `service: [companion_tts]`; check notification and audio permissions |
-| `service: [mobile_app]` displays text but does not speak | That selector is visual-only; select `companion_tts` for speech |
+| Mobile App notification does not speak | Use `integration: [mobile_app]` with `service: [tts]` or `service: [companion_tts]` and configure Android Companion TTS recipients |
 | An Info announcement goes to a General device | Check the requested room's visual and audio eligibility, TTS engine, actual physical player state, area assignment, room grace and routing history |
 | TV notify entity seems available but screen is off | Check the linked `media_player` observer and the TV's real power state |
 | Snapcast produces no sound | Check the configured TTS engine, shared player, announcement source, area-assigned clients, client mute and playback readiness |
