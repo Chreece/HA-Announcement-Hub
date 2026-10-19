@@ -245,8 +245,11 @@ namespace = {
     ),
     "resolve_notify_profile": lambda profiles, integration: {},
     "tts_allowed_for_level": lambda level, minimum: (
-        namespace["LEVEL_PRIORITY"][level]
-        >= namespace["LEVEL_PRIORITY"][minimum]
+        level == "critical" or (
+            minimum != "never"
+            and namespace["LEVEL_PRIORITY"][level]
+            >= namespace["LEVEL_PRIORITY"][minimum]
+        )
     ),
     "timedelta": timedelta,
 }
@@ -265,6 +268,8 @@ def job(*, preferred=("kueche",), services=(), level="info", age=0):
         routing_stage_started_at=start, routing_history=[],
         routing_retry_after=None,
         routing_audio_retry=False,
+        status="pending", started_at=None, finished_at=None,
+        error=None, channel_errors={},
         preferred_areas=tuple(preferred),
         requested_services=tuple(services),
         companion_tts_requested=False,
