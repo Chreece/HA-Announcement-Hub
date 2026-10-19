@@ -3,10 +3,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Chreece/HA-Announcement-Hub/releases"><img alt="GitHub release" src="https://img.shields.io/github/v/release/Chreece/HA-Announcement-Hub?display_name=tag&sort=semver"></a>
-  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/validate.yml"><img alt="Tests" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/validate.yml/badge.svg"></a>
-  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hacs.yml"><img alt="HACS" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hacs.yml/badge.svg"></a>
-  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hassfest.yml"><img alt="Hassfest" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hassfest.yml/badge.svg"></a>
+  <a href="https://github.com/Chreece/HA-Announcement-Hub/releases"><img alt="Latest version" src="https://img.shields.io/github/v/release/Chreece/HA-Announcement-Hub?display_name=tag&sort=semver"></a>
+  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/validate.yml"><img alt="Python tests" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/validate.yml/badge.svg"></a>
+  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hacs.yml"><img alt="HACS validation" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hacs.yml/badge.svg"></a>
+  <a href="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hassfest.yml"><img alt="Hassfest validation" src="https://github.com/Chreece/HA-Announcement-Hub/actions/workflows/hassfest.yml/badge.svg"></a>
 </p>
 
 <p align="center">
@@ -15,568 +15,417 @@
   </a>
 </p>
 
-<!-- ko-fi-support -->
-<p align="center">
-  <a href="https://ko-fi.com/chreece">
-    <img src="https://raw.githubusercontent.com/Chreece/pir2ha/main/.github/ko-fi-banner.svg" alt="Support Chreece on Ko-fi" width="600">
-  </a>
-</p>
-
 # Announcement Hub for Home Assistant
 
-Announcement Hub is a Home Assistant-native, persistent queue for spoken
-announcements and visible notifications. It selects outputs by integration,
-config entry, entity, service, and Home Assistant area, then executes every job
-without overlapping the next one.
+**One announcement service. The right room, the right device, and the right channel.**
 
-It does **not** run an external daemon, request a Home Assistant token, create
-helpers, edit automations, or change MPD/Snapserver configuration.
+Announcement Hub is a Home Assistant integration for audible TTS, room-aware
+Snapcast playback, Android Companion App speech, TV overlays, visual notifications,
+and optional AI-assisted wording. It owns message routing, prioritizes the
+requested room, and maintains a persistent delivery queue so an unavailable
+output does not silently discard a message.
 
-## Main behavior
+It uses your configured Home Assistant entities and services; it does not
+create an external daemon, separate credentials, an MPD installation, a
+Snapserver installation, or new physical notification devices.
 
-- Adds the primary announcement action `notify.announcement_hub`, plus
-  `announcement_hub.cancel` and `announcement_hub.clear_queue`.
-- Keeps `announcement_hub.send` as a backward-compatible legacy alias for
-  existing automations; new automations should use `notify.announcement_hub`.
-- Accepts a primary `text` with optional spoken `text_tts` and visual
-  `text_notify` overrides. Legacy channel-only actions remain supported.
-- Persists waiting jobs across Home Assistant restarts.
-- Freezes each job's selected outputs, area bindings, player, TTS settings, and
-  notification data when the job enters the queue.
-- Treats TTS as a continuous producer/consumer pipeline: every queued server or
-  direct-player utterance starts rendering immediately in the background, even
-  when file caching is disabled, while the current announcement is still playing.
-- Keeps announcement order on shared audio paths, but starts independent audible
-  output classes (direct room players, shared server/Snapcast, and opted-in
-  Companion App TTS) together for the same announcement.
-- Runs visual delivery alongside spoken delivery instead of making one channel
-  finish before the other can begin.
-- Resolves fixed-room delivery by announcement level first. If a normal-level
-  fixed room output exists, it is used; only when none survives the level filter
-  does Announcement Hub relax to the nearest fixed-room tier.
-- Uses available outputs immediately and gives unavailable or transiently
-  failing outputs one configurable retry window before recording a timeout.
-- Supports visible notifications through modern `notify.*` entities and legacy
-  `notify.<service>` actions.
-- Supports Android Companion App push TTS as an optional audible output. Eligible
-  devices are selected in setup, while ordinary action calls opt in with
-  `companion_tts: true`; the action option defaults to `false`.
-- Routes selected Snapcast clients by Home Assistant area and verifies the mute
-  state before speech. For consecutive already-rendered announcements using the
-  exact same route, the verified route is handed directly to the next item to
-  avoid restore/reapply settle gaps; the original mute state is restored as soon
-  as that chain ends or the route changes.
-- Provides a diagnostic queue sensor and lifecycle events.
+## What it can do
+
+| Capability | Behavior |
+| --- | --- |
+| Unified announcement action | `notify.announcement_hub` with `text`, optional spoken/visual variants, level, rooms and output restrictions |
+| Room-first delivery | Requested area → other occupied areas → door-gated fallback area → General notification outputs |
+| Smart visual/audio choice | Prefer visual delivery for low-severity messages in the requested room; use that room's speaker when visual delivery cannot work |
+| Speech in alternate rooms | Prefer room-bound audio in occupied or permitted fallback rooms so a person can hear the announcement |
+| Server TTS | One configured TTS engine with language, voice and provider-specific options |
+| Snapcast | Route synchronized room clients, verify their mute states, isolate the chosen recipients and restore previous states |
+| Direct room TTS | Speak on selected `media_player` entities assigned to Home Assistant areas |
+| Android Companion App TTS | Opt-in push speech through `notify.mobile_app` using the Companion App's TTS payload |
+| Visual notifications | Configured `notify` entities and legacy services, including mobile and Notifications for Android TV |
+| TV-aware delivery | NFAndroidTV visual routing can check reliable media-player power observers instead of assuming an available notify service means the screen is on |
+| Visual profiles | Long-message splitting, word-based display durations, title part numbering, TV overlay style and provider data |
+| Tap navigation | Android Companion App `clickAction` or Apple Companion App `url`, from the shared `click_action` field |
+| AI rewriting | Optional preferred Assist agent, another selected conversation agent, backup AI, independent speech/visual styles, and untouched-original fallback |
+| Persistent queue | Original text is saved before AI starts; interrupted AI jobs survive Home Assistant restarts and do not block newer runnable announcements |
+| Diagnostics | Queue sensor, per-job routing and AI results, channel outcomes and lifecycle events |
 
 ## Installation
 
-Copy:
+### HACS
 
-```text
-custom_components/announcement_hub
-```
+1. Open **HACS** in Home Assistant.
+2. Add `https://github.com/Chreece/HA-Announcement-Hub` as a custom repository of type **Integration**, if it is not already listed.
+3. Install **Announcement Hub**.
+4. Restart Home Assistant.
+5. Go to **Settings → Devices & services → Add integration → Announcement Hub**.
 
-to:
+The integration supports a single configuration entry. Ensure at least one
+notification or speech output is configured during the setup wizard.
+
+### Manual installation
+
+Copy the repository's `custom_components/announcement_hub` directory into:
 
 ```text
 /config/custom_components/announcement_hub
 ```
 
-For the Docker configuration used on this homeserver:
+Restart Home Assistant and add the integration from **Devices & services**.
+The repository also includes an optional `./install.sh` installer when working
+from a local checkout. Home Assistant must still be restarted after installing
+the component.
+
+## Interface walkthrough
+
+The following screen previews illustrate the integration's **English setup
+fields and example selections**. They are documentation renderings, **not
+captures from a live Home Assistant installation**. The exact theme, entities,
+available fields and layout depend on your system.
+
+### Choose a configuration section
+
+The **Configure** and **Reconfigure** menus let you open just the section you
+need. Saving a section preserves the other configured sections. **Edit all
+settings (full wizard)** walks through the complete form.
+
+![Illustrative Announcement Hub configuration menu](https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/screen-configure-menu.svg)
+
+### Step 1 — Notification outputs and room scope
+
+![Illustrative notification device selection and severity fields](https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/screen-notifications.svg)
+
+On **1. Notification outputs**, choose:
+
+1. **Notification devices** — the `notify` entities allowed to show messages.
+   On first setup, discovered devices are selected automatically; deselect any
+   device you do not want.
+2. **Room-based notification devices** — devices physically located in a
+   Home Assistant area, such as a television. Give these devices the correct
+   area in Home Assistant first.
+3. **Minimum Info / Success**, **Minimum Warning**, **Minimum Error** and
+   **Critical only** — choose each device's minimum notification level.
+   Devices not assigned to a higher minimum accept Debug and above.
+
+A **Room** device participates only in permitted room stages. A **General**
+device (for example, a phone or tablet not assigned to a fixed room) is
+considered after the room stages. A General device must not be treated as a
+speaker physically located in an unrelated room.
+
+Home Assistant entity and device registry areas determine the location of a
+notification device. A room-scoped device without a resolvable area cannot
+correctly participate in room routing. An explicitly configured legacy
+`service:notify.some_service` has no guaranteed room identity and is treated
+as General.
+
+### Step 2 — TTS engines and audible devices
+
+![Illustrative TTS engine, Snapcast and Companion App configuration](https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/screen-tts.svg)
+
+Under **2. TTS outputs**, configure the audio paths you actually use:
+
+- **TTS engine**: one Home Assistant TTS engine, such as Piper. The default
+  engine is offered when discoverable.
+- **TTS language** and **TTS voice**: select values supported by that engine.
+  A voice field is shown when the engine supports voice selection; engines
+  that cannot enumerate voices may offer manual entry.
+- **TTS engine options**: optional provider-specific values.
+- **Direct TTS players per room**: enabled media players assigned to an area.
+  The shared Snapcast player must not also be selected as a direct room player.
+- **Snapcast room clients**: selected, area-assigned Snapcast output clients.
+- **Shared media player driving Snapcast**: the central player that feeds the
+  announcement source, for example `media_player.mpd`. An active engine and
+  shared player are required when using Snapcast.
+- **Use TTS from level**: the normal severity preference for speech.
+  See [Room-first channel selection](#room-first-channel-selection).
+- **Pre-generate and cache speech**: controls TTS caching. Speech prefetch
+  and file-cache persistence are separate mechanisms.
+- **Companion App TTS devices**: the eligible Android Companion App devices
+  that may speak when explicitly requested by an action.
+- **Companion App audio stream**: Default, music, alarm, or alarm-max stream.
+- **Companion TTS speech estimate**: words per minute used for approximate
+  queue timing because Android push TTS has no dependable playback-finished
+  acknowledgement.
+
+**Companion App TTS is independent of server TTS.** Android devices must be
+registered in Home Assistant, able to receive mobile notifications, and
+selected in this page. Selecting a device only makes it eligible; an ordinary
+action must still opt in.
+
+### Step 3 — Provider-specific output profiles
+
+![Illustrative Android TV notification profile](https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/screen-profiles.svg)
+
+A profile is offered for each selected notification integration; additional
+Snapcast-specific controls are offered when appropriate.
+
+Visual profiles can configure maximum characters per message part, reading
+speed, minimum and maximum display time, reading-time buffer, spacing between
+parts, title part numbering, and additional provider data. Text is divided at
+natural sentence or word boundaries where possible.
+
+Estimated reading time is:
 
 ```text
-/home/chreece/homeassistant/config/custom_components/announcement_hub
+display seconds = clamp(words / reading_words_per_minute × 60 + buffer,
+                        minimum_display_seconds, maximum_display_seconds)
 ```
 
-Or run the included installer from the extracted project directory:
+For **Notifications for Android TV / Fire TV**, you can configure position,
+font size, background color, transparency and interactive overlay behavior.
+The integration uses the available advanced legacy notification action or
+the provider's active runtime client to preserve the supported appearance
+settings.
 
-```bash
-./install.sh
-```
+For **Companion App visual notifications**, multipart messages can use a
+stable replacement tag so the next part replaces the previous one instead
+of creating a notification stack.
 
-The installer validates the component, backs up any existing copy under
-`~/.local/state/ha-integration-backups/announcement_hub/`, and atomically
-replaces only the custom-component directory. It does not restart Home
-Assistant.
+For **Snapcast**, configure the announcement source, whether only clients
+already on that source are managed, route-settle delay, route verification
+timeout and restoration of original mute states. The shared TTS player and
+source must already be working in Home Assistant and Snapserver.
 
-Restart Home Assistant manually, then add **Announcement Hub** from
-**Settings → Devices & services → Add integration**.
+### Step 4 — General settings, presence, queue and AI
 
-## Direct navigation when reconfiguring
+![Illustrative room-presence, fallback and AI settings](https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/screen-general.svg)
 
-The integration's **Reconfigure** action opens a menu rather than restarting
-the four-step first-time setup. **Configure** opens the same menu:
+The **4. General options** page includes:
 
-- **Notification outputs & rooms** — devices, room scope and levels.
-- **TTS engines & devices** — engines, language, voices and physical players.
-- **Provider-specific profiles** — notification timing, appearance and Snapcast.
-- **General, presence & AI** — AI/backup agents, room fallback and queue settings.
-- **Edit all settings** — keep the full original editor when you need it.
+| Setting | What it controls |
+| --- | --- |
+| Default notification title | Title used when the action supplies none |
+| Rewrite announcements with AI | Optional AI processing for ordinary announcements |
+| Default AI conversation agent | Preferred Assist pipeline or a specific conversation agent |
+| Backup AI conversation agent | Alternate agent, or original message without a second AI attempt |
+| Room-presence entity | A sensor reporting currently occupied Home Assistant rooms |
+| Occupied rooms value | Sensor state or attribute containing room names / area IDs |
+| Fallback room | An alternate area eligible after the requested and occupied areas |
+| Require an open occupied-room door for fallback | Door rule that must pass before using the configured alternate room |
+| Door sensor label filter | Optional label to restrict which door sensors count |
+| Notification/TTS order | Which channel begins first; delivery can still overlap |
+| Maximum queued announcements | Capacity limit for new jobs |
+| Unavailable-output wait | Per-stage availability grace before trying another permitted route |
+| Audio idle wait | Maximum wait for a busy shared playback path |
+| Playback start timeout | Maximum wait for TTS playback to begin |
+| Maximum TTS playback time | Upper bound for one audible playback |
+| Post-playback gap | Optional delay between audible playback rounds |
+| Critical notification data | Provider data merged for Critical visual messages |
 
-Choosing one section jumps directly to its form and **saves immediately after
-that section is completed**, without forcing the remaining pages. Previously
-saved choices and settings outside that section are preserved. First-time
-installation still uses the guided setup wizard.
-## Setup: outputs instead of allowed/default providers
-
-Version 0.2 removes the former **Allowed** and **Default** provider lists. Every
-item selected in setup is a configured output. An output may be selected at one
-of three scopes:
-
-```text
-Integration → all matching output entities
-Config entry → every matching entity belonging to that entry
-Entity → one exact output
-```
-
-Legacy notification actions can also be entered as `service:notify.name` and
-are treated as global because Home Assistant does not expose an area for an
-arbitrary service.
-
-### Outputs page
-
-Select any combination of:
-
-- **Visual notification outputs** — Notifications for Android TV, Companion App
-  notifications, and other `notify` entities/services.
-- **Snapcast audio outputs** — Snapcast clients eligible to receive an
-  announcement. Selecting these enables automatic mute/unmute room routing.
-  Other clients currently attached to the managed announcement source are also
-  temporarily muted and restored so the message cannot leak to them.
-- **Companion App TTS outputs** — Android Companion App devices that may speak.
-  Selecting them only makes them eligible; ordinary action calls still opt in.
-
-Output entries inherit their area from the entity or device registry. Assign
-TV, phone, and Snapcast devices to their correct Home Assistant areas.
-
-### Text-to-speech page
-
-Configure:
-
-- exactly one active TTS engine, such as the Piper/Wyoming TTS entity. Home
-  Assistant's default TTS engine is preselected when one is available;
-- the active engine's language and voice directly underneath it. Voice discovery
-  accepts locale-compatible variants, so a generic language such as `el` can
-  use voices advertised as `el_GR`/ `el-GR`. If an engine accepts a voice
-  option but cannot enumerate values, the voice field remains available for a
-  manual voice ID;
-- any remaining provider-specific TTS options;
-- direct TTS media players **per room**. There is no second generic direct-player
-  selector: every direct player selected here is automatically room-scoped;
-- when Snapcast is present, the synchronized room clients plus the shared server
-  TTS media player, normally `media_player.mpd`;
-- the minimum level that is allowed to use audible TTS and cache/prefetch
-  behavior;
-- Companion App audio stream and estimated words per minute.
-
-The stored configuration keeps the historical `tts_engines` list shape for
-backward compatibility, but setup, queued jobs, and runtime delivery always use
-at most one engine.
-
-### TTS level threshold
-
-Levels are ordered as:
-
-```text
-debug < info/success < warning < error < critical
-```
-
-When a job is below **Use TTS from level**, the default behavior is
-**visual-first**: eligible notification outputs receive `text_notify`, or
-`text_tts` as a visual fallback if only speech text was supplied. TTS stays
-silent while the **requested room** has a usable visual notification. If
-the requested room has no ready visual output, its authorized TTS/Snapcast
-audio can speak even below the usual minimum; this is a same-room delivery
-fallback, not a general audible broadcast. An occupied or door-gated
-alternate room likewise prefers its available speakers so someone in that
-room can hear the announcement. `Never` explicitly disables all such
-non-Critical speech fallbacks.
-
-Without an explicit `service` or `output` selector, `critical` tries
-every configured matching output and remains audible when a TTS path exists.
-With explicit targets, Critical preserves only those targets, even if that
-means visual notifications with **no TTS**.
-
-### Snapcast page
-
-Configure the expected announcement source, normally `TTS`, routing settle and
-verification timeouts, and whether previous mute states are restored.
-
-For each spoken server-TTS round, Announcement Hub:
-
-1. waits for the shared audio path to become idle;
-2. snapshots every currently routable Snapcast client on the managed source;
-3. unmutes only the selected requested clients and mutes the others;
-4. verifies the real mute states;
-5. plays one prepared TTS item through the shared media player;
-6. waits for the player and routed clients to finish;
-7. restores the exact previous mute states.
-
-If a selected Snapcast output is unavailable, currently available clients hear
-the message immediately. The unavailable client is watched during the configured
-availability window; if it comes online in time, the message is replayed only to
-that late output. Otherwise its timeout is recorded and the queue continues.
-
-### Queue page
-
-Configure:
-
-- visual-before-TTS or TTS-before-visual ordering;
-- maximum queue length;
-- unavailable-output wait;
-- audio-path idle, playback-start, and playback-duration timeouts;
-- the gap between audible outputs;
-- optional AI message rewriting (off by default) and a conversation-agent
-  selector, preselected to **Home Assistant default**.
-
-## Per-integration visual profiles and multipart reading time
-
-After selecting visual notification outputs, setup opens one profile page for
-every concrete integration represented by those outputs. Profiles are frozen
-into each queued job, so changing options later cannot alter an announcement
-that is already waiting.
-
-Every profile provides:
-
-- maximum characters per displayed part (`0` disables splitting);
-- reading speed in words per minute;
-- minimum and maximum display duration;
-- an extra reading-time buffer and a gap between parts;
-- optional part numbering in the title;
-- provider-specific data merged before per-call `notify_data`.
-
-Splitting prefers a complete sentence (`.`, `!`, or `?`), then a comma or
-other clause boundary, and finally whitespace. A word is hard-cut only when
-that single word is longer than the configured maximum.
-
-Display time is calculated for every part as:
-
-```text
-words / words-per-minute × 60 + buffer
-```
-
-and then clamped to the configured minimum and maximum. Parts for one output
-remain sequential, while different visual outputs receive the same
-announcement concurrently.
-
-### Notifications for Android TV / Fire TV
-
-Placement and styling are delivered through the provider's advanced legacy notify action when available. On modern config-entry installations where that action is absent or named differently, Announcement Hub uses the integration's live runtime client in an executor, preserving position, duration, font, colour, transparency, and interrupt without falling back to generic `notify.send_message`.
-
-For room-routing availability, Announcement Hub automatically associates an
-NFAndroidTV notification output with the physical TV's `media_player` observers
-when Home Assistant exposes a reliable identity link. It first accepts media
-players on the same device-registry device; otherwise it compares the
-NFAndroidTV config entry's configured host/IP with media-player config entries.
-An exact host may legitimately have several observers when the same TV is
-exposed through Android TV, Android TV Remote, Bravia, or another integration.
-Those observers are kept as one physical-endpoint group instead of being treated
-as an ambiguous match. Home Assistant area is used only to narrow an already
-exact host match when matching observers exist in the notification output's area.
-
-Power state is evaluated conservatively across the whole observer group. Any
-observer that positively reports an active state keeps visual delivery eligible.
-The NFAndroidTV visual output is treated as unavailable only when every reliable
-observer is `off`, `standby`, `unavailable`, `unknown`, or has no state. This
-allows the room's TTS tier to be selected when the display cannot be shown,
-without letting one stale/disconnected integration override another observer
-that proves the TV is on. Entity IDs, friendly names, model strings, and fuzzy
-text similarity are never used to infer an association. If no strong
-device/host association exists, Announcement Hub keeps normal notify-transport
-availability rather than guessing.
-
-The native legacy notification action is used when available so each profile
-can control:
-
-- bottom-right, bottom-left, top-right, top-left, or center placement;
-- small, medium, large, or maximum font;
-- background color and transparency;
-- interactive/interrupt behavior;
-- a duration calculated from the words in the current part.
-
-### Companion App visual notifications
-
-Multipart Companion App notifications use one stable tag by default, causing
-each new part to replace the previous part instead of building a stack. This
-is independent from the optional Companion App **TTS** output.
-
-## Occupancy-aware routing and durable room fallback
-
-Announcement Hub is responsible for routing announcements from integrations
-such as Air Quality Advisor. The caller passes the original message and the
-actual Home Assistant room name (for example \`output: ["Küche"]\`). Announcement
-Hub resolves the name into an area ID; the caller must not work out fallback
-targets or override output settings.
-
-When the action requests a room or uses the configured occupancy sensor,
-Announcement Hub tries the following priority tiers **one at a time**:
-
-1. **Explicit rooms first:** physical notification/TTS/Snapcast outputs
-   belonging to the named rooms, whether or not occupancy currently detects
-   someone there. Visual minimum levels apply; room-bound audio can provide
-   a speech fallback when no usable visual output is available.
-2. **Occupied rooms next:** if \`occupied_only\` is enabled and an occupancy
-   source is configured, try other currently occupied rooms.
-3. **Door-gated fallback room:** use the configured fallback area only if
-   the original requested/occupied room has an eligible door sensor in state
-   \`on\` (open), or the door check has been explicitly disabled.
-4. **General visual and other non-room outputs:** after room routes are
-   exhausted, try only outputs configured with General scope. Never target a
-   room-bound device in an unrelated room.
-
-Each tier is checked against the actual configured outputs and its severity
-thresholds. If there is no matching device, move immediately to the next tier.
-If matching devices are registered but \`unavailable\`, \`unknown\`, or otherwise
-unready, retain that tier for **Output availability timeout** before advancing.
-If some selected devices succeed, the announcement is delivered there; there
-is no need to broadcast it to later tiers.
-
-**Room-first delivery, including Info and Success:** the configured minimum
-TTS level is a preference for **how** to announce, not permission to skip an
-available speaker in a requested room. With Piper set to Warning, a ready
-Info-level room notification stays visual-only. If no eligible visual output
-is ready in that room, Announcement Hub tries its configured and authorized
-direct TTS, Snapcast or opted-in Companion audio instead, even for Info. If a
-visual provider fails, it also retries the same room's audio before moving
-on. When the request must move to an occupied room, or to the configured
-alternate room with its door check satisfied, audible delivery is preferred
-at all normal severity levels so the person can hear the message. If neither
-channel is ready, the configured availability grace applies before moving
-to another permitted room, and General outputs remain last.
-
-**Safety:** an explicit TTS minimum of **Never** remains an absolute speech
-opt-out except for Critical. Notification minimum levels and explicit service
-or entity allowlists are never bypassed. Only physically room-bound audio
-can provide the room fallback; global TTS infrastructure cannot cause audio
-in an unrelated area.
-
-**No silent expiry:** if all eligible outputs are unavailable (or none are
-configured yet), the announcement stays queued and persisted. A newer
-runnable announcement can proceed without waiting behind it. The pending
-announcement retries permitted room tiers and General outputs as availability
-or configuration changes, including after Home Assistant restarts. It will
-finish only after delivery, explicit cancellation, or an explicit queue clear.
-Normal queue capacity limits still apply to new submissions.
-
-An explicit \`service\` restriction (provider, entity or config entry) remains
-a hard allowlist through every fallback tier. For example, \`service:
-[mobile_app]\` never turns into Piper/Snapcast or a different notify provider.
-With **\`occupied_only: false\`**, the preferred room is still attempted but
-the occupancy tier is skipped. Without a room preference or occupancy routing,
-the existing automatic level policy remains in use.
-
-The send action and the queue diagnostic sensor expose \`routing_mode\`,
-\`routing_stage\`, \`preferred_areas\` and recent \`routing_history\`, allowing
-the real output choice and each grace-period escalation to be inspected.
-
-## Main action
+For presence, a sensor may expose a list such as:
 
 ```yaml
-action: notify.announcement_hub
-data:
-  text: "Το πλυντήριο ολοκλήρωσε το πρόγραμμα."
-  text_notify: "Το πλυντήριο τελείωσε."  # optional visual override
-  output:
-    - living_room
-    - kitchen
-  level: info
+state: "occupied"
+attributes:
+  rooms:
+    - Kitchen
+    - Living Room
 ```
 
-The call returns as soon as the job has been accepted. It does not wait for the
-queued playback to finish.
+Select the sensor and set **Occupied rooms value** to `rooms`. The integration
+can also interpret area IDs and supported string/mapping representations.
+Unknown or missing room values do not authorize a broadcast to unrelated
+room devices.
 
-### Primary text and optional channel-specific variants
+## How delivery works
 
-Use **`text`** as the main message when creating a new announcement. It is
-the required primary field in the action editor; the two overrides are optional.
-Announcement Hub resolves the inputs **before** applying AI, severity thresholds,
-output restrictions, room selection, and queue persistence:
+### Room routing order
 
-| Supplied fields | Spoken (TTS) source | Visual notification source |
-| --- | --- | --- |
-| `text` only | `text` | `text` |
-| `text` + `text_tts` | `text_tts` | `text` |
-| `text` + `text_notify` | `text` | `text_notify` |
-| All three | `text_tts` | `text_notify` |
+For a call with `output` specifying a preferred area, Announcement Hub
+considers the following stages **one at a time**:
 
-Leave an override empty to inherit the common `text` value. Actual channels
-still depend on your routing, level, TTS threshold and explicit `service` or
-`output` targets. For example, `service: [mobile_app]` at Critical remains
-**visual-only**, even with a common `text`.
-
-For backwards compatibility, existing YAML automations using only
-`text_tts`, only `text_notify`, or both **continue to work unchanged**.
-If `text` is omitted, the old channel-specific behavior is preserved. A call
-with no non-empty text in any field is rejected.
-
-```yaml
-action: notify.announcement_hub
-data:
-  text: "Η πόρτα της εισόδου είναι ανοιχτή."
-  text_tts: "Η εξώπορτα παραμένει ανοιχτή."
-  text_notify: "🚪 **Η πόρτα της εισόδου είναι ανοιχτή.**"
-  level: warning
+```text
+Requested room(s)
+    ↓ if no usable authorized output
+Other currently occupied rooms (when occupied_only is true)
+    ↓ if no usable authorized output
+Configured alternate room (only if the door rule permits)
+    ↓ if no usable authorized output
+General/non-room notification outputs
 ```
 
-### Optional AI rewriting
+- The **requested room** is attempted even if it is not currently listed as
+  occupied.
+- The **occupied-room stage** uses the configured occupancy sensor; it does
+  not guess where people are.
+- The **alternate-room stage** observes the configured open-door condition.
+  When enabled, the relevant door sensor must belong to the originally
+  targeted area, have device class `door`, and have state `on`. An optional
+  label filter narrows which doors qualify.
+- The **General stage** can reach configured General outputs without treating
+  them as physical endpoints in a specific room.
+- Room-bound devices in other, unrelated areas are not silently selected.
+- If a stage has no eligible candidates it is skipped immediately. A stage
+  with candidates that are currently unavailable receives its configured
+  availability grace before escalation.
+- A successful output stops escalation to later stages. A failed provider
+  can trigger another eligible channel in the same room first.
 
-Under **General options**, configure **Rewrite announcements with AI** and
-**Default AI conversation agent**, and **Backup AI conversation agent**.
-Rewriting defaults to off for backward compatibility. The preselected
-**Home Assistant default** option now follows the **conversation agent configured
-in Home Assistant's preferred Assist pipeline**, not the intent-only agent
-used by a bare `conversation.process` call. The dropdown shows the preferred
-agent and resolves it fresh for every announcement, so changing the preferred
-Assist pipeline automatically updates the AI used. You can select a specific
-conversation agent instead. The backup dropdown defaults to **Original
-announcement (no backup AI)** and can also choose the preferred Assist
-pipeline or a specific alternative agent.
+A `service` restriction is a **hard allowlist**, not a request to broadcast.
+If you specify `service: [mobile_app]`, for example, the message cannot be
+converted into server TTS or Snapcast as a fallback.
 
-If the preferred Assist pipeline is unavailable or still uses
-`conversation.home_assistant` (the built-in intent-only agent), Announcement Hub
-does **not** send a rewriting prompt to it. Instead it tries the configured
-backup AI, if any, then delivers the original announcement unchanged. This is
-reported as `preferred_assist_pipeline_unavailable` or
-`preferred_assist_agent_not_generative` in
-`announcement_hub_result.ai.failure_reason`.
+### Room-first channel selection
 
-When enabled, the agent produces **two channel-specific versions** from the
-resolved delivery plan in **one AI request**: 
+The notification level and TTS minimum are **not the same policy**.
 
-- **Spoken (`text_tts`)** is short, natural speech with no emoji, emoticons,
-  headings, Markdown, HTML, SSML, symbols or visual decoration. A final
-  speech-cleaning pass removes harmless formatting and rejects complex markup.
-- **Visual (`text_notify`)** is separately composed for readability, with
-  optional appropriate emoji, brief emphasis, line breaks and simple styling.
-  Rich formatting varies by notification provider; HTML/SSML is not requested.
+| Situation | Channel selected |
+| --- | --- |
+| Low-severity message; an eligible visual device works in requested room | Prefer the room's visual notification; keep soft-threshold TTS silent |
+| Room visual output missing, unavailable or unsuitable | Try that room's authorized TTS/Snapcast output even at Info/Success |
+| A selected visual provider fails | Try suitable audio in the same room before escalating |
+| Announcement moves to an occupied room | Prefer that room's available audio so the person can hear it |
+| Announcement moves to the configured alternate room | Prefer audio when the door rule allows the route |
+| No permitted room route works | Consider the configured General outputs |
+| TTS preference is `Never` | No non-Critical speech fallback; the explicit hard opt-out is respected |
 
-Only planned output channels are rewritten. For example, a Critical alert
-with only visual input still has a planned TTS channel, so AI returns a
-speech-ready variant as well; an ordinary visual-only alert does not suddenly
-start speaking. Both versions use the same source facts but are formatted
-independently. The prompt asks it to preserve the original information and not
-to control devices or execute actions; the integration checks the response
-format, but cannot guarantee that every paraphrase is factually equivalent.
-AI cannot change the announcement level, recipients,
-room routing, title or notification metadata. If an agent is offline, times
-out, rejects the request, or returns an invalid response, Announcement Hub
-tries the optional backup agent once. If that fails too (or if no backup agent
-is selected), the original text is delivered unchanged. Unsafe-looking responses,
-including changed numerical readings and obvious AI refusals, are also rejected.
-Announcement Hub first queues and persists the **original message** and
-returns an acknowledgement immediately. AI rewriting then runs in a
-separate, integration-owned background task while other ready announcements
-continue through the delivery queue. A queued job is not dispatched until
-its own AI processing completes; on a provider error, the original text is
-used. If Home Assistant restarts during AI loading, the persisted original is
-processed again rather than silently lost. Announcement Hub does not cancel
-an in-flight Home Assistant conversation request after an arbitrary timeout. Cold-started local models and slower cloud
-agents are allowed to finish; after 60 seconds the Hub logs that it is still
-waiting, rather than treating the delay as a failure. This works with every
-conversation agent because it awaits `conversation.process`, not a
-provider-specific status endpoint. The standard Conversation API does not
-expose universal model-loading, generation-progress or health details.
-A real provider exception (including a timeout raised by the provider itself)
-or invalid/unsafe AI result triggers the configured backup, then the original
-announcement if necessary. Waiting for an unresponsive provider can delay
-enqueueing indefinitely; disable AI per action for time-critical alerts.
-The action response reports immediate queue acceptance and AI status
-`pending` for requests that need rewriting. The queue diagnostic sensor
-later exposes the final AI outcome and elapsed processing time; the initial
-service response cannot contain the result of asynchronous rewriting.
+Notification minimum levels still control which visual outputs may be used.
+All speech fallback remains limited to **configured and authorized physical
+outputs**, with the same strict service restrictions as the original action.
 
-To override AI for an individual announcement:
+Severity order:
+
+```text
+debug < info / success < warning < error < critical
+```
+
+An unrestricted Critical message is allowed to use every configured matching
+output. A Critical message with explicit service/device restrictions cannot
+enable devices outside those restrictions.
+
+### Snapcast routing and playback
+
+When server TTS is selected, Announcement Hub resolves the allowed physical
+Snapcast clients from their Home Assistant areas. The shared media player
+provides the audio; it is not itself permission to speak in every room.
+
+For a spoken round, Hub waits for the managed playback path to become idle,
+captures the relevant client mute states, unmutes the selected recipients,
+mutes other managed clients as needed, verifies the actual route, plays the
+prepared TTS item and restores the original states.
+
+Unavailable selected clients receive the configured availability grace.
+For consecutive announcements using the same verified route, Hub may reuse
+that route to avoid audible gaps, then restore the original mute states when
+the chain ends or the route changes. A short output-tail allowance prevents
+the end of speech being cut off.
+
+### Physical availability and delivery acknowledgement
+
+For Notifications for Android TV, Hub can associate the notify endpoint
+with reliable media-player observers through the same device-registry
+device or an exact configured host identity. If **all** reliable observers
+report off, standby or unavailable, the TV visual output is not considered
+ready. Names and fuzzy matching are not used to invent an association.
+
+**A successful Home Assistant notify action is not proof that a device
+displayed, played, or was seen receiving the message.** Companion push,
+external notification providers, device power policies and local notification
+permissions can still prevent user-visible presentation.
+
+## Send announcements
+
+Open **Developer tools → Actions**, select `notify.announcement_hub` and
+supply the message and optional targets. The examples below work equally well
+in automations or scripts.
+
+The legacy alias `announcement_hub.send` remains available for existing
+automations.
+
+### Send an ordinary announcement
 
 ```yaml
 action: notify.announcement_hub
 data:
   text: "The washing machine has finished."
-  text_notify: "🧺 Washing machine finished"  # optional
-  use_ai: true
-  ai_agent: conversation.my_ai_assistant
+  title: "Laundry"
+  level: info
 ```
 
-- Omit `use_ai` to inherit the integration setting; set `use_ai: false` to
-  bypass AI even when globally enabled.
-- Omit `ai_agent` to inherit the integration agent. The action editor provides
-  Home Assistant's conversation-agent selector.
-- The backup agent is configured globally. If both agents are unavailable or
-  return invalid text, announcements still use their exact original wording.
-- Both `notify.announcement_hub` and the legacy `announcement_hub.send`
-  support the per-announcement overrides.
+`text` is the shared message. `text_tts` and `text_notify` override the spoken
+and visual variants independently. Omitting the overrides inherits the main
+text; older automations containing only channel-specific text remain valid.
 
-**Note:** Home Assistant's built-in intent-only agent generally cannot
-rewrite arbitrary text. For natural variation, select an LLM-backed
-conversation agent. Its home-control permissions also apply when processing
-rewriting prompts; use an agent with only the capabilities you intend. If all
-AI attempts fail, the previously established original-text fallback is kept
-unchanged (rather than silently stripping the sender's input formatting).
+### Prefer a specific room
 
-### Verifying AI inheritance in an announcement
-
-An omitted `use_ai` always inherits **Rewrite announcements with AI** from
-the saved integration configuration. `use_ai: true` forces AI for that call;
-`use_ai: false` disables it only for that call. An omitted `ai_agent` uses the
-configured default agent.
-
-The `notify.announcement_hub` response now includes an `ai` object when the
-action requests a response. For example, keep your existing call and add
-`response_variable: announcement_hub_result`. Inspect the
-`announcement_hub_result.ai` object in the automation/script trace:
-
-- `enabled` — whether AI was effectively enabled for this announcement.
-- `source` — `integration` (inherited default) or `action` (explicit override).
-- `status` — `rewritten`, `accepted_unchanged`, `fallback_original`,
-  `disabled`, or `not_applicable` (no eligible message channel).
-- `agent` / `agent_used` — requested and successful conversation agents.
-- `attempted` / `attempts` — whether AI was called and each safe outcome.
-- `failure_reason` — an error category such as `no_intent_match`, `timeout`,
-  `invalid_response`, or `action_response_not_allowed`.
-
-These diagnostics do not include the announcement content, AI prompt,
-provider error messages, or secrets. They are also available in queue status
-for the corresponding job.
-
-**Important:** Home Assistant has two distinct defaults. Without an
-`agent_id`, `conversation.process` uses the built-in intent-only agent;
-Announcement Hub's **Home Assistant default** means the agent from the
-preferred Assist pipeline. The resolved agent ID is included in the action's
-`ai.agent`, `ai.agent_used` and attempt diagnostics, while
-`ai.agent_selection` indicates `preferred_assist` or `explicit`.
-If your preferred pipeline is still set to Home Assistant's built-in Assist,
-configure it to use an LLM agent or select an explicit LLM agent in
-Announcement Hub. A Home Assistant `action_done` conversation response is
-accepted as a rewrite only when no home-control actions are reported; actual
-action results are still rejected.
-### Output behavior
-
-When `output` is omitted:
-
-```text
-all configured matching outputs enabled for that call are candidates
-→ currently available outputs are used immediately
-→ unavailable or failed outputs are retried for the configured timeout
-→ remaining outputs are recorded with their final timeout/error
+```yaml
+action: notify.announcement_hub
+data:
+  text: "Please check the window."
+  level: info
+  output:
+    - Kitchen
+  occupied_only: true
 ```
 
-When one or more `output` areas are supplied, those areas are the **first
-priority**, not a permanent hard restriction. Other occupied rooms (when
-`occupied_only` is enabled), the door-gated fallback room, and finally
-general/non-room outputs are considered after the grace period. No unrelated
-room is selected, and no unrequested service or TTS channel is added.
+`output` accepts Home Assistant area names or IDs. It indicates a **preferred
+room**, not a hard device allowlist. If you intentionally want to skip the
+other occupied rooms, set `occupied_only: false`; the door-gated alternate
+room and General outputs can still be considered.
 
-For TTS, selected targets are never dropped merely because they are currently
-`unavailable` or `unknown`. They remain pending and are retried until the
-configured output-availability timeout expires.
+### Write different visual and spoken texts
 
-### Provider-targeted notifications and tap actions
+```yaml
+action: notify.announcement_hub
+data:
+  text: "The entrance door is open."
+  text_tts: "Please close the entrance door."
+  text_notify: "🚪 Entrance door open"
+  title: "Home"
+  level: warning
+```
 
-The existing `service` action field restricts **which configured integrations
-or devices** may be used at **every severity**, including Critical. That
-allowlist stays strict; `output` gives a **preferred room** whose delivery
-grace period is followed by controlled room/general fallback. Device selection
-does not broaden to other providers. For example, target only Companion App visual
-notifications with a tap-through dashboard link:
+A text channel with no authorized destination is not sent simply because
+the text exists.
+
+### Speak through an Android Companion App
+
+![Illustrative Companion App TTS action example](https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/screen-companion-action.svg)
+
+Select your Android device under **2. TTS outputs → Companion App TTS
+devices**, then call:
+
+```yaml
+action: notify.announcement_hub
+data:
+  text_tts: "The garage door is still open."
+  level: warning
+  companion_tts: true
+```
+
+To restrict this announcement to Companion App **speech only**:
+
+```yaml
+action: notify.announcement_hub
+data:
+  text_tts: "Your timer has finished."
+  level: warning
+  service:
+    - companion_tts
+```
+
+The explicit `companion_tts` service selector is sufficient; no additional
+`companion_tts: true` boolean is needed for that example. It selects only
+the configured, eligible Android Companion App speech targets allowed by
+the call's area routing.
+
+**Important:** `service: [mobile_app]` is **visual-only**. Setting
+`companion_tts: true` alongside that explicit visual restriction does not
+expand the allowlist to spoken TTS. Use `service: [companion_tts]` or include
+`companion_tts` in the explicit service list.
+
+For a single selected Android Companion App entry, a configured entry may
+also be targeted by its `entry:<config_entry_id>` selector together with
+`companion_tts: true`, while normal visual entries remain distinct. The
+Companion App must be able to receive notification pushes and play TTS.
+Audio-stream and background behavior depend on Android permissions and
+device settings.
+
+Internally, Hub uses the Home Assistant `notify.mobile_app` action with a
+Companion TTS payload (`message: TTS` and `data.tts_text`). It cannot
+reliably determine when the phone has finished speaking, so it estimates
+the hold time using the configured speaking rate.
+
+### Send only a visual Companion App notification with a tap destination
 
 ```yaml
 action: notify.announcement_hub
@@ -584,150 +433,164 @@ data:
   text_notify: "Movement detected at the front door."
   title: "Doorbell"
   service:
-    - mobile_app                 # or integration:mobile_app
+    - mobile_app
   click_action: /lovelace/cameras
+  level: warning
 ```
 
-Or target only Notifications for Android TV/Fire TV:
+For Companion App visual notifications, `click_action` maps to Android
+`data.clickAction` or Apple `data.url`, and overrides conflicting values
+in `notify_data`. Supported examples include dashboard paths, HTTPS URLs,
+`app://` links and `entityId:light.some_light`. The user taps a notification
+to navigate; Hub does not create action buttons.
+
+### Send only to Notifications for Android TV
 
 ```yaml
 action: notify.announcement_hub
 data:
-  text_notify: "The washing machine has finished."
+  text_notify: "The dryer is finished."
+  title: "Laundry"
+  level: info
   service:
     - nfandroidtv
 ```
 
-The optional `click_action` field is understood by **Companion App visual
-notifications**. Announcement Hub maps the same value to the documented
-`data.clickAction` key for Android and `data.url` for iOS/macOS. Supported
-targets include a Home Assistant dashboard path (e.g. `/lovelace/cameras`),
-a full HTTPS URL, `app://<package>`, and `entityId:<entity_id>`. On individual
-Companion App devices, tapping the notification opens the target; it does
-not add buttons or run Home Assistant actions.
+Styling comes from the provider's saved output profile.
 
-The value is sent only to known Companion App notification routes, including
-their advanced legacy notify actions and the `notify.mobile_app` group.
-Unsupported integrations, direct/Companion TTS and the Android TV/Fire TV
-overlay do not receive it. NFAndroidTV's `interrupt` option makes the
-overlay interactive, but it does not support opening arbitrary URLs.
-Existing `notify_data` remains available for more provider-specific options;
-an explicitly supplied `click_action` takes precedence over
-`notify_data.clickAction` and `notify_data.url` for Companion App outputs.
-Notifications routed through generic `notify.send_message` cannot carry
-provider-specific click metadata if no advanced mobile_app action is present.
-
-**Provider restrictions stay strict:** A Critical notification directed only
-to `mobile_app` cannot activate Piper, Snapcast or another notify provider.
-`service` is a hard device/integration restriction; `output` is a preferred
-room and may advance through the configured routing stages. Click actions
-do not affect routing. Unrestricted Critical messages retain their original
-automatic broadcast behavior.
-
-The response includes `strict_targets: true` when a `service` restriction is
-supplied. Preferred-room escalation instead reports
-`routing_mode: room_fallback` and the current `routing_stage`. An explicitly
-empty `service: []` or `output: []` remains invalid; omit the field to use
-automatic routing.
-
-### Specific outputs or integrations
-
-The optional `service` field narrows every job, including Critical, to
-only the configured integration/device types listed, even during area
-fallback. Both `notify.announcement_hub` and `announcement_hub.send`
-support this field:
-
-```text
-mobile_app                    # selected outputs from an integration
-nfandroidtv                   # selected outputs from an integration
-entry:<config_entry_id>       # selected outputs from one entry
-entity:notify.living_room_tv  # one visual output
-entity:tts.piper              # one TTS engine
-service:notify.some_service   # one legacy notification action
-tts                           # configured server TTS path
-notify                        # configured visual notification outputs
-snapcast                      # server TTS through configured Snapcast outputs
-companion_tts                 # configured Companion App TTS outputs
-all                           # all configured outputs
-```
-
-Plain entity IDs such as `tts.piper` and `notify.some_entity` are also accepted.
-When `service` is absent, Companion App TTS can be enabled with
-`companion_tts: true` or an unrestricted Critical announcement. When
-`service` is explicit, include `companion_tts` or `all` in that list to
-allow push TTS. For example, `service: [mobile_app]` is **visual only** at
-every level, even if `companion_tts: true` was supplied.
-
-### Companion App TTS
-
-First select eligible Android Companion App entries/entities under
-**Companion App TTS outputs**. Ordinary calls do not use them unless the action
-opts in; an unrestricted `critical` uses every configured matching output.
-An explicitly targeted Critical announcement never enables unselected TTS.
+### Send only to configured Snapcast speakers
 
 ```yaml
 action: notify.announcement_hub
 data:
-  text_tts: "The garage door is still open."
-  companion_tts: true
+  text_tts: "Dinner is ready."
   level: warning
+  output:
+    - Kitchen
+  service:
+    - snapcast
 ```
 
-The existing explicit restriction also opts in:
+The requested room must have a configured, eligible Snapcast client with a
+working shared TTS player. The service restriction prevents fallback to an
+unrequested provider.
 
-```yaml
-service:
-  - companion_tts
-```
-
-Companion App push TTS has no reliable playback-finished state in Home
-Assistant. Announcement Hub therefore keeps the queue locked for an estimated
-duration based on the configured words-per-minute value before it advances to
-the next audible output.
-
-### Critical example
+### Critical announcement
 
 ```yaml
 action: notify.announcement_hub
 data:
-  text_tts: "Smoke detected in the kitchen."
-  output:
-    - kitchen
-    - living_room
+  text: "Smoke detected. Check the kitchen."
   level: critical
 ```
 
-If only one text field exists, it can supply the other channel **only when
-that channel has been selected**. For example, a Critical announcement with
-`service: [mobile_app]` remains visual-only even if `text_tts` is supplied.
-A failed explicitly selected output does not trigger another provider or
-room; it is retried only up to the configured availability timeout.
+With no explicit output or provider restriction, Critical considers all
+configured eligible outputs. To limit recipients even for Critical, provide
+`service` and/or a preferred `output` with the documented room-routing
+rules.
 
-### Action response
+### Choose exact integrations or devices
+
+The optional `service` field accepts configured selections such as:
+
+| Selector | Meaning |
+| --- | --- |
+| `notify` | All configured visual notification devices |
+| `tts` | Configured server/direct TTS paths |
+| `snapcast` | Server TTS through configured Snapcast clients |
+| `companion_tts` | Configured Android Companion App spoken output |
+| `mobile_app` | Visual output from the mobile_app integration |
+| `nfandroidtv` | Visual output from Notifications for Android TV |
+| `entry:<config_entry_id>` | Outputs from a configured integration entry |
+| `entity:notify.living_room_tv` | One configured notify entity |
+| `entity:tts.piper` | One configured TTS entity |
+| `service:notify.some_service` | One configured legacy notification action |
+| `all` | All configured output classes |
+
+Plain selected entity IDs are also accepted. An explicit empty `service: []`
+or `output: []` is invalid; omit the field for automatic selection.
+
+## AI rewriting
+
+In **4. General options**, switch on **Rewrite announcements with AI** and
+select a default conversation agent. **Home Assistant default** resolves the
+conversation engine from the current *preferred Assist pipeline*; the
+built-in intent-only agent is not considered a generative rewrite model.
+Alternatively, select a specific Home Assistant `conversation.*` agent.
+A separate backup may be configured, or left at **Original announcement
+(no backup AI)**.
+
+When AI is enabled, Hub asks for channel-specific text in one structured
+response: plain speech without markup or emoji and independently styled
+visual text. The same facts, measurements, language, names and severity
+must remain intact. Invalid, action-producing or unsafe output is rejected.
+
+**The original announcement is persisted before any AI request starts.**
+AI runs in an integration-owned task while the queue can process other
+runnable jobs. The individual message waits for its rewrite to finish, then
+uses the rewritten text or the original if AI fails. Interrupted
+preprocessing can be retried from the saved original after Home Assistant
+restarts.
+
+Hub does **not** cancel an otherwise active AI request after a fixed
+elapsed time. At 60 seconds it can log that the request is still pending.
+The Home Assistant conversation service does not provide a universal
+generation-progress endpoint. A provider may still time out or fail on
+its own. A genuinely unresponsive provider can leave that individual job
+pending; later ready jobs are not blocked.
+
+Per-call AI override:
+
+```yaml
+action: notify.announcement_hub
+data:
+  text: "The robot vacuum has finished cleaning."
+  use_ai: true
+  ai_agent: conversation.my_assistant
+```
+
+Use `use_ai: false` for deterministic or time-critical announcements where
+you do not want to wait for rewriting. Omitting `use_ai` inherits the
+integration setting.
+
+## Queue, jobs and diagnostics
+
+### Request a job ID
 
 ```yaml
 - action: notify.announcement_hub
   data:
-    text_tts: "Test announcement"
+    text: "The garden lights are on."
+    level: info
   response_variable: announcement_job
 ```
 
-The job ID is available as:
+Use `{{ announcement_job.job_id }}` in a script or automation. The
+immediate action response means **accepted into the queue**, not
+**played or visibly received**. For AI-enabled calls, the immediate
+response usually shows `ai.status: pending`; the queue sensor later
+exposes the final rewrite result.
 
-```jinja2
-{{ announcement_job.job_id }}
-```
+`sensor.announcement_hub_queue` shows the number of waiting jobs. Its
+attributes include `current`, `pending`, `last`, `worker_alive`,
+`prefetching` and `ai_processing` where applicable. Each job includes
+route stage/history, selected channels, timing, safe AI diagnostics,
+provider errors and successful channel names without disclosing its
+raw message text.
 
-Visual action calls are serialized, but the notification provider controls how
-long an on-screen overlay remains visible.
+Route stages are `primary`, `occupied`, `fallback` and `general`.
+An initial response at `primary` with no selected targets does **not**
+mean routing failed: the worker may choose and record the next stage
+after queue acceptance.
 
-The response also reports the frozen TTS engines, visible outputs, Snapcast
-clients, Companion App TTS entries, and whether TTS was suppressed by the level
-threshold.
+`successful_channels` means the underlying Home Assistant service call
+returned successfully. It **does not guarantee device-side reception**.
+If you need receipt guarantees, use a recipient/provider that exposes
+acknowledgements beyond the Home Assistant notification action.
 
-## Queue management
+### Cancel or clear announcements
 
-Cancel one job:
+Cancel one waiting or active job:
 
 ```yaml
 action: announcement_hub.cancel
@@ -735,7 +598,7 @@ data:
   job_id: "JOB_ID"
 ```
 
-Clear waiting jobs:
+Clear the waiting queue:
 
 ```yaml
 action: announcement_hub.clear_queue
@@ -743,13 +606,16 @@ data:
   include_current: false
 ```
 
-## Status and events
+Set `include_current: true` to request cancellation of the active job
+as well.
 
-`sensor.announcement_hub_queue` reports the number of waiting jobs. Its
-attributes contain the active, pending, and most recent job without exposing the
-message text.
+An accepted announcement with no currently usable output remains
+persisted and may be retried as availability, room occupancy and
+configuration permit. Unavailable jobs do not prevent newer runnable
+messages from progressing. A failed explicit device restriction is not
+silently replaced with a different, unrequested provider.
 
-Events:
+### Home Assistant events
 
 ```text
 announcement_hub_queued
@@ -763,27 +629,47 @@ announcement_hub_cancelled
 announcement_hub_queue_cleared
 ```
 
-## Upgrade from 0.1
+These events can be used in automations and diagnostics to observe
+enqueueing, channel attempts, completed service calls, failures and
+explicit cancellations.
 
-The config entry migrates automatically:
+## Troubleshooting
 
-- former allowed/default TTS values become selected TTS engines;
-- former allowed/default notification values become selected visual outputs;
-- enabled Snapcast clients become selected Snapcast outputs;
-- Companion App TTS devices remain ineligible until selected in setup, and
-  ordinary calls still require per-action opt-in;
-- the new TTS threshold defaults to `debug`, preserving audible behavior;
-- the new availability wait defaults to 5 seconds.
+| Symptom | Check |
+| --- | --- |
+| No Companion App speech | Android device selected under Companion TTS outputs; use `companion_tts: true` or `service: [companion_tts]`; check notification and audio permissions |
+| `service: [mobile_app]` displays text but does not speak | That selector is visual-only; select `companion_tts` for speech |
+| An Info announcement goes to a General device | Check the requested room's visual and audio eligibility, TTS engine, actual physical player state, area assignment, room grace and routing history |
+| TV notify entity seems available but screen is off | Check the linked `media_player` observer and the TV's real power state |
+| Snapcast produces no sound | Check the configured TTS engine, shared player, announcement source, area-assigned clients, client mute and playback readiness |
+| Room fallback is skipped | Check the occupancy sensor values and whether the configured source-area door sensor is open and passes the optional label filter |
+| AI returns the original message | Inspect the job's `ai.attempts` and `ai.failure_reason`; actual provider errors, invalid JSON or integrity checks can trigger fallback |
+| AI takes a long time | Check the underlying conversation agent's load/generation time; Hub preserves the original job and does not impose an arbitrary generation cutoff |
+| Job remains pending | Inspect the queue sensor, `routing_history`, availability grace, restrictions and `ai_processing` |
+| A notification is marked successful but cannot be seen | The service call succeeded; check the recipient app, device connectivity, display rules, notification permissions, sound settings and any provider-side acknowledgement |
 
-Existing waiting queue records are migrated best-effort and retain their text,
-area request, provider selection, and prepared TTS media-source IDs.
+For debugging, use the **Announcement Hub queue sensor** and Home Assistant
+logs for `custom_components.announcement_hub`. The action response is an
+initial queue snapshot; the persisted job and its lifecycle events show
+what happened during actual processing.
 
-## Validation performed for 0.2.0
+## Safety and interoperability
 
-- Python source compiles under Python 3.13.
-- JSON and YAML resources parse.
-- 16 queue-model and resource-contract tests pass.
-- The installer is tested against a temporary Home Assistant config directory,
-  including replacement and backup behavior.
-- Live behavior still needs the first test against the actual Home Assistant,
-  MPD, Snapcast, Android TV, and Companion App entities in this installation.
+- Announcement Hub never broadens an explicit service or device allowlist.
+- It respects configured severity thresholds, area scopes, occupancy, the
+  alternate-room door rule, and the hard TTS `Never` preference (except
+  Critical).
+- Conversation agents may have Home Assistant tool permissions even though
+  Hub asks only for text. Use an agent with the smallest permissions required
+  and review any third-party provider's data handling.
+- The integration runs through supported Home Assistant TTS, media-player,
+  notify, conversation and Snapcast interfaces. Physical device readiness
+  depends on each underlying provider and its integration.
+- Provider-specific visual payloads and automatic source routing cannot
+  guarantee that every device has displayed or audibly played a message.
+
+<p align="center">
+  <a href="https://ko-fi.com/chreece">
+    <img src="https://raw.githubusercontent.com/Chreece/pir2ha/main/.github/ko-fi-banner.svg" alt="Support the project" width="600">
+  </a>
+</p>
