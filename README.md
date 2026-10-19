@@ -510,7 +510,9 @@ selected recipients. When combined with `area`, Hub creates two independently
 tracked queue jobs: one for the preferred-room route and one for the exact
 recipients. The action response includes `related_job_ids` for the second
 job, and cancelling the returned group ID cancels its waiting related job.
-Physical recipients that overlap are excluded from duplicate room delivery.
+When both legs choose the same physical endpoint, Hub records successful
+receipts for the shared group and suppresses a second send to that endpoint,
+without incorrectly treating the requested room as empty.
 
 **Only one entity:**
 
