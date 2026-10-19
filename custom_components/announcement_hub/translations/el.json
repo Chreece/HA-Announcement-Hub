@@ -472,12 +472,12 @@
       },
       "fields": {
         "text_tts": {
-          "name": "Spoken TTS text",
-          "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
+          "name": "Κείμενο εκφώνησης (TTS)",
+          "description": "Χρησιμοποιείται αποκλειστικά για ομιλία και ποτέ ως γραπτή ειδοποίηση. Αν υπάρχει κοινό κείμενο, αντικαθιστά μόνο την εκφωνούμενη εκδοχή του."
         },
         "text_notify": {
-          "name": "Written notification text",
-          "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
+          "name": "Κείμενο γραπτής ειδοποίησης",
+          "description": "Χρησιμοποιείται αποκλειστικά για γραπτές ειδοποιήσεις και δεν εκφωνείται. Αν υπάρχει κοινό κείμενο, αντικαθιστά μόνο την οπτική εκδοχή του."
         },
         "title": {
           "name": "Τίτλος ειδοποίησης",
@@ -488,8 +488,8 @@
           "description": "Σπουδαιότητα ανακοίνωσης. Το Critical χρησιμοποιεί όλες τις κατάλληλες ρυθμισμένες εξόδους μόνο όταν δεν έχει δοθεί ρητό service ή output. Οι ρητές επιλογές ισχύουν και στο Critical χωρίς ενεργοποίηση ανεπιθύμητου TTS."
         },
         "service": {
-          "name": "Delivery service channels",
-          "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
+          "name": "Κανάλια παράδοσης",
+          "description": "Επιλογή τρόπου αποστολής: notification για γραπτή ειδοποίηση, tts για ομιλία ή συγκεκριμένα snapcast, companion_tts ή all. Δεν προστίθενται νέοι παραλήπτες."
         },
         "notify_data": {
           "name": "Δεδομένα ειδοποίησης",
@@ -504,12 +504,12 @@
           "description": "Προαιρετικές επιλογές φωνής ή μηχανής για αυτή την εργασία."
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
-          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
+          "name": "Επιτρέπεται εκφώνηση στο Companion App",
+          "description": "Προαιρετική δυνατότητα ομιλίας στις προεπιλεγμένες συσκευές Android Companion. Σε νέες ενέργειες επιλέξτε το κανάλι tts ή companion_tts."
         },
         "occupied_only": {
-          "name": "Use occupied-room fallback",
-          "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
+          "name": "Εναλλακτικά σε κατειλημμένους χώρους",
+          "description": "Μετά τον αρχικό χώρο, δοκιμάζονται άλλοι κατειλημμένοι χώροι. Οι ρητά επιλεγμένες ενσωματώσεις, συσκευές και οντότητες παραμένουν ανεξάρτητες."
         },
         "use_ai": {
           "name": "Παράκαμψη χρήσης AI",
@@ -524,24 +524,24 @@
           "description": "Προαιρετικό URL, διαδρομή πίνακα Home Assistant, σύνδεσμος app:// ή entityId:entity_id που ανοίγει με πάτημα στην οπτική ειδοποίηση Companion App. Στο Android αποστέλλεται clickAction, σε iOS/macOS url. Αγνοείται σε Android TV/Fire TV, TTS και παρόχους χωρίς υποστήριξη. Υπερισχύει των αντίστοιχων πεδίων του notify_data."
         },
         "text": {
-          "name": "Announcement text",
-          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+          "name": "Κείμενο ανακοίνωσης",
+          "description": "Κοινό κείμενο για εκφώνηση και γραπτή ειδοποίηση. Είναι προαιρετικό όταν έχει δοθεί κείμενο συγκεκριμένου καναλιού, το οποίο υπερισχύει της αντίστοιχης εκδοχής."
         },
         "area": {
-          "name": "Preferred areas",
-          "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
+          "name": "Προτιμώμενοι χώροι",
+          "description": "Πρώτα οι επιλεγμένοι χώροι, έπειτα άλλοι κατειλημμένοι χώροι, ο εναλλακτικός χώρος όταν επιτρέπεται από τον έλεγχο πόρτας και τέλος οι γενικές έξοδοι. Οι ρητοί παραλήπτες εξυπηρετούνται ανεξάρτητα."
         },
         "integration": {
-          "name": "Explicit integrations",
-          "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
+          "name": "Ενσωματώσεις (ρητή επιλογή)",
+          "description": "Αποστολή μόνο στις ρυθμισμένες εξόδους των επιλεγμένων ενσωματώσεων, χωρίς άλλες συσκευές ή ενσωματώσεις. Συνδυάζεται με χώρους και συγκεκριμένες συσκευές."
         },
         "device": {
-          "name": "Explicit devices",
-          "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
+          "name": "Συσκευές (ρητή επιλογή)",
+          "description": "Χρήση μόνο των ρυθμισμένων εξόδων στις επιλεγμένες συσκευές του Home Assistant. Δεν προστίθενται άλλες συσκευές ή ηχεία."
         },
         "entity": {
-          "name": "Explicit entities",
-          "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
+          "name": "Οντότητες (ρητή επιλογή)",
+          "description": "Χρήση αποκλειστικά των οντοτήτων ειδοποίησης ή αναπαραγωγής που ορίζονται εδώ. Δεν προστίθενται άλλοι παραλήπτες."
         }
       }
     },
