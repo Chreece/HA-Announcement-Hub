@@ -188,6 +188,10 @@ class FakeManager:
             )
         )
 
+    @staticmethod
+    def _group_already_delivered(job, physical):
+        return False
+
     def _staged_audio_ready(self, *, targets, engines, shared_player, companion_records, job=None):
         return bool(
             shared_player and engines
