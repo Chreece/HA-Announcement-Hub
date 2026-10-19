@@ -66,9 +66,9 @@ def test_below_tts_threshold_prefers_visual_output() -> None:
         server_tts_enabled=True,
     )
     assert plan.tts_text is None
-    assert plan.notify_text == "Spoken-only information"
+    assert plan.notify_text is None
     assert plan.tts_suppressed_by_level is True
-    assert plan.has_visual_output is True
+    assert plan.has_visual_output is False
     assert plan.has_audible_output is False
 
 
@@ -101,10 +101,10 @@ def test_critical_uses_both_channels_even_when_one_text_is_missing() -> None:
         server_tts_enabled=True,
     )
     assert plan.tts_text == "Smoke detected"
-    assert plan.notify_text == "Smoke detected"
+    assert plan.notify_text is None
     assert plan.tts_engines == ("tts.piper",)
     assert plan.notify_outputs == ("entity:notify.tv",)
-    assert plan.has_visual_output is True
+    assert plan.has_visual_output is False
     assert plan.has_audible_output is True
 
 
@@ -293,8 +293,8 @@ def test_public_status_omits_message_content_and_title() -> None:
     assert private["text_tts"] == "Private spoken message"
 
 
-def test_critical_visual_only_source_creates_both_channel_texts() -> None:
-    """The AI must see both planned outputs even if only visual input was given."""
+def test_critical_visual_only_source_does_not_create_speech() -> None:
+    """A dedicated notify text remains written even at Critical severity."""
     plan = build_delivery_plan(
         text_tts=None,
         text_notify="Window is open",
@@ -307,9 +307,9 @@ def test_critical_visual_only_source_creates_both_channel_texts() -> None:
         companion_tts_entries=[],
         server_tts_enabled=False,
     )
-    assert plan.tts_text == "Window is open"
+    assert plan.tts_text is None
     assert plan.notify_text == "Window is open"
-    assert plan.has_audible_output
+    assert not plan.has_audible_output
     assert plan.has_visual_output
 
 
