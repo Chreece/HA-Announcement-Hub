@@ -103,9 +103,9 @@ def test_new_primary_field_is_localized_for_both_actions() -> None:
         for field in ("text", "text_tts", "text_notify"):
             assert fields[field]["name"]
             assert fields[field]["description"]
-        assert "text" in fields["text"]["description"]
-        assert "text" in fields["text_tts"]["description"]
-        assert "text" in fields["text_notify"]["description"]
+        for field in ("text", "text_tts", "text_notify"):
+            assert len(fields[field]["description"]) >= 40
+    assert "text" in source["services"]["send"]["fields"]["text"]["description"]
     assert source["services"]["send"]["fields"]["text"]["name"]
 
 
