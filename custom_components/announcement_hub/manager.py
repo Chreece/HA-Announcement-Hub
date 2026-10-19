@@ -1928,6 +1928,15 @@ class AnnouncementManager:
             self._fire_event(EVENT_CANCELLED, job)
         if include_current and self._current:
             await self.async_cancel(self._current.job_id)
+        # No stale group receipts may remain after the waiting queue is
+        # cleared. Running groups are kept until their active job finishes.
+        for group_id in tuple(self._group_success):
+            if not any(
+                job.group_id == group_id for job in self._queue
+            ) and not (
+                self._current and self._current.group_id == group_id
+            ):
+                self._group_success.pop(group_id, None)
         self._schedule_save()
         self.hass.bus.async_fire(
             EVENT_QUEUE_CLEARED,
@@ -1978,6 +1987,7 @@ class AnnouncementManager:
                 ai_task.cancel()
             self._last = job
             self._fire_event(EVENT_CANCELLED, job)
+            self._cleanup_group_success(job)
             self._schedule_save()
             self._notify_update()
             return "cancelled"
@@ -2070,6 +2080,7 @@ class AnnouncementManager:
                     self._last = job
                     if terminal_event is not None:
                         self._fire_event(terminal_event, job)
+                self._cleanup_group_success(job)
                 self._schedule_save()
                 self._notify_update()
 
@@ -4400,13 +4411,35 @@ class AnnouncementManager:
         )
 
     def _mark_group_physical(self, job: AnnouncementJob, physical: str) -> None:
-        """Persist actual successful endpoints, not attempted/available devices."""
+        """Persist shared actual receipts, including in the waiting sibling.
+
+        A restart between the two legs must never cause a second notification
+        just because the completed leg is no longer the queue's last job.
+        """
         if not job.group_id:
             return
         self._group_success.setdefault(job.group_id, set()).add(physical)
-        if physical not in job.delivered_physical:
-            job.delivered_physical.append(physical)
+        group_jobs = (
+            *self._queue,
+            *((self._current,) if self._current else ()),
+        )
+        for sibling in group_jobs:
+            if (
+                sibling.group_id == job.group_id
+                and physical not in sibling.delivered_physical
+            ):
+                sibling.delivered_physical.append(physical)
         self._schedule_save()
+
+    def _cleanup_group_success(self, job: AnnouncementJob) -> None:
+        """Bound in-memory receipt tracking to groups with outstanding jobs."""
+        if not job.group_id or any(
+            queued.group_id == job.group_id for queued in self._queue
+        ):
+            return
+        if self._current and self._current.group_id == job.group_id:
+            return
+        self._group_success.pop(job.group_id, None)
 
     def _record_channel_success(self, job: AnnouncementJob, channel: str) -> None:
         if channel not in job.successful_channels:
