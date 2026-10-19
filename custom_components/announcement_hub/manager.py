@@ -13,6 +13,7 @@ import json
 import logging
 import math
 import re
+from uuid import uuid4
 from typing import Any
 
 from homeassistant.components import tts
@@ -243,6 +244,9 @@ class AnnouncementManager:
         # cannot block a later, ready announcement from another room.
         self._ai_tasks: dict[str, asyncio.Task[None]] = {}
         self._save_lock = asyncio.Lock()
+        # Delivery receipts belong to a combined action's selected physical
+        # recipients, preventing duplicates between room and explicit legs.
+        self._group_success: dict[str, set[str]] = {}
         self._wake = asyncio.Event()
         self._running = False
         self._cancel_requested: set[str] = set()
@@ -372,6 +376,12 @@ class AnnouncementManager:
             with suppress(TypeError, ValueError, KeyError):
                 self._last = AnnouncementJob.from_dict(raw_last)
 
+        self._group_success.clear()
+        for old_job in (*self._queue, *((self._last,) if self._last else ())):
+            if old_job.group_id:
+                self._group_success.setdefault(old_job.group_id, set()).update(
+                    old_job.delivered_physical
+                )
         self._running = True
         self._ensure_worker()
         for job in self._queue:
@@ -898,6 +908,7 @@ class AnnouncementManager:
         entities: Sequence[str] | str | None = None,
         channels: Sequence[str] | str | None = None,
         _fanout: bool = False,
+        _group_token: str | None = None,
         _excluded_physical: Sequence[str] = (),
     ) -> AnnouncementJob:
         # Resolve the primary message into two independent inputs BEFORE
@@ -994,6 +1005,7 @@ class AnnouncementManager:
                 raise ServiceValidationError(
                     "No configured device from integration/device/entity matches service"
                 )
+            group_token = uuid4().hex
             common = dict(
                 text=text, text_tts=text_tts, text_notify=text_notify,
                 outputs=None, requested_services=None, level=level,
@@ -1002,10 +1014,13 @@ class AnnouncementManager:
                 tts_options=tts_options, companion_tts=companion_tts,
                 occupied_only=occupied_only, use_ai=use_ai, ai_agent=ai_agent,
                 channels=channel_tokens, _fanout=True,
+                _group_token=group_token,
             )
+            # Both legs are allowed to select overlapping physical outputs:
+            # the shared delivery receipts suppress duplicates after actual
+            # success, without making the preferred room appear empty.
             area_job = await self.async_enqueue(
                 **common, areas=area_tokens,
-                _excluded_physical=physical_keys(static),
             )
             try:
                 explicit_job = await self.async_enqueue(
@@ -1017,7 +1032,6 @@ class AnnouncementManager:
                     await self.async_cancel(area_job.job_id)
                 raise
             area_job.related_job_ids = (explicit_job.job_id,)
-            explicit_job.group_id = area_job.job_id
             self._schedule_save()
             self._notify_update()
             return area_job
@@ -1878,6 +1892,7 @@ class AnnouncementManager:
                 )
             ),
         )
+        job.group_id = _group_token
         if room_fallback_routing:
             self._prepare_staged_route(job)
         self._queue.append(job)
