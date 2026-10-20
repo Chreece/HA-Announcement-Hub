@@ -3534,7 +3534,22 @@ class AnnouncementManager:
                     raise
                 except Exception as err:  # noqa: BLE001
                     errors.append(f"{engine}: {err}")
-                    await self._async_stop_player(player)
+                    if route_targets:
+                        try:
+                            self._assert_snapcast_route_isolated(route_targets)
+                        except HomeAssistantError as isolation_error:
+                            _LOGGER.warning(
+                                "Announcement %s detected Snapcast "
+                                "route drift during playback: %s",
+                                job.job_id, isolation_error,
+                            )
+                            await self._async_quarantine_snapcast_route(
+                                player, route_targets
+                            )
+                        else:
+                            await self._async_stop_player(player)
+                    else:
+                        await self._async_stop_player(player)
                     self._record_channel_failure(job, channel, err)
                     continue
                 for client in route_targets:
@@ -3733,16 +3748,19 @@ class AnnouncementManager:
             # Both *missing* routing and later external unmute changes fail
             # closed. Do not infer permission from the shared MPD entity.
             self._assert_snapcast_route_isolated(route_targets)
+        payload = {
+            ATTR_ENTITY_ID: player,
+            ATTR_MEDIA_CONTENT_ID: media_source_id,
+            ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
+        }
+        # Snapcast's MPD/shared player is a dedicated audio source and must
+        # not trigger provider-side announce/chime handling. HA's announce
+        # flag remains enabled only for *direct* room media players that
+        # support temporarily interrupting/restoring their existing content.
+        if not shared_path:
+            payload[ATTR_MEDIA_ANNOUNCE] = True
         await self.hass.services.async_call(
-            MEDIA_PLAYER_DOMAIN,
-            "play_media",
-            {
-                ATTR_ENTITY_ID: player,
-                ATTR_MEDIA_CONTENT_ID: media_source_id,
-                ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
-                ATTR_MEDIA_ANNOUNCE: True,
-            },
-            blocking=True,
+            MEDIA_PLAYER_DOMAIN, "play_media", payload, blocking=True
         )
 
         start_timeout = float(
@@ -3911,6 +3929,29 @@ class AnnouncementManager:
                 + ", ".join(muted_targets)
             )
 
+    async def _async_quarantine_snapcast_route(
+        self, player: str, targets: Sequence[str]
+    ) -> None:
+        """Stop shared audio, re-mute other clients and drain its last packets."""
+        await self._async_stop_player(player)
+        visible = self._routable_snapcast_snapshot(targets)
+        target_set = set(targets)
+        desired = {
+            entity_id: entity_id not in target_set
+            for entity_id in visible
+        }
+        if desired:
+            try:
+                await self._async_set_mute_states(desired)
+            except asyncio.CancelledError:
+                raise
+            except Exception as err:  # noqa: BLE001
+                _LOGGER.error(
+                    "Snapcast route quarantine could not mute every "
+                    "non-target client: %s", err
+                )
+        await asyncio.sleep(_SNAPCAST_TAIL_DRAIN_SECONDS)
+
     async def _async_guard_snapcast_tail(
         self,
         job: AnnouncementJob,
@@ -3930,17 +3971,7 @@ class AnnouncementManager:
             try:
                 self._assert_snapcast_route_isolated(targets)
             except HomeAssistantError:
-                await self._async_stop_player(player)
-                visible = self._routable_snapcast_snapshot(targets)
-                desired = {
-                    entity_id: entity_id not in set(targets)
-                    for entity_id in visible
-                }
-                with suppress(Exception):
-                    await self._async_set_mute_states(desired)
-                # Give already-buffered source packets time to stop before
-                # restoration could unmute unrelated clients again.
-                await asyncio.sleep(_SNAPCAST_TAIL_DRAIN_SECONDS)
+                await self._async_quarantine_snapcast_route(player, targets)
                 raise
             remaining = deadline - loop.time()
             if remaining <= 0:
