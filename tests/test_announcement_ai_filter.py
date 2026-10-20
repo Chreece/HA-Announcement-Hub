@@ -396,7 +396,7 @@ def test_slow_primary_finishes_without_hub_timeout_or_backup(monkeypatch, caplog
     assert len(hass.services.calls) == 1
     assert diag["status"] == "rewritten"
     assert diag["attempt_duration_seconds"]["conversation.primary"] >= 0.05
-    assert "continuing to await conversation.process" in caplog.text
+    assert "continuing to await AI provider" in caplog.text
 
 
 def test_backend_timeout_is_reported_as_provider_failure_not_local_cutoff() -> None:
