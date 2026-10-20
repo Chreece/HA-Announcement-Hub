@@ -3561,7 +3561,9 @@ class AnnouncementManager:
                     # restore/mute the route until that tail has drained.
                     drain_delay = max(post_delay, _SNAPCAST_TAIL_DRAIN_SECONDS)
                     if drain_delay > 0:
-                        await asyncio.sleep(drain_delay)
+                        await self._async_guard_snapcast_tail(
+                            job, player, route_targets, drain_delay
+                        )
             # Non-Snapcast server TTS keeps the ordinary optional cushion. A
             # prepared same-route Snapcast successor intentionally skips both
             # delays so its audio can follow through the already-open route.
@@ -3724,15 +3726,13 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
-        if (
-            job.tts_media_player
-            and player == job.tts_media_player
-            and not route_targets
-        ):
-            raise HomeAssistantError(
-                "Shared TTS playback requires a verified Snapcast client "
-                "route; refusing audio without physical recipients"
-            )
+        shared_path = bool(
+            job.tts_media_player and player == job.tts_media_player
+        )
+        if shared_path:
+            # Both *missing* routing and later external unmute changes fail
+            # closed. Do not infer permission from the shared MPD entity.
+            self._assert_snapcast_route_isolated(route_targets)
         await self.hass.services.async_call(
             MEDIA_PLAYER_DOMAIN,
             "play_media",
@@ -3748,9 +3748,15 @@ class AnnouncementManager:
         start_timeout = float(
             self.settings.get(CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT)
         )
+        def playback_started() -> bool:
+            if shared_path:
+                self._assert_snapcast_route_isolated(route_targets)
+            return self._is_player_busy(player) or self._any_snapcast_busy(
+                route_targets
+            )
+
         started = await self._wait_for(
-            lambda: self._is_player_busy(player)
-            or self._any_snapcast_busy(route_targets),
+            playback_started,
             timeout=start_timeout,
             job=job,
         )
@@ -3763,9 +3769,15 @@ class AnnouncementManager:
         playback_timeout = float(
             self.settings.get(CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT)
         )
+        def playback_finished() -> bool:
+            if shared_path:
+                self._assert_snapcast_route_isolated(route_targets)
+            return not self._is_player_busy(player) and not (
+                self._any_snapcast_busy(route_targets)
+            )
+
         finished = await self._wait_for(
-            lambda: not self._is_player_busy(player)
-            and not self._any_snapcast_busy(route_targets),
+            playback_finished,
             timeout=playback_timeout,
             job=job,
         )
@@ -3858,6 +3870,82 @@ class AnnouncementManager:
                 continue
             snapshot[entity_id] = bool(muted)
         return snapshot
+
+    def _assert_snapcast_route_isolated(
+        self, target_clients: Sequence[str],
+    ) -> None:
+        """Refuse to play a shared stream if any other client can hear it.
+
+        Availability/room checks are necessary but not sufficient: a second
+        Home Assistant automation (for example a global volume controller)
+        may unmute another Snapcast client after Hub established its route.
+        Recheck the live output state immediately before and while playing.
+        """
+        targets = set(target_clients)
+        if not targets:
+            raise HomeAssistantError(
+                "Shared TTS route refused: no physical Snapcast recipients"
+            )
+        snapshot = self._routable_snapcast_snapshot(tuple(targets))
+        if not targets.issubset(snapshot):
+            missing = sorted(targets - set(snapshot))
+            raise HomeAssistantError(
+                "Shared TTS route lost selected client(s): "
+                + ", ".join(missing)
+            )
+        unexpected = sorted(
+            entity_id for entity_id, muted in snapshot.items()
+            if entity_id not in targets and not muted
+        )
+        if unexpected:
+            raise HomeAssistantError(
+                "Shared TTS playback blocked: other Snapcast clients were "
+                "unmuted by an external controller: " + ", ".join(unexpected)
+            )
+        muted_targets = sorted(
+            entity_id for entity_id in targets if snapshot[entity_id]
+        )
+        if muted_targets:
+            raise HomeAssistantError(
+                "Shared TTS route lost audible target(s): "
+                + ", ".join(muted_targets)
+            )
+
+    async def _async_guard_snapcast_tail(
+        self,
+        job: AnnouncementJob,
+        player: str,
+        targets: Sequence[str],
+        seconds: float,
+    ) -> None:
+        """Keep the route isolated while buffered Snapcast speech drains.
+
+        If an unrelated controller changes mute states, stop the source and
+        immediately re-isolate the output list before restoring prior state.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + max(0.0, seconds)
+        while True:
+            self._raise_if_cancelled(job)
+            try:
+                self._assert_snapcast_route_isolated(targets)
+            except HomeAssistantError:
+                await self._async_stop_player(player)
+                visible = self._routable_snapcast_snapshot(targets)
+                desired = {
+                    entity_id: entity_id not in set(targets)
+                    for entity_id in visible
+                }
+                with suppress(Exception):
+                    await self._async_set_mute_states(desired)
+                # Give already-buffered source packets time to stop before
+                # restoration could unmute unrelated clients again.
+                await asyncio.sleep(_SNAPCAST_TAIL_DRAIN_SECONDS)
+                raise
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                return
+            await asyncio.sleep(min(0.1, remaining))
 
     def _clear_held_snapcast_route(self) -> None:
         self._held_snapcast_snapshot = None
