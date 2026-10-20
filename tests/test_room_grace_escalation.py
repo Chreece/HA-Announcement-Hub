@@ -640,6 +640,153 @@ def test_room_speech_respects_never_and_restricted_notify_service(monkeypatch):
     assert j.snapcast_clients == ()
 
 
+def test_visual_first_failure_retries_speech_in_same_requested_room(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "media_player.kitchen_snapcast": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["channel_fallback_mode"] = "visual_then_tts"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    assert not j.snapcast_clients
+    manager._requeue_undelivered_stage(j, "visual provider error")
+    assert j.routing_stage == "primary"
+    assert j.routing_channel_retry == "tts"
+    assert manager._staged_route_ready(j)
+    assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
+    assert not j.notify_outputs
+
+
+def test_tts_first_failure_retries_visual_without_moving_rooms(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "media_player.kitchen_snapcast": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["channel_fallback_mode"] = "tts_then_visual"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
+    assert not j.notify_outputs
+    manager._requeue_undelivered_stage(j, "tts provider error")
+    assert j.routing_stage == "primary"
+    assert j.routing_channel_retry == "visual"
+    assert manager._staged_route_ready(j)
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    assert not j.snapcast_clients
+
+
+def test_tts_first_uses_visual_immediately_if_audio_offline(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True, timeout=10,
+        available={
+            "entity:notify.kitchen": True,
+            "media_player.kitchen_snapcast": False,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["channel_fallback_mode"] = "tts_then_visual"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    assert not j.snapcast_clients
+
+
+def test_directional_fallback_never_creates_missing_tts_text(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True, occupied=(), door_open=False,
+        available={
+            "entity:notify.kitchen": True,
+            "media_player.kitchen_snapcast": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["channel_fallback_mode"] = "visual_then_tts"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    j.text_tts = None
+    assert manager._staged_route_ready(j)
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    assert not j.snapcast_clients
+    manager._requeue_undelivered_stage(j, "visual provider error")
+    assert j.routing_channel_retry is None
+    assert j.routing_stage == "general"
+
+
+def test_visual_first_respects_hard_never_and_does_not_add_speakers(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "media_player.kitchen_snapcast": True,
+        },
+    )
+    manager.settings["channel_fallback_mode"] = "visual_then_tts"
+    manager.settings["tts_min_level"] = "never"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    manager._requeue_undelivered_stage(j, "visual provider error")
+    assert j.routing_channel_retry is None
+    assert not j.snapcast_clients
+
+
+def test_missing_alternate_channel_advances_room_without_broadcast(monkeypatch):
+    global manager
+    manager = FakeManager(
+        available={
+            "entity:notify.kitchen": True,
+            "entity:notify.living": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["channel_fallback_mode"] = "visual_then_tts"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    manager._requeue_undelivered_stage(j, "visual failure")
+    assert j.routing_channel_retry is None
+    assert j.routing_stage == "occupied"
+    assert j.notify_outputs == ("entity:notify.living",)
+
+
+def test_simultaneous_mode_keeps_both_channels_at_warning(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "media_player.kitchen_snapcast": True,
+        },
+    )
+    manager.settings["channel_fallback_mode"] = "both"
+    configure_manager(monkeypatch, manager)
+    j = job(level="warning")
+    assert manager._staged_route_ready(j)
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
+
+
 def test_scheduler_does_not_drop_undelivered_jobs():
     scheduler = SRC[
         SRC.index("    def _next_runnable_job("):
