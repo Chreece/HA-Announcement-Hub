@@ -104,7 +104,6 @@
         "title": "4. Allgemeine Optionen",
         "description": "Anwesenheitsrouting, Fallback, optionaler Tür-Label-Filter, Benachrichtigungsstandards und Queue/Timeouts.",
         "data": {
-          "dispatch_order": "Reihenfolge Benachrichtigung/TTS",
           "queue_max": "Maximale Anzahl Ankündigungen",
           "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
           "idle_timeout": "Wartezeit auf freien Audiopfad",
@@ -120,10 +119,10 @@
           "fallback_door_label": "Label-Filter für Türsensoren",
           "default_use_ai": "Ankündigungen mit KI umformulieren",
           "default_ai_agent": "Standard-KI-Konversationsagent",
-          "fallback_ai_agent": "Ersatz-KI-Konversationsagent"
+          "fallback_ai_agent": "Ersatz-KI-Konversationsagent",
+          "channel_fallback_mode": "Kanal-Fallback für Mitteilungen"
         },
         "data_description": {
-          "dispatch_order": "Legt fest, ob innerhalb eines Jobs zuerst visuelle Benachrichtigungen oder zuerst TTS ausgeführt wird.",
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
           "output_availability_timeout": "So lange darf ein nicht verfügbarer Ausgang pending bleiben. Andere ausführbare Jobs dürfen vorbeiziehen; danach wird der Ausgang still übersprungen.",
           "idle_timeout": "Maximale Zeit, auf einen freien Audiopfad zu warten, damit vorhandene Wiedergabe nicht unterbrochen wird.",
@@ -139,7 +138,8 @@
           "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen.",
           "default_use_ai": "Wenn aktiviert, verwenden Ankündigungen standardmäßig die KI, solange die einzelne Aktion nicht ausdrücklich use_ai: false setzt. Ein nicht angegebenes use_ai übernimmt diese Integrationseinstellung. Bei KI-Fehlern bleibt die Originalmeldung erhalten. Der KI-Status steht in der Antwortvariable der Aktion.",
           "default_ai_agent": "Home Assistant Standard verwendet den Konversationsagenten der bevorzugten Assist-Pipeline, nicht den integrierten Intent-Agenten von conversation.process. Die Auswahl wird bei jeder Ankündigung neu ermittelt und im Menü angezeigt. Falls die Pipeline den integrierten Agenten nutzt, einen LLM-Agenten ausdrücklich auswählen oder einen Ersatzagenten konfigurieren.",
-          "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt."
+          "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt.",
+          "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam."
         }
       },
       "reconfigure": {
@@ -280,7 +280,6 @@
         "title": "4. Allgemeine Optionen",
         "description": "Anwesenheitsrouting, Fallback, optionaler Tür-Label-Filter, Benachrichtigungsstandards und Queue/Timeouts.",
         "data": {
-          "dispatch_order": "Reihenfolge Benachrichtigung/TTS",
           "queue_max": "Maximale Anzahl Ankündigungen",
           "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
           "idle_timeout": "Wartezeit auf freien Audiopfad",
@@ -296,10 +295,10 @@
           "fallback_door_label": "Label-Filter für Türsensoren",
           "default_use_ai": "Ankündigungen mit KI umformulieren",
           "default_ai_agent": "Standard-KI-Konversationsagent",
-          "fallback_ai_agent": "Ersatz-KI-Konversationsagent"
+          "fallback_ai_agent": "Ersatz-KI-Konversationsagent",
+          "channel_fallback_mode": "Kanal-Fallback für Mitteilungen"
         },
         "data_description": {
-          "dispatch_order": "Legt fest, ob innerhalb eines Jobs zuerst visuelle Benachrichtigungen oder zuerst TTS ausgeführt wird.",
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
           "output_availability_timeout": "So lange darf ein nicht verfügbarer Ausgang pending bleiben. Andere ausführbare Jobs dürfen vorbeiziehen; danach wird der Ausgang still übersprungen.",
           "idle_timeout": "Maximale Zeit, auf einen freien Audiopfad zu warten, damit vorhandene Wiedergabe nicht unterbrochen wird.",
@@ -315,7 +314,8 @@
           "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen.",
           "default_use_ai": "Wenn aktiviert, verwenden Ankündigungen standardmäßig die KI, solange die einzelne Aktion nicht ausdrücklich use_ai: false setzt. Ein nicht angegebenes use_ai übernimmt diese Integrationseinstellung. Bei KI-Fehlern bleibt die Originalmeldung erhalten. Der KI-Status steht in der Antwortvariable der Aktion.",
           "default_ai_agent": "Home Assistant Standard verwendet den Konversationsagenten der bevorzugten Assist-Pipeline, nicht den integrierten Intent-Agenten von conversation.process. Die Auswahl wird bei jeder Ankündigung neu ermittelt und im Menü angezeigt. Falls die Pipeline den integrierten Agenten nutzt, einen LLM-Agenten ausdrücklich auswählen oder einen Ersatzagenten konfigurieren.",
-          "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt."
+          "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt.",
+          "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam."
         }
       },
       "init": {
@@ -442,6 +442,13 @@
         "warning": "Warnung",
         "error": "Fehler",
         "critical": "Kritisch"
+      }
+    },
+    "channel_fallback_mode": {
+      "options": {
+        "visual_then_tts": "Zuerst visuell → TTS bei Fehlschlag",
+        "tts_then_visual": "Zuerst TTS → visuell bei Fehlschlag",
+        "both": "Beide erlaubten Kanäle"
       }
     }
   },
