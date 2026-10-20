@@ -2483,7 +2483,11 @@ class AnnouncementManager:
         ):
             desired_retry = "tts" if selected_visual else "visual"
 
-        if desired_retry == "tts" and minimum_tts_level == TTS_LEVEL_NEVER:
+        if (
+            desired_retry == "tts"
+            and minimum_tts_level == TTS_LEVEL_NEVER
+            and job.level != LEVEL_CRITICAL
+        ):
             # Respect explicit non-Critical mute; the stage selector also
             # filters this channel, so never try to force it.
             desired_retry = None
