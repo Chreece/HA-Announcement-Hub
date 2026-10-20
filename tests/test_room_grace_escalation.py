@@ -102,6 +102,7 @@ class FakeManager:
         self.settings = {
             "tts_min_level": "warning",
             "notify_profiles": {},
+            "channel_fallback_mode": "both",
         }
         self._availability_timeout = timeout
         self.occupied = tuple(occupied)
@@ -239,6 +240,11 @@ namespace = {
     "TTS_LEVEL_NEVER": "never",
     "CONF_TTS_MIN_LEVEL": "tts_min_level",
     "DEFAULT_TTS_MIN_LEVEL": "debug",
+    "CONF_CHANNEL_FALLBACK_MODE": "channel_fallback_mode",
+    "DEFAULT_CHANNEL_FALLBACK_MODE": "both",
+    "CHANNEL_VISUAL_THEN_TTS": "visual_then_tts",
+    "CHANNEL_TTS_THEN_VISUAL": "tts_then_visual",
+    "LEVEL_CRITICAL": "critical",
     "CONF_NOTIFY_PROFILES": "notify_profiles",
     "NOTIFY_SCOPE_GENERAL": "general",
     "UTC": UTC,
@@ -281,6 +287,7 @@ def job(*, preferred=("kueche",), services=(), level="info", age=0):
         routing_stage_started_at=start, routing_history=[],
         routing_retry_after=None,
         routing_audio_retry=False,
+        routing_channel_retry=None,
         status="pending", started_at=None, finished_at=None,
         error=None, channel_errors={},
         preferred_areas=tuple(preferred),
