@@ -40,20 +40,15 @@ def prioritize_stage_targets(
     visual_ready: bool,
     audio_ready: bool,
     audio_retry: bool = False,
+    mode: str = "both",
+    retry_channel: str | None = None,
 ) -> StageTargets:
-    """Prioritize *in-room* receipt over a soft TTS severity preference.
+    """Choose channel order without adding any physical recipients.
 
-    Below the configured minimum TTS level, a ready visual endpoint suppresses
-    speech in the requested room. If visual delivery is not currently possible,
-    use that same room's ready speaker. In other occupied/door-gated fallback
-    rooms, spoken delivery wins so occupants can hear the announcement.
-    Unready room devices remain candidates for the stage's availability grace.
-
-    "Never" is a separate hard user opt-out; the caller must not include speech
-    candidates at all when that is configured (except Critical).
+    Preference applies only if both channel texts and both eligible output
+    classes exist at this stage. The caller removes missing text channels and
+    imposes severity/device allowlists before invoking this policy.
     """
-    if stage == "general":
-        return candidates
     audio = StageTargets(
         room_tts=candidates.room_tts,
         snapcast=candidates.snapcast,
@@ -61,8 +56,31 @@ def prioritize_stage_targets(
     )
     visual = StageTargets(notify=candidates.notify)
 
-    # A delivery provider may have acknowledged no output. Retry a different
-    # channel in the *same room* before escalating to another room.
+    if retry_channel == "tts":
+        return audio
+    if retry_channel == "visual":
+        return visual
+
+    if not candidates.notify or not candidates.has_audio:
+        return candidates
+
+    if mode == "visual_then_tts":
+        if visual_ready:
+            return visual
+        if audio_ready:
+            return audio
+        return candidates
+    if mode == "tts_then_visual":
+        if audio_ready:
+            return audio
+        if visual_ready:
+            return visual
+        return candidates
+
+    # Existing simultaneous mode: preserve low-severity visual-first in the
+    # requested room and audible preference when moved to another room.
+    if stage == "general":
+        return candidates
     if audio_retry:
         return audio
     if normal_speech_allowed:
@@ -73,15 +91,11 @@ def prioritize_stage_targets(
         if audio_ready:
             return audio
         return candidates
-
-    # Once a message has moved away from the explicitly requested room,
-    # audible delivery is the preferred way to reach the person.
     if audio_ready:
         return audio
     if visual_ready:
         return visual
     return candidates
-
 
 def next_stage(stage: str) -> str:
     """Advance a route priority without ever skipping past general outputs."""
