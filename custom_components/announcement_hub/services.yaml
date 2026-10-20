@@ -87,6 +87,13 @@ send:
         ai_agent:
           selector:
             conversation_agent:
+        ai_mode:
+          default: rewrite
+          selector:
+            select:
+              options:
+                - rewrite
+                - generate
     advanced:
       collapsed: true
       fields:
