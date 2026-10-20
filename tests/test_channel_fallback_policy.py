@@ -99,6 +99,26 @@ def test_failure_retry_never_expands_other_rooms_or_generals(stage):
         )
 
 
+def test_both_mode_does_not_retry_failed_visual_when_no_audio_exists():
+    only_visual = candidates(visual=True, speech=False)
+    result = routing.prioritize_stage_targets(
+        stage="primary", candidates=only_visual, mode="both",
+        normal_speech_allowed=False,
+        visual_ready=True, audio_ready=False, audio_retry=True,
+    )
+    assert not result.has_output
+
+
+@pytest.mark.parametrize("mode", ["visual_then_tts", "tts_then_visual"])
+def test_channel_text_and_physical_targets_are_required_together(mode):
+    empty = routing.prioritize_stage_targets(
+        stage="primary", candidates=candidates(visual=False, speech=False),
+        mode=mode, normal_speech_allowed=True,
+        visual_ready=False, audio_ready=False,
+    )
+    assert not empty.has_output
+
+
 def test_simultaneous_default_retains_legacy_low_severity_room_rules():
     c = candidates()
     primary = routing.prioritize_stage_targets(
@@ -248,6 +268,16 @@ def test_normal_delivery_single_channel_ignores_preference(
     asyncio.run(_async_process_job(worker, j))
     assert worker.calls.count("tts" if tts else "visual") == 1
     assert len(j.successful_channels) == 1
+
+
+@pytest.mark.parametrize("mode", ["visual_then_tts", "tts_then_visual"])
+def test_dual_channel_complete_provider_failure_is_not_reported_as_success(mode):
+    worker = DeliveryHarness(mode, fails=["visual", "tts"])
+    j = job()
+    with pytest.raises(RuntimeError):
+        asyncio.run(_async_process_job(worker, j))
+    assert len(worker.calls) == 2
+    assert not j.successful_channels
 
 
 def test_no_fallback_changes_text_payload_or_exact_recipient_list():
