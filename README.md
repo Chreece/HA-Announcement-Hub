@@ -812,6 +812,9 @@ data:
   text: "The robot vacuum has finished cleaning."
   use_ai: true
   ai_agent: conversation.my_assistant
+
+  # Alternatively select an AI Task entity:
+  # ai_agent: ai_task.my_model
 ```
 
 Use `use_ai: false` for deterministic or time-critical announcements where
@@ -939,3 +942,8 @@ what happened during actual processing.
     <img src="https://raw.githubusercontent.com/Chreece/pir2ha/main/.github/ko-fi-banner.svg" alt="Support the project" width="600">
   </a>
 </p>
+
+
+### AI Task providers
+
+Announcement Hub supports Home Assistant **AI Task** entities alongside conversation agents. In the integration's general AI settings, choose an `ai_task.*` entity as the primary or backup provider. For a specific announcement, set `ai_agent: ai_task.your_entity` with `use_ai: true`. The Hub calls `ai_task.generate_data` with the announcement instructions and validates its JSON response using the same factual, speech and visual safeguards as conversation agents. If the AI Task fails or returns invalid content, the configured backup provider is tried; otherwise the original announcement is delivered. AI preprocessing continues within the existing durable announcement queue.
