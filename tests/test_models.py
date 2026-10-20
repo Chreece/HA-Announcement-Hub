@@ -190,12 +190,16 @@ def test_job_round_trip_preserves_output_and_room_binding() -> None:
         companion_tts_words_per_minute=165,
     )
     job.media_source_ids["tts.piper"] = "media-source://tts/test"
+    job.title = "Έκτακτη Ενημέρωση"
     job.group_id = "group-123"
     job.related_job_ids = ("child-456",)
     job.delivered_physical.append("notify:entity:notify.wall_display")
 
     restored = AnnouncementJob.from_dict(job.to_dict())
     assert restored.job_id == job.job_id
+    assert restored.title == "Έκτακτη Ενημέρωση"
+    assert "title" not in restored.public_dict()
+    assert restored.public_dict(include_text=True)["title"] == "Έκτακτη Ενημέρωση"
     assert restored.group_id == "group-123"
     assert restored.related_job_ids == ("child-456",)
     assert restored.delivered_physical == ["notify:entity:notify.wall_display"]
