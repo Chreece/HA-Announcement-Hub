@@ -863,16 +863,14 @@ class AnnouncementManager:
         player: str | None,
         snapcast_clients: Sequence[str],
     ) -> bool:
-        """Return whether the shared TTS path can run immediately."""
-        if not player or not engines:
+        """Only a physical, explicitly selected Snapcast route can run."""
+        if not player or not engines or not snapcast_clients:
             return False
         state = self.hass.states.get(player)
         if state is None or state.state in {STATE_UNAVAILABLE, STATE_UNKNOWN}:
             return False
         if not any(tts_engine_available(self.hass, engine) for engine in engines):
             return False
-        if not snapcast_clients:
-            return True
         return any(
             self._snapcast_output_available(entity_id)
             for entity_id in snapcast_clients
@@ -1216,9 +1214,13 @@ class AnnouncementManager:
             # Build all physical channel candidates first. Level policy chooses
             # among candidates that are available NOW. An unavailable preferred
             # channel never makes an immediately usable fallback wait.
-            server_tts_enabled = bool(player and routed_selected[0])
-            if filter_by_area and server_tts_enabled:
-                server_tts_enabled = bool(routed_selected[3])
+            # The shared player is audio infrastructure, not a recipient.
+            # Without authorized physical Snapcast clients this path must
+            # never play; otherwise every unmuted client on its stream hears
+            # the announcement (including the provider's optional chime).
+            server_tts_enabled = bool(
+                player and routed_selected[0] and routed_selected[3]
+            )
 
             notify_by_ref = {output.ref: output for output in routed_notify}
             companion_by_id = {
@@ -2662,6 +2664,7 @@ class AnnouncementManager:
             or not job.server_tts_enabled
             or not job.tts_engines
             or not job.tts_media_player
+            or not job.snapcast_clients
         ):
             return False
         if job.snapcast_clients and all(
@@ -2677,8 +2680,6 @@ class AnnouncementManager:
             for engine in job.tts_engines
         ):
             return False
-        if not job.snapcast_clients:
-            return True
         return any(
             self._snapcast_output_available(entity_id)
             for entity_id in job.snapcast_clients
@@ -3350,6 +3351,15 @@ class AnnouncementManager:
             )
 
     async def _async_send_server_tts(self, job: AnnouncementJob) -> None:
+        # Fail closed even for jobs restored from older queued snapshots:
+        # playing the shared MPD/Piper source without a physical mute route
+        # broadcasts to all Snapcast clients that are currently unmuted.
+        if not job.snapcast_clients:
+            self._record_channel_failure(
+                job, "server_tts",
+                "Shared TTS playback refused: no authorized Snapcast clients",
+            )
+            return
         if job.snapcast_clients and all(
             self._group_already_delivered(job, f"snapcast:{client}")
             for client in job.snapcast_clients
@@ -3402,14 +3412,6 @@ class AnnouncementManager:
                     job,
                     "snapcast",
                     "No selected Snapcast output belongs to the requested area",
-                )
-                return
-
-            if not job.snapcast_clients:
-                if not await self._async_wait_player_available(player, job):
-                    return
-                await self._async_play_server_round(
-                    job, player, selected_clients=(), target_clients=()
                 )
                 return
 
@@ -3474,6 +3476,15 @@ class AnnouncementManager:
         target_clients: Sequence[str],
     ) -> None:
         self._raise_if_cancelled(job)
+        if (
+            not selected_clients
+            or not target_clients
+            or not set(target_clients).issubset(set(selected_clients))
+        ):
+            raise HomeAssistantError(
+                "Refusing shared TTS playback without an authorized "
+                "physical Snapcast destination"
+            )
         if not await self._async_wait_player_available(player, job):
             return
 
@@ -3709,6 +3720,15 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
+        if (
+            job.tts_media_player
+            and player == job.tts_media_player
+            and not route_targets
+        ):
+            raise HomeAssistantError(
+                "Shared TTS playback requires a verified Snapcast client "
+                "route; refusing audio without physical recipients"
+            )
         await self.hass.services.async_call(
             MEDIA_PLAYER_DOMAIN,
             "play_media",
