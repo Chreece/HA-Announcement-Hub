@@ -146,6 +146,75 @@ def test_queue_is_created_before_any_ai_request():
     assert block.index("await self._store.async_save(self._serialize())") < block.index("self._schedule_ai_rewrite(job)")
 
 
+def test_generated_title_is_applied_after_ai_and_before_delivery():
+    async def provider(_hass, **kwargs):
+        assert kwargs["mode"] == "generate"
+        assert isinstance(kwargs["title_result"], dict)
+        kwargs["title_result"]["title"] = "Ανοιχτή Πόρτα"
+        return kwargs["text_tts"], "🚪 Η πόρτα είναι ανοιχτή."
+
+    harness = Harness(provider)
+    job = _job(mode="room_fallback", raw="Γράψε για ανοιχτή πόρτα.")
+    job.title = "Notification"
+    job.ai["requested_mode"] = "generate"
+    job.ai["requested_generate_title"] = True
+    harness._queue.append(job)
+    _run(harness, job)
+
+    assert job.title == "Ανοιχτή Πόρτα"
+    assert job.notify_text == "🚪 Η πόρτα είναι ανοιχτή."
+    assert job.ai["pending_preprocessing"] is False
+    assert "requested_generate_title" not in job.ai
+    assert harness._prefetched == [job.job_id]
+    assert harness._saved > 0
+
+
+def test_supplied_title_is_not_overwritten_by_generation():
+    async def provider(_hass, **kwargs):
+        assert kwargs["title_result"] is None
+        return kwargs["text_tts"], "Door open"
+
+    harness = Harness(provider)
+    job = _job(raw="Write a door warning.")
+    job.title = "My Security Alert"
+    job.ai["requested_mode"] = "generate"
+    job.ai["requested_generate_title"] = False
+    harness._queue.append(job)
+    _run(harness, job)
+    assert job.title == "My Security Alert"
+    assert job.notify_text == "Door open"
+
+
+def test_failure_or_restart_preserves_default_title_and_request_flag():
+    async def interrupted(_hass, **kwargs):
+        assert kwargs["title_result"] is not None
+        raise asyncio.CancelledError
+
+    harness = Harness(interrupted)
+    job = _job()
+    job.title = "Configured Notification Title"
+    job.ai["requested_mode"] = "generate"
+    job.ai["requested_generate_title"] = True
+    harness._queue.append(job)
+    try:
+        _run(harness, job)
+    except asyncio.CancelledError:
+        pass
+    else:
+        raise AssertionError("AI interruption was swallowed")
+    assert job.ai["pending_preprocessing"] is True
+    assert job.ai["requested_generate_title"] is True
+    assert job.title == "Configured Notification Title"
+
+    async def failed(_hass, **kwargs):
+        raise RuntimeError("AI offline")
+    harness._rewrite = failed
+    _run(harness, job)
+    assert job.title == "Configured Notification Title"
+    assert job.ai["status"] == "fallback_original"
+    assert "requested_generate_title" not in job.ai
+
+
 def test_queued_ai_source_is_redacted_from_public_diagnostics():
     model = (ROOT / "custom_components" / "announcement_hub" / "models.py").read_text()
     init = (ROOT / "custom_components" / "announcement_hub" / "__init__.py").read_text()
