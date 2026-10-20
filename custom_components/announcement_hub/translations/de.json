@@ -542,6 +542,10 @@
         "entity": {
           "name": "Entitäten (explizit)",
           "description": "Nur die angegebenen Benachrichtigungs- oder Media-Player-Entitäten verwenden. Keine anderen Empfänger hinzufügen. Mit Integrationen und Bereichen kombinierbar."
+        },
+        "ai_mode": {
+          "name": "KI-Textmodus",
+          "description": "Rewrite überarbeitet eine fertige Mitteilung. Generate erstellt aus beschreibenden Anweisungen eine Mitteilung. Die Originalanweisung bleibt bei KI-Fehlern als Rückfall erhalten."
         }
       }
     },

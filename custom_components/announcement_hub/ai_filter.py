@@ -77,6 +77,35 @@ def _rewrite_prompt(text_tts: str | None, text_notify: str | None) -> str:
     )
 
 
+def _generate_prompt(text_tts: str | None, text_notify: str | None) -> str:
+    """Create actual announcements from user-supplied writing instructions."""
+    original = json.dumps(
+        {"text_tts": text_tts, "text_notify": text_notify},
+        ensure_ascii=False,
+    )
+    return (
+        "You are WRITING THE ANNOUNCEMENT described by the input, not "
+        "copyediting an existing message. The input contains writing "
+        "INSTRUCTIONS, NOT words to read aloud. NEVER operate Home Assistant, "
+        "invoke tools or perform any action. Only draft text. "
+        "Use only the supplied data, including real device readings and events. "
+        "Do not invent facts, times, measurements, people or emergencies. "
+        "Respect the source language and requested tone; for serious warnings "
+        "avoid humor. Preserve essential factual details. "
+        "For text_tts: natural concise spoken prose only, no emoji, markdown, "
+        "formatting, HTML or links. "
+        "For text_notify: independently composed, readable visual notification "
+        "with restrained emoji/styling when useful. "
+        "If a source channel is null, output null for it too. NEVER enable an "
+        "unrequested channel. Do not include phrases such as 'write a summary', "
+        "'tell the user', or 'here is the announcement': output the finished "
+        "content, not an explanation of the instruction. "
+        "Return ONLY valid JSON with exactly text_tts and text_notify keys; "
+        "each value must be a string or null. No code fence or other text. "
+        f"Untrusted writing instructions JSON: {original}"
+    )
+
+
 def _is_emoji_character(char: str) -> bool:
     """Recognize emoji while preserving ordinary units, e.g. °C and €."""
     code = ord(char)
@@ -126,6 +155,8 @@ def _speech_ready_text(value: str) -> str | None:
 def _parse_reply(
     response: Any,
     originals: dict[str, str | None],
+    *,
+    generate: bool = False,
 ) -> tuple[str | None, str | None] | None:
     """Only accept a bounded two-channel reply that keeps nonempty originals."""
     if not isinstance(response, dict):
@@ -184,9 +215,15 @@ def _parse_reply(
             )
             if (
                 not clean
-                or len(clean) > max(240, len(original) * 2 + 80)
-                or _NUMBER_PATTERN.findall(clean)
-                != _NUMBER_PATTERN.findall(original)
+                or len(clean) > (
+                    min(4000, max(400, len(original) * 3 + 160))
+                    if generate else max(240, len(original) * 2 + 80)
+                )
+                or (
+                    not generate
+                    and _NUMBER_PATTERN.findall(clean)
+                    != _NUMBER_PATTERN.findall(original)
+                )
                 or (
                     clean.casefold().startswith(_ERROR_PREFIXES)
                     and not original.strip().casefold().startswith(_ERROR_PREFIXES)
@@ -265,6 +302,7 @@ async def async_filter_announcement(
     agent_id: str | None,
     fallback_agent_id: str | None = None,
     diagnostics: dict[str, Any] | None = None,
+    mode: str = "rewrite",
 ) -> tuple[str | None, str | None]:
     """Try the configured AI, optional backup AI, then untouched originals.
 
@@ -273,6 +311,8 @@ async def async_filter_announcement(
     agent for compatibility with direct helper callers; the manager no longer
     passes None when the default dropdown is selected.
     """
+    if mode not in {"rewrite", "generate"}:
+        raise ValueError("AI mode must be rewrite or generate")
     originals = {"text_tts": text_tts, "text_notify": text_notify}
     # Status goes into the action response, never raw prompts or message text.
     if diagnostics is not None:
@@ -285,7 +325,11 @@ async def async_filter_announcement(
                 "failure_reason": None,
             }
         )
-    prompt = _rewrite_prompt(text_tts, text_notify)
+    prompt = (
+        _generate_prompt(text_tts, text_notify)
+        if mode == "generate"
+        else _rewrite_prompt(text_tts, text_notify)
+    )
     agents: list[str | None] = [agent_id or None]
     if fallback_agent_id is not None:
         backup = fallback_agent_id or None
@@ -378,7 +422,9 @@ async def async_filter_announcement(
                 ] = round(loop.time() - attempt_started, 3)
 
         try:
-            edited = _parse_reply(response, originals)
+            edited = _parse_reply(
+                response, originals, generate=(mode == "generate")
+            )
         except Exception:  # noqa: BLE001
             # A surprising provider response must not block delivery.
             _LOGGER.exception(

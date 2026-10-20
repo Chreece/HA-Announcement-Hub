@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.9.32"
+VERSION: Final = "0.9.33"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -35,6 +35,7 @@ ATTR_COMPANION_TTS: Final = "companion_tts"
 ATTR_OCCUPIED_ONLY: Final = "occupied_only"
 ATTR_USE_AI: Final = "use_ai"
 ATTR_AI_AGENT: Final = "ai_agent"
+ATTR_AI_MODE: Final = "ai_mode"
 ATTR_JOB_ID: Final = "job_id"
 ATTR_INCLUDE_CURRENT: Final = "include_current"
 

@@ -901,6 +901,7 @@ class AnnouncementManager:
         occupied_only: bool,
         use_ai: bool | None = None,
         ai_agent: str | None = None,
+        ai_mode: str = "rewrite",
         text: str | None = None,
         areas: Sequence[str] | str | None = None,
         integrations: Sequence[str] | str | None = None,
@@ -911,6 +912,8 @@ class AnnouncementManager:
         _group_token: str | None = None,
         _excluded_physical: Sequence[str] = (),
     ) -> AnnouncementJob:
+        if ai_mode not in {"rewrite", "generate"}:
+            raise ServiceValidationError("ai_mode must be rewrite or generate")
         # Resolve the primary message into two independent inputs BEFORE
         # severity/room routing and the optional AI rewrite. Channel-specific
         # values override text; an omitted override inherits its text value.
@@ -1022,7 +1025,7 @@ class AnnouncementManager:
                 click_action=click_action, language=language,
                 tts_options=tts_options, companion_tts=companion_tts,
                 occupied_only=occupied_only, use_ai=use_ai, ai_agent=ai_agent,
-                channels=channel_tokens, _fanout=True,
+                ai_mode=ai_mode, channels=channel_tokens, _fanout=True,
                 _group_token=group_token,
             )
             # Both legs are allowed to select overlapping physical outputs:
@@ -1826,6 +1829,7 @@ class AnnouncementManager:
         ai_info: dict[str, Any] = {
             "enabled": ai_enabled,
             "source": ai_source,
+            "mode": ai_mode,
             "status": "pending" if ai_enabled else "disabled",
             "attempted": False,
             "agent": None,
@@ -1870,6 +1874,7 @@ class AnnouncementManager:
                     "source_notify": plan.notify_text,
                     "requested_agent_id": agent_id,
                     "requested_fallback_agent_id": fallback_agent_id,
+                    "requested_mode": ai_mode,
                 })
             else:
                 ai_info["status"] = "not_applicable"
@@ -4063,6 +4068,7 @@ class AnnouncementManager:
                 agent_id=ai.get("requested_agent_id"),
                 fallback_agent_id=ai.get("requested_fallback_agent_id"),
                 diagnostics=ai,
+                mode=ai.get("requested_mode", "rewrite"),
             )
         except asyncio.CancelledError:
             ai["status"] = "pending"
@@ -4093,6 +4099,7 @@ class AnnouncementManager:
         for key in (
             "source_tts", "source_notify",
             "requested_agent_id", "requested_fallback_agent_id",
+            "requested_mode",
         ):
             ai.pop(key, None)
         self._schedule_prefetch(job)

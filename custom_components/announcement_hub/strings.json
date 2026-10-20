@@ -542,6 +542,10 @@
         "entity": {
           "name": "Explicit entities",
           "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
+        },
+        "ai_mode": {
+          "name": "AI writing mode",
+          "description": "Rewrite edits a finished factual announcement without changing measurements. Generate writes a finished announcement from supplied informational instructions. Both modes run after queue acceptance; generation failure falls back to the original instructions."
         }
       }
     },

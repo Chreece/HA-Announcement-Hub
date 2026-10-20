@@ -587,6 +587,31 @@ never manufactured, even at Critical level or after an output failure.
 `output` remains recognized internally for existing YAML compatibility,
 but the action editor exposes only `area`. New calls should use `area`.
 
+## AI rewriting and announcement generation
+
+Announcement Hub supports two AI modes: `rewrite` (the default, for
+copyediting already-complete factual messages) and `generate` (for
+producing an announcement from instructions such as "summarize today's
+calendar" or "tell the household the laundry has finished"). Generation
+happens **after the original instructions are persisted in the queue**, so
+a burst of calls never depends on an out-of-queue AI response before Hub
+can acknowledge them.
+
+```yaml
+action: notify.announcement_hub
+data:
+  text: "Tell the household in Greek that the washing machine has finished."
+  area:
+    - Kitchen
+  ai_mode: generate
+  use_ai: true
+```
+
+Generated speech and visual output remain separate. This is a *content
+generation* feature only, not permission for the agent to execute actions.
+If both AI agents fail, the original instructions remain the final text
+fallback; for urgent safety alerts, use direct factual content instead.
+
 ## AI rewriting
 
 In **4. General options**, switch on **Rewrite announcements with AI** and
