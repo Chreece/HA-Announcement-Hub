@@ -1,0 +1,105 @@
+<ha-card>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="content">
+    <header class="top">
+      <div class="identity">
+        <div class="identity-icon"><ha-icon icon="mdi:bullhorn-outline"></ha-icon></div>
+        <div>
+          <span class="kicker">HOME ASSISTANT · MESSAGING</span>
+          <h2 id="card-heading">Announcement Hub</h2>
+          <p class="intro">Compose once. Deliver to the right place.</p>
+        </div>
+      </div>
+      <div id="queue-pill" class="queue-pill" aria-label="Waiting queue jobs"><ha-icon icon="mdi:playlist-check"></ha-icon><span id="queue-number">–</span><span class="queue-word">waiting</span></div>
+    </header>
+    <div class="sections">
+      <section class="section" aria-labelledby="message-heading">
+        <div class="section-top"><div class="section-name"><span class="index">01</span><h3 id="message-heading">The message</h3></div><span class="muted micro">Your words, your tone</span></div>
+        <label class="field"><span>Announcement</span><textarea id="message" rows="3" maxlength="20000" placeholder="What should people know?"></textarea></label>
+        <div class="columns">
+          <label class="field"><span>Title <small>optional</small></span><input id="message-title" maxlength="200" autocomplete="off" placeholder="Optional title"></label>
+          <div class="field"><span>Importance</span><div id="levels" class="choices" role="group" aria-label="Announcement importance"></div></div>
+        </div>
+        <details class="disclosure" id="variants">
+          <summary><ha-icon icon="mdi:tune-variant"></ha-icon><strong>Custom wording for each channel</strong><small>Optional</small></summary>
+          <p class="hint">Speech and written text stay independent. Blank fields inherit the main announcement.</p>
+          <div class="columns">
+            <label class="field"><span>Spoken text (TTS)</span><textarea id="text-tts" rows="2" placeholder="Optional spoken version"></textarea></label>
+            <label class="field"><span>Written notification</span><textarea id="text-notify" rows="2" placeholder="Optional written version"></textarea></label>
+          </div>
+        </details>
+      </section>
+      <section class="section" aria-labelledby="recipient-heading">
+        <div class="section-top"><div class="section-name"><span class="index">02</span><h3 id="recipient-heading">Who receives it?</h3></div><span class="muted micro">Room-first or exact</span></div>
+        <div id="target-mode" class="segmented" role="group" aria-label="Recipient selection">
+          <button type="button" data-mode="automatic">Automatic routing</button>
+          <button type="button" data-mode="targeted">Choose recipients</button>
+        </div>
+        <p id="routing-explanation" class="hint">Announcement Hub chooses configured outputs using room and fallback rules.</p>
+        <div id="targets" hidden>
+          <div class="target-group">
+            <div class="target-label"><ha-icon icon="mdi:floor-plan"></ha-icon><div><strong>Areas</strong><small>Preferred rooms with Hub fallback</small></div></div>
+            <input id="area-search" class="search" placeholder="Search rooms..." aria-label="Search Home Assistant areas" autocomplete="off">
+            <div id="area-options" class="options"></div>
+          </div>
+          <details class="disclosure" id="more-targets">
+            <summary><ha-icon icon="mdi:devices"></ha-icon><strong>Exact recipients</strong><small>Integrations · devices · entities</small></summary>
+            <p class="hint">Explicit recipients are additional destinations; Hub never substitutes unrelated devices.</p>
+            <div class="target-group">
+              <div class="target-label"><ha-icon icon="mdi:puzzle-outline"></ha-icon><div><strong>Integrations</strong><small>All Hub-configured outputs from an integration</small></div></div>
+              <input id="integration-search" class="search" placeholder="Search integrations..." aria-label="Search integrations" autocomplete="off">
+              <div id="integration-options" class="options"></div>
+            </div>
+            <div class="target-group">
+              <div class="target-label"><ha-icon icon="mdi:cellphone-link"></ha-icon><div><strong>Devices</strong><small>Exact Home Assistant device registry targets</small></div></div>
+              <input id="device-search" class="search" placeholder="Search devices..." aria-label="Search devices" autocomplete="off">
+              <div id="device-options" class="options"></div>
+            </div>
+            <div class="target-group">
+              <div class="target-label"><ha-icon icon="mdi:checkbox-multiple-marked-outline"></ha-icon><div><strong>Entities</strong><small>Exact notify or media-player entities</small></div></div>
+              <input id="entity-search" class="search" placeholder="Search notify.* or media_player.* ..." aria-label="Search entities" autocomplete="off">
+              <div id="entity-options" class="options"></div>
+            </div>
+          </details>
+          <div id="chosen-targets" class="picked" aria-live="polite"></div>
+          <details class="disclosure">
+            <summary><ha-icon icon="mdi:keyboard-outline"></ha-icon><strong>Enter targets manually</strong><small>Advanced</small></summary>
+            <p class="hint">Comma-separated area names/IDs, integration domains, device IDs and exact entity IDs. Useful if a registry is unavailable.</p>
+            <div class="columns">
+              <label class="field"><span>Areas</span><input id="manual-area" placeholder="Kitchen, Hallway"></label>
+              <label class="field"><span>Integrations</span><input id="manual-integration" placeholder="mobile_app, nfandroidtv"></label>
+              <label class="field"><span>Device IDs</span><input id="manual-device" placeholder="Exact device registry ID"></label>
+              <label class="field"><span>Entities</span><input id="manual-entity" placeholder="notify.phone, media_player.speaker"></label>
+            </div>
+          </details>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="channel-heading">
+        <div class="section-top"><div class="section-name"><span class="index">03</span><h3 id="channel-heading">How to deliver</h3></div></div>
+        <span class="field-caption">Delivery service</span><div id="channels" class="choices spacious" role="group" aria-label="Delivery service"></div>
+        <div id="ai-block"><span class="field-caption ai-label"><ha-icon icon="mdi:creation-outline"></ha-icon> AI wording</span><div id="ai-choices" class="choices spacious" role="group" aria-label="AI wording mode"></div><p id="ai-explanation" class="hint">Use Announcement Hub's configured AI setting.</p></div>
+        <details class="disclosure" id="advanced">
+          <summary><ha-icon icon="mdi:cog-outline"></ha-icon><strong>Advanced options</strong><small>Presence · agent · tap action</small></summary>
+          <div class="columns">
+            <label class="field"><span>Conversation agent <small>optional</small></span><input id="ai-agent" placeholder="conversation.my_agent"></label>
+            <label class="field"><span>Notification tap destination <small>optional</small></span><input id="click-action" placeholder="/lovelace/cameras"></label>
+          </div>
+          <label class="checkbox-line"><input type="checkbox" id="occupied-only" checked><span>Try occupied rooms during area fallback</span></label>
+          <p class="hint">Explicit devices, configured severity limits and door checks remain enforced by Announcement Hub.</p>
+        </details>
+      </section>
+    </div>
+    <footer class="footer">
+      <div class="summary"><ha-icon icon="mdi:shield-check-outline"></ha-icon><span id="summary">Automatic recipients · Hub channels</span></div>
+      <div id="critical-confirm" class="critical-confirm" hidden>
+        <ha-icon icon="mdi:alert-octagon-outline"></ha-icon>
+        <div><strong>Send a Critical announcement?</strong><span>This uses your chosen recipients and Critical severity rules.</span></div>
+        <button type="button" class="danger" id="confirm-critical">Confirm</button>
+        <button type="button" class="quiet" id="cancel-critical">Cancel</button>
+      </div>
+      <div id="notice" class="notice" aria-live="polite" role="status" hidden></div>
+      <button type="button" id="send" class="send-button"><ha-icon icon="mdi:send"></ha-icon><span id="send-label">Send announcement</span><span class="send-arrow">↗</span></button>
+      <p class="fineprint">A queued request is not a device-side delivery receipt.</p>
+    </footer>
+  </div>
+</ha-card>

@@ -9,6 +9,7 @@ from typing import Any
 
 import probatio
 
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.components.notify.const import DOMAIN as NOTIFY_DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import (
@@ -321,6 +322,19 @@ def _migrate_v1_settings(settings: dict[str, Any]) -> dict[str, Any]:
 async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
     """Register integration-level actions."""
     hass.data.setdefault(DOMAIN, {})
+
+    # Serve the packaged Lovelace card without external CDNs, Node/npm, or
+    # copying JS to /config/www. Dashboard owners register one module URL.
+    # Home Assistant's async static-path API performs file checks off-loop.
+    await hass.http.async_register_static_paths(
+        [
+            StaticPathConfig(
+                "/announcement_hub",
+                str(Path(__file__).parent / "frontend"),
+                False,
+            )
+        ]
+    )
 
     async def async_send(call: ServiceCall) -> ServiceResponse:
         manager = _get_manager(hass)

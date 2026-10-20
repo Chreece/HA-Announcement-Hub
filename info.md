@@ -8,6 +8,7 @@ A Home Assistant-native, persistent announcement queue that coordinates **TTS**,
 
 ## Highlights
 
+- **Modern Lovelace Announcement Hub card:** compose and send directly from a dashboard with room selection, exact recipients, AI, TTS and clear queue acknowledgements.
 - Persistent queue survives Home Assistant restarts.
 - Room-aware routing by Home Assistant area and occupancy.
 - Visual notifications and spoken announcements can run concurrently.
@@ -24,6 +25,23 @@ Add this repository as a **custom integration** in HACS, then download **Announc
 
 After restart, go to **Settings → Devices & services → Add integration → Announcement Hub**.
 
+## Dashboard composer
+
+The card ships inside this integration. Add the one-time dashboard resource
+`/announcement_hub/announcement-hub-card.js` (type **JavaScript module**)
+in **Settings → Dashboards → ⋮ → Resources**, then add the
+**Announcement Hub** card from the dashboard's card picker.
+
+```yaml
+type: custom:announcement-hub-card
+title: Household announcements
+show_queue: true
+show_ai: true
+```
+
+The card follows the same permission, severity, area routing, and exact-device
+rules as `notify.announcement_hub`; no separate card installation is needed.
+
 ## Main action
 
 ```yaml
@@ -31,7 +49,7 @@ action: notify.announcement_hub
 data:
   text_tts: "The washing machine has finished."
   text_notify: "Washing machine finished."
-  output:
+  area:
     - living_room
   level: info
 ```

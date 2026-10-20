@@ -75,6 +75,72 @@ The repository also includes an optional `./install.sh` installer when working
 from a local checkout. Home Assistant must still be restarted after installing
 the component.
 
+## Dashboard card
+
+Announcement Hub includes its own modern **Lovelace Announcement Composer**
+card. It is bundled with the HACS integration: no extra custom-card repository,
+CDN, Node installation or separate JavaScript download is required.
+
+### Add the card
+
+1. Install Announcement Hub through HACS and restart Home Assistant. Confirm
+   the integration is configured under **Settings → Devices & services**.
+2. Open **Settings → Dashboards → ⋮ → Resources → Add resource**.
+3. Enter the URL **`/announcement_hub/announcement-hub-card.js`**, select
+   **JavaScript module** and save. This is a one-time dashboard resource
+   registration; the integration serves the JS, CSS and HTML automatically.
+4. Edit any dashboard → **Add card** → search for **Announcement Hub**.
+   The card appears in the custom-card picker and has a graphical editor.
+   Alternatively, use this YAML:
+
+```yaml
+type: custom:announcement-hub-card
+title: Household announcements
+default_level: info
+show_queue: true
+show_ai: true
+clear_after_send: false
+```
+
+The visual editor controls the card heading, initial importance, queue
+counter, AI controls and whether the message fields clear after a successful
+send. **Message text, target selections and credentials are not stored in the
+dashboard configuration.** Dashboard permissions continue to be enforced by
+Home Assistant's authenticated service call.
+
+### Using the composer
+
+The card supports a primary announcement; optional `title`, `text_tts`
+(spoken only), and `text_notify` (written only); Info, Success, Warning,
+Error, Critical and Debug importance; optional AI rewriting or generation;
+and an optional conversation-agent override. When AI generation is selected
+with a blank title, Hub can produce a title of up to three words.
+
+**Automatic routing** leaves recipient choice to the integration's configured
+occupancy/fallback rules. **Choose recipients** lets you select one or more
+areas (room-first routing) and also integrations, exact Home Assistant devices,
+and notify/media-player entities. The optional channel selector filters the
+authorized deliveries to Written, Speech, Both, Snapcast or Companion App TTS.
+A channel cannot be selected by itself: choose an area or explicit recipient
+first. Device/integration selections do not authorize unrelated room speakers.
+
+The card discovers area and recipient names from Home Assistant registries
+when allowed. Manual comma-separated target IDs are available if those lists
+are empty or registry access is restricted. Your actual eligible outputs are
+still determined by Announcement Hub's configuration, and the integration
+validates every request.
+
+The Send button uses the native `notify.announcement_hub` action and requests
+the queue response. It displays the accepted job ID, or an error without an
+automatic retry that could submit a duplicate. Critical messages require an
+additional confirmation. The optional counter reads
+`sensor.announcement_hub_queue`. **A queued acknowledgement is not proof
+that a device displayed or spoke the message.**
+
+The card uses Home Assistant's light/dark theme variables, adapts to mobile
+screen widths, and respects reduced-motion preferences. Home Assistant's
+normal authenticated dashboard and service permissions control who may send.
+
 ## Interface walkthrough
 
 The following screen previews illustrate the integration's **English setup
