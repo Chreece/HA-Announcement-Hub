@@ -164,7 +164,9 @@
       this.$("message").addEventListener("input", () => this._clearNotice());
       this.$("send").addEventListener("click", () => {
         if (this._sending) return;
-        if (this._level === "critical" && !this._confirming) {
+        if (this._level === "critical") {
+          // Only the dedicated Confirm button can submit a Critical send.
+          // Repeated taps on Send must never bypass confirmation.
           this._confirming = true;
           this.$("critical-confirm").hidden = false;
           this.$("confirm-critical").focus();
