@@ -21,7 +21,11 @@ def test_all_unavailable_outputs_are_a_valid_no_op() -> None:
         manager.index("async def _async_send_server_tts"):
         manager.index("async def _async_play_server_round")
     ]
-    assert "if not await self._async_wait_player_available(player, job):" in server
+    assert "if not job.snapcast_clients:" in server
+    assert "if not await self._async_wait_player_available(player, job):" in manager[
+        manager.index("async def _async_play_server_round"):
+        manager.index("async def _async_available_tts_engines")
+    ]
     assert "return" in server
     assert "skipped unavailable Snapcast output(s)" in manager
 

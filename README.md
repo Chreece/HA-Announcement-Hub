@@ -387,6 +387,56 @@ restriction. Without a room, it cannot invent a room speaker.
 
 ### Snapcast routing and playback
 
+**Audio isolation safeguards:** the shared TTS player is infrastructure, not
+an announcement recipient. Playback is refused if there are no explicitly
+selected physical Snapcast clients or if the selected clients cannot be
+isolated from the other clients on the stream. It is never safe to play
+through the shared MPD source without a verified mute route: every client
+already listening to that stream could hear it. Older stored queue jobs
+without a physical route are not expanded into a whole-house broadcast.
+
+While shared TTS plays and its buffered audio tail drains, Hub checks that
+only the intended Snapcast clients are unmuted. If a second automation
+changes these mute states, Hub stops shared playback and re-mutes other
+managed clients before it restores their previous states. The channel error
+records the unexpected unmuted client so the conflicting controller can be
+identified.
+
+**When a bell is heard:** Hub does not generate a pre-announcement bell
+file. Home Assistant's `media_player.play_media` announcement flag can
+trigger provider-specific behaviors such as a chime. The dedicated shared
+Snapcast/MPD route does not use this announcement flag. Under **Configure →
+2. TTS engines & devices**, you can disable **Direct-speaker announcement
+mode** if a selected standalone media player/voice assistant plays an
+unwanted notification sound. Doing so may interrupt existing media instead
+of temporarily announcing and resuming.
+
+If you have a separate automation that changes Snapcast `volume_mute`,
+`source`, or a voice assistant's mute/volume during TTS, coordinate it with
+Hub's current queue job. For example, before that automation changes audio
+routing, check the **`current`** attribute of
+`sensor.announcement_hub_queue`:
+
+```yaml
+- condition: template
+  value_template: >-
+    {% set current = state_attr('sensor.announcement_hub_queue', 'current') %}
+    {{ current is none or not current.get('snapcast_clients') }}
+```
+
+Put the guard **immediately before** the competing mute/source actions;
+a trigger-level condition alone cannot prevent an automation that was
+already running from changing a route during playback. You should still
+check that this does not suppress another necessary audio-volume action.
+The Hub's own isolation monitor is a final safety net, not a replacement
+for coordinating two competing volume controllers.
+
+If an old `script.text_to_speech` builds its `area` target from the complete
+list of `input_select.rooms` options, it is itself explicitly requesting
+all those rooms. Remove any rule that substitutes every room when a people
+counter is `1`, unavailable, or a client name does not match. Prefer the
+actual supplied room(s), or omit `area` and let Hub use occupancy routing.
+
 When server TTS is selected, Announcement Hub resolves the allowed physical
 Snapcast clients from their Home Assistant areas. The shared media player
 provides the audio; it is not itself permission to speak in every room.

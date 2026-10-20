@@ -37,7 +37,8 @@
           "companion_tts_words_per_minute": "Companion TTS speech estimate",
           "tts_area_players": "Direct TTS players per room",
           "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice"
+          "tts_voice": "TTS voice",
+          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
         },
         "data_description": {
           "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
@@ -51,7 +52,8 @@
           "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
           "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID."
+          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
+          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
         }
       },
       "notification_profile": {
@@ -213,7 +215,8 @@
           "companion_tts_words_per_minute": "Companion TTS speech estimate",
           "tts_area_players": "Direct TTS players per room",
           "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice"
+          "tts_voice": "TTS voice",
+          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
         },
         "data_description": {
           "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
@@ -227,7 +230,8 @@
           "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
           "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID."
+          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
+          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
         }
       },
       "notification_profile": {

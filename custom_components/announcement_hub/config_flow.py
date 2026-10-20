@@ -60,6 +60,7 @@ from .const import (
     CONF_TTS_AREA_PLAYERS,
     CONF_TTS_PLAYER_POLICIES,
     CONF_TTS_MIN_LEVEL,
+    CONF_DIRECT_TTS_ANNOUNCE,
     CONF_TTS_OPTIONS,
     DEFAULT_COMPANION_TTS_MEDIA_STREAM,
     DEFAULT_COMPANION_TTS_WPM,
@@ -86,6 +87,7 @@ from .const import (
     DEFAULT_TTS_CACHE,
     DEFAULT_TTS_LANGUAGE,
     DEFAULT_TTS_MIN_LEVEL,
+    DEFAULT_DIRECT_TTS_ANNOUNCE,
     DEFAULT_TTS_OPTIONS,
     DISPATCH_ORDERS,
     CHANNEL_FALLBACK_MODES,
@@ -842,6 +844,7 @@ class _AnnouncementFlowMixin:
             self._working[CONF_TTS_MEDIA_PLAYER] = shared_player
             for key in (
                 CONF_TTS_MIN_LEVEL,
+                CONF_DIRECT_TTS_ANNOUNCE,
                 CONF_TTS_CACHE,
                 CONF_COMPANION_TTS_OUTPUTS,
                 CONF_COMPANION_TTS_MEDIA_STREAM,
@@ -1006,6 +1009,12 @@ class _AnnouncementFlowMixin:
                     CONF_TTS_CACHE,
                     default=self._value(
                         CONF_TTS_CACHE, DEFAULT_TTS_CACHE
+                    ),
+                ): selector.BooleanSelector(),
+                probatio.Required(
+                    CONF_DIRECT_TTS_ANNOUNCE,
+                    default=self._value(
+                        CONF_DIRECT_TTS_ANNOUNCE, DEFAULT_DIRECT_TTS_ANNOUNCE
                     ),
                 ): selector.BooleanSelector(),
                 probatio.Optional(

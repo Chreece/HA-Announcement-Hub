@@ -27,7 +27,11 @@ def test_direct_room_players_are_area_bound_but_shared_player_is_global() -> Non
         manager.index("def _job_has_ready_server_tts"):
         manager.index("def _job_runnable_now")
     ]
-    assert "server_tts_enabled = bool(routed_selected[3])" in manager
+    assert "player and routed_selected[0] and routed_selected[3]" in manager
+    assert "if not job.snapcast_clients:" in manager[
+        manager.index("async def _async_send_server_tts"):
+        manager.index("async def _async_play_server_round")
+    ]
 
 
 def test_snapcast_clients_remain_routing_only() -> None:

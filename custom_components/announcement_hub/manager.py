@@ -85,6 +85,7 @@ from .const import (
     CONF_TTS_ROOM_PLAYERS,
     CONF_TTS_PLAYER_POLICIES,
     CONF_TTS_MIN_LEVEL,
+    CONF_DIRECT_TTS_ANNOUNCE,
     CONF_TTS_OPTIONS,
     DEFAULT_COMPANION_TTS_MEDIA_STREAM,
     DEFAULT_COMPANION_TTS_WPM,
@@ -111,6 +112,7 @@ from .const import (
     DEFAULT_TTS_CACHE,
     DEFAULT_TTS_LANGUAGE,
     DEFAULT_TTS_MIN_LEVEL,
+    DEFAULT_DIRECT_TTS_ANNOUNCE,
     DEFAULT_TTS_OPTIONS,
     DISPATCH_NOTIFY_THEN_TTS,
     CHANNEL_VISUAL_THEN_TTS,
@@ -310,10 +312,6 @@ class AnnouncementManager:
         if self._running:
             return
         stored = await self._store.async_load() or {}
-        current_snapcast = expand_snapcast_output_tokens(
-            self.hass,
-            self._ensure_list(self.settings.get(CONF_SNAPCAST_OUTPUTS, [])),
-        )
         for raw_job in stored.get("jobs", []):
             legacy_job = "snapcast_clients" not in raw_job
             try:
@@ -327,7 +325,15 @@ class AnnouncementManager:
             if len(job.tts_engines) > 1:
                 job.tts_engines = job.tts_engines[:1]
             if legacy_job and job.server_tts_enabled and not job.snapcast_clients:
-                job.snapcast_clients = current_snapcast
+                # Old queue records did not always include the physical route.
+                # Never reinterpret that omission as "every Snapcast client":
+                # a restored job might otherwise wake the entire household.
+                job.server_tts_enabled = False
+                _LOGGER.warning(
+                    "Stored announcement %s has no physical Snapcast recipients; "
+                    "disabled unsafe shared TTS playback",
+                    job.job_id,
+                )
             if job.server_tts_enabled and not job.tts_media_player:
                 player_value = self.settings.get(CONF_TTS_MEDIA_PLAYER)
                 job.tts_media_player = (
@@ -863,16 +869,14 @@ class AnnouncementManager:
         player: str | None,
         snapcast_clients: Sequence[str],
     ) -> bool:
-        """Return whether the shared TTS path can run immediately."""
-        if not player or not engines:
+        """Only a physical, explicitly selected Snapcast route can run."""
+        if not player or not engines or not snapcast_clients:
             return False
         state = self.hass.states.get(player)
         if state is None or state.state in {STATE_UNAVAILABLE, STATE_UNKNOWN}:
             return False
         if not any(tts_engine_available(self.hass, engine) for engine in engines):
             return False
-        if not snapcast_clients:
-            return True
         return any(
             self._snapcast_output_available(entity_id)
             for entity_id in snapcast_clients
@@ -1216,9 +1220,13 @@ class AnnouncementManager:
             # Build all physical channel candidates first. Level policy chooses
             # among candidates that are available NOW. An unavailable preferred
             # channel never makes an immediately usable fallback wait.
-            server_tts_enabled = bool(player and routed_selected[0])
-            if filter_by_area and server_tts_enabled:
-                server_tts_enabled = bool(routed_selected[3])
+            # The shared player is audio infrastructure, not a recipient.
+            # Without authorized physical Snapcast clients this path must
+            # never play; otherwise every unmuted client on its stream hears
+            # the announcement (including the provider's optional chime).
+            server_tts_enabled = bool(
+                player and routed_selected[0] and routed_selected[3]
+            )
 
             notify_by_ref = {output.ref: output for output in routed_notify}
             companion_by_id = {
@@ -2662,6 +2670,7 @@ class AnnouncementManager:
             or not job.server_tts_enabled
             or not job.tts_engines
             or not job.tts_media_player
+            or not job.snapcast_clients
         ):
             return False
         if job.snapcast_clients and all(
@@ -2677,8 +2686,6 @@ class AnnouncementManager:
             for engine in job.tts_engines
         ):
             return False
-        if not job.snapcast_clients:
-            return True
         return any(
             self._snapcast_output_available(entity_id)
             for entity_id in job.snapcast_clients
@@ -3350,6 +3357,15 @@ class AnnouncementManager:
             )
 
     async def _async_send_server_tts(self, job: AnnouncementJob) -> None:
+        # Fail closed even for jobs restored from older queued snapshots:
+        # playing the shared MPD/Piper source without a physical mute route
+        # broadcasts to all Snapcast clients that are currently unmuted.
+        if not job.snapcast_clients:
+            self._record_channel_failure(
+                job, "server_tts",
+                "Shared TTS playback refused: no authorized Snapcast clients",
+            )
+            return
         if job.snapcast_clients and all(
             self._group_already_delivered(job, f"snapcast:{client}")
             for client in job.snapcast_clients
@@ -3402,14 +3418,6 @@ class AnnouncementManager:
                     job,
                     "snapcast",
                     "No selected Snapcast output belongs to the requested area",
-                )
-                return
-
-            if not job.snapcast_clients:
-                if not await self._async_wait_player_available(player, job):
-                    return
-                await self._async_play_server_round(
-                    job, player, selected_clients=(), target_clients=()
                 )
                 return
 
@@ -3474,6 +3482,15 @@ class AnnouncementManager:
         target_clients: Sequence[str],
     ) -> None:
         self._raise_if_cancelled(job)
+        if (
+            not selected_clients
+            or not target_clients
+            or not set(target_clients).issubset(set(selected_clients))
+        ):
+            raise HomeAssistantError(
+                "Refusing shared TTS playback without an authorized "
+                "physical Snapcast destination"
+            )
         if not await self._async_wait_player_available(player, job):
             return
 
@@ -3519,7 +3536,22 @@ class AnnouncementManager:
                     raise
                 except Exception as err:  # noqa: BLE001
                     errors.append(f"{engine}: {err}")
-                    await self._async_stop_player(player)
+                    if route_targets:
+                        try:
+                            self._assert_snapcast_route_isolated(route_targets)
+                        except HomeAssistantError as isolation_error:
+                            _LOGGER.warning(
+                                "Announcement %s detected Snapcast "
+                                "route drift during playback: %s",
+                                job.job_id, isolation_error,
+                            )
+                            await self._async_quarantine_snapcast_route(
+                                player, route_targets
+                            )
+                        else:
+                            await self._async_stop_player(player)
+                    else:
+                        await self._async_stop_player(player)
                     self._record_channel_failure(job, channel, err)
                     continue
                 for client in route_targets:
@@ -3546,7 +3578,9 @@ class AnnouncementManager:
                     # restore/mute the route until that tail has drained.
                     drain_delay = max(post_delay, _SNAPCAST_TAIL_DRAIN_SECONDS)
                     if drain_delay > 0:
-                        await asyncio.sleep(drain_delay)
+                        await self._async_guard_snapcast_tail(
+                            job, player, route_targets, drain_delay
+                        )
             # Non-Snapcast server TTS keeps the ordinary optional cushion. A
             # prepared same-route Snapcast successor intentionally skips both
             # delays so its audio can follow through the already-open route.
@@ -3709,24 +3743,42 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
+        shared_path = bool(
+            job.tts_media_player and player == job.tts_media_player
+        )
+        if shared_path:
+            # Both *missing* routing and later external unmute changes fail
+            # closed. Do not infer permission from the shared MPD entity.
+            self._assert_snapcast_route_isolated(route_targets)
+        payload = {
+            ATTR_ENTITY_ID: player,
+            ATTR_MEDIA_CONTENT_ID: media_source_id,
+            ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
+        }
+        # Snapcast's MPD/shared player is a dedicated audio source and must
+        # not trigger provider-side announce/chime handling. HA's announce
+        # flag remains enabled only for *direct* room media players that
+        # support temporarily interrupting/restoring their existing content.
+        if not shared_path and bool(self.settings.get(
+            CONF_DIRECT_TTS_ANNOUNCE, DEFAULT_DIRECT_TTS_ANNOUNCE
+        )):
+            payload[ATTR_MEDIA_ANNOUNCE] = True
         await self.hass.services.async_call(
-            MEDIA_PLAYER_DOMAIN,
-            "play_media",
-            {
-                ATTR_ENTITY_ID: player,
-                ATTR_MEDIA_CONTENT_ID: media_source_id,
-                ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
-                ATTR_MEDIA_ANNOUNCE: True,
-            },
-            blocking=True,
+            MEDIA_PLAYER_DOMAIN, "play_media", payload, blocking=True
         )
 
         start_timeout = float(
             self.settings.get(CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT)
         )
+        def playback_started() -> bool:
+            if shared_path:
+                self._assert_snapcast_route_isolated(route_targets)
+            return self._is_player_busy(player) or self._any_snapcast_busy(
+                route_targets
+            )
+
         started = await self._wait_for(
-            lambda: self._is_player_busy(player)
-            or self._any_snapcast_busy(route_targets),
+            playback_started,
             timeout=start_timeout,
             job=job,
         )
@@ -3739,9 +3791,15 @@ class AnnouncementManager:
         playback_timeout = float(
             self.settings.get(CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT)
         )
+        def playback_finished() -> bool:
+            if shared_path:
+                self._assert_snapcast_route_isolated(route_targets)
+            return not self._is_player_busy(player) and not (
+                self._any_snapcast_busy(route_targets)
+            )
+
         finished = await self._wait_for(
-            lambda: not self._is_player_busy(player)
-            and not self._any_snapcast_busy(route_targets),
+            playback_finished,
             timeout=playback_timeout,
             job=job,
         )
@@ -3834,6 +3892,95 @@ class AnnouncementManager:
                 continue
             snapshot[entity_id] = bool(muted)
         return snapshot
+
+    def _assert_snapcast_route_isolated(
+        self, target_clients: Sequence[str],
+    ) -> None:
+        """Refuse to play a shared stream if any other client can hear it.
+
+        Availability/room checks are necessary but not sufficient: a second
+        Home Assistant automation (for example a global volume controller)
+        may unmute another Snapcast client after Hub established its route.
+        Recheck the live output state immediately before and while playing.
+        """
+        targets = set(target_clients)
+        if not targets:
+            raise HomeAssistantError(
+                "Shared TTS route refused: no physical Snapcast recipients"
+            )
+        snapshot = self._routable_snapcast_snapshot(tuple(targets))
+        if not targets.issubset(snapshot):
+            missing = sorted(targets - set(snapshot))
+            raise HomeAssistantError(
+                "Shared TTS route lost selected client(s): "
+                + ", ".join(missing)
+            )
+        unexpected = sorted(
+            entity_id for entity_id, muted in snapshot.items()
+            if entity_id not in targets and not muted
+        )
+        if unexpected:
+            raise HomeAssistantError(
+                "Shared TTS playback blocked: other Snapcast clients were "
+                "unmuted by an external controller: " + ", ".join(unexpected)
+            )
+        muted_targets = sorted(
+            entity_id for entity_id in targets if snapshot[entity_id]
+        )
+        if muted_targets:
+            raise HomeAssistantError(
+                "Shared TTS route lost audible target(s): "
+                + ", ".join(muted_targets)
+            )
+
+    async def _async_quarantine_snapcast_route(
+        self, player: str, targets: Sequence[str]
+    ) -> None:
+        """Stop shared audio, re-mute other clients and drain its last packets."""
+        await self._async_stop_player(player)
+        visible = self._routable_snapcast_snapshot(targets)
+        target_set = set(targets)
+        desired = {
+            entity_id: entity_id not in target_set
+            for entity_id in visible
+        }
+        if desired:
+            try:
+                await self._async_set_mute_states(desired)
+            except asyncio.CancelledError:
+                raise
+            except Exception as err:  # noqa: BLE001
+                _LOGGER.error(
+                    "Snapcast route quarantine could not mute every "
+                    "non-target client: %s", err
+                )
+        await asyncio.sleep(_SNAPCAST_TAIL_DRAIN_SECONDS)
+
+    async def _async_guard_snapcast_tail(
+        self,
+        job: AnnouncementJob,
+        player: str,
+        targets: Sequence[str],
+        seconds: float,
+    ) -> None:
+        """Keep the route isolated while buffered Snapcast speech drains.
+
+        If an unrelated controller changes mute states, stop the source and
+        immediately re-isolate the output list before restoring prior state.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + max(0.0, seconds)
+        while True:
+            self._raise_if_cancelled(job)
+            try:
+                self._assert_snapcast_route_isolated(targets)
+            except HomeAssistantError:
+                await self._async_quarantine_snapcast_route(player, targets)
+                raise
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                return
+            await asyncio.sleep(min(0.1, remaining))
 
     def _clear_held_snapcast_route(self) -> None:
         self._held_snapcast_snapshot = None

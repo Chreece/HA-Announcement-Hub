@@ -93,7 +93,8 @@ def test_snapcast_tail_drains_before_route_restore() -> None:
     assert "hold_route = self._should_hold_snapcast_route(" in block
     assert "if not hold_route:" in block
     assert "drain_delay = max(post_delay, _SNAPCAST_TAIL_DRAIN_SECONDS)" in block
-    assert "await asyncio.sleep(drain_delay)" in block
+    assert "await self._async_guard_snapcast_tail(" in block
+    assert "job, player, route_targets, drain_delay" in block
 
 
 def test_prepared_same_route_handoff_still_skips_tail_gap() -> None:

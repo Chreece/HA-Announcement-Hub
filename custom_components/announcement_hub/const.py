@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.9.36"
+VERSION: Final = "0.9.37"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -97,6 +97,7 @@ CONF_TTS_LANGUAGE: Final = "tts_language"
 CONF_TTS_VOICE: Final = "tts_voice"
 CONF_TTS_OPTIONS: Final = "tts_options"
 CONF_TTS_MIN_LEVEL: Final = "tts_min_level"
+CONF_DIRECT_TTS_ANNOUNCE: Final = "direct_tts_announce"
 CONF_COMPANION_TTS_MEDIA_STREAM: Final = "companion_tts_media_stream"
 CONF_COMPANION_TTS_WPM: Final = "companion_tts_words_per_minute"
 CONF_DEFAULT_TITLE: Final = "default_title"
@@ -205,6 +206,8 @@ DEFAULT_TTS_CACHE: Final = True
 DEFAULT_TTS_LANGUAGE: Final = ""
 DEFAULT_TTS_OPTIONS: Final = {}
 DEFAULT_TTS_MIN_LEVEL: Final = LEVEL_DEBUG
+# Existing direct-player behavior preserved unless user opts out of a chime.
+DEFAULT_DIRECT_TTS_ANNOUNCE: Final = True
 DEFAULT_COMPANION_TTS_MEDIA_STREAM: Final = COMPANION_STREAM_DEFAULT
 DEFAULT_COMPANION_TTS_WPM: Final = 150
 DEFAULT_TITLE: Final = "Notification"
