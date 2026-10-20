@@ -310,10 +310,6 @@ class AnnouncementManager:
         if self._running:
             return
         stored = await self._store.async_load() or {}
-        current_snapcast = expand_snapcast_output_tokens(
-            self.hass,
-            self._ensure_list(self.settings.get(CONF_SNAPCAST_OUTPUTS, [])),
-        )
         for raw_job in stored.get("jobs", []):
             legacy_job = "snapcast_clients" not in raw_job
             try:
@@ -327,7 +323,15 @@ class AnnouncementManager:
             if len(job.tts_engines) > 1:
                 job.tts_engines = job.tts_engines[:1]
             if legacy_job and job.server_tts_enabled and not job.snapcast_clients:
-                job.snapcast_clients = current_snapcast
+                # Old queue records did not always include the physical route.
+                # Never reinterpret that omission as "every Snapcast client":
+                # a restored job might otherwise wake the entire household.
+                job.server_tts_enabled = False
+                _LOGGER.warning(
+                    "Stored announcement %s has no physical Snapcast recipients; "
+                    "disabled unsafe shared TTS playback",
+                    job.job_id,
+                )
             if job.server_tts_enabled and not job.tts_media_player:
                 player_value = self.settings.get(CONF_TTS_MEDIA_PLAYER)
                 job.tts_media_player = (
