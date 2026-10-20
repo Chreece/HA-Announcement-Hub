@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.9.37 - 2026-10-20
+
+- Fix an unsafe shared TTS path that could play on the central MPD player
+  even with **zero authorized Snapcast clients**. Require physical recipients
+  at planning, readiness, round dispatch and media-playback boundaries.
+- Stop broadening legacy queued TTS jobs with an empty physical route to all
+  currently configured Snapcast clients on Home Assistant restart.
+- Re-validate the live client mute route immediately before and throughout
+  shared playback, including the buffered audio tail. On an external unmute,
+  stop shared playback, mute unintended listeners and allow the queue to
+  recover without continuing the broadcast. Log the unexpected client IDs.
+- Do not send the media-player `announce` option to the dedicated Snapcast
+  shared MPD player. Provide a translated optional **Direct-speaker
+  announcement mode** setting to disable provider-specific bells/chimes
+  on standalone TTS media players; default preserves existing behavior.
+- Document how a competing Home Assistant volume automation can overwrite
+  Hub's route and how to keep existing room-specific scripts from expanding
+  their requested rooms to every configured area.
+- Add executable regressions for missing clients, unexpected unmuting,
+  shared/direct announcement modes, persisted legacy routing and tail
+  re-isolation.
+
+
 ## 0.9.36 - 2026-10-20
 
 - Ship a fully functional, responsive Lovelace announcement-composer card,
