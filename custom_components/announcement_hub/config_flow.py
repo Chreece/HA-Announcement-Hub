@@ -1221,7 +1221,7 @@ class _AnnouncementFlowMixin:
         )
 
     def _ai_agent_options(self) -> list[selector.SelectOptionDict]:
-        """Offer the HA default and currently available conversation agents."""
+        """Offer conversation agents and AI Task entities in one selector."""
         preferred_id, _, preferred_error = resolve_preferred_assist_agent(
             self.hass
         )
@@ -1252,6 +1252,19 @@ class _AnnouncementFlowMixin:
                 selector.SelectOptionDict(
                     value=state.entity_id,
                     label=state.name or state.entity_id,
+                )
+            )
+        for state in sorted(
+            self.hass.states.async_all("ai_task"),
+            key=lambda state: (state.name or state.entity_id).casefold(),
+        ):
+            if state.entity_id in seen:
+                continue
+            seen.add(state.entity_id)
+            options.append(
+                selector.SelectOptionDict(
+                    value=state.entity_id,
+                    label=f"AI Task: {state.name or state.entity_id}",
                 )
             )
         # HA also supports agents that are not represented by entities.
