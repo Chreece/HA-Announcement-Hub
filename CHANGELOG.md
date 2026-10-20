@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.33 - 2026-10-20
+
+- Add per-announcement AI generation mode in addition to strict copyediting.
+  It can turn fact-bearing instructions into finished natural TTS and written
+  notification text inside the durable queue preprocessing stage.
+- Respect the configured provider and backup, source language, hard selected
+  delivery targets and independent TTS/written channel boundaries. AI never
+  controls Home Assistant.
+- Preserve the original unprocessed text as the final fallback when generation
+  fails; add regression tests and document usage.
+
+
 ## 0.9.32 - 2026-10-19
 
 - Separate recipients and channels in announcement actions: area, integration,
