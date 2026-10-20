@@ -104,7 +104,6 @@
         "title": "4. General options",
         "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
         "data": {
-          "dispatch_order": "Notification/TTS order",
           "queue_max": "Maximum queued announcements",
           "output_availability_timeout": "Unavailable-output wait",
           "idle_timeout": "Audio idle wait",
@@ -120,10 +119,10 @@
           "fallback_door_label": "Door sensor label filter",
           "default_use_ai": "Rewrite announcements with AI",
           "default_ai_agent": "Default AI conversation agent",
-          "fallback_ai_agent": "Backup AI conversation agent"
+          "fallback_ai_agent": "Backup AI conversation agent",
+          "channel_fallback_mode": "Notification channel fallback"
         },
         "data_description": {
-          "dispatch_order": "Choose whether visual notifications are delivered before spoken TTS or TTS before visual notifications within one announcement job.",
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
           "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
           "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
@@ -139,7 +138,8 @@
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
           "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered."
+          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "channel_fallback_mode": "Only when BOTH spoken and written text AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
         }
       },
       "reconfigure": {
@@ -280,7 +280,6 @@
         "title": "4. General options",
         "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
         "data": {
-          "dispatch_order": "Notification/TTS order",
           "queue_max": "Maximum queued announcements",
           "output_availability_timeout": "Unavailable-output wait",
           "idle_timeout": "Audio idle wait",
@@ -296,10 +295,10 @@
           "fallback_door_label": "Door sensor label filter",
           "default_use_ai": "Rewrite announcements with AI",
           "default_ai_agent": "Default AI conversation agent",
-          "fallback_ai_agent": "Backup AI conversation agent"
+          "fallback_ai_agent": "Backup AI conversation agent",
+          "channel_fallback_mode": "Notification channel fallback"
         },
         "data_description": {
-          "dispatch_order": "Choose whether visual notifications are delivered before spoken TTS or TTS before visual notifications within one announcement job.",
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
           "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
           "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
@@ -315,7 +314,8 @@
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
           "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered."
+          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "channel_fallback_mode": "Only when BOTH spoken and written text AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
         }
       },
       "init": {
@@ -442,6 +442,13 @@
         "warning": "Warning",
         "error": "Error",
         "critical": "Critical"
+      }
+    },
+    "channel_fallback_mode": {
+      "options": {
+        "visual_then_tts": "Visual first → TTS if unsuccessful",
+        "tts_then_visual": "TTS first → Visual if unsuccessful",
+        "both": "Both eligible channels"
       }
     }
   },
