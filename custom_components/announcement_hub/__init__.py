@@ -34,6 +34,7 @@ from .const import (
     ATTR_OCCUPIED_ONLY,
     ATTR_USE_AI,
     ATTR_AI_AGENT,
+    ATTR_AI_MODE,
     ATTR_OUTPUT,
     ATTR_AREA,
     ATTR_INTEGRATION,
@@ -178,6 +179,9 @@ SEND_SCHEMA = probatio.All(
             probatio.Optional(ATTR_OCCUPIED_ONLY, default=DEFAULT_OCCUPIED_ONLY): bool,
             probatio.Optional(ATTR_USE_AI): bool,
             probatio.Optional(ATTR_AI_AGENT): cv.string,
+            probatio.Optional(ATTR_AI_MODE, default="rewrite"): probatio.In(
+                ("rewrite", "generate")
+            ),
         }
     ),
     _validate_send_payload,
@@ -341,6 +345,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             occupied_only=call.data[ATTR_OCCUPIED_ONLY],
             use_ai=call.data.get(ATTR_USE_AI),
             ai_agent=call.data.get(ATTR_AI_AGENT),
+            ai_mode=call.data[ATTR_AI_MODE],
         )
         pending = manager.pending_jobs()
         position = next(
