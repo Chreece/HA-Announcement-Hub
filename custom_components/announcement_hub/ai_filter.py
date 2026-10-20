@@ -1,4 +1,4 @@
-"""Optional fail-open copyediting by a Home Assistant conversation agent.
+"""Optional fail-open copyediting by Home Assistant conversation or AI Task.
 
 Run once before enqueueing so restored jobs do not contact the agent again.
 """
@@ -425,11 +425,19 @@ async def async_filter_announcement(
             diagnostics["attempted"] = True
             if index == 0:
                 diagnostics["agent"] = agent_label
-        payload = {"text": prompt}
-        if candidate:
-            payload["agent_id"] = candidate
-        if preferred_language:
-            payload["language"] = preferred_language
+        is_ai_task = isinstance(candidate, str) and candidate.startswith("ai_task.")
+        if is_ai_task:
+            payload = {
+                "task_name": "Announcement Hub announcement",
+                "instructions": prompt,
+                "entity_id": candidate,
+            }
+        else:
+            payload = {"text": prompt}
+            if candidate:
+                payload["agent_id"] = candidate
+            if preferred_language:
+                payload["language"] = preferred_language
         # Await the *same* in-flight request for as long as the agent needs.
         # Do not cancel generation just because a local model is loading.
         loop = asyncio.get_running_loop()
@@ -438,14 +446,14 @@ async def async_filter_announcement(
             AI_FILTER_SLOW_REQUEST_SECONDS,
             _LOGGER.warning,
             "Announcement AI agent %s has not responded after %.0f seconds; "
-            "continuing to await conversation.process (no Hub timeout)",
+            "continuing to await AI provider (no Hub timeout)",
             agent_label,
             AI_FILTER_SLOW_REQUEST_SECONDS,
         )
         try:
             response = await hass.services.async_call(
-                "conversation",
-                "process",
+                "ai_task" if is_ai_task else "conversation",
+                "generate_data" if is_ai_task else "process",
                 payload,
                 blocking=True,
                 return_response=True,
@@ -477,6 +485,14 @@ async def async_filter_announcement(
                     agent_label
                 ] = round(loop.time() - attempt_started, 3)
 
+        # AI Task returns {"data": generated_text}; normalize only this
+        # provider's response and retain all existing safety checks.
+        if is_ai_task and isinstance(response, dict):
+            data = response.get("data")
+            if isinstance(data, dict):
+                data = json.dumps(data, ensure_ascii=False)
+            if isinstance(data, str):
+                response = {"response": {"speech": {"plain": {"speech": data}}}}
         try:
             edited = _parse_reply(
                 response, originals, generate=(mode == "generate"),
