@@ -60,6 +60,11 @@ def prioritize_stage_targets(
         return audio
     if retry_channel == "visual":
         return visual
+    if mode == "both" and audio_retry and stage != "general":
+        # A failed visual attempt must never be replayed just because this
+        # room happens to have no eligible alternate audio output. Return
+        # empty targets and let the stage advance instead.
+        return audio
 
     if not candidates.notify or not candidates.has_audio:
         return candidates
@@ -81,8 +86,6 @@ def prioritize_stage_targets(
     # requested room and audible preference when moved to another room.
     if stage == "general":
         return candidates
-    if audio_retry:
-        return audio
     if normal_speech_allowed:
         return candidates
     if stage == "primary":
