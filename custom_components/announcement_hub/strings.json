@@ -120,8 +120,8 @@
           "fallback_check_door": "Require an open occupied-room door for fallback",
           "fallback_door_label": "Door sensor label filter",
           "default_use_ai": "Rewrite announcements with AI",
-          "default_ai_agent": "Default AI conversation agent",
-          "fallback_ai_agent": "Backup AI conversation agent",
+          "default_ai_agent": "Default AI provider (conversation or AI Task)",
+          "fallback_ai_agent": "Backup AI provider (conversation or AI Task)",
           "channel_fallback_mode": "Notification channel fallback"
         },
         "data_description": {
@@ -298,8 +298,8 @@
           "fallback_check_door": "Require an open occupied-room door for fallback",
           "fallback_door_label": "Door sensor label filter",
           "default_use_ai": "Rewrite announcements with AI",
-          "default_ai_agent": "Default AI conversation agent",
-          "fallback_ai_agent": "Backup AI conversation agent",
+          "default_ai_agent": "Default AI provider (conversation or AI Task)",
+          "fallback_ai_agent": "Backup AI provider (conversation or AI Task)",
           "channel_fallback_mode": "Notification channel fallback"
         },
         "data_description": {
@@ -527,7 +527,7 @@
           "description": "Optional override for this announcement. Leave unset to inherit the integration setting; true enables AI and false bypasses it even if globally enabled."
         },
         "ai_agent": {
-          "name": "Override AI conversation agent",
+          "name": "Override AI provider (conversation or AI Task)",
           "description": "Choose a currently available conversation agent for this announcement. Leave empty to inherit the integration selection (initially Home Assistant default)."
         },
         "click_action": {
