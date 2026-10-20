@@ -153,6 +153,8 @@ class AnnouncementJob:
     occupancy_requested: bool = True
     routing_retry_after: str | None = None
     routing_audio_retry: bool = False
+    # Alternate channel attempted after a failed visual/audio room route.
+    routing_channel_retry: str | None = None
     channel_services: tuple[str, ...] = ()
     excluded_physical: tuple[str, ...] = ()
     related_job_ids: tuple[str, ...] = ()
@@ -320,6 +322,7 @@ class AnnouncementJob:
         payload.setdefault("occupancy_requested", True)
         payload.setdefault("routing_retry_after", None)
         payload.setdefault("routing_audio_retry", False)
+        payload.setdefault("routing_channel_retry", None)
         payload.setdefault("channel_services", ())
         payload.setdefault("excluded_physical", ())
         payload.setdefault("related_job_ids", ())
@@ -373,6 +376,7 @@ class AnnouncementJob:
             "routing_history": list(self.routing_history[-12:]),
             "routing_retry_after": self.routing_retry_after,
             "routing_audio_retry": self.routing_audio_retry,
+            "routing_channel_retry": self.routing_channel_retry,
             "tts_engines": list(self.tts_engines),
             "notify_outputs": list(self.notify_outputs),
             "room_tts_players": list(self.room_tts_players),
