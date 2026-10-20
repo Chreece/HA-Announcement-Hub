@@ -410,3 +410,21 @@ def test_strict_targets_persist_in_job_and_legacy_jobs_default_false() -> None:
     old_job = job.to_dict()
     old_job.pop("strict_targets")
     assert AnnouncementJob.from_dict(old_job).strict_targets is False
+
+
+def test_channel_retry_mode_is_persisted_and_restored() -> None:
+    import ast
+
+    source = (ROOT / "custom_components" / "announcement_hub" / "models.py").read_text()
+    tree = ast.parse(source)
+    job = next(node for node in tree.body
+               if isinstance(node, ast.ClassDef)
+               and node.name == "AnnouncementJob")
+    assert any(
+        isinstance(statement, ast.AnnAssign)
+        and isinstance(statement.target, ast.Name)
+        and statement.target.id == "routing_channel_retry"
+        for statement in job.body
+    )
+    assert 'payload.setdefault("routing_channel_retry", None)' in source
+    assert '"routing_channel_retry": self.routing_channel_retry' in source
