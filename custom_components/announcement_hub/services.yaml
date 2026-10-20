@@ -85,8 +85,9 @@ send:
           selector:
             boolean:
         ai_agent:
+          example: ai_task.openai_ai_task
           selector:
-            conversation_agent:
+            text:
         ai_mode:
           default: rewrite
           selector:
