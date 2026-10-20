@@ -53,6 +53,9 @@ required = {
     "sensor.py",
     "diagnostics.py",
     "icons.json",
+    "frontend/announcement-hub-card.js",
+    "frontend/announcement-hub-card.css",
+    "frontend/announcement-hub-card.html",
     "services.yaml",
     "strings.json",
 }
