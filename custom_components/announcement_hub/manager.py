@@ -85,6 +85,7 @@ from .const import (
     CONF_TTS_ROOM_PLAYERS,
     CONF_TTS_PLAYER_POLICIES,
     CONF_TTS_MIN_LEVEL,
+    CONF_DIRECT_TTS_ANNOUNCE,
     CONF_TTS_OPTIONS,
     DEFAULT_COMPANION_TTS_MEDIA_STREAM,
     DEFAULT_COMPANION_TTS_WPM,
@@ -111,6 +112,7 @@ from .const import (
     DEFAULT_TTS_CACHE,
     DEFAULT_TTS_LANGUAGE,
     DEFAULT_TTS_MIN_LEVEL,
+    DEFAULT_DIRECT_TTS_ANNOUNCE,
     DEFAULT_TTS_OPTIONS,
     DISPATCH_NOTIFY_THEN_TTS,
     CHANNEL_VISUAL_THEN_TTS,
@@ -3757,7 +3759,9 @@ class AnnouncementManager:
         # not trigger provider-side announce/chime handling. HA's announce
         # flag remains enabled only for *direct* room media players that
         # support temporarily interrupting/restoring their existing content.
-        if not shared_path:
+        if not shared_path and bool(self.settings.get(
+            CONF_DIRECT_TTS_ANNOUNCE, DEFAULT_DIRECT_TTS_ANNOUNCE
+        )):
             payload[ATTR_MEDIA_ANNOUNCE] = True
         await self.hass.services.async_call(
             MEDIA_PLAYER_DOMAIN, "play_media", payload, blocking=True
