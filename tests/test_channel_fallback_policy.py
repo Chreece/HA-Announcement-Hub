@@ -176,6 +176,8 @@ class DeliveryHarness:
         self.calls = []
 
     async def _async_send_notifications(self, job):
+        if not job.notify_text or not job.notify_outputs:
+            return
         self.calls.append("visual")
         await asyncio.sleep(0)
         if "visual" in self.fails:
@@ -184,6 +186,11 @@ class DeliveryHarness:
         job.successful_channels.append("notify.tv")
 
     async def _async_send_tts(self, job):
+        if not job.tts_text or not (
+            job.room_tts_players or job.server_tts_enabled
+            or job.companion_tts_entries
+        ):
+            return
         self.calls.append("tts")
         await asyncio.sleep(0)
         if "tts" in self.fails:
