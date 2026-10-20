@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.9.34 - 2026-10-20
+
+- Add a configurable channel-fallback policy under General settings:
+  Visual → TTS, TTS → Visual or Both. Default Both preserves the existing
+  behavior for previously configured integrations.
+- Apply channel priority only when both spoken and written source texts
+  AND both permitted output types exist. Never invent a missing channel,
+  broaden explicit recipients or bypass severity and room/door restrictions.
+- For room-aware announcements, attempt the alternate channel within the
+  same room after provider failure before escalating to occupied, alternate
+  or general outputs. The retry direction persists across restarts.
+- In explicit-recipient delivery, run visual and speech sequentially when
+  a directional mode is chosen; the second channel runs only if the first
+  reports no successful output. Both retains existing parallel dispatch.
+- Replace the misleading Notification/TTS start-order selector with
+  localized, explanatory visual/TTS fallback choices.
+
+
 ## 0.9.33 - 2026-10-20
 
 - Add per-announcement AI generation mode in addition to strict copyediting.
