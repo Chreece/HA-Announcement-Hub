@@ -792,6 +792,47 @@ def test_simultaneous_mode_keeps_both_channels_at_warning(monkeypatch):
     assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
 
 
+def test_both_mode_failed_visual_without_room_speech_does_not_repeat_visual(monkeypatch):
+    global manager
+    manager = FakeManager(
+        available={
+            "entity:notify.kitchen": True,
+            "entity:notify.living": True,
+            "entity:notify.phone": True,
+        }
+    )
+    manager.settings["channel_fallback_mode"] = "both"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    manager._requeue_undelivered_stage(j, "visual provider failed")
+    assert j.routing_audio_retry
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "occupied"
+    assert j.notify_outputs == ("entity:notify.living",)
+
+
+def test_second_failed_directional_channel_advances_and_resets_retry(monkeypatch):
+    global manager
+    manager = FakeManager(
+        kitchen_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "entity:notify.living": True,
+            "media_player.kitchen_snapcast": True,
+        }
+    )
+    manager.settings["channel_fallback_mode"] = "visual_then_tts"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    manager._requeue_undelivered_stage(j, "visual failed")
+    assert j.routing_channel_retry == "tts"
+    manager._requeue_undelivered_stage(j, "speech failed")
+    assert j.routing_stage == "occupied"
+    assert j.routing_channel_retry is None
+
+
 def test_scheduler_does_not_drop_undelivered_jobs():
     scheduler = SRC[
         SRC.index("    def _next_runnable_job("):
