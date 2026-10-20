@@ -37,7 +37,8 @@
           "companion_tts_words_per_minute": "Companion-TTS-Sprechschätzung",
           "tts_area_players": "Direkte TTS-Player pro Raum",
           "companion_tts_outputs": "Companion-App-TTS-Geräte",
-          "tts_voice": "TTS-Stimme"
+          "tts_voice": "TTS-Stimme",
+          "direct_tts_announce": "Ansagemodus für direkte TTS-Lautsprecher"
         },
         "data_description": {
           "tts_engines": "Die eine aktive Sprach-Engine. Die Home-Assistant-Standard-TTS-Engine wird automatisch vorausgewählt, wenn sie verfügbar ist.",
@@ -51,7 +52,8 @@
           "snapcast_outputs": "Synchronisierte physische Raum-Ausgänge. TTS wird nicht direkt an sie gesendet; Announcement Hub verwaltet Mute/Routing, während der gemeinsame Player Snapserver speist.",
           "companion_tts_outputs": "Android-Companion-App-Geräte, die Push-TTS erhalten dürfen. Das ist getrennt von normalen visuellen Handy-Benachrichtigungen.",
           "tts_area_players": "Direkte Media Player, die erzeugtes TTS nur erhalten, wenn ihre Home-Assistant-Area dem belegten/Fallback-Raum entspricht. Jeder hier gewählte Player ist automatisch raumgebunden.",
-          "tts_voice": "Stimme der aktiven TTS-Engine für die gewählte Sprache. Kompatible Sprachvarianten werden zusammengeführt (z. B. el und el_GR). Unterstützt der Provider Stimmen, kann sie aber nicht auflisten, bleibt das Feld für eine manuelle Voice-ID sichtbar."
+          "tts_voice": "Stimme der aktiven TTS-Engine für die gewählte Sprache. Kompatible Sprachvarianten werden zusammengeführt (z. B. el und el_GR). Unterstützt der Provider Stimmen, kann sie aber nicht auflisten, bleibt das Feld für eine manuelle Voice-ID sichtbar.",
+          "direct_tts_announce": "Aktiviert den Ansagemodus für direkte Media-Player und Sprachassistenten. Manche Geräte spielen vorher einen Signalton und setzen danach die Wiedergabe fort. Deaktivieren verhindert solche gerätespezifischen Ansagetöne, kann jedoch laufende Wiedergabe unterbrechen. Die gemeinsame Snapcast-TTS-Quelle nutzt diesen Modus nie."
         }
       },
       "notification_profile": {
@@ -213,7 +215,8 @@
           "companion_tts_words_per_minute": "Companion-TTS-Sprechschätzung",
           "tts_area_players": "Direkte TTS-Player pro Raum",
           "companion_tts_outputs": "Companion-App-TTS-Geräte",
-          "tts_voice": "TTS-Stimme"
+          "tts_voice": "TTS-Stimme",
+          "direct_tts_announce": "Ansagemodus für direkte TTS-Lautsprecher"
         },
         "data_description": {
           "tts_engines": "Die eine aktive Sprach-Engine. Die Home-Assistant-Standard-TTS-Engine wird automatisch vorausgewählt, wenn sie verfügbar ist.",
@@ -227,7 +230,8 @@
           "snapcast_outputs": "Synchronisierte physische Raum-Ausgänge. TTS wird nicht direkt an sie gesendet; Announcement Hub verwaltet Mute/Routing, während der gemeinsame Player Snapserver speist.",
           "companion_tts_outputs": "Android-Companion-App-Geräte, die Push-TTS erhalten dürfen. Das ist getrennt von normalen visuellen Handy-Benachrichtigungen.",
           "tts_area_players": "Direkte Media Player, die erzeugtes TTS nur erhalten, wenn ihre Home-Assistant-Area dem belegten/Fallback-Raum entspricht. Jeder hier gewählte Player ist automatisch raumgebunden.",
-          "tts_voice": "Stimme der aktiven TTS-Engine für die gewählte Sprache. Kompatible Sprachvarianten werden zusammengeführt (z. B. el und el_GR). Unterstützt der Provider Stimmen, kann sie aber nicht auflisten, bleibt das Feld für eine manuelle Voice-ID sichtbar."
+          "tts_voice": "Stimme der aktiven TTS-Engine für die gewählte Sprache. Kompatible Sprachvarianten werden zusammengeführt (z. B. el und el_GR). Unterstützt der Provider Stimmen, kann sie aber nicht auflisten, bleibt das Feld für eine manuelle Voice-ID sichtbar.",
+          "direct_tts_announce": "Aktiviert den Ansagemodus für direkte Media-Player und Sprachassistenten. Manche Geräte spielen vorher einen Signalton und setzen danach die Wiedergabe fort. Deaktivieren verhindert solche gerätespezifischen Ansagetöne, kann jedoch laufende Wiedergabe unterbrechen. Die gemeinsame Snapcast-TTS-Quelle nutzt diesen Modus nie."
         }
       },
       "notification_profile": {
