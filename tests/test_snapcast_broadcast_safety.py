@@ -34,6 +34,8 @@ NAMESPACE = {
     "STATE_UNAVAILABLE": "unavailable",
     "STATE_UNKNOWN": "unknown",
     "MEDIA_PLAYER_DOMAIN": "media_player",
+    "CONF_DIRECT_TTS_ANNOUNCE": "direct_tts_announce",
+    "DEFAULT_DIRECT_TTS_ANNOUNCE": True,
     "CONF_START_TIMEOUT": "start_timeout",
     "DEFAULT_START_TIMEOUT": 10.0,
     "CONF_PLAYBACK_TIMEOUT": "playback_timeout",
@@ -239,6 +241,39 @@ def test_direct_room_tts_still_uses_announce_semantics_and_no_snapcast_route():
     ))
     assert m.hass.services.calls[0][2]["announce"] is True
     assert m.guard_checks == 0
+
+
+def test_disabling_direct_announcement_mode_prevents_provider_chime_flag():
+    m = FakeManager()
+    m.settings["direct_tts_announce"] = False
+    async def harmless_wait(predicate, *, timeout, job):
+        return True
+    m._wait_for = harmless_wait
+    asyncio.run(m._async_play_media_source(
+        job(recipients=(), server=False),
+        "media_player.kitchen_speaker",
+        "media-source://tts/test", (),
+    ))
+    assert "announce" not in m.hass.services.calls[0][2]
+
+
+def test_chime_setting_is_localized_in_the_tts_configure_menu():
+    import json
+
+    const = (ROOT / "custom_components/announcement_hub/const.py").read_text()
+    flow = (ROOT / "custom_components/announcement_hub/config_flow.py").read_text()
+    assert 'CONF_DIRECT_TTS_ANNOUNCE: Final = "direct_tts_announce"' in const
+    assert "CONF_DIRECT_TTS_ANNOUNCE, DEFAULT_DIRECT_TTS_ANNOUNCE" in flow
+    assert "CONF_DIRECT_TTS_ANNOUNCE," in flow
+    for relative in ("strings.json", "translations/en.json",
+                     "translations/de.json", "translations/el.json"):
+        data = json.loads(
+            (ROOT / "custom_components/announcement_hub" / relative).read_text()
+        )
+        for section in ("config", "options"):
+            step = data[section]["step"]["tts"]
+            assert step["data"]["direct_tts_announce"]
+            assert step["data_description"]["direct_tts_announce"]
 
 
 def test_no_recipient_shared_play_media_fails_before_service_dispatch():
