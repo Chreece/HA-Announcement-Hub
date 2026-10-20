@@ -728,6 +728,10 @@ def test_directional_fallback_never_creates_missing_tts_text(monkeypatch):
     assert not j.snapcast_clients
     manager._requeue_undelivered_stage(j, "visual provider error")
     assert j.routing_channel_retry is None
+    # After one channel fails, advance the stage; the worker then evaluates
+    # the next permitted room. It must not invent missing TTS content.
+    assert j.routing_stage == "occupied"
+    assert manager._staged_route_ready(j)
     assert j.routing_stage == "general"
 
 
@@ -767,6 +771,7 @@ def test_missing_alternate_channel_advances_room_without_broadcast(monkeypatch):
     manager._requeue_undelivered_stage(j, "visual failure")
     assert j.routing_channel_retry is None
     assert j.routing_stage == "occupied"
+    assert manager._staged_route_ready(j)
     assert j.notify_outputs == ("entity:notify.living",)
 
 
