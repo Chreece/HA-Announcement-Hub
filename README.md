@@ -202,7 +202,7 @@ The **4. General options** page includes:
 | Fallback room | An alternate area eligible after the requested and occupied areas |
 | Require an open occupied-room door for fallback | Door rule that must pass before using the configured alternate room |
 | Door sensor label filter | Optional label to restrict which door sensors count |
-| Notification/TTS order | Which channel begins first; delivery can still overlap |
+| Visual/TTS fallback preference | Visual first → TTS if it fails, TTS first → Visual if it fails, or Both eligible channels; applies only when both channel texts **and** both permitted output types exist |
 | Maximum queued announcements | Capacity limit for new jobs |
 | Unavailable-output wait | Per-stage availability grace before trying another permitted route |
 | Audio idle wait | Maximum wait for a busy shared playback path |
@@ -269,6 +269,32 @@ broadcasting to all configured devices.
 ### Room-first channel selection
 
 The notification level and TTS minimum are **not the same policy**.
+
+**Choose a delivery preference** in **Configure → 4. General settings, presence & AI → Notification channel fallback**:
+
+| Configuration choice | With two eligible channels |
+| --- | --- |
+| **Visual first → TTS on failure** | Try the written notification first; use TTS only if the visual provider cannot deliver |
+| **TTS first → Visual on failure** | Try spoken TTS first; use the written notification only if speech cannot be delivered |
+| **Both eligible channels** | Attempt both written notification and speech, subject to their eligibility and severity settings |
+
+**This rule is active only if both channel texts (`text_tts` and
+`text_notify`) are present AND a permitted visual output and a permitted
+audio output are candidates at the current route.** The shared `text`
+field fills both variants unless overridden. If only one channel or only
+one eligible output type exists, that channel is used as usual. No text
+is copied between channels, and no additional device, room, integration
+or service is authorized.
+
+For an area-targeted announcement, provider failure retries the other
+eligible channel **inside the same room** before advancing through occupied
+rooms, the door-checked fallback area or General notifications. An already
+successful Home Assistant send does not trigger a second-channel fallback;
+it does not guarantee the receiving device visibly displayed the message.
+The normal TTS severity threshold, hard **Never** setting (except Critical),
+and configured notification minimums still apply. The **Both** choice
+preserves the existing room-first low-severity preference and simultaneous
+delivery where both channels are eligible.
 
 | Situation | Channel selected |
 | --- | --- |

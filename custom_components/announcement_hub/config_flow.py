@@ -25,6 +25,7 @@ from .const import (
     CONF_DEFAULT_AI_AGENT,
     CONF_FALLBACK_AI_AGENT,
     CONF_DISPATCH_ORDER,
+    CONF_CHANNEL_FALLBACK_MODE,
     CONF_FALLBACK_CHECK_DOOR,
     CONF_FALLBACK_DOOR_LABEL,
     CONF_FALLBACK_ROOM,
@@ -64,6 +65,7 @@ from .const import (
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_CRITICAL_NOTIFY_DATA,
     DEFAULT_DISPATCH_ORDER,
+    DEFAULT_CHANNEL_FALLBACK_MODE,
     DEFAULT_USE_AI,
     DEFAULT_AI_AGENT,
     DEFAULT_FALLBACK_AI_AGENT,
@@ -86,6 +88,7 @@ from .const import (
     DEFAULT_TTS_MIN_LEVEL,
     DEFAULT_TTS_OPTIONS,
     DISPATCH_ORDERS,
+    CHANNEL_FALLBACK_MODES,
     INTEGRATION_MOBILE_APP,
     INTEGRATION_NFANDROIDTV,
     NFANDROIDTV_COLORS,
@@ -1305,7 +1308,7 @@ class _AnnouncementFlowMixin:
                 (CONF_FALLBACK_ROOM, None),
                 (CONF_FALLBACK_CHECK_DOOR, DEFAULT_FALLBACK_CHECK_DOOR),
                 (CONF_FALLBACK_DOOR_LABEL, None),
-                (CONF_DISPATCH_ORDER, DEFAULT_DISPATCH_ORDER),
+                (CONF_CHANNEL_FALLBACK_MODE, DEFAULT_CHANNEL_FALLBACK_MODE),
                 (CONF_QUEUE_MAX, DEFAULT_QUEUE_MAX),
                 (CONF_OUTPUT_AVAILABILITY_TIMEOUT, DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT),
                 (CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT),
@@ -1426,13 +1429,15 @@ class _AnnouncementFlowMixin:
                     self._value(CONF_FALLBACK_DOOR_LABEL, None),
                 ): selector.LabelSelector(),
                 probatio.Required(
-                    CONF_DISPATCH_ORDER,
-                    default=self._value(CONF_DISPATCH_ORDER, DEFAULT_DISPATCH_ORDER),
+                    CONF_CHANNEL_FALLBACK_MODE,
+                    default=self._value(
+                        CONF_CHANNEL_FALLBACK_MODE, DEFAULT_CHANNEL_FALLBACK_MODE
+                    ),
                 ): selector.SelectSelector(
                     selector.SelectSelectorConfig(
-                        options=list(DISPATCH_ORDERS),
+                        options=list(CHANNEL_FALLBACK_MODES),
                         mode=selector.SelectSelectorMode.DROPDOWN,
-                        translation_key="dispatch_order",
+                        translation_key="channel_fallback_mode",
                     )
                 ),
                 probatio.Required(

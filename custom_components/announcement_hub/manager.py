@@ -57,6 +57,7 @@ from .const import (
     CONF_DEFAULT_AI_AGENT,
     CONF_FALLBACK_AI_AGENT,
     CONF_DISPATCH_ORDER,
+    CONF_CHANNEL_FALLBACK_MODE,
     CONF_FALLBACK_CHECK_DOOR,
     CONF_FALLBACK_DOOR_LABEL,
     CONF_FALLBACK_ROOM,
@@ -89,6 +90,7 @@ from .const import (
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_CRITICAL_NOTIFY_DATA,
     DEFAULT_DISPATCH_ORDER,
+    DEFAULT_CHANNEL_FALLBACK_MODE,
     DEFAULT_USE_AI,
     DEFAULT_AI_AGENT,
     DEFAULT_FALLBACK_AI_AGENT,
@@ -111,6 +113,9 @@ from .const import (
     DEFAULT_TTS_MIN_LEVEL,
     DEFAULT_TTS_OPTIONS,
     DISPATCH_NOTIFY_THEN_TTS,
+    CHANNEL_VISUAL_THEN_TTS,
+    CHANNEL_TTS_THEN_VISUAL,
+    CHANNEL_FALLBACK_MODES,
     DOMAIN,
     EVENT_CANCELLED,
     EVENT_CHANNEL_FAILED,
@@ -2313,6 +2318,18 @@ class AnnouncementManager:
             visual_ready=visual_ready,
             audio_ready=audio_ready,
             audio_retry=job.routing_audio_retry,
+            mode=(
+                str(self.settings.get(
+                    CONF_CHANNEL_FALLBACK_MODE, DEFAULT_CHANNEL_FALLBACK_MODE
+                ))
+                if job.text_tts and job.text_notify
+                else DEFAULT_CHANNEL_FALLBACK_MODE
+            ),
+            retry_channel=(
+                job.routing_channel_retry
+                if job.text_tts and job.text_notify
+                else None
+            ),
         )
 
         job.outputs = tuple(areas)
@@ -2375,6 +2392,7 @@ class AnnouncementManager:
         old_stage = job.routing_stage
         job.routing_stage = next_stage(job.routing_stage)
         job.routing_audio_retry = False
+        job.routing_channel_retry = None
         job.routing_stage_started_at = utcnow_iso()
         job.routing_history.append(f"{old_stage}: {reason}")
         job.routing_history = job.routing_history[-24:]
@@ -2412,6 +2430,7 @@ class AnnouncementManager:
                     job.routing_history = job.routing_history[-24:]
                     job.routing_stage = "primary"
                     job.routing_audio_retry = False
+                    job.routing_channel_retry = None
                     job.routing_stage_started_at = utcnow_iso()
                     continue
                 return False
@@ -2443,38 +2462,85 @@ class AnnouncementManager:
         minimum_tts_level = str(
             self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
         )
-        can_retry_same_room_audio = bool(
-            job.routing_stage in {"primary", "occupied", "fallback"}
-            and job.notify_outputs
-            and not (
+        mode = str(self.settings.get(
+            CONF_CHANNEL_FALLBACK_MODE, DEFAULT_CHANNEL_FALLBACK_MODE
+        ))
+        both_texts = bool(job.text_tts and job.text_notify)
+        selected_visual = bool(job.notify_text and job.notify_outputs)
+        selected_audio = bool(
+            job.tts_text and (
                 job.room_tts_players or job.snapcast_clients
                 or job.companion_tts_entries
             )
-            and not job.routing_audio_retry
-            and minimum_tts_level != TTS_LEVEL_NEVER
-            and not tts_allowed_for_level(job.level, minimum_tts_level)
         )
-        if can_retry_same_room_audio:
-            # A visual provider can fail after initially reporting "ready".
-            # Try available room audio next, before moving elsewhere. If none
-            # exists, the stage advances immediately without an extra wait.
-            job.routing_audio_retry = True
-            job.routing_stage_started_at = utcnow_iso()
-            job.routing_history.append(
-                f"{job.routing_stage}: visual failed; trying same-room audio"
+        attempted_one = selected_visual != selected_audio
+        desired_retry: str | None = None
+        if (
+            both_texts
+            and attempted_one
+            and job.routing_channel_retry is None
+            and mode in (CHANNEL_VISUAL_THEN_TTS, CHANNEL_TTS_THEN_VISUAL)
+        ):
+            desired_retry = "tts" if selected_visual else "visual"
+
+        if (
+            desired_retry == "tts"
+            and minimum_tts_level == TTS_LEVEL_NEVER
+            and job.level != LEVEL_CRITICAL
+        ):
+            # Respect explicit non-Critical mute; the stage selector also
+            # filters this channel, so never try to force it.
+            desired_retry = None
+
+        retried = False
+        if desired_retry:
+            # A ready provider can fail AFTER the availability check. Rebuild
+            # the same physical-room candidates using only the opposite
+            # channel before attempting another room or any General output.
+            job.routing_channel_retry = desired_retry
+            if self._prepare_staged_route(job):
+                retried = True
+                job.routing_stage_started_at = utcnow_iso()
+                job.routing_history.append(
+                    f"{job.routing_stage}: {reason}; retry same-room "
+                    f"{'speech' if desired_retry == 'tts' else 'visual'}"
+                )
+                job.routing_history = job.routing_history[-24:]
+            else:
+                job.routing_channel_retry = None
+
+        if not retried:
+            # Existing "both" behavior: low-level visual errors can retry
+            # that room's TTS when BOTH source channels were supplied.
+            can_retry_same_room_audio = bool(
+                mode not in (CHANNEL_VISUAL_THEN_TTS, CHANNEL_TTS_THEN_VISUAL)
+                and both_texts
+                and job.routing_stage in {"primary", "occupied", "fallback"}
+                and job.notify_outputs
+                and not selected_audio
+                and not job.routing_audio_retry
+                and minimum_tts_level != TTS_LEVEL_NEVER
+                and not tts_allowed_for_level(job.level, minimum_tts_level)
             )
-            job.routing_history = job.routing_history[-24:]
-        elif job.routing_stage != "general":
-            self._advance_staged_route(job, reason)
-        else:
-            # A failing general notification action must not generate a busy
-            # loop; give its transport at least five seconds before retrying.
-            wait = max(self._availability_timeout, 5.0)
-            job.routing_retry_after = (
-                datetime.now(UTC) + timedelta(seconds=wait)
-            ).isoformat()
-            job.routing_history.append(f"general: {reason}")
-            job.routing_history = job.routing_history[-24:]
+            if can_retry_same_room_audio:
+                job.routing_audio_retry = True
+                job.routing_stage_started_at = utcnow_iso()
+                job.routing_history.append(
+                    f"{job.routing_stage}: visual failed; trying same-room audio"
+                )
+                job.routing_history = job.routing_history[-24:]
+            elif job.routing_stage != "general":
+                self._advance_staged_route(job, reason)
+            else:
+                # A failing general notification must not busy-loop forever.
+                # Reset the override before a later attempt.
+                job.routing_channel_retry = None
+                wait = max(self._availability_timeout, 5.0)
+                job.routing_retry_after = (
+                    datetime.now(UTC) + timedelta(seconds=wait)
+                ).isoformat()
+                job.routing_history.append(f"general: {reason}")
+                job.routing_history = job.routing_history[-24:]
         job.status = "pending"
         job.started_at = None
         job.finished_at = None
@@ -2658,11 +2724,11 @@ class AnnouncementManager:
         return None
 
     async def _async_process_job(self, job: AnnouncementJob) -> None:
-        """Run visual and audible channels as a pipelined pair.
+        """Dispatch eligible channels concurrently or in fallback order.
 
-        Dispatch order controls which channel is started first, but one channel
-        no longer has to finish before the other can begin. This keeps TTS
-        playback moving while visual reading timers run independently.
+        Channel order never alters the action's message/channel or recipient
+        allowlists. Directional fallback uses the second channel only when
+        the preferred one records no successful delivery.
         """
         order = self.settings.get(CONF_DISPATCH_ORDER, DEFAULT_DISPATCH_ORDER)
         if order == DISPATCH_NOTIFY_THEN_TTS:
@@ -2672,18 +2738,61 @@ class AnnouncementManager:
             first = self._async_send_tts
             second = self._async_send_notifications
 
-        first_task = asyncio.create_task(first(job))
-        await asyncio.sleep(0)
-        second_task = asyncio.create_task(second(job))
-        tasks = (first_task, second_task)
-        try:
-            await asyncio.gather(*tasks)
-        except BaseException:
-            for task in tasks:
-                if not task.done():
-                    task.cancel()
-            await asyncio.gather(*tasks, return_exceptions=True)
-            raise
+        mode = str(self.settings.get(
+            CONF_CHANNEL_FALLBACK_MODE, DEFAULT_CHANNEL_FALLBACK_MODE
+        ))
+        # Only dual-source announcements with actual permitted recipients
+        # for both channels use prioritized delivery. An exact service or
+        # device allowlist cannot be broadened by this preference.
+        has_both = bool(
+            job.tts_text and job.notify_text and job.notify_outputs
+            and (
+                job.room_tts_players or job.server_tts_enabled
+                or job.companion_tts_entries
+            )
+        )
+        if has_both and mode in (
+            CHANNEL_VISUAL_THEN_TTS, CHANNEL_TTS_THEN_VISUAL
+        ):
+            preferred = (
+                self._async_send_notifications
+                if mode == CHANNEL_VISUAL_THEN_TTS
+                else self._async_send_tts
+            )
+            fallback = (
+                self._async_send_tts
+                if mode == CHANNEL_VISUAL_THEN_TTS
+                else self._async_send_notifications
+            )
+            failures: list[Exception] = []
+            for sender in (preferred, fallback):
+                try:
+                    await sender(job)
+                except asyncio.CancelledError:
+                    raise
+                except Exception as err:  # noqa: BLE001
+                    failures.append(err)
+                if job.successful_channels:
+                    # A successful Home Assistant service call confirms this
+                    # leg was attempted. Do not send an unnecessary fallback.
+                    break
+            if not job.successful_channels and failures:
+                raise failures[-1]
+        else:
+            # The simultaneous option preserves the existing pipelined
+            # channel behavior and the previous start-order preference.
+            first_task = asyncio.create_task(first(job))
+            await asyncio.sleep(0)
+            second_task = asyncio.create_task(second(job))
+            tasks = (first_task, second_task)
+            try:
+                await asyncio.gather(*tasks)
+            except BaseException:
+                for task in tasks:
+                    if not task.done():
+                        task.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
+                raise
 
         self._raise_if_cancelled(job)
         # A job whose configured outputs all stayed unavailable is a valid

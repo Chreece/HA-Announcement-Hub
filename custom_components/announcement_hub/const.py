@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.9.33"
+VERSION: Final = "0.9.34"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -165,7 +165,9 @@ CONF_SNAPCAST_SETTLE_DELAY: Final = "snapcast_settle_delay"
 CONF_SNAPCAST_VERIFY_TIMEOUT: Final = "snapcast_verify_timeout"
 CONF_SNAPCAST_RESTORE: Final = "snapcast_restore"
 
+# Legacy start order retained for the simultaneous mode.
 CONF_DISPATCH_ORDER: Final = "dispatch_order"
+CONF_CHANNEL_FALLBACK_MODE: Final = "channel_fallback_mode"
 CONF_QUEUE_MAX: Final = "queue_max"
 CONF_OUTPUT_AVAILABILITY_TIMEOUT: Final = "output_availability_timeout"
 CONF_IDLE_TIMEOUT: Final = "idle_timeout"
@@ -178,6 +180,14 @@ DISPATCH_TTS_THEN_NOTIFY: Final = "tts_then_notify"
 DISPATCH_ORDERS: Final = (
     DISPATCH_NOTIFY_THEN_TTS,
     DISPATCH_TTS_THEN_NOTIFY,
+)
+CHANNEL_VISUAL_THEN_TTS: Final = "visual_then_tts"
+CHANNEL_TTS_THEN_VISUAL: Final = "tts_then_visual"
+CHANNEL_BOTH: Final = "both"
+CHANNEL_FALLBACK_MODES: Final = (
+    CHANNEL_VISUAL_THEN_TTS,
+    CHANNEL_TTS_THEN_VISUAL,
+    CHANNEL_BOTH,
 )
 
 COMPANION_STREAM_DEFAULT: Final = "default"
@@ -238,6 +248,8 @@ DEFAULT_SNAPCAST_SETTLE_DELAY: Final = 0.25
 DEFAULT_SNAPCAST_VERIFY_TIMEOUT: Final = 5.0
 DEFAULT_SNAPCAST_RESTORE: Final = True
 DEFAULT_DISPATCH_ORDER: Final = DISPATCH_NOTIFY_THEN_TTS
+# Keep existing simultaneous dispatch unless user chooses a direction.
+DEFAULT_CHANNEL_FALLBACK_MODE: Final = CHANNEL_BOTH
 DEFAULT_QUEUE_MAX: Final = 100
 DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT: Final = 5.0
 DEFAULT_IDLE_TIMEOUT: Final = 180.0
