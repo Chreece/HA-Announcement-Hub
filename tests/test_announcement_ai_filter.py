@@ -759,7 +759,7 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert "self._queue.append(job)" in manager
     fields = service["send"]["fields"]["ai"]["fields"]
     assert "boolean" in fields["use_ai"]["selector"]
-    assert "conversation_agent" in fields["ai_agent"]["selector"]
+    assert "text" in fields["ai_agent"]["selector"]
 
 
 def test_ai_fields_localized_in_config_options_and_action() -> None:
@@ -1002,3 +1002,72 @@ def test_generated_title_remains_private_in_durable_queue_diagnostics():
     assert 'job.title = title_result["title"]' in source
     assert '"requested_generate_title"' in models
     assert 'result["title"] = self.title' in models
+
+
+def test_ai_task_generates_using_selected_entity() -> None:
+    response = {"data": json.dumps({
+        "text_tts": "Die Wäsche ist fertig.",
+        "text_notify": "✅ Wäsche fertig",
+    })}
+    hass = Hass(response)
+    result = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Die Wäsche ist fertig",
+        text_notify="Wäsche fertig",
+        agent_id="ai_task.local_model",
+    ))
+    assert result == ("Die Wäsche ist fertig.", "✅ Wäsche fertig")
+    domain, service, payload, kwargs = hass.services.calls[0]
+    assert (domain, service) == ("ai_task", "generate_data")
+    assert payload["entity_id"] == "ai_task.local_model"
+    assert payload["task_name"] == "Announcement Hub announcement"
+    assert "Announcement source JSON" in payload["instructions"]
+    assert kwargs == {"blocking": True, "return_response": True}
+
+
+def test_ai_task_structured_data_and_short_title() -> None:
+    hass = Hass({"data": {
+        "text_tts": "Room ready.",
+        "text_notify": "✅ Room ready",
+        "title": "Room is ready now",
+    }})
+    title = {}
+    result = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Room ready",
+        text_notify="Room ready",
+        agent_id="ai_task.local",
+        mode="generate",
+        title_result=title,
+    ))
+    assert result == ("Room ready.", "✅ Room ready")
+    assert title["title"] == "Room is ready"
+
+
+def test_ai_task_failure_uses_conversation_backup() -> None:
+    hass = Hass(responses=[
+        RuntimeError("AI Task unavailable"),
+        ha_reply("Ready.", "✅ Ready"),
+    ])
+    result = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Ready",
+        text_notify="Ready",
+        agent_id="ai_task.offline",
+        fallback_agent_id="conversation.backup",
+    ))
+    assert result == ("Ready.", "✅ Ready")
+    assert [(d, s) for d, s, _, _ in hass.services.calls] == [
+        ("ai_task", "generate_data"), ("conversation", "process")
+    ]
+
+
+def test_ai_task_invalid_response_falls_back_to_original() -> None:
+    hass = Hass({"data": "not json"})
+    result = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Temperature 23°C",
+        text_notify="Temperature 23°C",
+        agent_id="ai_task.bad",
+    ))
+    assert result == ("Temperature 23°C", "Temperature 23°C")
