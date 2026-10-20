@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.35 - 2026-10-20
+
+- Generate a descriptive title (up to three words) within the existing AI
+  generation request when no explicit title is supplied by the action.
+- Never overwrite caller-provided titles; default rewrite mode remains
+  unchanged and makes no title request.
+- Normalize model titles to plain text, remove decorations, enforce the
+  three-word limit and retain the configured fallback title if generation
+  fails or returns an unusable title. No extra model invocation is needed.
+- The generation flag is saved with the original queued job so restart can
+  retry without losing title generation; generated titles remain private in
+  normal queue diagnostics until visual delivery.
+
+
 ## 0.9.34 - 2026-10-20
 
 - Add a configurable channel-fallback policy under General settings:
