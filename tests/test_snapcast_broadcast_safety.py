@@ -101,6 +101,14 @@ class FakeManager:
     def _raise_if_cancelled(self, _job):
         pass
 
+    @staticmethod
+    def _is_player_busy(_player):
+        return True
+
+    @staticmethod
+    def _any_snapcast_busy(_targets):
+        return False
+
     def _record_channel_failure(self, _job, channel, error):
         self.failures.append((channel, str(error)))
 
