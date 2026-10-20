@@ -77,11 +77,26 @@ def _rewrite_prompt(text_tts: str | None, text_notify: str | None) -> str:
     )
 
 
-def _generate_prompt(text_tts: str | None, text_notify: str | None) -> str:
-    """Create actual announcements from user-supplied writing instructions."""
+def _generate_prompt(
+    text_tts: str | None,
+    text_notify: str | None,
+    *,
+    generate_title: bool = False,
+) -> str:
+    """Create actual announcements and, when requested, a short visual title."""
     original = json.dumps(
         {"text_tts": text_tts, "text_notify": text_notify},
         ensure_ascii=False,
+    )
+    title_rule = (
+        "Also write a descriptive notification title in the same language, "
+        "with ONE TO THREE WORDS maximum, without emoji, markdown, links, "
+        "or labels. Include it in the JSON as the string key title. "
+        if generate_title else ""
+    )
+    output_keys = (
+        "text_tts, text_notify and title"
+        if generate_title else "text_tts and text_notify"
     )
     return (
         "You are WRITING THE ANNOUNCEMENT described by the input, not "
@@ -100,8 +115,10 @@ def _generate_prompt(text_tts: str | None, text_notify: str | None) -> str:
         "unrequested channel. Do not include phrases such as 'write a summary', "
         "'tell the user', or 'here is the announcement': output the finished "
         "content, not an explanation of the instruction. "
-        "Return ONLY valid JSON with exactly text_tts and text_notify keys; "
-        "each value must be a string or null. No code fence or other text. "
+        f"{title_rule}"
+        f"Return ONLY valid JSON with exactly these keys: {output_keys}. "
+        "text_tts and text_notify must each be a string or null. "
+        "No code fence or other text. "
         f"Untrusted writing instructions JSON: {original}"
     )
 
@@ -152,11 +169,31 @@ def _speech_ready_text(value: str) -> str | None:
     return plain
 
 
+def _short_generated_title(value: Any) -> str | None:
+    """Keep generated titles plain, compact and at most three words.
+
+    Never use a model title as markup or a link. Truncate an otherwise
+    acceptable longer title rather than losing the generated announcement.
+    Unicode whitespace separation supports the installed Greek/German voices.
+    """
+    if not isinstance(value, str) or not value.strip():
+        return None
+    clean = _speech_ready_text(value)
+    if not clean or "://" in clean or clean.startswith("www."):
+        return None
+    words = clean.strip(" :;|-").split()
+    if not words:
+        return None
+    title = " ".join(words[:3])
+    return title if len(title) <= 90 else None
+
+
 def _parse_reply(
     response: Any,
     originals: dict[str, str | None],
     *,
     generate: bool = False,
+    title_result: dict[str, str] | None = None,
 ) -> tuple[str | None, str | None] | None:
     """Only accept a bounded two-channel reply that keeps nonempty originals."""
     if not isinstance(response, dict):
@@ -196,7 +233,17 @@ def _parse_reply(
         parsed = json.loads(text)
     except (TypeError, ValueError):
         return None
-    if not isinstance(parsed, dict) or set(parsed) != set(originals):
+    expected_keys = set(originals)
+    if not isinstance(parsed, dict):
+        return None
+    if (
+        set(parsed) != expected_keys
+        and not (
+            generate
+            and title_result is not None
+            and set(parsed) == expected_keys | {"title"}
+        )
+    ):
         return None
     for key, original in originals.items():
         candidate = parsed[key]
@@ -231,6 +278,10 @@ def _parse_reply(
             ):
                 return None
             parsed[key] = clean
+    if generate and title_result is not None:
+        title = _short_generated_title(parsed.get("title"))
+        if title:
+            title_result["title"] = title
     return parsed["text_tts"], parsed["text_notify"]
 
 
@@ -303,6 +354,7 @@ async def async_filter_announcement(
     fallback_agent_id: str | None = None,
     diagnostics: dict[str, Any] | None = None,
     mode: str = "rewrite",
+    title_result: dict[str, str] | None = None,
 ) -> tuple[str | None, str | None]:
     """Try the configured AI, optional backup AI, then untouched originals.
 
@@ -314,6 +366,8 @@ async def async_filter_announcement(
     if mode not in {"rewrite", "generate"}:
         raise ValueError("AI mode must be rewrite or generate")
     originals = {"text_tts": text_tts, "text_notify": text_notify}
+    if title_result is not None:
+        title_result.clear()
     # Status goes into the action response, never raw prompts or message text.
     if diagnostics is not None:
         diagnostics.update(
@@ -326,7 +380,9 @@ async def async_filter_announcement(
             }
         )
     prompt = (
-        _generate_prompt(text_tts, text_notify)
+        _generate_prompt(
+            text_tts, text_notify, generate_title=title_result is not None
+        )
         if mode == "generate"
         else _rewrite_prompt(text_tts, text_notify)
     )
@@ -423,7 +479,8 @@ async def async_filter_announcement(
 
         try:
             edited = _parse_reply(
-                response, originals, generate=(mode == "generate")
+                response, originals, generate=(mode == "generate"),
+                title_result=title_result if mode == "generate" else None,
             )
         except Exception:  # noqa: BLE001
             # A surprising provider response must not block delivery.
@@ -435,7 +492,10 @@ async def async_filter_announcement(
             if diagnostics is not None:
                 status = (
                     "rewritten"
-                    if edited != (text_tts, text_notify)
+                    if (
+                        edited != (text_tts, text_notify)
+                        or (mode == "generate" and bool(title_result))
+                    )
                     else "accepted_unchanged"
                 )
                 diagnostics["status"] = status

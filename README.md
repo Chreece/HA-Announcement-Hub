@@ -633,6 +633,27 @@ data:
   use_ai: true
 ```
 
+When `ai_mode: generate` is enabled and the action **omits `title`**,
+the same AI request also creates a descriptive notification title (one to
+three words, in the announcement's language). Hub removes formatting and
+enforces the three-word limit before using it, without another AI request.
+An explicitly supplied title is never overwritten, including on Critical
+announcements. If AI fails or returns no acceptable title, the configured
+**Default notification title** remains in use.
+
+The generated title is stored with the queued job and appears on its visual
+notifications; it is not spoken as part of `text_tts`. To enable this,
+provide `ai_mode: generate` and `use_ai: true` (or enable AI by default)
+while leaving `title` out of the action:
+
+```yaml
+action: notify.announcement_hub
+data:
+  text: "Tell the household in Greek that the washing machine has finished."
+  ai_mode: generate
+  use_ai: true
+```
+
 Generated speech and visual output remain separate. This is a *content
 generation* feature only, not permission for the agent to execute actions.
 If both AI agents fail, the original instructions remain the final text

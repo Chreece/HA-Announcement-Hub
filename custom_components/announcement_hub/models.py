@@ -405,6 +405,7 @@ class AnnouncementJob:
                 if key not in {
                     "source_tts", "source_notify",
                     "requested_agent_id", "requested_fallback_agent_id",
+                    "requested_generate_title", "requested_mode",
                 }
             },
             "started_at": self.started_at,

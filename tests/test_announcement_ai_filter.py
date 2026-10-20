@@ -868,3 +868,137 @@ def test_action_accepts_generation_mode_and_persists_it_with_original_job():
     assert '"requested_mode": ai_mode' in manager
     assert 'mode=ai.get("requested_mode", "rewrite")' in manager
     assert "generate" in services["send"]["fields"]["ai"]["fields"]["ai_mode"]["selector"]["select"]["options"]
+
+
+def _ha_reply_with_generated_title(tts, notify, title):
+    response = ha_reply(tts, notify)
+    payload = json.loads(response["response"]["speech"]["plain"]["speech"])
+    payload["title"] = title
+    response["response"]["speech"]["plain"]["speech"] = json.dumps(
+        payload, ensure_ascii=False
+    )
+    return response
+
+
+def test_generation_without_explicit_title_requests_three_words_in_one_call():
+    prompt = "Γράψε μία σύντομη ενημέρωση ότι η πόρτα είναι ανοιχτή."
+    hass = Hass(_ha_reply_with_generated_title(
+        "Η πόρτα είναι ανοιχτή.", "🚪 Η πόρτα είναι ανοιχτή.",
+        "🚪 **Ανοιχτή Πόρτα Σπιτιού Σήμερα**",
+    ))
+    title = {"title": "stale"}
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=prompt, text_notify=prompt,
+        agent_id="conversation.local", mode="generate", title_result=title,
+    ))
+    assert result == (
+        "Η πόρτα είναι ανοιχτή.", "🚪 Η πόρτα είναι ανοιχτή."
+    )
+    assert title == {"title": "Ανοιχτή Πόρτα Σπιτιού"}
+    assert len(title["title"].split()) == 3
+    assert len(hass.services.calls) == 1
+    message = hass.services.calls[0][2]["text"]
+    assert "ONE TO THREE WORDS maximum" in message
+    assert "text_tts, text_notify and title" in message
+
+
+def test_generation_with_explicit_title_does_not_ask_model_for_a_new_title():
+    hass = Hass(ha_reply("The door is open.", "Door open."))
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Write a door alert.", text_notify="Write a door alert.",
+        agent_id="conversation.local", mode="generate",
+    ))
+    assert result == ("The door is open.", "Door open.")
+    message = hass.services.calls[0][2]["text"]
+    assert "ONE TO THREE WORDS maximum" not in message
+    assert "exactly these keys: text_tts and text_notify" in message
+
+
+def test_missing_optional_ai_title_preserves_generated_message():
+    hass = Hass(ha_reply("The oven is ready.", "Oven ready."))
+    title = {}
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Announce oven ready",
+        text_notify="Announce oven ready",
+        agent_id="conversation.local", mode="generate", title_result=title,
+    ))
+    assert result == ("The oven is ready.", "Oven ready.")
+    assert title == {}  # Caller retains configured Default notification title.
+
+
+@pytest.mark.parametrize("bad_title", [
+    None,
+    "",
+    "🚪",
+    "<script>alert('x')</script>",
+    "https://example.invalid/alert",
+    "www.example.invalid",
+])
+def test_unusable_ai_title_never_discards_valid_body(bad_title):
+    hass = Hass(_ha_reply_with_generated_title(
+        "The window is open.", "Window open.", bad_title
+    ))
+    title = {}
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Write window warning",
+        text_notify="Write window warning",
+        agent_id="conversation.local", mode="generate", title_result=title,
+    ))
+    assert result == ("The window is open.", "Window open.")
+    assert title == {}
+
+
+def test_provider_failure_clears_title_and_preserves_original_message():
+    hass = Hass(error=RuntimeError("provider offline"))
+    title = {"title": "Old title"}
+    original = "Γράψε μήνυμα για την πόρτα."
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=original, text_notify=original,
+        agent_id="conversation.local", mode="generate", title_result=title,
+    ))
+    assert result == (original, original)
+    assert title == {}
+
+
+def test_backup_agent_may_generate_short_title_when_primary_fails():
+    hass = Hass(responses=[
+        RuntimeError("primary offline"),
+        _ha_reply_with_generated_title(
+            "Waschmaschine fertig.", "Wäsche ist fertig.",
+            "**Wäsche jetzt fertig**",
+        ),
+    ])
+    title = {}
+    result = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Formuliere eine Waschmaschinenmeldung.",
+        text_notify="Formuliere eine Waschmaschinenmeldung.",
+        mode="generate", agent_id="conversation.primary",
+        fallback_agent_id="conversation.backup", title_result=title,
+    ))
+    assert result == ("Waschmaschine fertig.", "Wäsche ist fertig.")
+    assert title == {"title": "Wäsche jetzt fertig"}
+    assert len(hass.services.calls) == 2
+
+
+def test_rewrite_mode_does_not_generate_a_title_even_when_destination_provided():
+    hass = Hass(ha_reply("Kitchen open.", "Kitchen open."))
+    title = {"title": "must clear"}
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Kitchen open", text_notify="Kitchen open",
+        agent_id="conversation.local", mode="rewrite", title_result=title,
+    ))
+    assert result == ("Kitchen open.", "Kitchen open.")
+    assert title == {}
+    assert "ONE TO THREE WORDS" not in hass.services.calls[0][2]["text"]
+
+
+def test_generated_title_remains_private_in_durable_queue_diagnostics():
+    source = (COMPONENT / "manager.py").read_text(encoding="utf-8")
+    models = (COMPONENT / "models.py").read_text(encoding="utf-8")
+    assert 'ai_mode == "generate" and title is None' in source
+    assert '"requested_generate_title": generate_title' in source
+    assert 'title_result if ai.get("requested_generate_title") else None' in source
+    assert 'job.title = title_result["title"]' in source
+    assert '"requested_generate_title"' in models
+    assert 'result["title"] = self.title' in models
