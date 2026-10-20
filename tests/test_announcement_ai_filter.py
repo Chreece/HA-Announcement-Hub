@@ -780,3 +780,91 @@ def test_ai_fields_localized_in_config_options_and_action() -> None:
         for key in ("use_ai", "ai_agent"):
             assert send["fields"][key]["name"]
             assert send["fields"][key]["description"]
+
+
+def test_generation_mode_creates_actual_text_from_greek_writing_instruction() -> None:
+    prompt = "Γράψε μια ενημέρωση ότι το πλυντήριο τελείωσε."
+    hass = Hass(ha_reply(
+        "Η πλύση ολοκληρώθηκε. Μπορείς να βγάλεις τα ρούχα.",
+        "🧺 **Η πλύση ολοκληρώθηκε!**",
+    ))
+    result = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts=prompt,
+        text_notify=prompt,
+        mode="generate",
+        agent_id="conversation.local",
+    ))
+    assert result[0] == "Η πλύση ολοκληρώθηκε. Μπορείς να βγάλεις τα ρούχα."
+    assert result[1] == "🧺 **Η πλύση ολοκληρώθηκε!**"
+    request = hass.services.calls[0][2]["text"]
+    assert "WRITING THE ANNOUNCEMENT" in request
+    assert "not" in request.casefold()
+    assert "Untrusted writing instructions" in request
+
+
+def test_generation_mode_accepts_safe_summary_without_exact_numeric_match() -> None:
+    hass = Hass(ha_reply("There are two open windows.", None))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Summarize 2 open windows in the bedroom and kitchen.",
+        text_notify=None,
+        mode="generate",
+        agent_id="conversation.local",
+    ))
+    assert got == ("There are two open windows.", None)
+
+
+def test_default_copyedit_mode_rejects_new_numbers_but_generate_is_distinct() -> None:
+    response = ha_reply("There are 2 open windows.", None)
+    hass = Hass(response)
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="There are open windows.", text_notify=None,
+        agent_id="conversation.local",
+    ))
+    assert got == ("There are open windows.", None)
+    assert "copyediting" in hass.services.calls[0][2]["text"]
+
+
+def test_generate_mode_provider_failure_preserves_original_instruction() -> None:
+    original = "Γράψε μια ανακοίνωση για τα παράθυρα."
+    hass = Hass(error=RuntimeError("offline"))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts=original, text_notify=original,
+        mode="generate", agent_id="conversation.offline",
+    ))
+    assert got == (original, original)
+
+
+def test_generation_mode_cannot_enable_unrequested_visual_channel() -> None:
+    hass = Hass(ha_reply("Washing machine finished.", "🧺 Finished!"))
+    got = asyncio.run(ai.async_filter_announcement(
+        hass,
+        text_tts="Write a sentence about laundry.", text_notify=None,
+        mode="generate", agent_id="conversation.local",
+    ))
+    assert got == ("Write a sentence about laundry.", None)
+
+
+def test_unknown_generation_mode_fails_closed_without_provider_request() -> None:
+    hass = Hass()
+    with pytest.raises(ValueError):
+        asyncio.run(ai.async_filter_announcement(
+            hass, text_tts="Text", text_notify=None,
+            mode="unsupported", agent_id="conversation.local",
+        ))
+    assert not hass.services.calls
+
+
+def test_action_accepts_generation_mode_and_persists_it_with_original_job():
+    init = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
+    manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
+    services = yaml.safe_load((COMPONENT / "services.yaml").read_text())
+    assert 'probatio.Optional(ATTR_AI_MODE, default="rewrite")' in init
+    assert 'ai_mode=call.data[ATTR_AI_MODE]' in init
+    assert 'ai_mode=ai_mode, channels=channel_tokens' in manager
+    assert '"requested_mode": ai_mode' in manager
+    assert 'mode=ai.get("requested_mode", "rewrite")' in manager
+    assert "generate" in services["send"]["fields"]["ai"]["fields"]["ai_mode"]["selector"]["select"]["options"]
