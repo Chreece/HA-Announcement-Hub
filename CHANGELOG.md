@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.36 - 2026-10-20
+
+- Ship a fully functional, responsive Lovelace announcement-composer card,
+  including a graphical card configuration editor and dashboard card-picker
+  registration. All assets are served locally by Announcement Hub through
+  Home Assistant's asynchronous HTTP static-path API.
+- Provide shared message and optional independent TTS/visual variants,
+  severity, optional notification title, service channel restrictions,
+  AI inherit/off/rewrite/generate, conversation agent and click-action fields.
+- Discover Home Assistant rooms, integration domains and exact devices and
+  entities via registry WebSocket APIs, with manual recipient IDs if registry
+  access is unavailable. Preserve room fallback and explicit-recipient union.
+- Show queue count and service acceptance status, prevent simultaneous
+  duplicate submissions, confirm Critical severity, and never claim
+  device-side receipt from an accepted queue submission.
+- Add a graphical card editor and English dashboard installation guide.
+  Include front-end resource assets in manual installation validation and
+  add automated frontend smoke/security tests.
+
+
 ## 0.9.35 - 2026-10-20
 
 - Generate a descriptive title (up to three words) within the existing AI
