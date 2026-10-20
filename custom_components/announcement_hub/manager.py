@@ -1831,6 +1831,11 @@ class AnnouncementManager:
             self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
             use_ai,
         )
+        # Only a genuinely omitted action title allows AI to replace the
+        # configured fallback title. An explicit title always wins.
+        generate_title = bool(
+            ai_enabled and ai_mode == "generate" and title is None
+        )
         ai_info: dict[str, Any] = {
             "enabled": ai_enabled,
             "source": ai_source,
@@ -1880,6 +1885,7 @@ class AnnouncementManager:
                     "requested_agent_id": agent_id,
                     "requested_fallback_agent_id": fallback_agent_id,
                     "requested_mode": ai_mode,
+                    "requested_generate_title": generate_title,
                 })
             else:
                 ai_info["status"] = "not_applicable"
@@ -4168,6 +4174,10 @@ class AnnouncementManager:
         ai = job.ai
         original_tts = ai.get("source_tts")
         original_notify = ai.get("source_notify")
+        # Keep the title out of public AI diagnostics; it is user content,
+        # not a diagnostic value. The queued job already has its configured
+        # fallback title if generation fails.
+        title_result: dict[str, str] = {}
         started = asyncio.get_running_loop().time()
         try:
             rewritten_tts, rewritten_notify = await async_filter_announcement(
@@ -4178,6 +4188,9 @@ class AnnouncementManager:
                 fallback_agent_id=ai.get("requested_fallback_agent_id"),
                 diagnostics=ai,
                 mode=ai.get("requested_mode", "rewrite"),
+                title_result=(
+                    title_result if ai.get("requested_generate_title") else None
+                ),
             )
         except asyncio.CancelledError:
             ai["status"] = "pending"
@@ -4199,6 +4212,8 @@ class AnnouncementManager:
         if job not in self._queue or not self._running:
             return
         job.text_tts, job.text_notify = rewritten_tts, rewritten_notify
+        if ai.get("requested_generate_title") and title_result.get("title"):
+            job.title = title_result["title"]
         if job.routing_mode == "room_fallback":
             self._prepare_staged_route(job)
         else:
@@ -4208,7 +4223,7 @@ class AnnouncementManager:
         for key in (
             "source_tts", "source_notify",
             "requested_agent_id", "requested_fallback_agent_id",
-            "requested_mode",
+            "requested_mode", "requested_generate_title",
         ):
             ai.pop(key, None)
         self._schedule_prefetch(job)
