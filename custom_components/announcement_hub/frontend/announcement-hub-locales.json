@@ -117,7 +117,10 @@
     "Recipients and message text are chosen when using the card, not stored in its dashboard configuration.": "Οι παραλήπτες και το μήνυμα επιλέγονται κατά τη χρήση της κάρτας και δεν αποθηκεύονται στις ρυθμίσεις του πίνακα.",
     "Announcement Hub": "Κέντρο Ανακοινώσεων",
     "Areas use room fallback.": "Οι περιοχές χρησιμοποιούν εφεδρική δρομολόγηση.",
-    "AI provider": "Πάροχος AI"
+    "AI provider": "Πάροχος AI",
+    "Announcement Hub chooses configured outputs using room and fallback rules.": "Το Hub επιλέγει τις ρυθμισμένες εξόδους σύμφωνα με τους κανόνες δωματίων και εφεδρικής δρομολόγησης.",
+    "Search notify.* or media_player.* ...": "Αναζήτηση notify.* ή media_player.* ...",
+    "Kitchen, Hallway": "Κουζίνα, Διάδρομος"
   },
   "de": {
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · NACHRICHTEN",
@@ -237,7 +240,10 @@
     "Recipients and message text are chosen when using the card, not stored in its dashboard configuration.": "Empfänger und Nachricht werden bei der Nutzung gewählt, nicht in der Dashboard-Konfiguration gespeichert.",
     "Announcement Hub": "Announcement Hub",
     "Areas use room fallback.": "Bereiche nutzen Raum-Fallback.",
-    "AI provider": "KI-Anbieter"
+    "AI provider": "KI-Anbieter",
+    "Announcement Hub chooses configured outputs using room and fallback rules.": "Announcement Hub wählt konfigurierte Ausgaben nach Raum- und Fallback-Regeln aus.",
+    "Search notify.* or media_player.* ...": "notify.* oder media_player.* suchen...",
+    "Kitchen, Hallway": "Küche, Flur"
   },
   "fr": {
     "The message": "Le message",
