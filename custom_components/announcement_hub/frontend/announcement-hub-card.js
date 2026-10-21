@@ -20,6 +20,41 @@
     ["rewrite", "Rewrite"], ["generate", "Generate"],
   ];
   const KINDS = ["area", "integration", "device", "entity"];
+  const getLanguage = (hass) => {
+    const raw = String(hass?.locale?.language || hass?.language || "en").replace(/_/g, "-");
+    if (/^zh-(tw|hk|hant)/i.test(raw)) return "zh-Hant";
+    if (/^zh/i.test(raw)) return "zh-Hans";
+    if (/^pt-br/i.test(raw)) return "pt-BR";
+    return raw.split("-")[0].toLowerCase();
+  };
+  let localeCache = null;
+  function loadLocales() {
+    if (!localeCache) localeCache = fetch(ROOT + "announcement-hub-locales.json", { credentials: "same-origin" })
+      .then((r) => r.ok ? r.json() : {}).catch(() => ({}));
+    return localeCache;
+  }
+  function translation(dict, key, params = {}) {
+    const value = dict?.[key] || key;
+    return value.replace(/\\{([a-z]+)\\}/g, (_, k) => String(params[k] ?? ""));
+  }
+  function localize(root, dictionary, originals) {
+    if (!root?.querySelectorAll) return;
+    for (const el of root.querySelectorAll("*")) {
+      if (el.tagName === "STYLE" || el.tagName === "SCRIPT") continue;
+      for (const attribute of ["placeholder", "aria-label", "title"]) {
+        if (!el.hasAttribute?.(attribute)) continue;
+        const originalAttr = "data-hub-original-" + attribute;
+        if (!el.hasAttribute(originalAttr)) el.setAttribute(originalAttr, el.getAttribute(attribute));
+        el.setAttribute(attribute, translation(dictionary, el.getAttribute(originalAttr)));
+      }
+      for (const node of el.childNodes || []) {
+        if (node.nodeType !== 3 || !node.nodeValue.trim()) continue;
+        if (!originals.has(node)) originals.set(node, node.nodeValue);
+        const source = originals.get(node);
+        node.nodeValue = source.replace(source.trim(), translation(dictionary, source.trim()));
+      }
+    }
+  }
   let assetPromise = null;
 
   function assets() {
@@ -79,6 +114,22 @@
       this._loading = false;
       this._sending = false;
       this._confirming = false;
+      this._localeCode = null;
+      this._translations = {};
+      this._originalNodes = new WeakMap();
+    }
+    _t(key, args) { return translation(this._translations, key, args); }
+    async _applyLocale() {
+      const language = getLanguage(this._hass);
+      if (this._localeCode === language) return;
+      const dictionaries = await loadLocales();
+      this._localeCode = language;
+      this._translations = dictionaries[language] || {};
+      if (this._mounted) {
+        localize(this.shadowRoot, this._translations, this._originalNodes);
+        this._sync();
+        for (const kind of KINDS) this._drawOptions(kind);
+      }
     }
     setConfig(config) {
       if (!config || typeof config !== "object") throw new Error("Announcement Hub card needs a configuration.");
@@ -90,6 +141,7 @@
     }
     set hass(value) {
       this._hass = value;
+      void this._applyLocale();
       if (this._mounted) {
         this._updateQueue();
         if (!this._loaded && !this._loading) void this._loadRegistry();
@@ -114,6 +166,7 @@
         this.shadowRoot.replaceChildren(style, template.content.cloneNode(true));
         this._mounted = true;
         this._bind();
+        await this._applyLocale();
         this._sync();
         if (this._hass) await this._loadRegistry();
       } catch (error) {
@@ -189,7 +242,7 @@
         const button = document.createElement("button");
         button.type = "button";
         button.dataset.value = value;
-        button.textContent = name;
+        button.textContent = this._t(name);
         button.setAttribute("aria-pressed", String(value === selected));
         target.appendChild(button);
       }
@@ -197,7 +250,7 @@
 
     _sync() {
       if (!this._mounted) return;
-      this.$("card-heading").textContent = this._config.title || "Announcement Hub";
+      this.$("card-heading").textContent = this._config.title || this._t("Announcement Hub");
       this.$("queue-pill").hidden = this._config.show_queue === false;
       this.$("ai-block").hidden = this._config.show_ai === false;
       this._renderButtons("levels", LEVELS, this._level);
@@ -208,8 +261,8 @@
         button.setAttribute("aria-pressed", String(button.dataset.mode === this._targetMode));
       }
       this.$("routing-explanation").textContent = this._targetMode === "automatic"
-        ? "Announcement Hub chooses configured recipients using occupancy and fallback rules."
-        : "Areas use room fallback. Integrations, devices and entities are exact additional recipients.";
+        ? this._t("Announcement Hub chooses configured recipients using occupancy and fallback rules.")
+        : this._t("Areas use room fallback. Integrations, devices and entities are exact additional recipients.");
       this._updateAIHint();
       this._drawChosen();
       this._updateQueue();
@@ -223,9 +276,9 @@
         rewrite: "Polish the message without changing its facts.",
         generate: "Generate the announcement from your instructions. An omitted title becomes an AI heading of at most 3 words.",
       };
-      this.$("ai-explanation").textContent = descriptions[this._config.show_ai === false ? "inherit" : this._ai];
+      this.$("ai-explanation").textContent = this._t(descriptions[this._config.show_ai === false ? "inherit" : this._ai]);
       this.$("message-title").placeholder = this._config.show_ai !== false && this._ai === "generate"
-        ? "AI will generate up to 3 words" : "Optional title";
+        ? this._t("AI will generate up to 3 words") : this._t("Optional title");
     }
 
     async _loadRegistry() {
@@ -285,8 +338,8 @@
       if (!options.length || options.length > 36) {
         const placeholder = document.createElement("span");
         placeholder.className = "option placeholder";
-        placeholder.textContent = options.length > 36 ? "Showing 36 of " + options.length + ". Search for more."
-          : this._loading ? "Discovering..." : "No matches. Manual IDs are available below.";
+        placeholder.textContent = options.length > 36 ? this._t("Showing {shown} of {total}. Search for more.", { shown: 36, total: options.length })
+          : this._loading ? this._t("Discovering...") : this._t("No matches. Manual IDs are available below.");
         holder.appendChild(placeholder);
       }
     }
@@ -302,8 +355,8 @@
           button.type = "button";
           button.dataset.kind = kind;
           button.dataset.value = value;
-          button.textContent = titleCase(kind) + ": " + clipped(info?.label || value, 36);
-          button.setAttribute("aria-label", "Remove " + kind + " " + (info?.label || value));
+          button.textContent = this._t(titleCase(kind)) + ": " + clipped(info?.label || value, 36);
+          button.setAttribute("aria-label", this._t("Remove {kind} {value}", { kind: this._t(titleCase(kind)), value: info?.label || value }));
           target.appendChild(button);
         }
       }
@@ -324,13 +377,13 @@
       const main = this.$("message").value.trim();
       const textTts = this.$("text-tts").value.trim();
       const textNotify = this.$("text-notify").value.trim();
-      if (!main && !textTts && !textNotify) throw new Error("Enter an announcement or a spoken/written version.");
+      if (!main && !textTts && !textNotify) throw new Error(this._t("Enter an announcement or a spoken/written version."));
       const recipients = this._targets();
       if (this._targetMode === "targeted" && !Object.keys(recipients).length) {
-        throw new Error("Choose a room or explicit recipient, or switch to Automatic routing.");
+        throw new Error(this._t("Choose a room or explicit recipient, or switch to Automatic routing."));
       }
       if (this._targetMode === "automatic" && this._channel !== "auto") {
-        throw new Error("Selecting a delivery service requires a room or exact recipient. Use Automatic channel for automatic routing.");
+        throw new Error(this._t("Selecting a delivery service requires a room or exact recipient. Use Automatic channel for automatic routing."));
       }
       const payload = { level: this._level, occupied_only: this.$("occupied-only").checked, ...recipients };
       if (main) payload.text = main;
@@ -355,9 +408,9 @@
       const targets = this._targets();
       const count = Object.values(targets).reduce((sum, values) => sum + values.length, 0);
       const destination = this._targetMode === "automatic"
-        ? "Automatic recipients" : count ? count + " selected target" + (count === 1 ? "" : "s") : "Choose recipients";
-      const labelForChannel = CHANNELS.find((channel) => channel[0] === this._channel)?.[1] || "Hub channels";
-      this.$("summary").textContent = destination + " · " + (this._channel === "auto" ? "Hub channels" : labelForChannel);
+        ? this._t("Automatic recipients") : count ? this._t(count === 1 ? "{count} selected target" : "{count} selected targets", { count }) : this._t("Choose recipients");
+      const labelForChannel = this._t(CHANNELS.find((channel) => channel[0] === this._channel)?.[1] || "Hub channels");
+      this.$("summary").textContent = destination + " · " + (this._channel === "auto" ? this._t("Hub channels") : labelForChannel);
     }
 
     _updateQueue() {
@@ -365,7 +418,7 @@
       const state = this._hass?.states?.["sensor.announcement_hub_queue"];
       const count = state && /^\d+$/.test(String(state.state)) ? String(state.state) : "–";
       this.$("queue-number").textContent = count;
-      this.$("queue-pill").title = count === "–" ? "Queue sensor unavailable" : count + " waiting announcements";
+      this.$("queue-pill").title = count === "–" ? this._t("Queue sensor unavailable") : this._t("{count} waiting announcements", { count });
     }
 
     _clearNotice() {
@@ -386,14 +439,14 @@
       this._clearNotice();
       let payload;
       try { payload = this._buildPayload(); }
-      catch (error) { this._notice(error.message || "Invalid announcement.", false); return; }
+      catch (error) { this._notice(error.message || this._t("Invalid announcement."), false); return; }
       if (!this._hass?.callService) {
-        this._notice("Home Assistant is not connected.", false);
+        this._notice(this._t("Home Assistant is not connected."), false);
         return;
       }
       this._sending = true;
       this.$("send").disabled = true;
-      this.$("send-label").textContent = "Submitting…";
+      this.$("send-label").textContent = this._t("Submitting…");
       this.$("critical-confirm").hidden = true;
       this._confirming = false;
       try {
@@ -402,23 +455,23 @@
         const reply = await this._hass.callService(
           "notify", "announcement_hub", payload, undefined, false, true
         );
-        if (reply?.accepted === false) throw new Error("Announcement Hub rejected the request.");
+        if (reply?.accepted === false) throw new Error(this._t("Announcement Hub rejected the request."));
         if (reply?.job_id) {
           const related = Array.isArray(reply.related_job_ids) && reply.related_job_ids.length
-            ? " · " + (reply.related_job_ids.length + 1) + " linked jobs" : "";
-          this._notice("Queued #" + reply.job_id.slice(0, 10) + related + ". Delivery will follow Hub routing.", true);
+            ? " · " + this._t("{count} linked jobs", {count: reply.related_job_ids.length + 1}) : "";
+          this._notice(this._t("Queued #{id}{related}. Delivery will follow Hub routing.", {id: reply.job_id.slice(0, 10), related}), true);
         } else {
-          this._notice("Request submitted. Check Announcement Hub's queue for status.", true);
+          this._notice(this._t("Request submitted. Check Announcement Hub's queue for status."), true);
         }
         if (this._config.clear_after_send === true) {
           for (const id of ["message", "text-tts", "text-notify"]) this.$(id).value = "";
         }
       } catch (error) {
-        this._notice("Could not submit: " + (error?.message || "Unknown error") + ". Check the queue before retrying.", false);
+        this._notice(this._t("Could not submit: {error}. Check the queue before retrying.", {error: error?.message || this._t("Unknown error")}), false);
       } finally {
         this._sending = false;
         this.$("send").disabled = false;
-        this.$("send-label").textContent = "Send announcement";
+        this.$("send-label").textContent = this._t("Send announcement");
       }
     }
   }
@@ -449,13 +502,24 @@
       this.attachShadow({ mode: "open" });
       this.shadowRoot.innerHTML = EDITOR_HTML; // Package-owned static markup.
       this._config = AnnouncementHubCard.getStubConfig();
+      this._localeCode = null;
+      this._translations = {};
+      this._originalNodes = new WeakMap();
       for (const id of ["title", "level", "queue", "ai", "clear"]) {
         this.$(id).addEventListener("change", () => this._changed());
       }
     }
     $(id) { return this.shadowRoot.getElementById("editor-" + id); }
     setConfig(config) { this._config = { ...AnnouncementHubCard.getStubConfig(), ...config }; this._sync(); }
-    set hass(value) { this._hass = value; }
+    set hass(value) { this._hass = value; void this._applyLocale(); }
+    async _applyLocale() {
+      const language = getLanguage(this._hass);
+      if (this._localeCode === language) return;
+      this._localeCode = language;
+      const locales = await loadLocales();
+      this._translations = locales[language] || {};
+      localize(this.shadowRoot, this._translations, this._originalNodes);
+    }
     _sync() {
       this.$("title").value = this._config.title || "";
       this.$("level").value = this._config.default_level || "info";
