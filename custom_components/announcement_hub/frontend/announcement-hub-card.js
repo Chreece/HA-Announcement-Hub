@@ -126,6 +126,7 @@
       const dictionaries = await loadLocales();
       this._localeCode = language;
       this._translations = dictionaries[language] || {};
+      if (typeof this.setAttribute === "function") this.setAttribute("dir", language === "ar" ? "rtl" : "ltr");
       if (this._mounted) {
         localize(this.shadowRoot, this._translations, this._originalNodes);
         this._localeRendered = true;
@@ -520,6 +521,7 @@
       this._localeCode = language;
       const locales = await loadLocales();
       this._translations = locales[language] || {};
+      if (typeof this.setAttribute === "function") this.setAttribute("dir", language === "ar" ? "rtl" : "ltr");
       localize(this.shadowRoot, this._translations, this._originalNodes);
     }
     _sync() {
