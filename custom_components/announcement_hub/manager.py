@@ -334,7 +334,8 @@ class AnnouncementManager:
                     for key in (
                         "job_id", "created_at", "status",
                         "failure_reason", "agent_used", "attempts",
-                        "elapsed_seconds", "retry_count"
+                        "elapsed_seconds", "retry_count",
+                        "source", "mode", "agent_selection",
                     )
                 })
         for raw_job in stored.get("jobs", []):
@@ -1977,6 +1978,22 @@ class AnnouncementManager:
         if room_fallback_routing:
             self._prepare_staged_route(job)
         self._queue.append(job)
+        if not job.ai.get("pending_preprocessing") and hasattr(self, "_ai_history"):
+            # Include jobs where AI is off so owners can distinguish a
+            # per-announcement use_ai: false from a failed live provider.
+            self._ai_history.append({
+                "job_id": job.job_id,
+                "created_at": job.created_at,
+                "status": job.ai.get("status", "disabled"),
+                "source": job.ai.get("source"),
+                "mode": job.ai.get("mode"),
+                "agent_selection": job.ai.get("agent_selection"),
+                "failure_reason": None,
+                "attempts": [],
+                "agent_used": None,
+                "elapsed_seconds": None,
+                "retry_count": 0,
+            })
         if job.ai.get("pending_preprocessing"):
             # Save the original *before* starting external preprocessing.
             # In particular, a caller being cancelled cannot leave an AI
@@ -4588,6 +4605,9 @@ class AnnouncementManager:
                 ][-6:],
                 "elapsed_seconds": ai.get("elapsed_seconds"),
                 "retry_count": ai.get("retry_count", 0),
+                "source": ai.get("source"),
+                "mode": ai.get("mode"),
+                "agent_selection": ai.get("agent_selection"),
             })
         for key in (
             "source_tts", "source_notify",
