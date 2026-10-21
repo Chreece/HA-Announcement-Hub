@@ -1139,7 +1139,7 @@ def test_ai_task_cannot_create_missing_channel_even_with_structured_response():
 def test_safe_diagnostics_separate_online_invalid_json_from_timeout():
     diag = {}
     got = asyncio.run(ai.async_filter_announcement(
-        Hass(ha_reply("not JSON", None)),
+        Hass({"response": {"speech": {"plain": {"speech": "not JSON"}}}}),
         text_tts="Door open", text_notify=None,
         agent_id="conversation.local", diagnostics=diag,
     ))
