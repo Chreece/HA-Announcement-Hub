@@ -69,7 +69,7 @@
           "show_part_number": "Teilnummer im Titel anzeigen",
           "integration_data": "Zusätzliche Integrationsdaten",
           "replace_parts": "Vorherigen Companion-App-Teil ersetzen",
-          "position": "Position",
+          "position": "Positionierung",
           "fontsize": "Schriftgröße",
           "color": "Hintergrundfarbe",
           "transparency": "Hintergrundtransparenz",
@@ -247,7 +247,7 @@
           "show_part_number": "Teilnummer im Titel anzeigen",
           "integration_data": "Zusätzliche Integrationsdaten",
           "replace_parts": "Vorherigen Companion-App-Teil ersetzen",
-          "position": "Position",
+          "position": "Positionierung",
           "fontsize": "Schriftgröße",
           "color": "Hintergrundfarbe",
           "transparency": "Hintergrundtransparenz",
@@ -365,9 +365,9 @@
         "critical": "Kritisch",
         "error": "Fehler",
         "warning": "Warnung",
-        "info": "Information",
+        "info": "Informationen",
         "success": "Erfolg",
-        "debug": "Debug",
+        "debug": "Fehlersuche",
         "never": "Nie"
       }
     },
@@ -384,39 +384,39 @@
         "critical": "Kritisch",
         "error": "Fehler",
         "warning": "Warnung",
-        "info": "Information",
+        "info": "Informationen",
         "success": "Erfolg",
-        "debug": "Debug"
+        "debug": "Fehlersuche"
       }
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left",
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "center": "Center"
+        "bottom-right": "Unten rechts",
+        "bottom-left": "Unten links",
+        "top-right": "Oben rechts",
+        "top-left": "Oben links",
+        "center": "Mitte"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large",
-        "max": "Maximum"
+        "small": "Klein",
+        "medium": "Mittel",
+        "large": "Groß",
+        "max": "Maximal"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Grey",
-        "black": "Black",
-        "indigo": "Indigo",
-        "green": "Green",
-        "red": "Red",
-        "cyan": "Cyan",
-        "teal": "Teal",
-        "amber": "Amber",
-        "pink": "Pink"
+        "grey": "Grau",
+        "black": "Schwarz",
+        "indigo": "Indigo-Blau",
+        "green": "Grün",
+        "red": "Rot",
+        "cyan": "Cyanblau",
+        "teal": "Petrol",
+        "amber": "Bernstein",
+        "pink": "Rosa"
       }
     },
     "nfandroidtv_transparency": {
@@ -441,7 +441,7 @@
     },
     "notify_level": {
       "options": {
-        "debug": "Debug",
+        "debug": "Fehlersuche",
         "info": "Info / Erfolg",
         "warning": "Warnung",
         "error": "Fehler",
