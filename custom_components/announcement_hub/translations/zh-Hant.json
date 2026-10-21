@@ -365,7 +365,7 @@
         "critical": "嚴重",
         "error": "錯誤",
         "warning": "警告",
-        "info": "Information",
+        "info": "資訊",
         "success": "成功",
         "debug": "偵錯",
         "never": "Never"
@@ -384,7 +384,7 @@
         "critical": "嚴重",
         "error": "錯誤",
         "warning": "警告",
-        "info": "Information",
+        "info": "資訊",
         "success": "成功",
         "debug": "偵錯"
       }
@@ -442,7 +442,7 @@
     "notify_level": {
       "options": {
         "debug": "偵錯",
-        "info": "Info / success",
+        "info": "資訊",
         "warning": "警告",
         "error": "錯誤",
         "critical": "嚴重"
@@ -465,41 +465,41 @@
   },
   "services": {
     "send": {
-      "name": "Send announcement (legacy alias)",
+      "name": "傳送公告",
       "description": "Backward-compatible alias for notify.announcement_hub. New automations should use notify.announcement_hub.",
       "sections": {
         "content": {
-          "name": "Content"
+          "name": "訊息"
         },
         "routing": {
-          "name": "Rooms and outputs"
+          "name": "選擇接收者"
         },
         "advanced": {
           "name": "進階"
         },
         "ai": {
-          "name": "AI rewriting"
+          "name": "AI 文案"
         }
       },
       "fields": {
         "text_tts": {
-          "name": "Spoken TTS text",
+          "name": "语音文本 (TTS)",
           "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
         },
         "text_notify": {
-          "name": "Written notification text",
+          "name": "文字通知",
           "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
         },
         "title": {
-          "name": "Notification title",
+          "name": "標題",
           "description": "Optional title for visual notifications."
         },
         "level": {
-          "name": "Level",
+          "name": "重要程度",
           "description": "Announcement severity. Critical uses every configured matching output only when no explicit service or output target is supplied. Explicit selections remain authoritative even for Critical and never enable unrequested TTS."
         },
         "service": {
-          "name": "Delivery service channels",
+          "name": "傳送服務",
           "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
         },
         "notify_data": {
@@ -519,43 +519,43 @@
           "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
         },
         "occupied_only": {
-          "name": "Use occupied-room fallback",
+          "name": "回退时尝试有人房间",
           "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
         },
         "use_ai": {
-          "name": "Override AI rewriting",
+          "name": "AI 文案",
           "description": "Optional override for this announcement. Leave unset to inherit the integration setting; true enables AI and false bypasses it even if globally enabled."
         },
         "ai_agent": {
-          "name": "Override AI provider (conversation or AI Task)",
+          "name": "AI 提供者",
           "description": "Choose a currently available conversation agent for this announcement. Leave empty to inherit the integration selection (initially Home Assistant default)."
         },
         "click_action": {
-          "name": "Click action (Companion App)",
+          "name": "点击通知后跳转",
           "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
         },
         "text": {
-          "name": "Announcement text",
+          "name": "公告",
           "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
         },
         "area": {
-          "name": "Preferred areas",
+          "name": "區域",
           "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
         },
         "integration": {
-          "name": "Explicit integrations",
+          "name": "整合",
           "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
         },
         "device": {
-          "name": "Explicit devices",
+          "name": "裝置",
           "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
         },
         "entity": {
-          "name": "Explicit entities",
+          "name": "實體",
           "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
         },
         "ai_mode": {
-          "name": "AI writing mode",
+          "name": "AI 文案",
           "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
         }
       }
@@ -571,7 +571,7 @@
       }
     },
     "cancel": {
-      "name": "取消公告",
+      "name": "取消",
       "description": "Cancels one waiting or active job by its ID.",
       "fields": {
         "job_id": {
