@@ -727,7 +727,8 @@ def test_manager_passes_default_marker_instead_of_none() -> None:
     assert "diagnostics=ai" in source
     flow = (COMPONENT / "config_flow.py").read_text(encoding="utf-8")
     assert "resolve_preferred_assist_agent(" in flow
-    assert "Preferred Assist pipeline:" in flow
+    assert 'provider_label(self.hass, "preferred", name=preferred_name)' in flow
+    assert 'provider_label(self.hass, "original")' in flow
 
 def test_config_and_actions_support_optional_ai_overrides() -> None:
     flow = (COMPONENT / "config_flow.py").read_text()
