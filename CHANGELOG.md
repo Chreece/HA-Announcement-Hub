@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.40 - 2026-10-21
+
+- Automatically register the bundled **Announcement Hub** composer card in
+  Home Assistant's Lovelace card picker after the integration starts.
+  No manual JavaScript resource installation is needed in storage mode.
+- Safely load existing Lovelace resources before registering to prevent
+  overwriting other dashboard cards on older Home Assistant versions.
+- Avoid duplicate resources across restarts, preserve manually configured
+  resources and update auto-managed module URLs with a version cache-buster.
+- Leave YAML-managed Lovelace resources untouched and keep documented
+  manual resource registration as a fallback.
+- Add registration safety, idempotency, upgrade and YAML-mode regression
+  tests; document the exact picker name and custom-card type.
+
 ## 0.9.39 - 2026-10-21
 
 - **Queue liveness:** Refill bounded AI and TTS preparation slots when a
