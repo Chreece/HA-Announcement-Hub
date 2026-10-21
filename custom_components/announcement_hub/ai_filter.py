@@ -188,6 +188,41 @@ def _short_generated_title(value: Any) -> str | None:
     return title if len(title) <= 90 else None
 
 
+def _extract_json_object(text: str) -> dict[str, Any] | None:
+    """Read text-only LLM JSON even with a harmless fence or prose preface.
+
+    Extract no more than one valid object and never execute the surrounding
+    text; downstream schema, channel and factual checks remain authoritative.
+    """
+    text = text.strip().lstrip("\ufeff")
+    if len(text) > 16000:
+        return None
+    fence = chr(96) * 3
+    if text.startswith(fence):
+        lines = text.splitlines()
+        if len(lines) >= 3 and lines[-1].strip() == fence:
+            text = "\n".join(lines[1:-1]).strip()
+    try:
+        value = json.loads(text)
+        return value if isinstance(value, dict) else None
+    except (TypeError, ValueError):
+        pass
+    # Some working conversation agents prepend a short phrase to a JSON
+    # object, despite instructions. Accept just the object when it is unique.
+    decoder = json.JSONDecoder()
+    candidates: list[dict[str, Any]] = []
+    for match in re.finditer(r"\{", text):
+        try:
+            parsed, _ = decoder.raw_decode(text[match.start():])
+        except (TypeError, ValueError):
+            continue
+        if isinstance(parsed, dict):
+            candidates.append(parsed)
+            if len(candidates) > 1:
+                return None  # ambiguous multiple objects
+    return candidates[0] if candidates else None
+
+
 def _parse_reply(
     response: Any,
     originals: dict[str, str | None],
@@ -211,9 +246,12 @@ def _parse_reply(
             # targets may still be a valid text-only AI answer.
             data = inner_response.get("data")
             if (
-                not isinstance(data, dict)
-                or set(data) - {"targets", "success", "failed"}
-                or any(data.get(field) for field in ("targets", "success", "failed"))
+                data is not None
+                and (
+                    not isinstance(data, dict)
+                    or set(data) - {"targets", "success", "failed"}
+                    or any(data.get(field) for field in ("targets", "success", "failed"))
+                )
             ):
                 return None
     try:
@@ -222,19 +260,10 @@ def _parse_reply(
         return None
     if not isinstance(text, str):
         return None
-    text = text.strip()
-    fence = chr(96) * 3
-    if text.startswith(fence) and text.endswith(fence):
-        lines = text.splitlines()
-        if len(lines) >= 3 and lines[-1].strip() == fence:
-            text = "\n".join(lines[1:-1]).strip()
-    try:
-        parsed = json.loads(text)
-    except (TypeError, ValueError):
+    parsed = _extract_json_object(text)
+    if parsed is None:
         return None
     expected_keys = set(originals)
-    if not isinstance(parsed, dict):
-        return None
     if (
         set(parsed) != expected_keys
         and not (
@@ -307,9 +336,12 @@ def _failure_reason(
     if kind == "action_done":
         data = details.get("data")
         if (
-            not isinstance(data, dict)
-            or set(data) - {"targets", "success", "failed"}
-            or any(data.get(key) for key in ("targets", "success", "failed"))
+            data is not None
+            and (
+                not isinstance(data, dict)
+                or set(data) - {"targets", "success", "failed"}
+                or any(data.get(key) for key in ("targets", "success", "failed"))
+            )
         ):
             return "action_response_not_allowed"
     try:
@@ -318,18 +350,9 @@ def _failure_reason(
         return "missing_generated_text"
     if not isinstance(speech, str) or not speech.strip():
         return "missing_generated_text"
-    text = speech.strip()
-    fence = chr(96) * 3
-    if text.startswith(fence) and text.endswith(fence):
-        lines = text.splitlines()
-        if len(lines) >= 3 and lines[-1].strip() == fence:
-            text = "\n".join(lines[1:-1]).strip()
-    try:
-        result = json.loads(text)
-    except (TypeError, ValueError):
+    result = _extract_json_object(speech)
+    if result is None:
         return "invalid_json"
-    if not isinstance(result, dict):
-        return "unexpected_response_fields"
     if originals is not None:
         expected = set(originals)
         if not expected.issubset(result) or set(result) - expected - {"title"}:
