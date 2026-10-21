@@ -61,6 +61,12 @@ class Harness:
         self.delivered = []
         self.hass = SimpleNamespace()
 
+    def _fill_ai_slots(self):
+        pass
+
+    def _fill_prefetch_slots(self):
+        pass
+
     def _schedule_save(self):
         self.saved += 1
 
