@@ -29,6 +29,7 @@ MUL = {
 PROTECTED = re.compile(
     r"(\{[A-Za-z_][A-Za-z_0-9]*\}"
     r"|https?://[^\s)]+|[a-z][a-z0-9_]*\.[a-z0-9_.]+"
+    r"|\b(?:Home Assistant|Announcement Hub|Companion App|Snapcast|Snapserver|TTS|MPD|Android TV|Fire TV)\b"
     r"|\b[a-z]+_[a-z0-9_]+\b|\b\d+(?:[.,/]\d+)*\b)"
 )
 DIGITS = re.compile(r"\d+(?:[.,/]\d+)*")
