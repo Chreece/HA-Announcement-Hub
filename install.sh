@@ -56,6 +56,7 @@ required = {
     "frontend/announcement-hub-card.js",
     "frontend/announcement-hub-card.css",
     "frontend/announcement-hub-card.html",
+    "frontend/announcement-hub-locales.json",
     "services.yaml",
     "strings.json",
 }
