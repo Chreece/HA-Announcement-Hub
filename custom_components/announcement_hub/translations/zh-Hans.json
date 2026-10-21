@@ -4,7 +4,7 @@
     "step": {
       "outputs": {
         "title": "通知输出",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "选择各房间的通知设备并设置最低通知级别。",
         "data": {
           "notify_outputs": "通知设备",
           "notify_room_outputs": "按房间选择通知设备",
@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "语音输出",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "选择 TTS 引擎、声音、播放器和 Snapcast 客户端。",
         "data": {
           "tts_engines": "TTS 引擎",
           "tts_media_player": "用于 Snapcast 的共享媒体播放器",
@@ -58,7 +58,7 @@
       },
       "notification_profile": {
         "title": "集成选项：{integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "配置此集成的通知与路由行为。",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -104,7 +104,7 @@
       },
       "queue": {
         "title": "常规选项",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "配置在场状态、备用路线、门检查、队列和超时。",
         "data": {
           "queue_max": "最大队列公告数",
           "output_availability_timeout": "Unavailable-output wait",
@@ -146,7 +146,7 @@
       },
       "reconfigure": {
         "title": "重新配置 Announcement Hub",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "选择要修改的部分，保存后返回集成。",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
@@ -182,7 +182,7 @@
     "step": {
       "outputs": {
         "title": "通知输出",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "选择各房间的通知设备并设置最低通知级别。",
         "data": {
           "notify_outputs": "通知设备",
           "notify_room_outputs": "按房间选择通知设备",
@@ -202,7 +202,7 @@
       },
       "tts": {
         "title": "语音输出",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "选择 TTS 引擎、声音、播放器和 Snapcast 客户端。",
         "data": {
           "tts_engines": "TTS 引擎",
           "tts_media_player": "用于 Snapcast 的共享媒体播放器",
@@ -236,7 +236,7 @@
       },
       "notification_profile": {
         "title": "集成选项：{integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "配置此集成的通知与路由行为。",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -282,7 +282,7 @@
       },
       "queue": {
         "title": "常规选项",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "配置在场状态、备用路线、门检查、队列和超时。",
         "data": {
           "queue_max": "最大队列公告数",
           "output_availability_timeout": "Unavailable-output wait",
@@ -324,7 +324,7 @@
       },
       "init": {
         "title": "Configure Announcement Hub",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "选择要修改的部分，保存后返回集成。",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
