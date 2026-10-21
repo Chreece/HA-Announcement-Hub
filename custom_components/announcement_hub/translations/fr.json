@@ -528,7 +528,7 @@
         },
         "ai_agent": {
           "name": "Fournisseur IA",
-          "description": "Choose a currently available conversation agent for this announcement. Leave empty to inherit the integration selection (initially Home Assistant default)."
+          "description": "Choisissez un agent conversationnel ou une entité AI Task disponible pour cette annonce. Laissez vide pour utiliser le fournisseur d'IA par défaut de l'intégration."
         },
         "click_action": {
           "name": "Destination au toucher",
