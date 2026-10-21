@@ -111,6 +111,7 @@ class WorkerHarness(Scheduler):
         self._wake = asyncio.Event()
         self._current = None
         self._delivery_tasks = {}
+        self._held_snapcast_snapshot = None
         self._max_parallel_deliveries = 4
         self._started = []
         self._completed = []
@@ -179,3 +180,22 @@ def test_burst_limits_are_finite_and_preprocessing_is_independent():
     assert "self._fill_ai_slots()" in SOURCE
     assert "self._fill_prefetch_slots()" in SOURCE
     assert 'getattr(self, "_players_by_job", {}).get(job_id' in SOURCE
+
+
+def test_pending_ai_on_shared_visual_output_does_not_block_other_rooms():
+    shared = "entity:notify.mobile"
+    pending = job("j1", "kitchen", ai=True, notify=shared)
+    other = job("j2", "bedroom", notify=shared)
+    h = Scheduler((pending, other))
+    assert h._next_runnable_job() is other
+    h._active_jobs[other.job_id] = other
+    assert h._next_runnable_job() is None
+
+
+def test_different_exact_devices_without_areas_are_independent():
+    first = job("j1", None, ai=True, notify="entity:notify.phone")
+    second = job("j2", None, notify="entity:notify.tablet")
+    h = Scheduler((first, second))
+    assert h._room_lane_keys(first) == set()
+    assert h._next_runnable_job() is second
+
