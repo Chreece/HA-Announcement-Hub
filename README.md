@@ -947,3 +947,20 @@ what happened during actual processing.
 ### AI Task providers
 
 Announcement Hub supports Home Assistant **AI Task** entities alongside conversation agents. In the integration's general AI settings, choose an `ai_task.*` entity as the primary or backup provider. For a specific announcement, set `ai_agent: ai_task.your_entity` with `use_ai: true`. The Hub calls `ai_task.generate_data` with the announcement instructions and validates its JSON response using the same factual, speech and visual safeguards as conversation agents. If the AI Task fails or returns invalid content, the configured backup provider is tried; otherwise the original announcement is delivered. AI preprocessing continues within the existing durable announcement queue.
+
+
+### Concurrent delivery and queue ordering
+
+Announcement Hub preserves **FIFO delivery within each room**, including
+announcements still waiting for AI rewriting or generation, TTS rendering,
+output availability, or retry. An older message cannot be overtaken by a
+newer message for the same room. When several room announcements are queued,
+a slow or unavailable announcement for one room **does not block an unrelated
+room**: the Hub runs up to four disjoint room deliveries concurrently.
+
+The scheduler also reserves shared physical notification targets, direct
+speakers and the common Snapcast source, so overlapping device routes are
+serialized even across different rooms. For burst traffic, at most two AI
+requests and two TTS prefetched renders run at once, with fair selection
+across rooms. Service acknowledgement remains durable and prompt;
+undelivered jobs retain their original order through retries and restart.
