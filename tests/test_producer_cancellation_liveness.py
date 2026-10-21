@@ -65,6 +65,7 @@ class Producers:
     async def _async_rewrite_job(self, item):
         self._ai_started.append(item.job_id)
         await self._gates[item.job_id].wait()
+        item.ai["pending_preprocessing"] = False
 
     async def _async_prefetch(self, item):
         self._tts_started.append(item.job_id)
