@@ -112,6 +112,7 @@ class WorkerHarness(Scheduler):
         self._current = None
         self._delivery_tasks = {}
         self._held_snapcast_snapshot = None
+        self._route_restores = 0
         self._max_parallel_deliveries = 4
         self._started = []
         self._completed = []
@@ -126,7 +127,8 @@ class WorkerHarness(Scheduler):
         pass
 
     async def _async_restore_held_snapcast_route(self):
-        pass
+        self._held_snapcast_snapshot = None
+        self._route_restores += 1
 
     async def _async_deliver_job(self, item):
         self._started.append(item.job_id)
@@ -199,3 +201,21 @@ def test_different_exact_devices_without_areas_are_independent():
     assert h._room_lane_keys(first) == set()
     assert h._next_runnable_job() is second
 
+
+
+def test_held_snapcast_route_restores_while_unrelated_delivery_remains_active():
+    async def scenario():
+        h = WorkerHarness((job("j1", "bedroom"),))
+        h._held_snapcast_snapshot = {"snapcast": False}
+        worker = asyncio.create_task(h._async_worker())
+        try:
+            await _wait_until(lambda: h._started == ["j1"])
+            await _wait_until(lambda: h._route_restores > 0)
+            assert "j1" in h._active_jobs
+            assert h._held_snapcast_snapshot is None
+        finally:
+            h._gates["j1"].set()
+            h._running = False
+            h._wake.set()
+            await worker
+    asyncio.run(scenario())
