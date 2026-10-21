@@ -236,3 +236,35 @@ test("module does not embed external JS/CSS dependencies or unsafe user markup",
   assert.match(js, /callWS/);
   assert.match(js, /config\/area_registry\/list/);
 });
+
+
+test("Greek, German and regional languages use correct card translations", async () => {
+  const path = new URL("../custom_components/announcement_hub/frontend/announcement-hub-locales.json", import.meta.url);
+  const payload = JSON.parse(readFileSync(path, "utf8"));
+  globalThis.fetch = async (url) => {
+    assert.equal(url, "/announcement_hub/announcement-hub-locales.json");
+    return { ok: true, json: async () => payload };
+  };
+  const card = new Card();
+  card._hass = { language: "el" };
+  await card._applyLocale();
+  assert.equal(card._t("Send announcement"), "Αποστολή ανακοίνωσης");
+  assert.equal(card._t("Confirm"), "Επιβεβαίωση");
+  assert.equal(card._t("Queued #{id}{related}. Delivery will follow Hub routing.",
+    { id: "12345", related: "" }).includes("12345"), true);
+  card._hass = { locale: { language: "de-DE" } };
+  await card._applyLocale();
+  assert.equal(card._t("Send announcement"), "Ankündigung senden");
+  card._hass = { locale: { language: "pt-BR" } };
+  await card._applyLocale();
+  assert.equal(card._t("Send announcement"), "Enviar anúncio");
+  card._hass = { locale: { language: "zh-TW" } };
+  await card._applyLocale();
+  assert.equal(card._t("Choose recipients"), "選擇接收者");
+  card._hass = { locale: { language: "es-ES" } };
+  await card._applyLocale();
+  assert.equal(card._t("Choose recipients"), "Elegir destinatarios");
+  card._hass = { language: "zz" };
+  await card._applyLocale();
+  assert.equal(card._t("Send announcement"), "Send announcement");
+});
