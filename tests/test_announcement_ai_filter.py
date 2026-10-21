@@ -1293,3 +1293,49 @@ def test_multiple_json_objects_are_not_accepted_as_unambiguous_output():
         agent_id="conversation.local",
     ))
     assert got == ("Original", None)
+
+
+def test_online_single_channel_ai_may_omit_only_the_null_channel():
+    response = {"response": {"speech": {"plain": {
+        "speech": json.dumps({"text_notify": "🚪 Door open!"})
+    }}}}
+    h = Hass(response)
+    got = asyncio.run(ai.async_filter_announcement(
+        h, text_tts=None, text_notify="Door open",
+        agent_id="conversation.local",
+    ))
+    assert got == (None, "🚪 Door open!")
+    assert len(h.services.calls) == 1
+
+
+def test_optional_title_does_not_invalidate_rewrite_or_override_user_title():
+    response = {"response": {"speech": {"plain": {
+        "speech": json.dumps({
+            "text_tts": "Door is open.",
+            "text_notify": "🚪 Door open",
+            "title": "New title",
+        })
+    }}}}
+    title = {"title": "Caller provided"}
+    got = asyncio.run(ai.async_filter_announcement(
+        Hass(response), text_tts="Door open", text_notify="Door open",
+        agent_id="conversation.local", mode="rewrite", title_result=title,
+    ))
+    assert got == ("Door is open.", "🚪 Door open")
+    assert title == {}  # never override the caller title
+
+
+def test_missing_required_channel_and_unexpected_action_are_rejected():
+    responses = [
+        json.dumps({"text_tts": "Door open!"}),
+        json.dumps({
+            "text_tts": "Door open.",
+            "text_notify": "🚪 Door open",
+            "actions": [{"service": "light.turn_on"}],
+        }),
+    ]
+    for value in responses:
+        raw = {"response": {"speech": {"plain": {"speech": value}}}}
+        assert ai._parse_reply(
+            raw, {"text_tts": "Door open", "text_notify": "Door open"}
+        ) is None
