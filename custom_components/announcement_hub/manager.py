@@ -2092,8 +2092,22 @@ class AnnouncementManager:
                     self._notify_update()
 
                 task.add_done_callback(_done)
-            if not self._active_jobs:
-                await self._async_restore_held_snapcast_route()
+            # A direct/visual announcement in another room must not keep a
+            # previous Snapcast client's music muted after speech completes.
+            # Preserve a warm route only for an immediate compatible successor.
+            snapcast_active = any(
+                active.server_tts_enabled and active.tts_text
+                and active.snapcast_clients
+                for active in self._active_jobs.values()
+            )
+            if self._held_snapcast_snapshot is not None and not snapcast_active:
+                successor = (
+                    self._next_runnable_job()
+                    if len(self._active_jobs) < self._max_parallel_deliveries
+                    else None
+                )
+                if successor is None or not self._job_matches_held_snapcast_route(successor):
+                    await self._async_restore_held_snapcast_route()
             self._wake.clear()
             try:
                 await asyncio.wait_for(self._wake.wait(), timeout=0.25)
@@ -2778,7 +2792,9 @@ class AnnouncementManager:
     def _room_lane_keys(job: AnnouncementJob) -> set[str]:
         """Serialize each original room, including AI and staged fallback waits."""
         areas = set(job.preferred_areas) | set(job.outputs)
-        return {f"room:{area}" for area in areas} or {"room:general"}
+        # Explicit-device jobs without a requested room share no logical room;
+        # their concrete physical devices provide the serialization boundary.
+        return {f"room:{area}" for area in areas}
 
     def _delivery_lane_keys(self, job: AnnouncementJob) -> set[str]:
         """Lock logical rooms, their physical endpoints and shared Snapcast."""
@@ -2808,15 +2824,21 @@ class AnnouncementManager:
         service is retried indefinitely until it comes online or is cancelled.
         """
         # Even an older AI/preprocessing or backoff job reserves its room.
-        reserved: set[str] = set()
+        active_resources: set[str] = set()
+        reserved_rooms: set[str] = set()
         for active in getattr(self, "_active_jobs", {}).values():
-            reserved.update(self._delivery_lane_keys(active))
+            active_resources.update(self._delivery_lane_keys(active))
+            reserved_rooms.update(self._room_lane_keys(active))
         for job in tuple(self._queue):
-            keys = self._delivery_lane_keys(job)
-            if keys & reserved:
-                reserved.update(keys)
+            rooms = self._room_lane_keys(job)
+            # Older pending jobs reserve their logical rooms through AI,
+            # backoff and provider outages. A physical output is locked only
+            # by an ACTIVE delivery, not speculative pending work in another
+            # room: a cold AI model must not reserve every shared phone.
+            blocked_room = bool(rooms & reserved_rooms)
+            reserved_rooms.update(rooms)
+            if blocked_room or self._delivery_lane_keys(job) & active_resources:
                 continue
-            reserved.update(keys)
             if job.ai.get("pending_preprocessing"):
                 # AI is never awaited by the delivery worker. A later ready
                 # alert can proceed while an earlier model cold-starts.
@@ -4427,9 +4449,7 @@ class AnnouncementManager:
         def _done(done_task: asyncio.Task[None]) -> None:
             if self._ai_tasks.get(job.job_id) is done_task:
                 self._ai_tasks.pop(job.job_id, None)
-            if done_task.cancelled():
-                return
-            if error := done_task.exception():
+            if not done_task.cancelled() and (error := done_task.exception()):
                 _LOGGER.error(
                     "Announcement AI preprocessing task failed for %s",
                     job.job_id,
@@ -4554,9 +4574,9 @@ class AnnouncementManager:
         self._prefetch_tasks[job.job_id] = task
 
         def _done(done_task: asyncio.Task[None]) -> None:
-            if done_task.cancelled():
-                return
-            if error := done_task.exception():
+            # Cancelled renders still free a producer slot. An early return
+            # here stranded jobs during bursts when another job was cancelled.
+            if not done_task.cancelled() and (error := done_task.exception()):
                 _LOGGER.debug("TTS prefetch task failed: %s", error)
             self._schedule_save()
             self._wake.set()
