@@ -1,4 +1,4 @@
-name: Evaluate translation quality (public UI strings)
+name: Evaluate dedicated offline French translator
 
 on:
   push:
@@ -12,27 +12,34 @@ permissions:
 jobs:
   sample:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Install trial public-text translator
-        run: python -m pip install --disable-pip-version-check "deep-translator==1.11.4"
-      - name: Compare difficult public UI phrases
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install open-source test dependencies
+        run: |
+          python -m pip install --disable-pip-version-check "torch==2.5.1" "transformers==4.47.1" sentencepiece sacremoses
+      - name: Compare dedicated French translation of public help text
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
           python - <<'PY'
-          from deep_translator import GoogleTranslator
-          messages = [
+          from transformers import MarianMTModel, MarianTokenizer
+          import torch
+          torch.set_num_threads(2)
+          name="Helsinki-NLP/opus-mt-en-fr"
+          tokenizer=MarianTokenizer.from_pretrained(name)
+          model=MarianMTModel.from_pretrained(name).eval()
+          inputs=[
             "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
             "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
             "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
             "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
           ]
-          for target in ["fr", "es", "ko"]:
-            print("LANGUAGE",target,flush=True)
-            obj=GoogleTranslator(source="en",target=target)
-            for i,m in enumerate(messages):
-              try:
-                print(i,repr(obj.translate(m)),flush=True)
-              except Exception as err:
-                print(i,"FAILED",type(err).__name__,flush=True)
+          for k,s in enumerate(inputs):
+            tokenized=tokenizer([s],return_tensors="pt",truncation=True)
+            with torch.inference_mode(): result=model.generate(**tokenized,max_new_tokens=280,num_beams=4)
+            print(k,tokenizer.batch_decode(result,skip_special_tokens=True)[0],flush=True)
           PY
