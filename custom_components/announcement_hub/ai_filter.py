@@ -300,16 +300,16 @@ def _parse_reply(
     if parsed is None:
         return None
     expected_keys = set(originals)
-    if (
-        set(parsed) != expected_keys
-        and not (
-            generate
-            and title_result is not None
-            and set(parsed) == expected_keys | {"title"}
-        )
-    ):
+    # Models commonly omit null channels or include an unused "title".
+    # Both are safe to ignore: they never select a new recipient or channel.
+    # Any other extra field, especially action/tool instructions, is rejected.
+    if set(parsed) - expected_keys - {"title"}:
         return None
     for key, original in originals.items():
+        if key not in parsed:
+            if original is not None:
+                return None
+            parsed[key] = None
         candidate = parsed[key]
         if original is None:
             if candidate is not None:
@@ -391,7 +391,10 @@ def _failure_reason(
         return "invalid_json"
     if originals is not None:
         expected = set(originals)
-        if not expected.issubset(result) or set(result) - expected - {"title"}:
+        if set(result) - expected - {"title"} or any(
+            key not in result and original is not None
+            for key, original in originals.items()
+        ):
             return "unexpected_response_fields"
         for key, original in originals.items():
             candidate = result.get(key)
