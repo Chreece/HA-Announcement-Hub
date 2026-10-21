@@ -4,7 +4,7 @@
     "step": {
       "outputs": {
         "title": "Uscite di notifica",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "I dispositivi di notifica rilevati vengono selezionati automaticamente. Escludi quelli indesiderati, associa le stanze e imposta le soglie minime.",
         "data": {
           "notify_outputs": "Dispositivi di notifica",
           "notify_room_outputs": "Dispositivi di notifica per stanza",
@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "Uscite TTS",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "Scegli il motore TTS, la lingua e la voce, poi i lettori per stanza e i client Snapcast con il lettore condiviso.",
         "data": {
           "tts_engines": "Motore TTS",
           "tts_media_player": "Lettore condiviso per Snapcast",
@@ -58,7 +58,7 @@
       },
       "notification_profile": {
         "title": "Opzioni integrazione: {integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "Configura notifiche e comportamento di instradamento dell'integrazione.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -104,7 +104,7 @@
       },
       "queue": {
         "title": "Opzioni generali",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "Presenza, percorsi alternativi, controllo porte, notifiche predefinite e tempi di attesa.",
         "data": {
           "queue_max": "Numero massimo di annunci in coda",
           "output_availability_timeout": "Unavailable-output wait",
@@ -146,7 +146,7 @@
       },
       "reconfigure": {
         "title": "Riconfigura Announcement Hub",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "Scegli la sezione da modificare. Dopo il salvataggio tornerai direttamente all'integrazione.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
@@ -182,7 +182,7 @@
     "step": {
       "outputs": {
         "title": "Uscite di notifica",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "I dispositivi di notifica rilevati vengono selezionati automaticamente. Escludi quelli indesiderati, associa le stanze e imposta le soglie minime.",
         "data": {
           "notify_outputs": "Dispositivi di notifica",
           "notify_room_outputs": "Dispositivi di notifica per stanza",
@@ -202,7 +202,7 @@
       },
       "tts": {
         "title": "Uscite TTS",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "Scegli il motore TTS, la lingua e la voce, poi i lettori per stanza e i client Snapcast con il lettore condiviso.",
         "data": {
           "tts_engines": "Motore TTS",
           "tts_media_player": "Lettore condiviso per Snapcast",
@@ -236,7 +236,7 @@
       },
       "notification_profile": {
         "title": "Opzioni integrazione: {integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "Configura notifiche e comportamento di instradamento dell'integrazione.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -282,7 +282,7 @@
       },
       "queue": {
         "title": "Opzioni generali",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "Presenza, percorsi alternativi, controllo porte, notifiche predefinite e tempi di attesa.",
         "data": {
           "queue_max": "Numero massimo di annunci in coda",
           "output_availability_timeout": "Unavailable-output wait",
@@ -324,7 +324,7 @@
       },
       "init": {
         "title": "Configure Announcement Hub",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "Scegli la sezione da modificare. Dopo il salvataggio tornerai direttamente all'integrazione.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
