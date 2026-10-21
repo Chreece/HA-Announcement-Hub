@@ -8,18 +8,18 @@
         "data": {
           "notify_outputs": "Bildirim cihazları",
           "notify_room_outputs": "Odaya göre bildirim cihazları",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Küçük Bilgi / Başarısız",
+          "notify_warning_outputs": "En Az uyarı",
+          "notify_error_outputs": "En Azal Hata",
+          "notify_critical_outputs": "Sadece kritik"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
-          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_outputs": "Tanıdılmış bilgilendirme üyeleriAnnouncement Hubkullanabilir. Tüm desteklenmiş aygıtlar otomatik olarak seçilendirir; asla istemediğin her aygıtını kaldırAnnouncement Hubbildirmek için.",
+          "notify_room_outputs": "Seçili bildirim aygıtları kimiHome AssistantBölgeden meşgul edilmiş/bağlı odasına uygulamalıdır. telefonlar, saatler ve laptoplar listeden çıkma gibi hareketler bırakmalıdır.",
+          "notify_info_outputs": "Bu listedeki aygıtlar Bilgi ve başarılık bildirimi ve her yüksek seviyeni alır. Aygıtlar yüksek seviyeli listesi kullanmasına tayin etilmeyen Ayıklama ve bu yüzden her seviye alır.",
+          "notify_warning_outputs": "Bu listedeki aygıtlar Uyarı, Hata ve Kritik bilgileri alır ama Ayıklama, Bilgi veya başarı değil.",
+          "notify_error_outputs": "Bu listedeki aygıtlar sadece Hata ve Kritik bilgiler alır.",
+          "notify_critical_outputs": "Bu listedeki aygıtlar sadece kritik bilgiler alır."
         }
       },
       "tts": {
@@ -29,77 +29,77 @@
           "tts_engines": "TTS motoru",
           "tts_media_player": "Snapcast için ortak medya oynatıcı",
           "snapcast_outputs": "Odaya göre Snapcast istemcileri",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "KullanTTSseviyeden",
+          "tts_cache": "Ön-yorulma ve kaç konuşmayı yönetin",
+          "tts_language": "TTSdil",
+          "tts_options": "TTSmotor seçenekleri",
+          "companion_tts_media_stream": "Companion Appses sırası",
+          "companion_tts_words_per_minute": "KompiyonTTSkonuşma bulunuyor",
+          "tts_area_players": "DoğruTTSOda başına oyuncular",
+          "companion_tts_outputs": "Companion App TTSaygıtlar",
+          "tts_voice": "TTSses",
+          "direct_tts_announce": "Doğru konuşma bilgisi modü (cime)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
-          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
-          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "tts_engines": "Tek etkin konuşma motoru.Home AssistantÖntanımlıTTSmotor bulunan zaman önce seçilendirir.",
+          "tts_media_player": "Aslında yaratıldığını oynayan genel medya oynatıcıTTSPaylaşıldıklarınaSnapserverörnek, örnekMPDBu küresel altyapısıdır ve oda tarafından asla filtrelenmez.",
+          "tts_min_level": "Konuşmaya izin verilen en az bir bilgi seviyesi. Aşağı seviyeler sessiz kalır; Kritik her zaman seslidir.",
+          "tts_cache": "Oluştur/AtlaTTSMümkün oynatmadan önce medya. Bu oynatma başlangıç kesinligi azaltır ve seçili çıkış yolu tarafından aynı oluşturulan medyayı yeniden kayıttırır.",
+          "tts_language": "Seçiliğe dil geçtiTTSMotor desteğindeki dillerden seçimler doğrudan geliyor.",
+          "tts_options": "Daha ek motor yardımcıTTSseçenekler. Dil ve desteklenmiş ses ayrıca ayarlanıyor; bunu tek başka temin eden seçenekler için kullan.",
+          "companion_tts_media_stream": "Kullanılan Android ses akışınıCompanion Appiç...TTSTelefonun nasıl ses/fokus aldığını kontrol ediyor.",
+          "companion_tts_words_per_minute": "Sadece ne kadar uzun olduğunu anlamaya kullanıldıCompanion Appiç...TTSkonuşuyor çünkü uygulama oynatma tamamlamayı bildirmiyor. Kutu bu kayıtın sıkışması için bekleyebilir.",
+          "snapcast_outputs": "Snapcastİstemci medya oynatıcıları sinkronizli fiziksel oda çıkışları olarak kullanıldı.Announcement HubgöndermeyecekTTSOnlara doğru olarak; paylaşılmış oynatıcı bedenlerde kendilerini yönetir.Snapserver..",
+          "companion_tts_outputs": "AndroidCompanion AppAygıtlar...TTSBu normal görsel telefon bildirimlerinden ayrı.",
+          "tts_area_players": "Yaralanan doğru medya oynatıcılarıTTSYalnızca onlara geldiğindeHome AssistantBölgeleri meşgul edilen/bağlı odasına uygun. Burada seçilen her oyun oda oyunu otomatik olarak sıkıştırılmıştır.",
+          "tts_voice": "Etkin tarafından teklif edilen sesTTSSeçili dil için motor. Yerli- uygun sesler (meselâ el_ GR ile el) dahil edilir. Teminçi ses desteği destekleyebilirse ama seçimleri saylamayamazsa, alan kullanıcı ses kimliği için kullanılabilir.",
+          "direct_tts_announce": "Kullanmak için kapatHome Assistantseçilen doğru medya çalarları için çalma kipisini bildir. Oyuncu kısa bir kırıl oynayabilir ve desteklendiğinde medyayı devam edebilir. Teminatçılar oluşturulan ziyaretleri kaçırmak için kapat; doğrudan kapatTTSdiğer oynatmayı kesmeyebilir. PaylaşılmışSnapcastkaynak hiçbir zaman bilgilendirme kipini kullanmaz."
         }
       },
       "notification_profile": {
         "title": "Entegrasyon seçenekleri: {integration}",
         "description": "Bildirim ve yönlendirme davranışını yapılandırın.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "Bölümdeki en büyük karakterler",
+          "reading_words_per_minute": "Okuma hızlılığı",
+          "minimum_display_seconds": "Küçük gösterim zamanı",
+          "maximum_display_seconds": "En maksimal görüntü zamanı",
+          "display_buffer_seconds": "Okuma zamanlı buffer",
+          "part_gap_seconds": "Parçalar arasında çıkmak",
+          "show_part_number": "Başlıqdaki parça numarasını göster",
+          "integration_data": "Daha eksel birlik verileri",
+          "replace_parts": "Öncekini değiştirCompanion Appparça",
+          "position": "Mevzi",
+          "fontsize": "Yazıtipi ölçüsi",
+          "color": "Arkaplan renki",
+          "transparency": "Arkaplan işaretleri",
+          "interrupt": "Etkileşimli bildirim",
+          "snapcast_source": "YayımlamaSnapcastkaynak",
+          "snapcast_only_source": "Sadece istemcileri bilgilendirme kaynakında yönet",
+          "snapcast_settle_delay": "Snapcastsıkıştırma vakitleri",
+          "snapcast_verify_timeout": "Snapcastdoğrulama zaman aşımına uygulamak",
+          "snapcast_restore": "_YenileSnapcastsıkıştırma durumları"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
-          "snapcast_only_source": "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "max_length": "Bir görsel bilgilendirme bölümünde gönderilen en maksimal karakterler sayısı. Bundan uzun metin doğal sınırlarında ayrılacak;0ayırmayı ğayrıldır.",
+          "reading_words_per_minute": "Bir görsel bildirim parçası gönderilmeden önce her hızlık olarak görünüyor olmalıyı tahmin etmek için kullanılan hızlık.",
+          "minimum_display_seconds": "Metin çok kısa olsa bile her görsel bildirim parçasının hesaplanmış gösterim uzunlığının alt sınıfı.",
+          "maximum_display_seconds": "Her görsel bilgilendirme bölümün hesaplanmış görüntü uzun mesajları kutunu sonsuza süresiz bırakmadan mahrum ettiği için yüksek sınır.",
+          "display_buffer_seconds": "Her görsel bilgilendirme parçası için okuma zamanlı birlikte eklenmiş saniyeler.",
+          "part_gap_seconds": "Görsel bildirim parçaları arasında durdur, sonraki bir parça verilmeden önceki parça temizleyebilir.",
+          "show_part_number": "Etkinleştirildiğinde, mesajlar ayır, mesela kibi sayıları ekle1/3ve2/3bilgilendirme serbestlerine.",
+          "integration_data": "Seçenek verici-sözlü ödeme yükü bu tekrarla gönderilmiş her görsel bildirim için birleştirildi.notify_dataeşleştirme anahtarlarının açıklaştırması.",
+          "replace_parts": "HakkındaCompanion AppMesajları ayır, bir bilgisi etiketini kayıtlayın, bu yüzden her yeni parça, bir parça oluşturma yerine önceki parçayı yerine alınıyor.",
+          "position": "Bildirimlerin Nereden Ekran MevziAndroid TV/Fire TVbilgilendirme sırası gösterir.",
+          "fontsize": "Bildirimler tarafından kullanılan metin ölçüsiAndroid TV/Fire TVbilgilendirme çıkarken.",
+          "color": "Bildirimler tarafından kullanılan arkaplan rengiAndroid TV/Fire TVbilgilendirme sırası için.",
+          "transparency": "Bildirimler tarafından kullanılan arkaplan işaretleriAndroid TV/Fire TVbilgilendirme sırası için.",
+          "interrupt": "EtkinleştirildiğindeAndroid TVbilgisi interaktif ve şimdi çalışan TV uygulamasından fokus alabilir.",
+          "snapcast_source": "İsmiSnapcastBildirim sesleri taşıyan kaynak/ayrı. Seçili oda müşterileri konuşmadan önce bu kaynaktan çıkarılmıştır.",
+          "snapcast_only_source": "Etkinleştirildiğinde,Announcement Hubsadece yapılandırılmış bilgilendirme kaynakında olan müşteriler için sık durumu değiştirir; diğerleriSnapcastZümreler/ kaynaklar buradan kaldı.",
+          "snapcast_settle_delay": "Değiştirmeden sonra kısa gecikmeSnapcastönceki durumu çıkartma/mut durumuTTSbaşlıyor, müşterilerin değişikliklerini uygulamasına izin verir.",
+          "snapcast_verify_timeout": "Beklemek için en maksimal zamanSnapcastMüşteriler, rotayı devam etmeden ya da faydalanmalı olarak tedavi etmeden önce dillenen durumunu raporlamak için.",
+          "snapcast_restore": "Bildirimden sonra her yönetimlisini geri döndürSnapcastİstemcinin önceki durumu normal dinlediğini devam etti."
         }
       },
       "queue": {
@@ -107,75 +107,75 @@
         "description": "Doluluk, yedek yönlendirme, kapılar, kuyruk ve zaman aşımlarını ayarlayın.",
         "data": {
           "queue_max": "En fazla kuyruktaki duyuru",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Kullanılmayan çıkış bekleyebilir",
+          "idle_timeout": "Ses sıkıştırma bekleyebilir",
+          "start_timeout": "Oynatma başlatma zaman aşımı",
+          "playback_timeout": "MaksimumTTSoynatma zamanı",
+          "post_play_delay": "Oynatmadan sonraki bozma",
+          "default_title": "Öntanımlı bildirim serbesi",
+          "critical_notify_data": "Kritik bildirim verileri",
           "occupancy_sensor": "Oda doluluk varlığı",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "İşleştirilmiş odalar değerleri",
           "fallback_room": "Yedek oda",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Açık meşgul oda kapısı gerekiyor.",
+          "fallback_door_label": "Kapı sensör etiket filtresi",
           "default_use_ai": "Duyuruları YZ ile yeniden yaz",
           "default_ai_agent": "Varsayılan YZ sağlayıcısı (sohbet veya YZ görevi)",
           "fallback_ai_agent": "Yedek YZ sağlayıcısı (sohbet veya YZ görevi)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Uyarı kanalı geriçağır"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
-          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "queue_max": "Kabul edilen bekleyen/aktiv bilgilendirme işlerin en maksimal sayısı. Bu sınır ulaşıldığında yeni gönderiler reddedilir.",
+          "output_availability_timeout": "İçeride olmayan çıkış ne kadar uzun süre kalabilir. Diğer çıkabilir bildirimler onu geçebilir; bu zamandan sonra, çıkış çıkış sessiz kaçılacak.",
+          "idle_timeout": "Başlamadan önce seçilmiş ses yolunun işsiz olmasına bekleyen en maksimal zamanTTS., mevcut bir oynatmayı terk etmeye mahkum ediyor.",
+          "start_timeout": "Media oynatıcısı için en maksimal zamanTTSOynatma istemi gönderildiğinden sonra oynat.",
+          "playback_timeout": "Ne kadar uzunlığı için güvenlik sınıfıAnnouncement HubSatırı boşaltmadan önce bir konuşu oynatmanın bitirmesini bekleyebilir.",
+          "post_play_delay": "Bir sonraki sesli çıkış/eş başlamadan önce sesli sesli bir çatışmadan sonra, geri-yere sıçramayı düzenleyebilir.",
+          "default_title": "Gönderme aksiyonu kendi titlini vermediğinde görsel bildirimler için kullanılan server.",
+          "critical_notify_data": "Teklif verileri sadece Kritik görünsel bildirimlere birleştirmiş, örnek, uygulama yönetimi tarafından desteği destekleyen acillik/imkanlık seçenekleri.",
+          "occupancy_sensor": "Durum veya seçilen özelliği şimdi işleştirilmiş entitetiHome AssistantAlan ismi/IDleri. Sadece içerilen bir gönderme aksiyonuna etkinleştirildiğinde kullanılacak.",
+          "occupancy_attribute": "Meşğul odalar kişi durumdan okulmuş ya da şu andaki özelliklerden birini seçin.",
+          "fallback_room": "EğitimTTSSadece hedef odası sıfırlı sabit oda kandidaları varsa kullanılan alanı. Mevcut sabit oda, faydalanmayan/bilinmeyenler, blok sıralayıcısı ve normal bir yerleştirilme zamanının altında kaldı.",
+          "fallback_check_door": "Etkinleştirildiğinde, sadece şimdiki hedef odalarından birinin açık raporlarına uygun bir kapı sensörü yapanırsa.",
+          "fallback_door_label": "SeçenekliHome Assistantetiket. Seçilen zaman, bu etiket taşındığı bir ikinci kapı sensörleri sadece geriye izin verebilir; şu hedef odalarındaki her kapı sensörü düşünmek için boş bırak.",
+          "default_use_ai": "Etkinleştirilmiş her bildirim AI'ye yeniden yazılma yazılması anlamına gelir.use_ai- Yalan.use_aibu tekrar ayarına ulaşıyor. AI'ye kaçındığında, orijinal mesaj gönderilir. Onun içindeki gönderme aksiyonunuzu kontrol edinresponse_variable..",
+          "default_ai_agent": "Home AssistantÖntanımlı Yardım bağlantılarının konuşma ajanının aşağısına uyur.conversation.processseçili ajan. Seçilmiş ajan gönderme zamanında çözülüyor ve downlown'da gösterilir. Eğer tercih edilen bağlantısın inşa edilen ajanını kullanırsa, LLM geri çekilmiş bir ajan seçin ya da bir yedek yapılandırın.",
+          "fallback_ai_agent": "İlk ajan başarılmadığında seçenekli bir AI ajan.Home AssistantÖntanımlı Yardım tuzağına da uyur; Original bildirim saniye bir AI denemeye geçir. AI işlemezse, orijinal metin hep verilir.",
+          "channel_fallback_mode": "Sadece BOTH konuşuyorkentext_ttsve yazılmış.text_notifyVe yardımcı.TTSve görsel aygıtlar bulunduğu: Görsel →TTSÖnce haber verir, sonra gönderme yok olsa konuşur;TTS→ Görselleştirme ilk konuşuyor, sonra konuşma yok olsa, iki de kanalı denemektir. Tek kullanılabilir bir kanal normal olarak çalışır. Kayıp metin oluşturmayı veya alıcıları genişlemeyecek; hala mevcut seviye uygulamadı."
         }
       },
       "reconfigure": {
         "title": "Announcement Hub ayarlarını değiştir",
         "description": "Bir bölüm seçin; kaydettikten sonra entegrasyona dönersiniz.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_outputs": "1. Bildirim çıkışları ve odaları",
+          "edit_tts": "2..TTSmotor ve aygıtlar",
+          "edit_profiles": "3. Teminatçı-sözlü çıkış profilleri",
+          "edit_general": "4. Umumiy ayarlar, bulunma ve AI",
+          "edit_all": "Tüm ayarları düzenle (tam sihirbaz)"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_outputs": "Uyarı aygıtlarını, oda alanı ve değiştirmeden en az uyarı seviyelerini seçinTTSYa da AI ayarları.",
+          "edit_tts": "Etkin konuşma motorunu değiştirin, ses, oda oynatıcılarını,SnapcastMüşteriler veCompanion AppKonuşma aygıtları.",
+          "edit_profiles": "Bildirim zamanını yapılandırın, gösterim düzenleri veSnapcastSeçili teminatçılar için çalma ayarları.",
+          "edit_general": "AI ve yedekleme ajanlarına doğru olarak atın, oda sıra, kutu ve zaman ayarlarına.",
+          "edit_all": "Original yapılandırma sihirbazı gibi tüm seçim sayfalarına ziyaret et."
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player."
+      "tts_player_required": "SeçTTSmedia oynatıcı nasılTTSmotorlar seçildi.",
+      "tts_engine_required": "SeçTTSmotorTTSoynatıcı seçildi.",
+      "snapcast_tts_path_required": "Snapcastçıkışlar en azından bir şey gerekirTTSmotor ve aTTSMedia oynatıcı.",
+      "output_required": "En azından bir görsel seçin, sunucu-TTS, ya daCompanion App TTSÇıkış.",
+      "display_time_order": "En maksimal görüntü zamanı en az gösterim zamanından büyük ya da eşit olmalı.",
+      "room_notify_area_required": "Oda tabanlı bir bilgisi aygıtı sahip olmalıHome AssistantAlan.",
+      "notify_level_overlap": "Bir uyarı aygıtı sadece en az bir seviye tayin edebilir.",
+      "room_tts_area_required": "Oda tabanlı bir doğruTTSMedia oynatıcısı var.Home AssistantAlan.",
+      "tts_player_role_overlap": "Aynı medya oynatıcı, ikisi de direkt bir olamaz.TTSoynatıcı ve paylaşılmışSnapcastkaynak oynatıcı."
     },
     "abort": {
-      "single_instance_allowed": "Announcement Hub is already configured."
+      "single_instance_allowed": "Announcement HubZaten yapılandırılmış."
     }
   },
   "options": {
@@ -186,18 +186,18 @@
         "data": {
           "notify_outputs": "Bildirim cihazları",
           "notify_room_outputs": "Odaya göre bildirim cihazları",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Küçük Bilgi / Başarısız",
+          "notify_warning_outputs": "En Az uyarı",
+          "notify_error_outputs": "En Azal Hata",
+          "notify_critical_outputs": "Sadece kritik"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
-          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_outputs": "Tanıdılmış bilgilendirme üyeleriAnnouncement Hubkullanabilir. Tüm desteklenmiş aygıtlar otomatik olarak seçilendirir; asla istemediğin her aygıtını kaldırAnnouncement Hubbildirmek için.",
+          "notify_room_outputs": "Seçili bildirim aygıtları kimiHome AssistantBölgeden meşgul edilmiş/bağlı odasına uygulamalıdır. telefonlar, saatler ve laptoplar listeden çıkma gibi hareketler bırakmalıdır.",
+          "notify_info_outputs": "Bu listedeki aygıtlar Bilgi ve başarılık bildirimi ve her yüksek seviyeni alır. Aygıtlar yüksek seviyeli listesi kullanmasına tayin etilmeyen Ayıklama ve bu yüzden her seviye alır.",
+          "notify_warning_outputs": "Bu listedeki aygıtlar Uyarı, Hata ve Kritik bilgileri alır ama Ayıklama, Bilgi veya başarı değil.",
+          "notify_error_outputs": "Bu listedeki aygıtlar sadece Hata ve Kritik bilgiler alır.",
+          "notify_critical_outputs": "Bu listedeki aygıtlar sadece kritik bilgiler alır."
         }
       },
       "tts": {
@@ -207,77 +207,77 @@
           "tts_engines": "TTS motoru",
           "tts_media_player": "Snapcast için ortak medya oynatıcı",
           "snapcast_outputs": "Odaya göre Snapcast istemcileri",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "KullanTTSseviyeden",
+          "tts_cache": "Ön-yorulma ve kaç konuşmayı yönetin",
+          "tts_language": "TTSdil",
+          "tts_options": "TTSmotor seçenekleri",
+          "companion_tts_media_stream": "Companion Appses sırası",
+          "companion_tts_words_per_minute": "KompiyonTTSkonuşma bulunuyor",
+          "tts_area_players": "DoğruTTSOda başına oyuncular",
+          "companion_tts_outputs": "Companion App TTSaygıtlar",
+          "tts_voice": "TTSses",
+          "direct_tts_announce": "Doğru konuşma bilgisi modü (cime)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
-          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
-          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "tts_engines": "Tek etkin konuşma motoru.Home AssistantÖntanımlıTTSmotor bulunan zaman önce seçilendirir.",
+          "tts_media_player": "Aslında yaratıldığını oynayan genel medya oynatıcıTTSPaylaşıldıklarınaSnapserverörnek, örnekMPDBu küresel altyapısıdır ve oda tarafından asla filtrelenmez.",
+          "tts_min_level": "Konuşmaya izin verilen en az bir bilgi seviyesi. Aşağı seviyeler sessiz kalır; Kritik her zaman seslidir.",
+          "tts_cache": "Oluştur/AtlaTTSMümkün oynatmadan önce medya. Bu oynatma başlangıç kesinligi azaltır ve seçili çıkış yolu tarafından aynı oluşturulan medyayı yeniden kayıttırır.",
+          "tts_language": "Seçiliğe dil geçtiTTSMotor desteğindeki dillerden seçimler doğrudan geliyor.",
+          "tts_options": "Daha ek motor yardımcıTTSseçenekler. Dil ve desteklenmiş ses ayrıca ayarlanıyor; bunu tek başka temin eden seçenekler için kullan.",
+          "companion_tts_media_stream": "Kullanılan Android ses akışınıCompanion Appiç...TTSTelefonun nasıl ses/fokus aldığını kontrol ediyor.",
+          "companion_tts_words_per_minute": "Sadece ne kadar uzun olduğunu anlamaya kullanıldıCompanion Appiç...TTSkonuşuyor çünkü uygulama oynatma tamamlamayı bildirmiyor. Kutu bu kayıtın sıkışması için bekleyebilir.",
+          "snapcast_outputs": "Snapcastİstemci medya oynatıcıları sinkronizli fiziksel oda çıkışları olarak kullanıldı.Announcement HubgöndermeyecekTTSOnlara doğru olarak; paylaşılmış oynatıcı bedenlerde kendilerini yönetir.Snapserver..",
+          "companion_tts_outputs": "AndroidCompanion AppAygıtlar...TTSBu normal görsel telefon bildirimlerinden ayrı.",
+          "tts_area_players": "Yaralanan doğru medya oynatıcılarıTTSYalnızca onlara geldiğindeHome AssistantBölgeleri meşgul edilen/bağlı odasına uygun. Burada seçilen her oyun oda oyunu otomatik olarak sıkıştırılmıştır.",
+          "tts_voice": "Etkin tarafından teklif edilen sesTTSSeçili dil için motor. Yerli- uygun sesler (meselâ el_ GR ile el) dahil edilir. Teminçi ses desteği destekleyebilirse ama seçimleri saylamayamazsa, alan kullanıcı ses kimliği için kullanılabilir.",
+          "direct_tts_announce": "Kullanmak için kapatHome Assistantseçilen doğru medya çalarları için çalma kipisini bildir. Oyuncu kısa bir kırıl oynayabilir ve desteklendiğinde medyayı devam edebilir. Teminatçılar oluşturulan ziyaretleri kaçırmak için kapat; doğrudan kapatTTSdiğer oynatmayı kesmeyebilir. PaylaşılmışSnapcastkaynak hiçbir zaman bilgilendirme kipini kullanmaz."
         }
       },
       "notification_profile": {
         "title": "Entegrasyon seçenekleri: {integration}",
         "description": "Bildirim ve yönlendirme davranışını yapılandırın.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "Bölümdeki en büyük karakterler",
+          "reading_words_per_minute": "Okuma hızlılığı",
+          "minimum_display_seconds": "Küçük gösterim zamanı",
+          "maximum_display_seconds": "En maksimal görüntü zamanı",
+          "display_buffer_seconds": "Okuma zamanlı buffer",
+          "part_gap_seconds": "Parçalar arasında çıkmak",
+          "show_part_number": "Başlıqdaki parça numarasını göster",
+          "integration_data": "Daha eksel birlik verileri",
+          "replace_parts": "Öncekini değiştirCompanion Appparça",
+          "position": "Mevzi",
+          "fontsize": "Yazıtipi ölçüsi",
+          "color": "Arkaplan renki",
+          "transparency": "Arkaplan işaretleri",
+          "interrupt": "Etkileşimli bildirim",
+          "snapcast_source": "YayımlamaSnapcastkaynak",
+          "snapcast_only_source": "Sadece istemcileri bilgilendirme kaynakında yönet",
+          "snapcast_settle_delay": "Snapcastsıkıştırma vakitleri",
+          "snapcast_verify_timeout": "Snapcastdoğrulama zaman aşımına uygulamak",
+          "snapcast_restore": "_YenileSnapcastsıkıştırma durumları"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
-          "snapcast_only_source": "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "max_length": "Bir görsel bilgilendirme bölümünde gönderilen en maksimal karakterler sayısı. Bundan uzun metin doğal sınırlarında ayrılacak;0ayırmayı ğayrıldır.",
+          "reading_words_per_minute": "Bir görsel bildirim parçası gönderilmeden önce her hızlık olarak görünüyor olmalıyı tahmin etmek için kullanılan hızlık.",
+          "minimum_display_seconds": "Metin çok kısa olsa bile her görsel bildirim parçasının hesaplanmış gösterim uzunlığının alt sınıfı.",
+          "maximum_display_seconds": "Her görsel bilgilendirme bölümün hesaplanmış görüntü uzun mesajları kutunu sonsuza süresiz bırakmadan mahrum ettiği için yüksek sınır.",
+          "display_buffer_seconds": "Her görsel bilgilendirme parçası için okuma zamanlı birlikte eklenmiş saniyeler.",
+          "part_gap_seconds": "Görsel bildirim parçaları arasında durdur, sonraki bir parça verilmeden önceki parça temizleyebilir.",
+          "show_part_number": "Etkinleştirildiğinde, mesajlar ayır, mesela kibi sayıları ekle1/3ve2/3bilgilendirme serbestlerine.",
+          "integration_data": "Seçenek verici-sözlü ödeme yükü bu tekrarla gönderilmiş her görsel bildirim için birleştirildi.notify_dataeşleştirme anahtarlarının açıklaştırması.",
+          "replace_parts": "HakkındaCompanion AppMesajları ayır, bir bilgisi etiketini kayıtlayın, bu yüzden her yeni parça, bir parça oluşturma yerine önceki parçayı yerine alınıyor.",
+          "position": "Bildirimlerin Nereden Ekran MevziAndroid TV/Fire TVbilgilendirme sırası gösterir.",
+          "fontsize": "Bildirimler tarafından kullanılan metin ölçüsiAndroid TV/Fire TVbilgilendirme çıkarken.",
+          "color": "Bildirimler tarafından kullanılan arkaplan rengiAndroid TV/Fire TVbilgilendirme sırası için.",
+          "transparency": "Bildirimler tarafından kullanılan arkaplan işaretleriAndroid TV/Fire TVbilgilendirme sırası için.",
+          "interrupt": "EtkinleştirildiğindeAndroid TVbilgisi interaktif ve şimdi çalışan TV uygulamasından fokus alabilir.",
+          "snapcast_source": "İsmiSnapcastBildirim sesleri taşıyan kaynak/ayrı. Seçili oda müşterileri konuşmadan önce bu kaynaktan çıkarılmıştır.",
+          "snapcast_only_source": "Etkinleştirildiğinde,Announcement Hubsadece yapılandırılmış bilgilendirme kaynakında olan müşteriler için sık durumu değiştirir; diğerleriSnapcastZümreler/ kaynaklar buradan kaldı.",
+          "snapcast_settle_delay": "Değiştirmeden sonra kısa gecikmeSnapcastönceki durumu çıkartma/mut durumuTTSbaşlıyor, müşterilerin değişikliklerini uygulamasına izin verir.",
+          "snapcast_verify_timeout": "Beklemek için en maksimal zamanSnapcastMüşteriler, rotayı devam etmeden ya da faydalanmalı olarak tedavi etmeden önce dillenen durumunu raporlamak için.",
+          "snapcast_restore": "Bildirimden sonra her yönetimlisini geri döndürSnapcastİstemcinin önceki durumu normal dinlediğini devam etti."
         }
       },
       "queue": {
@@ -285,79 +285,79 @@
         "description": "Doluluk, yedek yönlendirme, kapılar, kuyruk ve zaman aşımlarını ayarlayın.",
         "data": {
           "queue_max": "En fazla kuyruktaki duyuru",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Kullanılmayan çıkış bekleyebilir",
+          "idle_timeout": "Ses sıkıştırma bekleyebilir",
+          "start_timeout": "Oynatma başlatma zaman aşımı",
+          "playback_timeout": "MaksimumTTSoynatma zamanı",
+          "post_play_delay": "Oynatmadan sonraki bozma",
+          "default_title": "Öntanımlı bildirim serbesi",
+          "critical_notify_data": "Kritik bildirim verileri",
           "occupancy_sensor": "Oda doluluk varlığı",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "İşleştirilmiş odalar değerleri",
           "fallback_room": "Yedek oda",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Açık meşgul oda kapısı gerekiyor.",
+          "fallback_door_label": "Kapı sensör etiket filtresi",
           "default_use_ai": "Duyuruları YZ ile yeniden yaz",
           "default_ai_agent": "Varsayılan YZ sağlayıcısı (sohbet veya YZ görevi)",
           "fallback_ai_agent": "Yedek YZ sağlayıcısı (sohbet veya YZ görevi)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Uyarı kanalı geriçağır"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
-          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "queue_max": "Kabul edilen bekleyen/aktiv bilgilendirme işlerin en maksimal sayısı. Bu sınır ulaşıldığında yeni gönderiler reddedilir.",
+          "output_availability_timeout": "İçeride olmayan çıkış ne kadar uzun süre kalabilir. Diğer çıkabilir bildirimler onu geçebilir; bu zamandan sonra, çıkış çıkış sessiz kaçılacak.",
+          "idle_timeout": "Başlamadan önce seçilmiş ses yolunun işsiz olmasına bekleyen en maksimal zamanTTS., mevcut bir oynatmayı terk etmeye mahkum ediyor.",
+          "start_timeout": "Media oynatıcısı için en maksimal zamanTTSOynatma istemi gönderildiğinden sonra oynat.",
+          "playback_timeout": "Ne kadar uzunlığı için güvenlik sınıfıAnnouncement HubSatırı boşaltmadan önce bir konuşu oynatmanın bitirmesini bekleyebilir.",
+          "post_play_delay": "Bir sonraki sesli çıkış/eş başlamadan önce sesli sesli bir çatışmadan sonra, geri-yere sıçramayı düzenleyebilir.",
+          "default_title": "Gönderme aksiyonu kendi titlini vermediğinde görsel bildirimler için kullanılan server.",
+          "critical_notify_data": "Teklif verileri sadece Kritik görünsel bildirimlere birleştirmiş, örnek, uygulama yönetimi tarafından desteği destekleyen acillik/imkanlık seçenekleri.",
+          "occupancy_sensor": "Durum veya seçilen özelliği şimdi işleştirilmiş entitetiHome AssistantAlan ismi/IDleri. Sadece içerilen bir gönderme aksiyonuna etkinleştirildiğinde kullanılacak.",
+          "occupancy_attribute": "Meşğul odalar kişi durumdan okulmuş ya da şu andaki özelliklerden birini seçin.",
+          "fallback_room": "EğitimTTSSadece hedef odası sıfırlı sabit oda kandidaları varsa kullanılan alanı. Mevcut sabit oda, faydalanmayan/bilinmeyenler, blok sıralayıcısı ve normal bir yerleştirilme zamanının altında kaldı.",
+          "fallback_check_door": "Etkinleştirildiğinde, sadece şimdiki hedef odalarından birinin açık raporlarına uygun bir kapı sensörü yapanırsa.",
+          "fallback_door_label": "SeçenekliHome Assistantetiket. Seçilen zaman, bu etiket taşındığı bir ikinci kapı sensörleri sadece geriye izin verebilir; şu hedef odalarındaki her kapı sensörü düşünmek için boş bırak.",
+          "default_use_ai": "Etkinleştirilmiş her bildirim AI'ye yeniden yazılma yazılması anlamına gelir.use_ai- Yalan.use_aibu tekrar ayarına ulaşıyor. AI'ye kaçındığında, orijinal mesaj gönderilir. Onun içindeki gönderme aksiyonunuzu kontrol edinresponse_variable..",
+          "default_ai_agent": "Home AssistantÖntanımlı Yardım bağlantılarının konuşma ajanının aşağısına uyur.conversation.processseçili ajan. Seçilmiş ajan gönderme zamanında çözülüyor ve downlown'da gösterilir. Eğer tercih edilen bağlantısın inşa edilen ajanını kullanırsa, LLM geri çekilmiş bir ajan seçin ya da bir yedek yapılandırın.",
+          "fallback_ai_agent": "İlk ajan başarılmadığında seçenekli bir AI ajan.Home AssistantÖntanımlı Yardım tuzağına da uyur; Original bildirim saniye bir AI denemeye geçir. AI işlemezse, orijinal metin hep verilir.",
+          "channel_fallback_mode": "Sadece BOTH konuşuyorkentext_ttsve yazılmış.text_notifyVe yardımcı.TTSve görsel aygıtlar bulunduğu: Görsel →TTSÖnce haber verir, sonra gönderme yok olsa konuşur;TTS→ Görselleştirme ilk konuşuyor, sonra konuşma yok olsa, iki de kanalı denemektir. Tek kullanılabilir bir kanal normal olarak çalışır. Kayıp metin oluşturmayı veya alıcıları genişlemeyecek; hala mevcut seviye uygulamadı."
         }
       },
       "init": {
-        "title": "Configure Announcement Hub",
+        "title": "YapılandırAnnouncement Hub",
         "description": "Bir bölüm seçin; kaydettikten sonra entegrasyona dönersiniz.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_outputs": "1. Bildirim çıkışları ve odaları",
+          "edit_tts": "2..TTSmotor ve aygıtlar",
+          "edit_profiles": "3. Teminatçı-sözlü çıkış profilleri",
+          "edit_general": "4. Umumiy ayarlar, bulunma ve AI",
+          "edit_all": "Tüm ayarları düzenle (tam sihirbaz)"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_outputs": "Uyarı aygıtlarını, oda alanı ve değiştirmeden en az uyarı seviyelerini seçinTTSYa da AI ayarları.",
+          "edit_tts": "Etkin konuşma motorunu değiştirin, ses, oda oynatıcılarını,SnapcastMüşteriler veCompanion AppKonuşma aygıtları.",
+          "edit_profiles": "Bildirim zamanını yapılandırın, gösterim düzenleri veSnapcastSeçili teminatçılar için çalma ayarları.",
+          "edit_general": "AI ve yedekleme ajanlarına doğru olarak atın, oda sıra, kutu ve zaman ayarlarına.",
+          "edit_all": "Original yapılandırma sihirbazı gibi tüm seçim sayfalarına ziyaret et."
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player."
+      "tts_player_required": "SeçTTSmedia oynatıcı nasılTTSmotorlar seçildi.",
+      "tts_engine_required": "SeçTTSmotorTTSoynatıcı seçildi.",
+      "snapcast_tts_path_required": "Snapcastçıkışlar en azından bir şey gerekirTTSmotor ve aTTSMedia oynatıcı.",
+      "output_required": "En azından bir görsel seçin, sunucu-TTS, ya daCompanion App TTSÇıkış.",
+      "display_time_order": "En maksimal görüntü zamanı en az gösterim zamanından büyük ya da eşit olmalı.",
+      "room_notify_area_required": "Oda tabanlı bir bilgisi aygıtı sahip olmalıHome AssistantAlan.",
+      "notify_level_overlap": "Bir uyarı aygıtı sadece en az bir seviye tayin edebilir.",
+      "room_tts_area_required": "Oda tabanlı bir doğruTTSMedia oynatıcısı var.Home AssistantAlan.",
+      "tts_player_role_overlap": "Aynı medya oynatıcı, ikisi de direkt bir olamaz.TTSoynatıcı ve paylaşılmışSnapcastkaynak oynatıcı."
     }
   },
   "selector": {
     "dispatch_order": {
       "options": {
-        "notify_then_tts": "Visual notifications first, then speech",
-        "tts_then_notify": "Speech first, then visual notifications"
+        "notify_then_tts": "İlk görünüyor bildirimler, sonra konuşma",
+        "tts_then_notify": "İlk konuşma, sonra görsel bildirimler"
       }
     },
     "tts_min_level": {
@@ -368,15 +368,15 @@
         "info": "Bilgi",
         "success": "Başarılı",
         "debug": "Hata ayıklama",
-        "never": "Never"
+        "never": "Asla"
       }
     },
     "companion_tts_media_stream": {
       "options": {
-        "default": "App default",
-        "music_stream": "Music stream",
-        "alarm_stream": "Alarm stream",
-        "alarm_stream_max": "Alarm stream at maximum volume"
+        "default": "Uygulama Öntanımlı",
+        "music_stream": "Müzik akışları",
+        "alarm_stream": "Alarm akışı",
+        "alarm_stream_max": "Azami sesinde alarm akışı"
       }
     },
     "level": {
@@ -391,30 +391,30 @@
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left",
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "center": "Center"
+        "bottom-right": "Aşağı sağ",
+        "bottom-left": "Aşağı sola",
+        "top-right": "Yukarı sağ",
+        "top-left": "Soldan",
+        "center": "Orta"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large",
-        "max": "Maximum"
+        "small": "Kiçik",
+        "medium": "Orta",
+        "large": "Büyük",
+        "max": "Maksimum"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Grey",
-        "black": "Black",
+        "grey": "Rız",
+        "black": "Siyah",
         "indigo": "Indigo",
-        "green": "Green",
-        "red": "Red",
-        "cyan": "Cyan",
-        "teal": "Teal",
+        "green": "Yaşıl",
+        "red": "Kırmızı",
+        "cyan": "Siyah",
+        "teal": "Tel",
         "amber": "Amber",
         "pink": "Pink"
       }
@@ -430,13 +430,13 @@
     },
     "occupancy_source": {
       "options": {
-        "state": "State"
+        "state": "Durum"
       }
     },
     "notify_scope": {
       "options": {
-        "room": "Room-based",
-        "general": "General / movable"
+        "room": "Oda tabanlı",
+        "general": "Genel / hareketli"
       }
     },
     "notify_level": {
@@ -450,23 +450,23 @@
     },
     "channel_fallback_mode": {
       "options": {
-        "visual_then_tts": "Visual first → TTS if unsuccessful",
-        "tts_then_visual": "TTS first → Visual if unsuccessful",
-        "both": "Both eligible channels"
+        "visual_then_tts": "Gösterilmiş ilk →TTSEğer başarısız olsa",
+        "tts_then_visual": "TTSilk → Muvafaqiyet başarısız olsa görsel",
+        "both": "İki de yararlı kanalı"
       }
     }
   },
   "entity": {
     "sensor": {
       "queue": {
-        "name": "Queue"
+        "name": "Kutu"
       }
     }
   },
   "services": {
     "send": {
       "name": "Duyuruyu gönder",
-      "description": "Backward-compatible alias for notify.announcement_hub. New automations should use notify.announcement_hub.",
+      "description": "Arkada uygun isimnotify.announcement_hub.Yeni otomatik kullanmalınotify.announcement_hub.",
       "sections": {
         "content": {
           "name": "Mesaj"
@@ -484,99 +484,99 @@
       "fields": {
         "text_tts": {
           "name": "Sesli metin (TTS)",
-          "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
+          "description": "Sadece konuşma mesajı. Yazılmış bildirim metin olarak gönderme. Metin verilirse konuşan metin sürüminin üstüne alınma."
         },
         "text_notify": {
           "name": "Yazılı bildirim",
-          "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
+          "description": "Tek görünüsel bildirim içerisi. Konuşmamış gibi asla göndermeTTS. Metin verilirse metin bilgilendirme sürüminin üstüne alınıyor."
         },
         "title": {
           "name": "Başlık",
-          "description": "Optional title for visual notifications."
+          "description": "Görsel bildirimler için seçenek titre."
         },
         "level": {
           "name": "Önem",
-          "description": "Announcement severity. Critical uses every configured matching output only when no explicit service or output target is supplied. Explicit selections remain authoritative even for Critical and never enable unrequested TTS."
+          "description": "Yayımlama derecesi. Kritiksel ayarlanmış her çıkış çıkışını sadece açık hizmet veya çıkış hedefi verilmediğinde kullanır. Eksplisi seçimleri Kritik ve asla istemeyen etkinleştirmeye kadar kabul etmeye çalışır.TTS.."
         },
         "service": {
           "name": "Dağıtım hizmeti",
-          "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
+          "description": "Bildirim (yazılmış), tts (snappcast), ya dacompanion_ttsSeçili aygıtları süzgeçer; asla bağlanmağan alıcılar seçmez."
         },
         "notify_data": {
-          "name": "Notification data",
-          "description": "Optional integration-specific data for this visual notification."
+          "name": "Bildirim verileri",
+          "description": "Bu görsel bilgiliği için seçenekli birlikte değerli veriler."
         },
         "language": {
-          "name": "TTS language",
-          "description": "Optional language override for this job."
+          "name": "TTSdil",
+          "description": "Bu iş için seçenek dil alıştırma."
         },
         "tts_options": {
-          "name": "TTS options",
-          "description": "Optional voice or engine options for this job."
+          "name": "TTSseçenekler",
+          "description": "Bu iş için ses ya da motor seçenekleri."
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
-          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
+          "name": "İzin verCompanion Appkonuşma",
+          "description": "Eski seçenekliCompanion Appkonuşu-çıkış opt-in. Yeni işler tts ya da tutları isteyebilircompanion_ttsHizmetinde, seçili alıcılara mahsus."
         },
         "occupied_only": {
           "name": "Yedek yönlendirmede dolu odaları dene",
-          "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
+          "description": "Alan hedeflerindeki aramalar, ilk seçilen odaları deneyin, sonra etkinleştirildiğinde diğer işletilen bölgeler. Eksplit integresyon, aygıt ve hizmet hedefleri sabit kalır."
         },
         "use_ai": {
           "name": "YZ metni",
-          "description": "Optional override for this announcement. Leave unset to inherit the integration setting; true enables AI and false bypasses it even if globally enabled."
+          "description": "Bu bildirim için seçenek sırası. Yükseltme ayarını miras almak için bırak; gerçek AI'ye ve dünyaya etkinleştirilse bile yalanlı bir başına erişir."
         },
         "ai_agent": {
           "name": "YZ sağlayıcısı",
-          "description": "Choose a currently available conversation agent for this announcement. Leave empty to inherit the integration selection (initially Home Assistant default)."
+          "description": "Bu bildirim için bu günde faydalanışlı bir konuşma ajanını seçin. Boş bırak, ileşim seçimi miras almak için (onlarından başlangıç olarak)Home AssistantÖntanımlı)."
         },
         "click_action": {
           "name": "Bildirime dokunma hedefi",
-          "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
+          "description": "Seçenekli URL,Home Assistantdashboard yolu, uygulama:// derin ilişim, ya da entityId:entity_idAçıklamak için...Companion AppGörsel bildirim sıkıldı. Android tık Action alır; iOS/macOS url alır.Android TV/Fire TVsıkışmalar,TTS, ve desteği olmadan sahip verici. Eşleştirme anahtarlarının üstüne alınmasınotify_data.."
         },
         "text": {
           "name": "Duyuru",
-          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+          "description": "İki konuşma için paylaşılmış metinTTSve yazılmış bildirimler.text_ttsYa datext_notifytemin edilir; kanal alan alan mevcut metin sürüminin üstüne alınır."
         },
         "area": {
           "name": "Alanlar",
-          "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
+          "description": "Seçili oda göndericisi. Seçili deneHome AssistantÖnce bölgeler, sonra diğer meşgul bölgeler, sonra kapı kapıdan sıra bölge ve sonra Genel çıkışlar. Birleştirilmiş açık alıcılar özgürlü olarak gönderilir."
         },
         "integration": {
           "name": "Entegrasyonlar",
-          "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
+          "description": "Verilen ile yükseltme sahnelerine ait olan her yapılandırılmış fiziksel çıktı gönder. Bağlanmağan aygıtlara ya da integrasyonlara genişleme. Bölge ve tam aygıt/havaları ile birleştirebilir."
         },
         "device": {
           "name": "Cihazlar",
-          "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
+          "description": "Sadece bu tam olarak çıkışlara gönderHome Assistantaygıt kimliği. GizlemeSnapcastYa da diğer konuşucular."
         },
         "entity": {
           "name": "Varlıklar",
-          "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
+          "description": "Sadece bu doğru yapılandırılmış bildirimde gönderin ya damedia_playerkısmlar. Başka alıcılar eklenmiyor. Bölge ve tekrarlama ile birleştirebilir."
         },
         "ai_mode": {
           "name": "YZ metni",
-          "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
+          "description": "Yeniden yazma bitirmiş bir bilgi düzenle; Bilgi yazma iletişimlerinden bildirim oluştur. Original tanıtmalar AI yok olsa korulmuştur."
         }
       }
     },
     "clear_queue": {
       "name": "Duyuru kuyruğunu temizle",
-      "description": "Cancels all waiting jobs and can also stop the active announcement.",
+      "description": "Bütün bekleyen işleri geri döndür ve etkin bilgisini durdurabilir.",
       "fields": {
         "include_current": {
-          "name": "Include active announcement",
-          "description": "Also requests cancellation of the job currently running."
+          "name": "Etkin bilgisi dahil et",
+          "description": "Şimdi çalışan işin geri dönüştüğünü ayrıca isteyebilir."
         }
       }
     },
     "cancel": {
       "name": "İptal",
-      "description": "Cancels one waiting or active job by its ID.",
+      "description": "Kimlikleri tarafından bekleyen ya da etkin işi geri döndür.",
       "fields": {
         "job_id": {
-          "name": "Job ID",
-          "description": "The job ID returned by announcement_hub.send."
+          "name": "Görev Kimligi",
+          "description": "İş kimligi geri döndü.announcement_hub.send."
         }
       }
     }
