@@ -74,4 +74,4 @@ def test_general_direct_tts_players_bypass_room_filter() -> None:
 def test_no_startup_task_regression() -> None:
     manager = (C / "manager.py").read_text()
     assert "self.hass.async_create_task(" not in manager
-    assert manager.count("self.entry.async_create_background_task(") == 3
+    assert manager.count("self.entry.async_create_background_task(") == 4
