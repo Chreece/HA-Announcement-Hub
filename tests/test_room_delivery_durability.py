@@ -34,6 +34,9 @@ class Harness:
         job.status = "pending"
         self._queue.append(job)
 
+    def _room_lane_keys(self, job):
+        return {f"room:{job.job_id}"}
+
     def _delivery_lane_keys(self, job):
         return {f"room:{job.job_id}"}
 
