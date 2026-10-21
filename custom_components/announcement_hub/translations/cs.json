@@ -8,98 +8,98 @@
         "data": {
           "notify_outputs": "Zařízení oznámení",
           "notify_room_outputs": "Zařízení oznámení podle místnosti",
-          "notify_info_outputs": "Minimální informace / úspěch",
-          "notify_warning_outputs": "Minimální varování",
-          "notify_error_outputs": "Minimální chyba",
-          "notify_critical_outputs": "Kritický jen"
+          "notify_info_outputs": "Minimum Info / Success",
+          "notify_warning_outputs": "Minimum Warning",
+          "notify_error_outputs": "Minimum Error",
+          "notify_critical_outputs": "Critical only"
         },
         "data_description": {
-          "notify_outputs": "Uznámená oznámení jednotky, žeAnnouncement Hubmohou používat. Všechny podporovaných zařízení jsou automaticky vybrany; odstranit každou zařízení, který nikdy nechceteAnnouncement Huboznámení.",
-          "notify_room_outputs": "Vybrané oznámení zařízení, kteréHome AssistantOblast musí odpovídat na začetné/původní pokoje. Nechte si pomocí zařízení, jako telefony, hlediska a laptopy z této seznamu.",
-          "notify_info_outputs": "Zařízení v tomto seznamu obdrží informace a úspěšné oznámení a každé vyšší úroveň. Zařízení nepřijezdněné žádnému seznamu vyššího úroveň pomocí Debug a proto přijme každé úroveň.",
-          "notify_warning_outputs": "Zařízení v tomto seznamu obdrží varování, chyba a kritických oznámení, ale ne debug, Info nebo úspěch.",
-          "notify_error_outputs": "Zařízení v tomto seznamu obdržují pouze chyba a kritický oznámení.",
-          "notify_critical_outputs": "Zařízení v tomto seznamu obdrží pouze kritické oznámení."
+          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
+          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
+          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
+          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
+          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
         }
       },
       "tts": {
         "title": "Výstupy TTS",
         "description": "Vyberte TTS engine, hlas, přehrávače a klienty Snapcast.",
         "data": {
-          "tts_engines": "TTSmotor",
+          "tts_engines": "TTS engine",
           "tts_media_player": "Sdílený přehrávač pro Snapcast",
           "snapcast_outputs": "Klienti Snapcast podle místností",
-          "tts_min_level": "PoužitíTTSod úroveň",
-          "tts_cache": "Před-generovat a kache",
-          "tts_language": "TTSjazyka",
-          "tts_options": "TTSmožnosti motora",
-          "companion_tts_media_stream": "Companion Appzvukový stream",
-          "companion_tts_words_per_minute": "KomunikaceTTSpočet promluvy",
-          "tts_area_players": "PřímoTTShráčky za pokoj",
-          "companion_tts_outputs": "Companion App TTSzařízení",
-          "tts_voice": "TTShlas",
-          "direct_tts_announce": "Říz přímo oznámení (možná čím)"
+          "tts_min_level": "Use TTS from level",
+          "tts_cache": "Pre-generate and cache speech",
+          "tts_language": "TTS language",
+          "tts_options": "TTS engine options",
+          "companion_tts_media_stream": "Companion App audio stream",
+          "companion_tts_words_per_minute": "Companion TTS speech estimate",
+          "tts_area_players": "Direct TTS players per room",
+          "companion_tts_outputs": "Companion App TTS devices",
+          "tts_voice": "TTS voice",
+          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
         },
         "data_description": {
-          "tts_engines": "Jediný aktivní motor.Home AssistantnejménějšíTTSmotor je předvýbrána, když je k dispozici.",
-          "tts_media_player": "Obecný hráč médií, který vlastně hruje vytvořenouTTSdo společnéhoSnapserverstream, napříkladMPDJe to globalní infrastruktura a nikdy není filtrovaná pokojům.",
-          "tts_min_level": "Minimální úrovni oznámení, který je dovolena mluvit. Nižší úroveň zůstanou tichti; Kritické je vždycky slyšené.",
-          "tts_cache": "Generovací/případějícíTTSMedia před vyhráváním, když je možné. To sníže zpět vyhrávání zastartování a umožňuje být stejné vytvořené medie použití vybraným výstupem.",
-          "tts_language": "Jazyk předával do vybranéhoTTSMotor. Vybory přijdou přímo z reklamované jazyky.",
-          "tts_options": "Dodatečné motorových specifickýchTTSmožnosti. Jazyk a podporovaný hlas jsou nastaveny odděleno nad výše; použijte to pouze pro další možnosti poskytovatele.",
-          "companion_tts_media_stream": "Android audiotráv používané proCompanion App- Vytáhnout...TTS, ovládající, jak telefon ohraje objem/fokusu.",
-          "companion_tts_words_per_minute": "Používané pouze pro počet, jak dlouhoCompanion App- Vytáhnout...TTSmluví, protože aplikace nezprávěje dokončení vyhrávání. Vyčáda čeká, aby se tohoto počítalo zabránit překročování.",
-          "snapcast_outputs": "SnapcastHráčky klientních médií používající jako synchronizace fizických pokojevých výstupů.Announcement HubneposlalTTSpřímo jim; řídí jejich mutový/roučování, zatímco společný hráč hračkySnapserver..",
-          "companion_tts_outputs": "AndroidCompanion AppZařízení, které byly možné získat trych-TTSTohle je oddělená od normálního vizuálního telefonu.",
-          "tts_area_players": "Přímové mediální hráčky, které se vytvořiliTTSJenom když jimHome AssistantOblast se odpovídá začetné/pětné pokoje. Každý hráč tady vybraný je automaticky pokojskován.",
-          "tts_voice": "Glas nabídněný aktivnímTTSMotor pro vybrané jazyce. Lokální kompatibilní hlasy jsou zahrnuty (například el s el_ GR). Pokud poskytovatel podporuje hlas, ale nemohují zničit výběry, pola zůstane k dispozici pro ruční hlasový identifikač.",
-          "direct_tts_announce": "Zapomněte na použitíHome Assistantoznámení režim vyhrávání pro vybrané přímé mediální hráčky, které může hrát krátké zvláštník a ponovit médií při podporu. Zaběžte se, aby se uniknout poskytovatelských zvonek; příméTTSmůže přerušit jiné hračky. SdílenéSnapcastZdroj nikdy nevyužívají oznámení řadu."
+          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
+          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
+          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
+          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
+          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
+          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
+          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
+          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
+          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
+          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
+          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
         }
       },
       "notification_profile": {
         "title": "Možnosti integrace: {integration}",
         "description": "Nastavte chování oznámení a směrování.",
         "data": {
-          "max_length": "Maximální značky na část",
-          "reading_words_per_minute": "Čtení rychlost",
-          "minimum_display_seconds": "Minimální čas prohlížení",
-          "maximum_display_seconds": "Maximální čas prohlížení",
-          "display_buffer_seconds": "Buffer čtení čísla",
-          "part_gap_seconds": "Gap mezi částími",
-          "show_part_number": "Zobrazit číslo částek v názevku",
-          "integration_data": "Dodatečné údaje o integraci",
-          "replace_parts": "Nahrazit předchozíCompanion Appčást",
-          "position": "Pozice",
-          "fontsize": "Velikost písma",
-          "color": "Barva pozadí",
-          "transparency": "Transparentnost pozadí",
-          "interrupt": "Interaktivní oznámení",
-          "snapcast_source": "OznámeníSnapcastzdroj",
-          "snapcast_only_source": "Správnění pouze klienty už na zdroje oznámení",
-          "snapcast_settle_delay": "Snapcastozdálení způsobení",
-          "snapcast_verify_timeout": "Snapcastobdobí ověřování",
-          "snapcast_restore": "ZnovuSnapcaststáty"
+          "max_length": "Maximum characters per part",
+          "reading_words_per_minute": "Reading speed",
+          "minimum_display_seconds": "Minimum display time",
+          "maximum_display_seconds": "Maximum display time",
+          "display_buffer_seconds": "Reading-time buffer",
+          "part_gap_seconds": "Gap between parts",
+          "show_part_number": "Show part number in the title",
+          "integration_data": "Additional integration data",
+          "replace_parts": "Replace the previous Companion App part",
+          "position": "Position",
+          "fontsize": "Font size",
+          "color": "Background color",
+          "transparency": "Background transparency",
+          "interrupt": "Interactive notification",
+          "snapcast_source": "Announcement Snapcast source",
+          "snapcast_only_source": "Manage only clients already on announcement source",
+          "snapcast_settle_delay": "Snapcast routing settle delay",
+          "snapcast_verify_timeout": "Snapcast routing verification timeout",
+          "snapcast_restore": "Restore Snapcast mute states"
         },
         "data_description": {
-          "max_length": "Maximální počet značků poslané v jednom vizuálním části oznámení. Tekst dlouho než to je rozdělený na přírodních hranicích;0nezvyšuje rozdělení.",
-          "reading_words_per_minute": "Čísla rychlost používaný k počet, jak dlouho je třeba každé vizuální oznámení zůstat vidětné předtím, než je další část poslano.",
-          "minimum_display_seconds": "Nižší limity pro výpočtu období každého vizuálního oznámení, i když je text velmi krátké.",
-          "maximum_display_seconds": "Výhrovní limit pro výpočtu obdobě každého vizuálního oznámení, zabránující dlouhou zprávy blokující řadu nebezpečné.",
-          "display_buffer_seconds": "Dodatečné sekundy přidané k počet čísla čísla pro každé vizuální oznámení část.",
-          "part_gap_seconds": "Pause vloženo mezi rozdělenými vizuálními části, aby předcházející část může čistět předtím, než se dodá příští.",
-          "show_part_number": "Pokud je založeno, rozdělený zprávy přidají čísla, jako jsou1/3a2/3na název oznámení.",
-          "integration_data": "Opcionální poskytovatele-specifikované platby spojené do každého vizuálního oznámení, které vyslane prostřednictvím tuto integraci.notify_datapřekročí vhodné klíče.",
-          "replace_parts": "ProCompanion Approzdělený zprávy, použijte jedno oznámení, takže každý nový část nahrazuje předchozí část místo vytvoření stack.",
-          "position": "Pozice obrazování, kde zprávyAndroid TV/Fire TVpokazuje oznámení překládka.",
-          "fontsize": "Velikost textu používané zprávy proAndroid TV/Fire TVpři předložení oznámení napravy.",
-          "color": "Barva pozadí používající oznámení proAndroid TV/Fire TVpro oznámení opravy.",
-          "transparency": "Transparenci pozadí používající zprávy proAndroid TV/Fire TVpro oznámení opravy.",
-          "interrupt": "Pokud je založeno, jeAndroid TVoznámení je interaktivní a může přerušit nebo zaměřet soustřední z současného vykonávajícího TV aplikace.",
-          "snapcast_source": "JménoSnapcastZdroj/stream, který nosí zvuk oznámení. Vybrané klienty jsou před tímto zdroje před řečím.",
-          "snapcast_only_source": "Pokud se vytvořil,Announcement Hubzmění nepředstavu pouze pro klienty, které jsou již na konfigurovaném zdroju oznámení; jinéSnapcastskupiny/zdroje nejsou nepotřebovány.",
-          "snapcast_settle_delay": "Po změně krátké zásadySnapcastrouting/moute stát předtímTTSzačíná, umožňuje klientů používat změnu routing.",
-          "snapcast_verify_timeout": "Maximální čas na čekatSnapcastklienty, abych zprávěl požadovaný státu pokládalo/mutu, předtím, nebo pokračovat cestu jako nedostupné.",
-          "snapcast_restore": "Po oznámení znovu každý řízeníSnapcastKlientův předcházející mutový stát tak normální poslouchající se přesně jako předtím."
+          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
+          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
+          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
+          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
+          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
+          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
+          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
+          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
+          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
+          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
+          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
+          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
+          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
+          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
+          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "snapcast_only_source": "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
+          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
+          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
+          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
         }
       },
       "queue": {
@@ -107,75 +107,75 @@
         "description": "Nastavte přítomnost, záložní trasu, dveře, frontu a časové limity.",
         "data": {
           "queue_max": "Maximální počet oznámení ve frontě",
-          "output_availability_timeout": "Počkat nedostupného výstupu",
-          "idle_timeout": "Audiotní počkat neaktivní",
-          "start_timeout": "Čas zahájení odhrátky",
-          "playback_timeout": "MaximálníTTSčas odprávy",
-          "post_play_delay": "Pohrávání způsobů",
-          "default_title": "Nazev oznámení stanoveného",
-          "critical_notify_data": "Kritických údaje oznámení",
+          "output_availability_timeout": "Unavailable-output wait",
+          "idle_timeout": "Audio idle wait",
+          "start_timeout": "Playback start timeout",
+          "playback_timeout": "Maximum TTS playback time",
+          "post_play_delay": "Post-playback gap",
+          "default_title": "Default notification title",
+          "critical_notify_data": "Critical notification data",
           "occupancy_sensor": "Entita přítomnosti v místnosti",
-          "occupancy_attribute": "Hodnota obyvaného pokojů",
+          "occupancy_attribute": "Occupied rooms value",
           "fallback_room": "Záložní místnost",
-          "fallback_check_door": "Požaduje otevřené dveře pro závodní pokoje",
-          "fallback_door_label": "Filter označení dveře",
+          "fallback_check_door": "Require an open occupied-room door for fallback",
+          "fallback_door_label": "Door sensor label filter",
           "default_use_ai": "Přeformulovat oznámení pomocí AI",
           "default_ai_agent": "Výchozí poskytovatel AI (konverzace nebo úloha)",
           "fallback_ai_agent": "Záložní poskytovatel AI (konverzace nebo úloha)",
-          "channel_fallback_mode": "Oznámení kanál způsob"
+          "channel_fallback_mode": "Notification channel fallback"
         },
         "data_description": {
-          "queue_max": "Maximální počet příjemných/aktivních oznámeních zaměstnaných práv. Nové poslatky jsou odmítněny, když je dosáhnout tento limit.",
-          "output_availability_timeout": "Jak dlouho může zůstat nedostupné výstupy. Ostatní záznamy mohou ho předát; po tomto časování se nedostupné výstupy tichotně přeskočit.",
-          "idle_timeout": "Maximální čas čekat na vybraný zvuk, aby se stalo neaktivní před začátkemTTS, zabránit stávající hráva přerušení.",
-          "start_timeout": "Maximální čas umožňující, aby medijní hráč začalTTSvyhrajení po poslaní žádosti hra.",
-          "playback_timeout": "Bezpečnostní množství pro kolik dlouhoAnnouncement HubČekáte, aby se jedna promluvná hráčka dokončila před vypuštěním řadu.",
-          "post_play_delay": "Malý tichový rozdíl po zvláštním zprávě, předtím, než začne další zvláštní výstup/pracovník, zabránit zpět na záchod.",
-          "default_title": "Nazev používaný pro vizuální oznámení, pokud pošlení akce neposkytuje své vlastní název.",
-          "critical_notify_data": "Poskytovatelské údaje připojené pouze do Kritických vizuálních oznámeních, například možnosti, které podporuje integrace oznámení.",
-          "occupancy_sensor": "Subjekt, kterého stát nebo vybraný atribut obsahuje obecnýHome Assistantjména/ID oblasti. Použije se pouze, když je pouze začítáno pouze rutingu je zavolena pro pošlení akce.",
-          "occupancy_attribute": "Vyberte, zda jsou oceněné pokoje čteny z stát subjektu nebo z jednoho z jeho současného atributu.",
-          "fallback_room": "PřílohaTTSOblast používaný pouze, když současné cílové pokoje obsahuje nul fixální kandidaty. Stávající fixální kandidaty, včetně nedostupné/neznámeny, blok revolve a zůstaň podmínky normálního dostupnosti.",
-          "fallback_check_door": "Pokud je zacházené, je povoleno povoleno pouze, pokud v jednom z současných cílních pokojů zprávají otevřený senzor dveře.",
-          "fallback_door_label": "OpcionálníHome Assistantetikety. Po vybraném, mohou pouze dveře binarní senzory, které nosí tuto etiketu povolení, nechte se prázdně, aby se všechny dveře sensoři v současném cílení.",
-          "default_use_ai": "Zvláštní znamená každý zprávy zprávy AI znovu zprávu, pokud jeho poslační akce neposkytuje výrazněuse_ai: falské. Omitovanéuse_aistále tuto integrační nastavení. Když AI neuspívá, je původní zpráva předložena. Zkontrolujte status poslatní akceresponse_variable..",
-          "default_ai_agent": "Home Assistantstanovisko sleduje konverzační agent vašeho preferovaného asistního přípravku, místo vzbuzovanéhoconversation.processVybraný agent je rozhodnut při poslatní čas a ukázat v váš preferenčním lipce. Pokud využíváte vzbuzovaný agent, vyberte vyřezně nebo konfigurujte způsob.",
-          "fallback_ai_agent": "Neopcionální zásobní agenta AI, když průběh nechybí.Home Assistantstanovisko sleduje také preferované asistní přípravku; První oznámení přeskočí druhého snaží AI. Pokud ani AI nefunguje, je originalní text vždy dodávaný.",
-          "channel_fallback_mode": "Jen když BOTH mluvítext_ttsa napišentext_notifyA STÁVNÍTTSa vizuální zařízení jsou přítomné: Vizuální →TTSnejprvé označuje, pak mluví, pokud dodávka nedokáže;TTS→ Visual mluví nejprvé, pak uvede, pokud nechává řeč; Obě snaží obě kanálů. Jediný dostupný kanál funguje normalně. Nevytvoří zbývající tekst nebo rozšíření příjemci; stále se použije stále stále stále."
+          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
+          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
+          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
+          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
+          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
+          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
+          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
+          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
+          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
+          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
+          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
+          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
+          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
         }
       },
       "reconfigure": {
         "title": "Přenastavit Announcement Hub",
         "description": "Vyberte sekci, uložte a vraťte se do integrace.",
         "menu_options": {
-          "edit_outputs": "1. Oznámení výstupy a pokoje",
-          "edit_tts": "2..TTSmotory a zařízení",
-          "edit_profiles": "3. Profile vydávky z specifických poskytovatelů",
-          "edit_general": "4. Obecné nastavení, přítomnost a AI",
-          "edit_all": "Editovat všechny nastavení (plný čísla)"
+          "edit_outputs": "1. Notification outputs & rooms",
+          "edit_tts": "2. TTS engines & devices",
+          "edit_profiles": "3. Provider-specific output profiles",
+          "edit_general": "4. General settings, presence & AI",
+          "edit_all": "Edit all settings (full wizard)"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Vyberte oznámení zařízení, oblast pokoje a minimální úrovnky oznámení bez změnyTTSnebo nastavení AI.",
-          "edit_tts": "Změní aktivní motor proslov, hlas, hráčky pokoje,Snapcastklienty aCompanion Appzařízení promluvy.",
-          "edit_profiles": "Nastavení časování oznámení, style prokazu aSnapcastnastavení vyhrajení pro vybrané poskytovatele.",
-          "edit_general": "Skočte přímo k AI a zásobních agencí, obchod, pokoje revolve, řadu a nastavení časových nastavení.",
-          "edit_all": "Navštěvte všechny nastavení stránky v řádku, jako v původním konfiguračce."
+          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
+          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
+          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
+          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
         }
       }
     },
     "error": {
-      "tts_player_required": "Vyberte aTTShráč médií, kdyTTSmotory jsou vybrany.",
-      "tts_engine_required": "Vyberte aTTSmotor, když aTTSHráč je vybraný.",
-      "snapcast_tts_path_required": "Snapcastvýstupy potřebují alespoň jednoTTSmotor a aTTSHráč médií.",
-      "output_required": "Vyberte alespoň jedno vizuální, server-TTS, neboCompanion App TTSvýstup.",
-      "display_time_order": "Maximální čas prohlášení musí být větší než nebo rovněž minimálním časům prohlášení.",
-      "room_notify_area_required": "Zařízení oznámení na pokoji musí mít aHome AssistantOblast.",
-      "notify_level_overlap": "Oznámení zařízení může mít pouze jeden minimální úrovni.",
-      "room_tts_area_required": "Pokojů založený příméTTSmediální hráč musí mít aHome AssistantOblast.",
-      "tts_player_role_overlap": "Stejné mediální hráč nemohou být obou direktníTTShráč a sdílenéSnapcastHráč zdroje."
+      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
+      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
+      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
+      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
+      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
+      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
+      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
+      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
+      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player."
     },
     "abort": {
-      "single_instance_allowed": "Announcement Hubuž je konfigurované."
+      "single_instance_allowed": "Announcement Hub is already configured."
     }
   },
   "options": {
@@ -186,98 +186,98 @@
         "data": {
           "notify_outputs": "Zařízení oznámení",
           "notify_room_outputs": "Zařízení oznámení podle místnosti",
-          "notify_info_outputs": "Minimální informace / úspěch",
-          "notify_warning_outputs": "Minimální varování",
-          "notify_error_outputs": "Minimální chyba",
-          "notify_critical_outputs": "Kritický jen"
+          "notify_info_outputs": "Minimum Info / Success",
+          "notify_warning_outputs": "Minimum Warning",
+          "notify_error_outputs": "Minimum Error",
+          "notify_critical_outputs": "Critical only"
         },
         "data_description": {
-          "notify_outputs": "Uznámená oznámení jednotky, žeAnnouncement Hubmohou používat. Všechny podporovaných zařízení jsou automaticky vybrany; odstranit každou zařízení, který nikdy nechceteAnnouncement Huboznámení.",
-          "notify_room_outputs": "Vybrané oznámení zařízení, kteréHome AssistantOblast musí odpovídat na začetné/původní pokoje. Nechte si pomocí zařízení, jako telefony, hlediska a laptopy z této seznamu.",
-          "notify_info_outputs": "Zařízení v tomto seznamu obdrží informace a úspěšné oznámení a každé vyšší úroveň. Zařízení nepřijezdněné žádnému seznamu vyššího úroveň pomocí Debug a proto přijme každé úroveň.",
-          "notify_warning_outputs": "Zařízení v tomto seznamu obdrží varování, chyba a kritických oznámení, ale ne debug, Info nebo úspěch.",
-          "notify_error_outputs": "Zařízení v tomto seznamu obdržují pouze chyba a kritický oznámení.",
-          "notify_critical_outputs": "Zařízení v tomto seznamu obdrží pouze kritické oznámení."
+          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
+          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
+          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
+          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
+          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
         }
       },
       "tts": {
         "title": "Výstupy TTS",
         "description": "Vyberte TTS engine, hlas, přehrávače a klienty Snapcast.",
         "data": {
-          "tts_engines": "TTSmotor",
+          "tts_engines": "TTS engine",
           "tts_media_player": "Sdílený přehrávač pro Snapcast",
           "snapcast_outputs": "Klienti Snapcast podle místností",
-          "tts_min_level": "PoužitíTTSod úroveň",
-          "tts_cache": "Před-generovat a kache",
-          "tts_language": "TTSjazyka",
-          "tts_options": "TTSmožnosti motora",
-          "companion_tts_media_stream": "Companion Appzvukový stream",
-          "companion_tts_words_per_minute": "KomunikaceTTSpočet promluvy",
-          "tts_area_players": "PřímoTTShráčky za pokoj",
-          "companion_tts_outputs": "Companion App TTSzařízení",
-          "tts_voice": "TTShlas",
-          "direct_tts_announce": "Říz přímo oznámení (možná čím)"
+          "tts_min_level": "Use TTS from level",
+          "tts_cache": "Pre-generate and cache speech",
+          "tts_language": "TTS language",
+          "tts_options": "TTS engine options",
+          "companion_tts_media_stream": "Companion App audio stream",
+          "companion_tts_words_per_minute": "Companion TTS speech estimate",
+          "tts_area_players": "Direct TTS players per room",
+          "companion_tts_outputs": "Companion App TTS devices",
+          "tts_voice": "TTS voice",
+          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
         },
         "data_description": {
-          "tts_engines": "Jediný aktivní motor.Home AssistantnejménějšíTTSmotor je předvýbrána, když je k dispozici.",
-          "tts_media_player": "Obecný hráč médií, který vlastně hruje vytvořenouTTSdo společnéhoSnapserverstream, napříkladMPDJe to globalní infrastruktura a nikdy není filtrovaná pokojům.",
-          "tts_min_level": "Minimální úrovni oznámení, který je dovolena mluvit. Nižší úroveň zůstanou tichti; Kritické je vždycky slyšené.",
-          "tts_cache": "Generovací/případějícíTTSMedia před vyhráváním, když je možné. To sníže zpět vyhrávání zastartování a umožňuje být stejné vytvořené medie použití vybraným výstupem.",
-          "tts_language": "Jazyk předával do vybranéhoTTSMotor. Vybory přijdou přímo z reklamované jazyky.",
-          "tts_options": "Dodatečné motorových specifickýchTTSmožnosti. Jazyk a podporovaný hlas jsou nastaveny odděleno nad výše; použijte to pouze pro další možnosti poskytovatele.",
-          "companion_tts_media_stream": "Android audiotráv používané proCompanion App- Vytáhnout...TTS, ovládající, jak telefon ohraje objem/fokusu.",
-          "companion_tts_words_per_minute": "Používané pouze pro počet, jak dlouhoCompanion App- Vytáhnout...TTSmluví, protože aplikace nezprávěje dokončení vyhrávání. Vyčáda čeká, aby se tohoto počítalo zabránit překročování.",
-          "snapcast_outputs": "SnapcastHráčky klientních médií používající jako synchronizace fizických pokojevých výstupů.Announcement HubneposlalTTSpřímo jim; řídí jejich mutový/roučování, zatímco společný hráč hračkySnapserver..",
-          "companion_tts_outputs": "AndroidCompanion AppZařízení, které byly možné získat trych-TTSTohle je oddělená od normálního vizuálního telefonu.",
-          "tts_area_players": "Přímové mediální hráčky, které se vytvořiliTTSJenom když jimHome AssistantOblast se odpovídá začetné/pětné pokoje. Každý hráč tady vybraný je automaticky pokojskován.",
-          "tts_voice": "Glas nabídněný aktivnímTTSMotor pro vybrané jazyce. Lokální kompatibilní hlasy jsou zahrnuty (například el s el_ GR). Pokud poskytovatel podporuje hlas, ale nemohují zničit výběry, pola zůstane k dispozici pro ruční hlasový identifikač.",
-          "direct_tts_announce": "Zapomněte na použitíHome Assistantoznámení režim vyhrávání pro vybrané přímé mediální hráčky, které může hrát krátké zvláštník a ponovit médií při podporu. Zaběžte se, aby se uniknout poskytovatelských zvonek; příméTTSmůže přerušit jiné hračky. SdílenéSnapcastZdroj nikdy nevyužívají oznámení řadu."
+          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
+          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
+          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
+          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
+          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
+          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
+          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
+          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
+          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
+          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
+          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
         }
       },
       "notification_profile": {
         "title": "Možnosti integrace: {integration}",
         "description": "Nastavte chování oznámení a směrování.",
         "data": {
-          "max_length": "Maximální značky na část",
-          "reading_words_per_minute": "Čtení rychlost",
-          "minimum_display_seconds": "Minimální čas prohlížení",
-          "maximum_display_seconds": "Maximální čas prohlížení",
-          "display_buffer_seconds": "Buffer čtení čísla",
-          "part_gap_seconds": "Gap mezi částími",
-          "show_part_number": "Zobrazit číslo částek v názevku",
-          "integration_data": "Dodatečné údaje o integraci",
-          "replace_parts": "Nahrazit předchozíCompanion Appčást",
-          "position": "Pozice",
-          "fontsize": "Velikost písma",
-          "color": "Barva pozadí",
-          "transparency": "Transparentnost pozadí",
-          "interrupt": "Interaktivní oznámení",
-          "snapcast_source": "OznámeníSnapcastzdroj",
-          "snapcast_only_source": "Správnění pouze klienty už na zdroje oznámení",
-          "snapcast_settle_delay": "Snapcastozdálení způsobení",
-          "snapcast_verify_timeout": "Snapcastobdobí ověřování",
-          "snapcast_restore": "ZnovuSnapcaststáty"
+          "max_length": "Maximum characters per part",
+          "reading_words_per_minute": "Reading speed",
+          "minimum_display_seconds": "Minimum display time",
+          "maximum_display_seconds": "Maximum display time",
+          "display_buffer_seconds": "Reading-time buffer",
+          "part_gap_seconds": "Gap between parts",
+          "show_part_number": "Show part number in the title",
+          "integration_data": "Additional integration data",
+          "replace_parts": "Replace the previous Companion App part",
+          "position": "Position",
+          "fontsize": "Font size",
+          "color": "Background color",
+          "transparency": "Background transparency",
+          "interrupt": "Interactive notification",
+          "snapcast_source": "Announcement Snapcast source",
+          "snapcast_only_source": "Manage only clients already on announcement source",
+          "snapcast_settle_delay": "Snapcast routing settle delay",
+          "snapcast_verify_timeout": "Snapcast routing verification timeout",
+          "snapcast_restore": "Restore Snapcast mute states"
         },
         "data_description": {
-          "max_length": "Maximální počet značků poslané v jednom vizuálním části oznámení. Tekst dlouho než to je rozdělený na přírodních hranicích;0nezvyšuje rozdělení.",
-          "reading_words_per_minute": "Čísla rychlost používaný k počet, jak dlouho je třeba každé vizuální oznámení zůstat vidětné předtím, než je další část poslano.",
-          "minimum_display_seconds": "Nižší limity pro výpočtu období každého vizuálního oznámení, i když je text velmi krátké.",
-          "maximum_display_seconds": "Výhrovní limit pro výpočtu obdobě každého vizuálního oznámení, zabránující dlouhou zprávy blokující řadu nebezpečné.",
-          "display_buffer_seconds": "Dodatečné sekundy přidané k počet čísla čísla pro každé vizuální oznámení část.",
-          "part_gap_seconds": "Pause vloženo mezi rozdělenými vizuálními části, aby předcházející část může čistět předtím, než se dodá příští.",
-          "show_part_number": "Pokud je založeno, rozdělený zprávy přidají čísla, jako jsou1/3a2/3na název oznámení.",
-          "integration_data": "Opcionální poskytovatele-specifikované platby spojené do každého vizuálního oznámení, které vyslane prostřednictvím tuto integraci.notify_datapřekročí vhodné klíče.",
-          "replace_parts": "ProCompanion Approzdělený zprávy, použijte jedno oznámení, takže každý nový část nahrazuje předchozí část místo vytvoření stack.",
-          "position": "Pozice obrazování, kde zprávyAndroid TV/Fire TVpokazuje oznámení překládka.",
-          "fontsize": "Velikost textu používané zprávy proAndroid TV/Fire TVpři předložení oznámení napravy.",
-          "color": "Barva pozadí používající oznámení proAndroid TV/Fire TVpro oznámení opravy.",
-          "transparency": "Transparenci pozadí používající zprávy proAndroid TV/Fire TVpro oznámení opravy.",
-          "interrupt": "Pokud je založeno, jeAndroid TVoznámení je interaktivní a může přerušit nebo zaměřet soustřední z současného vykonávajícího TV aplikace.",
-          "snapcast_source": "JménoSnapcastZdroj/stream, který nosí zvuk oznámení. Vybrané klienty jsou před tímto zdroje před řečím.",
-          "snapcast_only_source": "Pokud se vytvořil,Announcement Hubzmění nepředstavu pouze pro klienty, které jsou již na konfigurovaném zdroju oznámení; jinéSnapcastskupiny/zdroje nejsou nepotřebovány.",
-          "snapcast_settle_delay": "Po změně krátké zásadySnapcastrouting/moute stát předtímTTSzačíná, umožňuje klientů používat změnu routing.",
-          "snapcast_verify_timeout": "Maximální čas na čekatSnapcastklienty, abych zprávěl požadovaný státu pokládalo/mutu, předtím, nebo pokračovat cestu jako nedostupné.",
-          "snapcast_restore": "Po oznámení znovu každý řízeníSnapcastKlientův předcházející mutový stát tak normální poslouchající se přesně jako předtím."
+          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
+          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
+          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
+          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
+          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
+          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
+          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
+          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
+          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
+          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
+          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
+          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
+          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
+          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
+          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "snapcast_only_source": "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
+          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
+          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
+          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
         }
       },
       "queue": {
@@ -285,79 +285,79 @@
         "description": "Nastavte přítomnost, záložní trasu, dveře, frontu a časové limity.",
         "data": {
           "queue_max": "Maximální počet oznámení ve frontě",
-          "output_availability_timeout": "Počkat nedostupného výstupu",
-          "idle_timeout": "Audiotní počkat neaktivní",
-          "start_timeout": "Čas zahájení odhrátky",
-          "playback_timeout": "MaximálníTTSčas odprávy",
-          "post_play_delay": "Pohrávání způsobů",
-          "default_title": "Nazev oznámení stanoveného",
-          "critical_notify_data": "Kritických údaje oznámení",
+          "output_availability_timeout": "Unavailable-output wait",
+          "idle_timeout": "Audio idle wait",
+          "start_timeout": "Playback start timeout",
+          "playback_timeout": "Maximum TTS playback time",
+          "post_play_delay": "Post-playback gap",
+          "default_title": "Default notification title",
+          "critical_notify_data": "Critical notification data",
           "occupancy_sensor": "Entita přítomnosti v místnosti",
-          "occupancy_attribute": "Hodnota obyvaného pokojů",
+          "occupancy_attribute": "Occupied rooms value",
           "fallback_room": "Záložní místnost",
-          "fallback_check_door": "Požaduje otevřené dveře pro závodní pokoje",
-          "fallback_door_label": "Filter označení dveře",
+          "fallback_check_door": "Require an open occupied-room door for fallback",
+          "fallback_door_label": "Door sensor label filter",
           "default_use_ai": "Přeformulovat oznámení pomocí AI",
           "default_ai_agent": "Výchozí poskytovatel AI (konverzace nebo úloha)",
           "fallback_ai_agent": "Záložní poskytovatel AI (konverzace nebo úloha)",
-          "channel_fallback_mode": "Oznámení kanál způsob"
+          "channel_fallback_mode": "Notification channel fallback"
         },
         "data_description": {
-          "queue_max": "Maximální počet příjemných/aktivních oznámeních zaměstnaných práv. Nové poslatky jsou odmítněny, když je dosáhnout tento limit.",
-          "output_availability_timeout": "Jak dlouho může zůstat nedostupné výstupy. Ostatní záznamy mohou ho předát; po tomto časování se nedostupné výstupy tichotně přeskočit.",
-          "idle_timeout": "Maximální čas čekat na vybraný zvuk, aby se stalo neaktivní před začátkemTTS, zabránit stávající hráva přerušení.",
-          "start_timeout": "Maximální čas umožňující, aby medijní hráč začalTTSvyhrajení po poslaní žádosti hra.",
-          "playback_timeout": "Bezpečnostní množství pro kolik dlouhoAnnouncement HubČekáte, aby se jedna promluvná hráčka dokončila před vypuštěním řadu.",
-          "post_play_delay": "Malý tichový rozdíl po zvláštním zprávě, předtím, než začne další zvláštní výstup/pracovník, zabránit zpět na záchod.",
-          "default_title": "Nazev používaný pro vizuální oznámení, pokud pošlení akce neposkytuje své vlastní název.",
-          "critical_notify_data": "Poskytovatelské údaje připojené pouze do Kritických vizuálních oznámeních, například možnosti, které podporuje integrace oznámení.",
-          "occupancy_sensor": "Subjekt, kterého stát nebo vybraný atribut obsahuje obecnýHome Assistantjména/ID oblasti. Použije se pouze, když je pouze začítáno pouze rutingu je zavolena pro pošlení akce.",
-          "occupancy_attribute": "Vyberte, zda jsou oceněné pokoje čteny z stát subjektu nebo z jednoho z jeho současného atributu.",
-          "fallback_room": "PřílohaTTSOblast používaný pouze, když současné cílové pokoje obsahuje nul fixální kandidaty. Stávající fixální kandidaty, včetně nedostupné/neznámeny, blok revolve a zůstaň podmínky normálního dostupnosti.",
-          "fallback_check_door": "Pokud je zacházené, je povoleno povoleno pouze, pokud v jednom z současných cílních pokojů zprávají otevřený senzor dveře.",
-          "fallback_door_label": "OpcionálníHome Assistantetikety. Po vybraném, mohou pouze dveře binarní senzory, které nosí tuto etiketu povolení, nechte se prázdně, aby se všechny dveře sensoři v současném cílení.",
-          "default_use_ai": "Zvláštní znamená každý zprávy zprávy AI znovu zprávu, pokud jeho poslační akce neposkytuje výrazněuse_ai: falské. Omitovanéuse_aistále tuto integrační nastavení. Když AI neuspívá, je původní zpráva předložena. Zkontrolujte status poslatní akceresponse_variable..",
-          "default_ai_agent": "Home Assistantstanovisko sleduje konverzační agent vašeho preferovaného asistního přípravku, místo vzbuzovanéhoconversation.processVybraný agent je rozhodnut při poslatní čas a ukázat v váš preferenčním lipce. Pokud využíváte vzbuzovaný agent, vyberte vyřezně nebo konfigurujte způsob.",
-          "fallback_ai_agent": "Neopcionální zásobní agenta AI, když průběh nechybí.Home Assistantstanovisko sleduje také preferované asistní přípravku; První oznámení přeskočí druhého snaží AI. Pokud ani AI nefunguje, je originalní text vždy dodávaný.",
-          "channel_fallback_mode": "Jen když BOTH mluvítext_ttsa napišentext_notifyA STÁVNÍTTSa vizuální zařízení jsou přítomné: Vizuální →TTSnejprvé označuje, pak mluví, pokud dodávka nedokáže;TTS→ Visual mluví nejprvé, pak uvede, pokud nechává řeč; Obě snaží obě kanálů. Jediný dostupný kanál funguje normalně. Nevytvoří zbývající tekst nebo rozšíření příjemci; stále se použije stále stále stále."
+          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
+          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
+          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
+          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
+          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
+          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
+          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
+          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
+          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
+          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
+          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
+          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
+          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
         }
       },
       "init": {
-        "title": "NastavitAnnouncement Hub",
+        "title": "Configure Announcement Hub",
         "description": "Vyberte sekci, uložte a vraťte se do integrace.",
         "menu_options": {
-          "edit_outputs": "1. Oznámení výstupy a pokoje",
-          "edit_tts": "2..TTSmotory a zařízení",
-          "edit_profiles": "3. Profile vydávky z specifických poskytovatelů",
-          "edit_general": "4. Obecné nastavení, přítomnost a AI",
-          "edit_all": "Editovat všechny nastavení (plný čísla)"
+          "edit_outputs": "1. Notification outputs & rooms",
+          "edit_tts": "2. TTS engines & devices",
+          "edit_profiles": "3. Provider-specific output profiles",
+          "edit_general": "4. General settings, presence & AI",
+          "edit_all": "Edit all settings (full wizard)"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Vyberte oznámení zařízení, oblast pokoje a minimální úrovnky oznámení bez změnyTTSnebo nastavení AI.",
-          "edit_tts": "Změní aktivní motor proslov, hlas, hráčky pokoje,Snapcastklienty aCompanion Appzařízení promluvy.",
-          "edit_profiles": "Nastavení časování oznámení, style prokazu aSnapcastnastavení vyhrajení pro vybrané poskytovatele.",
-          "edit_general": "Skočte přímo k AI a zásobních agencí, obchod, pokoje revolve, řadu a nastavení časových nastavení.",
-          "edit_all": "Navštěvte všechny nastavení stránky v řádku, jako v původním konfiguračce."
+          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
+          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
+          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
+          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
         }
       }
     },
     "error": {
-      "tts_player_required": "Vyberte aTTShráč médií, kdyTTSmotory jsou vybrany.",
-      "tts_engine_required": "Vyberte aTTSmotor, když aTTSHráč je vybraný.",
-      "snapcast_tts_path_required": "Snapcastvýstupy potřebují alespoň jednoTTSmotor a aTTSHráč médií.",
-      "output_required": "Vyberte alespoň jedno vizuální, server-TTS, neboCompanion App TTSvýstup.",
-      "display_time_order": "Maximální čas prohlášení musí být větší než nebo rovněž minimálním časům prohlášení.",
-      "room_notify_area_required": "Zařízení oznámení na pokoji musí mít aHome AssistantOblast.",
-      "notify_level_overlap": "Oznámení zařízení může mít pouze jeden minimální úrovni.",
-      "room_tts_area_required": "Pokojů založený příméTTSmediální hráč musí mít aHome AssistantOblast.",
-      "tts_player_role_overlap": "Stejné mediální hráč nemohou být obou direktníTTShráč a sdílenéSnapcastHráč zdroje."
+      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
+      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
+      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
+      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
+      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
+      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
+      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
+      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
+      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player."
     }
   },
   "selector": {
     "dispatch_order": {
       "options": {
-        "notify_then_tts": "Vizuální oznámení nejprve, pak proslov",
-        "tts_then_notify": "Nejdřív, poté vizuální oznámení"
+        "notify_then_tts": "Visual notifications first, then speech",
+        "tts_then_notify": "Speech first, then visual notifications"
       }
     },
     "tts_min_level": {
@@ -368,15 +368,15 @@
         "info": "Informace",
         "success": "Úspěch",
         "debug": "Ladění",
-        "never": "Nikdy"
+        "never": "Never"
       }
     },
     "companion_tts_media_stream": {
       "options": {
-        "default": "Určité aplikace",
-        "music_stream": "Hlubní stream",
-        "alarm_stream": "Alarmní stream",
-        "alarm_stream_max": "Alarm stream maximálního hmotnostu"
+        "default": "App default",
+        "music_stream": "Music stream",
+        "alarm_stream": "Alarm stream",
+        "alarm_stream_max": "Alarm stream at maximum volume"
       }
     },
     "level": {
@@ -391,32 +391,32 @@
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Dolnou pravou",
-        "bottom-left": "Dolnou levou",
-        "top-right": "Nahoře napravo",
-        "top-left": "Nahoře levou",
+        "bottom-right": "Bottom right",
+        "bottom-left": "Bottom left",
+        "top-right": "Top right",
+        "top-left": "Top left",
         "center": "Center"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Malé",
-        "medium": "Srední",
-        "large": "Velký",
-        "max": "Maximální"
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large",
+        "max": "Maximum"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Srvé",
-        "black": "Černou",
+        "grey": "Grey",
+        "black": "Black",
         "indigo": "Indigo",
-        "green": "Zelenino",
-        "red": "Červené",
+        "green": "Green",
+        "red": "Red",
         "cyan": "Cyan",
-        "teal": "Třeba",
+        "teal": "Teal",
         "amber": "Amber",
-        "pink": "Prýčka"
+        "pink": "Pink"
       }
     },
     "nfandroidtv_transparency": {
@@ -430,13 +430,13 @@
     },
     "occupancy_source": {
       "options": {
-        "state": "Stát"
+        "state": "State"
       }
     },
     "notify_scope": {
       "options": {
-        "room": "Pokoje založené",
-        "general": "Generál / pohybný"
+        "room": "Room-based",
+        "general": "General / movable"
       }
     },
     "notify_level": {
@@ -450,23 +450,23 @@
     },
     "channel_fallback_mode": {
       "options": {
-        "visual_then_tts": "Vizuální první →TTSpokud neuspůsobné",
-        "tts_then_visual": "TTSprvní → Vizuální, pokud neuspěšný",
-        "both": "Oba k dispozici k dispozici"
+        "visual_then_tts": "Visual first → TTS if unsuccessful",
+        "tts_then_visual": "TTS first → Visual if unsuccessful",
+        "both": "Both eligible channels"
       }
     }
   },
   "entity": {
     "sensor": {
       "queue": {
-        "name": "Vrážka"
+        "name": "Queue"
       }
     }
   },
   "services": {
     "send": {
       "name": "Odeslat oznámení",
-      "description": "Kompatibilní předpis zpět pronotify.announcement_hub.Nové automatie by měly použítnotify.announcement_hub.",
+      "description": "Backward-compatible alias for notify.announcement_hub. New automations should use notify.announcement_hub.",
       "sections": {
         "content": {
           "name": "Zpráva"
@@ -484,99 +484,99 @@
       "fields": {
         "text_tts": {
           "name": "Mluvený text (TTS)",
-          "description": "Jenom zpráva. Nikdy nepřišla jako písmý tekst oznámení. Předpokládám vyprávnutá verze tekstu, pokud je poskytovaný tekst."
+          "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
         },
         "text_notify": {
           "name": "Textové oznámení",
-          "description": "Obsah oznámení pouze vizuálního. Nikdy nepřišla jako slovenýTTS. Předpokládá verzi oznámení tekstu, pokud je poskytovaný tekst."
+          "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
         },
         "title": {
           "name": "Název",
-          "description": "Opcionální název pro vizuální oznámení."
+          "description": "Optional title for visual notifications."
         },
         "level": {
           "name": "Důležitost",
-          "description": "Kritický používá každý konfigurovaný vývoz, pokud není poskytována žádné vyřešné služby nebo výstupní cíl. Explicitní výběry zůstanou autoritativní i k Kritickému a nikdy neumožňují nezávěsného.TTS.."
+          "description": "Announcement severity. Critical uses every configured matching output only when no explicit service or output target is supplied. Explicit selections remain authoritative even for Critical and never enable unrequested TTS."
         },
         "service": {
           "name": "Způsob doručení",
-          "description": "Vyberte oznámení (psavení), tts (slova), snapcast nebocompanion_tts(speciální proslov), nebo všechny. Filtruje vybrané zařízení; nikdy nevybralo nesložené příjemce."
+          "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
         },
         "notify_data": {
-          "name": "Zpráva oznámení",
-          "description": "Opcionální údaje o specifické integraci pro této vizuální oznámení."
+          "name": "Notification data",
+          "description": "Optional integration-specific data for this visual notification."
         },
         "language": {
-          "name": "TTSjazyka",
-          "description": "Odborné jazyce překročí pro této práci."
+          "name": "TTS language",
+          "description": "Optional language override for this job."
         },
         "tts_options": {
-          "name": "TTSmožnosti",
-          "description": "Opcionální hlas nebo možnosti motorů pro této práci."
+          "name": "TTS options",
+          "description": "Optional voice or engine options for this job."
         },
         "companion_tts": {
-          "name": "DovoleníCompanion Appřek",
-          "description": "Výrobné neopcionálníCompanion Appnových akcí mohou žádat tts nebocompanion_ttsv službě, omezované na vybrané příjemce."
+          "name": "Allow Companion App speech",
+          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
         },
         "occupied_only": {
-          "name": "Používání zajetí-pokoje způsobů",
-          "description": "Vyzkoušené volby pro oblast zkusíte nejprve vybrané pokoje a pak další zakupované oblasti, pokud se zajistí. Explicitní integrace, zařízení a cíle subjektů zůstanou stanovené."
+          "name": "Use occupied-room fallback",
+          "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
         },
         "use_ai": {
           "name": "Text pomocí AI",
-          "description": "Opcionální překvapení pro toto zprávu. Nechte se nepřištět, aby se nasledili integrační nastavení; pravda umožňuje AI a falské bypassy ho i když se na světovým světovým věcím povolením."
+          "description": "Optional override for this announcement. Leave unset to inherit the integration setting; true enables AI and false bypasses it even if globally enabled."
         },
         "ai_agent": {
           "name": "Poskytovatel AI",
-          "description": "Vyberte současně k dispozici promluvní agent pro toto oznámení. Nechte se prázdně, aby se nadědili vzdělání integrací (přečněHome Assistantstanoviská)."
+          "description": "Choose a currently available conversation agent for this announcement. Leave empty to inherit the integration selection (initially Home Assistant default)."
         },
         "click_action": {
-          "name": "Klikněte akci (Companion App)",
-          "description": "Opcionální URL,Home Assistantcestávka dashboard, app:// hlubokové pokazy nebo entityId:entity_idotevření, když aCompanion Appvizuální oznámení je zaplněno. Android obdržuje kliknout Action; iOS/macOS obdržuje url. Ignorováno proAndroid TV/Fire TVnahrazení,TTS, a poskytovatele bez podporu. Předpokládám vhodných klíčů vnotify_data.."
+          "name": "Click action (Companion App)",
+          "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
         },
         "text": {
           "name": "Oznámení",
-          "description": "Sdělený tekst pro obě slovenýchTTSa písmý oznámení.text_ttsnebotext_notifyje poskytovaný; poskytovaný pole na kanální specifický předmět odpovídající verzi tekstu."
+          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
         },
         "area": {
           "name": "Oblasti",
-          "description": "Pokojní dodávka s revolvou. Zkus zvolenýHome AssistantPrvní oblasti, pak další oblasti, pak dveře zpětné oblasti, a pak obecné výstupy. Kombinující výrazní příjemci jsou poslany nezávislosti."
+          "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
         },
         "integration": {
           "name": "Integrace",
-          "description": "Pošlete každým konfigurovaným fizickým výstupem patří k daném integračním domenům. Nevyšírejte na nevztahující zařízení nebo integrace. Může být kombinovany s oblasti a přesné zařízení/cíle cennosti."
+          "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
         },
         "device": {
           "name": "Zařízení",
-          "description": "Pošlete pouze na vývody na těchto přesněHome AssistantIdentifikace zařízení. NepřijďteSnapcastnebo jiným řekům, může být kombinovany s oblast a integracím."
+          "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
         },
         "entity": {
           "name": "Entity",
-          "description": "Pošle pouze na tyto přesně konfigurované oznámení nebomedia_playersubjekty. Žádné další příjemci není přidané. Může být kombinovany s oblast a integracím."
+          "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
         },
         "ai_mode": {
           "name": "Text pomocí AI",
-          "description": "Replyv reformuje konční oznámení; Generáce vytvořuje oznámení z informačních instrukcí. Přívodní instrukce jsou uchovány, když AI nedokázuje."
+          "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
         }
       }
     },
     "clear_queue": {
       "name": "Vymazat frontu oznámení",
-      "description": "Zrušit všechny čekácí práce a může také zastavit aktivní oznámení.",
+      "description": "Cancels all waiting jobs and can also stop the active announcement.",
       "fields": {
         "include_current": {
-          "name": "Zahrnutí aktivní oznámení",
-          "description": "Požaduje také zrušení práce, které je současně fungován."
+          "name": "Include active announcement",
+          "description": "Also requests cancellation of the job currently running."
         }
       }
     },
     "cancel": {
       "name": "Zrušit",
-      "description": "Zrušit jeden čekat nebo aktivní práci jeho identifikace.",
+      "description": "Cancels one waiting or active job by its ID.",
       "fields": {
         "job_id": {
-          "name": "Identifikace práce",
-          "description": "Zprávu práce vrátilannouncement_hub.send."
+          "name": "Job ID",
+          "description": "The job ID returned by announcement_hub.send."
         }
       }
     }
