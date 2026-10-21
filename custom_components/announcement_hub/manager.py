@@ -268,6 +268,7 @@ class AnnouncementManager:
         self._held_snapcast_selected: tuple[str, ...] = ()
         self._held_snapcast_targets: tuple[str, ...] = ()
         self._held_snapcast_player: str | None = None
+        self._held_snapcast_restore_not_before = 0.0
         self._stop_lock = asyncio.Lock()
 
     @property
@@ -4214,6 +4215,12 @@ class AnnouncementManager:
         snapshot = self._held_snapcast_snapshot
         if snapshot is None:
             return
+        now = asyncio.get_running_loop().time()
+        if (
+            getattr(self, "_running", False)
+            and now < getattr(self, "_held_snapcast_restore_not_before", 0.0)
+        ):
+            return
         try:
             await self._async_restore_snapcast(snapshot)
         except asyncio.CancelledError:
@@ -4221,8 +4228,11 @@ class AnnouncementManager:
         except Exception as err:  # noqa: BLE001
             # Keep the *original* mute snapshot for another restoration
             # attempt; forgetting it strands clients in an unknown state.
+            # Avoid retrying every 250 ms when the provider is offline.
+            self._held_snapcast_restore_not_before = now + 5.0
             _LOGGER.warning("Could not restore held Snapcast route: %s", err)
             return
+        self._held_snapcast_restore_not_before = 0.0
         self._clear_held_snapcast_route()
 
     async def _async_apply_snapcast_route(
