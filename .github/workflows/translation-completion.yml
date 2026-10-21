@@ -1,4 +1,4 @@
-name: Validate offline translation pipeline
+name: Complete Announcement Hub translations
 on:
   push:
     branches: [main]
@@ -7,23 +7,50 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: announcement-hub-once-only-translation
+  cancel-in-progress: false
 
 jobs:
-  translator-smoke:
+  complete:
+    if: github.repository == 'Chreece/HA-Announcement-Hub'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install offline translation tooling
+      - name: Install Apache-2.0 offline translator and tests
         run: |
-          python -m pip install --disable-pip-version-check "torch==2.5.1" "transformers==4.47.1" "sentencepiece>=0.2" "sacremoses>=0.1"
-      - name: Verify public model and sample French translation
+          python -m pip install --disable-pip-version-check "torch==2.5.1" "transformers==4.47.1" "sentencepiece>=0.2" "sacremoses>=0.1" "pytest>=8" "pyyaml>=6"
+      - name: Translate every missing public UI string (no remote inference)
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
-          python -m compileall -q scripts/complete_localizations.py
-          python scripts/complete_localizations.py --languages fr --limit 8 --dry-run
+          python scripts/complete_localizations.py --languages fr es it pt pt-BR nl pl ru tr uk ar zh-Hans zh-Hant ja sv cs
+          # Dedicated Korean model is independent from the multilingual model.
+          # Preserve the other completed locales even if its download fails.
+          python scripts/complete_localizations.py --languages ko || echo "Korean offline-model generation unavailable; preserve existing ko catalog"
+      - name: Validate locale schemas and card runtime
+        run: |
+          python -m compileall -q custom_components tests scripts
+          python -m pytest -q tests/test_international_localizations.py tests/test_dashboard_card_integration.py
+          node --test tests/test_announcement_hub_card.mjs
+      - name: Commit generated locale data when validation passes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add custom_components/announcement_hub/translations/*.json custom_components/announcement_hub/frontend/announcement-hub-locales.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Complete missing multilingual UI descriptions using offline Marian translations"
+            git push origin HEAD:main
+          else
+            echo "All translations already present"
+          fi
