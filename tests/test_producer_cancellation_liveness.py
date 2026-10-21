@@ -120,3 +120,25 @@ def test_cancelled_tts_prefetch_releases_slot_without_new_enqueue():
             task.cancel()
         await asyncio.gather(*h._prefetch_tasks.values(), return_exceptions=True)
     asyncio.run(scenario())
+
+
+def test_shared_ai_provider_does_not_get_concurrent_jobs_from_other_rooms():
+    async def scenario():
+        first = make_job(1, "kitchen")
+        second = make_job(2, "bedroom")
+        third = make_job(3, "office")
+        first.ai["requested_agent_id"] = "ai_task.same"
+        second.ai["requested_agent_id"] = "ai_task.same"
+        third.ai["requested_agent_id"] = "conversation.different"
+        h = Producers([first, second, third])
+        h._fill_ai_slots()
+        await wait_for(lambda: len(h._ai_started) == 2)
+        assert h._ai_started == ["j1", "j3"]
+        assert second.job_id not in h._ai_tasks
+        h._gates[first.job_id].set()
+        await wait_for(lambda: "j2" in h._ai_started)
+        h._running = False
+        for task in h._ai_tasks.values():
+            task.cancel()
+        await asyncio.gather(*h._ai_tasks.values(), return_exceptions=True)
+    asyncio.run(scenario())
