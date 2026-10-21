@@ -2124,6 +2124,10 @@ class AnnouncementManager:
         ):
             try:
                 await self._async_restore_held_snapcast_route()
+                if self._held_snapcast_snapshot is not None:
+                    raise HomeAssistantError(
+                        "Previous Snapcast mute route is not restored"
+                    )
             except Exception:  # noqa: BLE001
                 # Do not lose the lane or start playback on a stale shared
                 # route. Preserve the job for a later bounded retry.
