@@ -1002,8 +1002,11 @@ undelivered jobs retain their original order through retries and restart.
 
 Announcement Hub **never treats being online as proof of a valid rewritten result**.
 Open the `sensor.announcement_hub_queue` entity in Developer Tools → States
-and inspect the `last.ai` attribute (or `pending` / `active` entries).
-It records safe status information, not the original message or model output:
+and inspect `recent_ai` for the last 20 AI outcomes, including failed,
+successful, and explicitly AI-disabled announcements. The `last.ai` field
+only describes the latest finished announcement and can be overwritten by
+a later success. These diagnostics retain safe status information only,
+not the original message, model prompt or generated content:
 
 - `rewritten`: the model's response passed checks and changed the text.
 - `accepted_unchanged`: AI responded and passed validation, but did not change the text.
@@ -1029,3 +1032,16 @@ If unchanged announcements persist, the most useful evidence is the
 `last.ai` diagnostics and the relevant Announcement Hub warning from the
 Home Assistant log at the time. Do not share private announcement text,
 authentication tokens or provider secrets.
+
+
+When the AI is reachable but returns invalid JSON or omits a required
+channel, the Hub accepts one unambiguous JSON object even if the agent adds
+a brief preamble. It also accepts missing **null** channels and ignores an
+unused generated title without enabling new outputs. If a reply is still
+invalid or changes measured numbers, and no backup provider is available,
+Hub makes **one short, safe formatting retry** with the same provider.
+Numeric integrity, strict recipient routing and no-tool-execution checks
+remain in force; an unsafe second response still falls back to the original.
+The `recent_ai` sensor history includes the safe retry count and failure
+classification, so a previous failed announcement remains inspectable after
+other announcements succeed.
