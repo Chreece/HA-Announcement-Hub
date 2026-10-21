@@ -1,4 +1,4 @@
-"""Persistent serialized announcement queue for Announcement Hub."""
+"""Durable, room-FIFO announcement scheduler with independent delivery lanes."""
 
 from __future__ import annotations
 
@@ -2107,7 +2107,20 @@ class AnnouncementManager:
             and job.server_tts_enabled
             and not self._job_matches_held_snapcast_route(job)
         ):
-            await self._async_restore_held_snapcast_route()
+            try:
+                await self._async_restore_held_snapcast_route()
+            except Exception:  # noqa: BLE001
+                # Do not lose the lane or start playback on a stale shared
+                # route. Preserve the job for a later bounded retry.
+                _LOGGER.exception("Cannot restore previous Snapcast route")
+                self._requeue_undelivered_job(
+                    job, "shared Snapcast route could not be restored"
+                )
+                self._active_jobs.pop(job.job_id, None)
+                self._current = next(iter(self._active_jobs.values()), None)
+                self._schedule_save()
+                self._wake.set()
+                return
         job.status = "processing"
         job.started_at = utcnow_iso()
         job.error = None
@@ -4521,6 +4534,16 @@ class AnnouncementManager:
             job.job_id in self._prefetch_tasks
             or sum(not task.done() for task in self._prefetch_tasks.values())
                >= self._max_parallel_prefetch
+        ):
+            return
+        # A room with a long TTS render may not monopolize the producer slots:
+        # prioritize first-ready render jobs from distinct rooms.
+        keys = self._room_lane_keys(job)
+        if any(
+            keys & self._room_lane_keys(other)
+            for other in self._queue
+            if other.job_id in self._prefetch_tasks
+            and not self._prefetch_tasks[other.job_id].done()
         ):
             return
         task = self.entry.async_create_background_task(
