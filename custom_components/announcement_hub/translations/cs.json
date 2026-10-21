@@ -4,7 +4,7 @@
     "step": {
       "outputs": {
         "title": "Výstupy oznámení",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "Vyberte oznamovací zařízení podle místností a minimální úrovně.",
         "data": {
           "notify_outputs": "Zařízení oznámení",
           "notify_room_outputs": "Zařízení oznámení podle místnosti",
@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "Výstupy TTS",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "Vyberte TTS engine, hlas, přehrávače a klienty Snapcast.",
         "data": {
           "tts_engines": "TTS engine",
           "tts_media_player": "Sdílený přehrávač pro Snapcast",
@@ -58,7 +58,7 @@
       },
       "notification_profile": {
         "title": "Možnosti integrace: {integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "Nastavte chování oznámení a směrování.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -104,7 +104,7 @@
       },
       "queue": {
         "title": "Obecné možnosti",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "Nastavte přítomnost, záložní trasu, dveře, frontu a časové limity.",
         "data": {
           "queue_max": "Maximální počet oznámení ve frontě",
           "output_availability_timeout": "Unavailable-output wait",
@@ -146,7 +146,7 @@
       },
       "reconfigure": {
         "title": "Přenastavit Announcement Hub",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "Vyberte sekci, uložte a vraťte se do integrace.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
@@ -182,7 +182,7 @@
     "step": {
       "outputs": {
         "title": "Výstupy oznámení",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "Vyberte oznamovací zařízení podle místností a minimální úrovně.",
         "data": {
           "notify_outputs": "Zařízení oznámení",
           "notify_room_outputs": "Zařízení oznámení podle místnosti",
@@ -202,7 +202,7 @@
       },
       "tts": {
         "title": "Výstupy TTS",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "Vyberte TTS engine, hlas, přehrávače a klienty Snapcast.",
         "data": {
           "tts_engines": "TTS engine",
           "tts_media_player": "Sdílený přehrávač pro Snapcast",
@@ -236,7 +236,7 @@
       },
       "notification_profile": {
         "title": "Možnosti integrace: {integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "Nastavte chování oznámení a směrování.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -282,7 +282,7 @@
       },
       "queue": {
         "title": "Obecné možnosti",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "Nastavte přítomnost, záložní trasu, dveře, frontu a časové limity.",
         "data": {
           "queue_max": "Maximální počet oznámení ve frontě",
           "output_availability_timeout": "Unavailable-output wait",
@@ -324,7 +324,7 @@
       },
       "init": {
         "title": "Configure Announcement Hub",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "Vyberte sekci, uložte a vraťte se do integrace.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
