@@ -284,26 +284,67 @@ def _parse_reply(
     return parsed["text_tts"], parsed["text_notify"]
 
 
-def _failure_reason(response: Any) -> str:
-    """Classify expected HA intent errors without revealing response content."""
+def _failure_reason(
+    response: Any, originals: dict[str, str | None] | None = None
+) -> str:
+    """Report safe failure categories without logging the user/AI text."""
     if not isinstance(response, dict):
         return "invalid_response"
     details = response.get("response")
     if not isinstance(details, dict):
         return "invalid_response"
     kind = details.get("response_type")
-    if kind == "action_done":
-        return "action_response_not_allowed"
     if kind == "error":
         payload = details.get("data")
         if isinstance(payload, dict) and payload.get("code") in {
-            "no_intent_match",
-            "no_valid_targets",
-            "failed_to_handle",
+            "no_intent_match", "no_valid_targets", "failed_to_handle",
         }:
             return str(payload["code"])
         return "agent_error_response"
-    return "invalid_response"
+    if kind == "action_done":
+        data = details.get("data")
+        if (
+            not isinstance(data, dict)
+            or set(data) - {"targets", "success", "failed"}
+            or any(data.get(key) for key in ("targets", "success", "failed"))
+        ):
+            return "action_response_not_allowed"
+    try:
+        speech = details["speech"]["plain"]["speech"]
+    except (TypeError, KeyError):
+        return "missing_generated_text"
+    if not isinstance(speech, str) or not speech.strip():
+        return "missing_generated_text"
+    text = speech.strip()
+    fence = chr(96) * 3
+    if text.startswith(fence) and text.endswith(fence):
+        lines = text.splitlines()
+        if len(lines) >= 3 and lines[-1].strip() == fence:
+            text = "\n".join(lines[1:-1]).strip()
+    try:
+        result = json.loads(text)
+    except (TypeError, ValueError):
+        return "invalid_json"
+    if not isinstance(result, dict):
+        return "unexpected_response_fields"
+    if originals is not None:
+        expected = set(originals)
+        if not expected.issubset(result) or set(result) - expected - {"title"}:
+            return "unexpected_response_fields"
+        for key, original in originals.items():
+            candidate = result.get(key)
+            if original is None and candidate is not None:
+                return "unrequested_channel"
+            if original is not None and not isinstance(candidate, str):
+                return "missing_channel_text"
+            if (
+                original is not None
+                and isinstance(candidate, str)
+                and _NUMBER_PATTERN.findall(candidate)
+                != _NUMBER_PATTERN.findall(original)
+            ):
+                return "number_mismatch"
+    return "unsafe_or_invalid_text"
 
 
 # A selected "default" means the preferred Assist pipeline, not the built-in
@@ -525,6 +566,7 @@ async def async_filter_announcement(
                 data = json.dumps(data, ensure_ascii=False)
             if isinstance(data, str):
                 response = {"response": {"speech": {"plain": {"speech": data}}}}
+        validation_exception = False
         try:
             edited = _parse_reply(
                 response, originals, generate=(mode == "generate"),
@@ -536,6 +578,7 @@ async def async_filter_announcement(
                 "Announcement AI result validation failed; using fallback"
             )
             edited = None
+            validation_exception = True
         if edited is not None:
             if diagnostics is not None:
                 status = (
@@ -559,7 +602,10 @@ async def async_filter_announcement(
                 )
             return edited
         if diagnostics is not None:
-            reason = _failure_reason(response)
+            reason = (
+                "invalid_response"
+                if validation_exception else _failure_reason(response, originals)
+            )
             diagnostics["attempts"].append(
                 {"agent": agent_label, "outcome": reason}
             )
