@@ -528,7 +528,7 @@
         },
         "ai_agent": {
           "name": "AI 提供者",
-          "description": "Choose a currently available conversation agent for this announcement. Leave empty to inherit the integration selection (initially Home Assistant default)."
+          "description": "Choose an available Conversation agent or AI Task entity for this announcement. Leave empty to inherit the integration's default AI provider."
         },
         "click_action": {
           "name": "点击通知后跳转",
