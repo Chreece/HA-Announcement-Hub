@@ -40,4 +40,4 @@ def test_scheduler_readiness_covers_visual_server_and_companion_outputs() -> Non
 def test_scheduler_keeps_startup_safe_background_task_lifecycle() -> None:
     source = MANAGER.read_text(encoding="utf-8")
     assert "self.hass.async_create_task(" not in source
-    assert source.count("self.entry.async_create_background_task(") == 3
+    assert source.count("self.entry.async_create_background_task(") == 4
