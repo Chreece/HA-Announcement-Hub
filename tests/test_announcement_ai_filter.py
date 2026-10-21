@@ -1199,3 +1199,97 @@ def test_ai_task_generic_provider_error_does_not_duplicate_request():
     ))
     assert result == ("Door open", None)
     assert len(hass.services.calls) == 1
+
+
+def test_conversation_with_unique_json_and_explanatory_preamble_is_accepted():
+    reply = {"response": {"response_type": "action_done", "data": None,
+                          "speech": {"plain": {"speech":
+                              'Here is your notification:\\n'
+                              + json.dumps({"text_tts": "Door is open.",
+                                            "text_notify": "🚪 Door open"})}}}}
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        Hass(reply), text_tts="Door open", text_notify="Door open",
+        agent_id="conversation.local", diagnostics=diag,
+    ))
+    assert got == ("Door is open.", "🚪 Door open")
+    assert diag["status"] == "rewritten"
+
+
+def test_invalid_first_response_gets_one_short_retry_and_succeeds():
+    replies = [
+        {"response": {"speech": {"plain": {"speech": "I can write that!"}}}},
+        ha_reply("Η πόρτα είναι ανοιχτή.", "🚪 Η πόρτα είναι ανοιχτή."),
+    ]
+    h = Hass(responses=replies)
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        h, text_tts="Η πόρτα είναι ανοιχτή",
+        text_notify="Η πόρτα είναι ανοιχτή",
+        agent_id="conversation.local", diagnostics=diag,
+    ))
+    assert got == ("Η πόρτα είναι ανοιχτή.", "🚪 Η πόρτα είναι ανοιχτή.")
+    assert len(h.services.calls) == 2
+    assert "TEXT GENERATION ONLY" in h.services.calls[1][2]["text"]
+    assert diag["retry_count"] == 1
+    assert diag["failure_reason"] is None
+    assert diag["status"] == "rewritten"
+    assert diag["attempts"][0]["outcome"] == "invalid_json"
+
+
+def test_factually_changed_number_is_retried_but_never_accepted():
+    h = Hass(responses=[
+        ha_reply("Temperature 25°C", None),
+        ha_reply("Temperature 26°C", None),
+    ])
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        h, text_tts="Temperature 23°C", text_notify=None,
+        agent_id="conversation.local", diagnostics=diag,
+    ))
+    assert got == ("Temperature 23°C", None)
+    assert len(h.services.calls) == 2
+    assert diag["failure_reason"] == "number_mismatch"
+
+
+def test_available_backup_is_preferred_over_duplicate_malformed_primary_retry():
+    h = Hass(responses=[
+        {"response": {"speech": {"plain": {"speech": "Not a JSON object"}}}},
+        ha_reply("Door is open.", "🚪 Door open"),
+    ])
+    got = asyncio.run(ai.async_filter_announcement(
+        h, text_tts="Door open", text_notify="Door open",
+        agent_id="conversation.bad", fallback_agent_id="conversation.backup",
+    ))
+    assert got == ("Door is open.", "🚪 Door open")
+    assert len(h.services.calls) == 2
+    assert h.services.calls[1][2]["agent_id"] == "conversation.backup"
+
+
+def test_online_ai_task_invalid_first_structure_gets_one_safe_retry():
+    h = Hass(responses=[
+        {"data": "Invalid JSON"},
+        {"data": {"text_tts": "Door is open.",
+                  "text_notify": "🚪 Door open"}},
+    ])
+    got = asyncio.run(ai.async_filter_announcement(
+        h, text_tts="Door open", text_notify="Door open",
+        agent_id="ai_task.local",
+    ))
+    assert got == ("Door is open.", "🚪 Door open")
+    assert len(h.services.calls) == 2
+    assert "structure" in h.services.calls[1][2]
+
+
+def test_multiple_json_objects_are_not_accepted_as_unambiguous_output():
+    h = Hass(responses=[
+        {"response": {"speech": {"plain": {"speech":
+          'Note: {"text_tts":"First", "text_notify":null} '
+          '{"text_tts":"Second", "text_notify":null}'}}}},
+        {"response": {"speech": {"plain": {"speech": "not JSON"}}}},
+    ])
+    got = asyncio.run(ai.async_filter_announcement(
+        h, text_tts="Original", text_notify=None,
+        agent_id="conversation.local",
+    ))
+    assert got == ("Original", None)
