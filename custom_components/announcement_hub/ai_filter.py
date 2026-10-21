@@ -285,7 +285,10 @@ def _parse_reply(
 
 
 def _failure_reason(
-    response: Any, originals: dict[str, str | None] | None = None
+    response: Any,
+    originals: dict[str, str | None] | None = None,
+    *,
+    generate: bool = False,
 ) -> str:
     """Report safe failure categories without logging the user/AI text."""
     if not isinstance(response, dict):
@@ -338,7 +341,8 @@ def _failure_reason(
             if original is not None and not isinstance(candidate, str):
                 return "missing_channel_text"
             if (
-                original is not None
+                not generate
+                and original is not None
                 and isinstance(candidate, str)
                 and _NUMBER_PATTERN.findall(candidate)
                 != _NUMBER_PATTERN.findall(original)
@@ -522,25 +526,52 @@ async def async_filter_announcement(
                 return_response=True,
             )
         except Exception as error:
-            # Error class only: never return provider secrets or original text.
-            # A TimeoutError raised by the provider itself is different from
-            # Hub cancelling an otherwise active request (which we never do).
-            reason = (
-                "provider_timeout"
-                if isinstance(error, TimeoutError) else "agent_error"
-            )
-            if diagnostics is not None:
-                diagnostics["attempts"].append(
-                    {"agent": agent_label, "outcome": reason}
+            # The HA service supports structure, but individual AI Task
+            # providers may not support its native schema generation.
+            # Downgrade that specific failure to the original JSON-in-text
+            # request once; never retry generic network/provider errors.
+            recovered = False
+            error_type = type(error).__name__
+            error_summary = str(error).casefold()
+            if is_ai_task and any(
+                term in error_summary
+                for term in ("structured output", "structure", "json schema",
+                             "schema unsupported", "unsupported schema")
+            ):
+                if diagnostics is not None:
+                    diagnostics["attempts"].append({
+                        "agent": agent_label,
+                        "outcome": "structured_output_unavailable",
+                    })
+                unstructured_payload = dict(payload)
+                unstructured_payload.pop("structure", None)
+                try:
+                    response = await hass.services.async_call(
+                        "ai_task", "generate_data", unstructured_payload,
+                        blocking=True, return_response=True,
+                    )
+                except Exception as retry_error:
+                    error = retry_error
+                else:
+                    recovered = True
+            if not recovered:
+                # Error class only: never return provider secrets or text.
+                reason = (
+                    "provider_timeout"
+                    if isinstance(error, TimeoutError) else "agent_error"
                 )
-                diagnostics["failure_reason"] = reason
-            _LOGGER.warning(
-                "Announcement %s AI agent %s failed (%s); falling back",
-                "backup" if index else "primary",
-                agent_label,
-                type(error).__name__,
-            )
-            continue
+                if diagnostics is not None:
+                    diagnostics["attempts"].append(
+                        {"agent": agent_label, "outcome": reason}
+                    )
+                    diagnostics["failure_reason"] = reason
+                _LOGGER.warning(
+                    "Announcement %s AI agent %s failed (%s); falling back",
+                    "backup" if index else "primary",
+                    agent_label,
+                    error_type,
+                )
+                continue
         finally:
             pending_notice.cancel()
             if diagnostics is not None:
@@ -604,7 +635,9 @@ async def async_filter_announcement(
         if diagnostics is not None:
             reason = (
                 "invalid_response"
-                if validation_exception else _failure_reason(response, originals)
+                if validation_exception else _failure_reason(
+                    response, originals, generate=(mode == "generate")
+                )
             )
             diagnostics["attempts"].append(
                 {"agent": agent_label, "outcome": reason}
