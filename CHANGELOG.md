@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.9.43 - 2026-10-21
+
+- Fix intermittent **AI-enabled announcements delivered unchanged** when a
+  Home Assistant Conversation agent returns a valid text response marked
+  `action_done` with empty `targets`, `success` and `failed` lists.
+  Continue rejecting actual Home Assistant action executions.
+- Use Home Assistant **AI Task native structured output** for announcement
+  speech, visual text and optional three-word generated titles. Request only
+  the channels the caller supplied, preserving channel and recipient safety.
+- When an AI Task provider explicitly rejects structured output, retry once
+  using the compatible JSON-in-text request. Generic provider failures do
+  not trigger duplicate calls.
+- Prevent overlapping AI preprocessing jobs for the **same selected provider**
+  across different rooms. Independent AI providers and room delivery queues
+  remain concurrent.
+- Improve safe queue diagnostics to separate malformed JSON, unexpected
+  response fields, missing output text, refused device-action responses and
+  preserved-number validation failures from provider timeouts/errors.
+- Add targeted regressions for valid actionless Conversation results, real
+  structured AI Task responses, disabled-channel protection, schema fallback,
+  provider serialization and AI failure classifications. Document diagnostics
+  under `sensor.announcement_hub_queue` without exposing announcement text.
+
 ## 0.9.42 - 2026-10-21
 
 - Complete every existing dashboard composer/card-editor locale string across
