@@ -26,6 +26,7 @@ def _method(name, **bindings):
 class Harness:
     def __init__(self, rewriter):
         self._queue = deque()
+        self._ai_history = deque(maxlen=20)
         self._running = True
         self.hass = object()
         self._prefetched = []
@@ -52,6 +53,7 @@ class Harness:
 def _job(*, mode="normal", raw="Window open"):
     return SimpleNamespace(
         job_id="kitchen-1",
+        created_at="2026-10-21T19:00:00+00:00",
         ai={
             "enabled": True,
             "status": "pending",
@@ -223,3 +225,25 @@ def test_queued_ai_source_is_redacted_from_public_diagnostics():
     init = (ROOT / "custom_components" / "announcement_hub" / "__init__.py").read_text()
     assert '"source_tts", "source_notify",' in model
     assert '"ai": job.public_dict()["ai"]' in init
+
+
+def test_completed_ai_fallback_record_retains_diagnostic_but_no_message_text():
+    async def provider(_hass, **kwargs):
+        diagnostics = kwargs["diagnostics"]
+        diagnostics["status"] = "fallback_original"
+        diagnostics["failure_reason"] = "invalid_json"
+        diagnostics["attempts"] = [
+            {"agent": "conversation.local", "outcome": "invalid_json"},
+        ]
+        return kwargs["text_tts"], kwargs["text_notify"]
+    h = Harness(provider)
+    job = _job(raw="Do not expose this private message")
+    h._queue.append(job)
+    _run(h, job)
+    assert len(h._ai_history) == 1
+    record = h._ai_history[0]
+    assert record["status"] == "fallback_original"
+    assert record["failure_reason"] == "invalid_json"
+    assert record["job_id"] == "kitchen-1"
+    assert "Do not expose this private message" not in str(record)
+    assert "source_notify" not in str(record)
