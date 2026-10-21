@@ -14,12 +14,12 @@
           "notify_critical_outputs": "Critical only"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
-          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_outputs": "Entités de notification reconnues que le Hub peut utiliser. Tous les appareils compatibles sont sélectionnés par défaut ; retirez ceux qui ne doivent jamais recevoir de notifications.",
+          "notify_room_outputs": "Appareils de notification dont la zone Home Assistant doit correspondre à la pièce occupée ou de repli. N'ajoutez pas ici les appareils mobiles comme les téléphones, montres et ordinateurs portables.",
+          "notify_info_outputs": "Les appareils de cette liste reçoivent les annonces Info, Succès et tous les niveaux supérieurs. Ceux qui ne sont affectés à aucun niveau supérieur utilisent Debug et reçoivent donc tous les niveaux.",
+          "notify_warning_outputs": "Les appareils de cette liste reçoivent Avertissement, Erreur et Critique, mais pas Debug, Info ou Succès.",
+          "notify_error_outputs": "Les appareils de cette liste ne reçoivent que les annonces Erreur et Critique.",
+          "notify_critical_outputs": "Les appareils de cette liste ne reçoivent que les annonces Critiques."
         }
       },
       "tts": {
@@ -41,19 +41,19 @@
           "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
-          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
-          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
+          "tts_engines": "Le moteur de synthèse vocale actif. Le moteur TTS par défaut de Home Assistant est présélectionné lorsqu'il est disponible.",
+          "tts_media_player": "Le lecteur multimédia général qui lit réellement la synthèse vocale sur le flux Snapserver partagé, par exemple MPD. Il s'agit d'une infrastructure commune qui n'est jamais filtrée par pièce.",
+          "tts_min_level": "Niveau minimal autorisant la synthèse vocale. Les niveaux inférieurs restent silencieux ; le niveau Critique est toujours audible.",
           "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
           "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
           "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
           "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
+          "companion_tts_words_per_minute": "Sert uniquement à estimer la durée de la voix envoyée par l'application Companion, qui ne signale pas la fin de la lecture. La file attend cette durée estimée pour éviter le chevauchement.",
+          "snapcast_outputs": "Lecteurs clients Snapcast utilisés comme sorties physiques synchronisées par pièce. Le Hub ne leur envoie pas directement le TTS : il gère leur sourdine et leur routage tandis que le lecteur partagé alimente Snapserver.",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
+          "tts_area_players": "Lecteurs multimédias directs qui reçoivent le TTS uniquement si leur zone Home Assistant correspond à la pièce occupée ou de repli. Chaque lecteur sélectionné est automatiquement limité à sa pièce.",
           "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "direct_tts_announce": "Active le mode d'annonce de Home Assistant sur les lecteurs directs sélectionnés. Selon le fournisseur, ce mode peut jouer une courte sonnerie et reprendre la lecture ensuite. Désactivez-le pour éviter ces sonneries ; le TTS direct peut interrompre une lecture en cours. La source Snapcast partagée n'utilise jamais ce mode."
         }
       },
       "notification_profile": {
@@ -125,23 +125,23 @@
           "channel_fallback_mode": "Notification channel fallback"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
+          "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
+          "output_availability_timeout": "Durée d'attente d'une sortie indisponible. Les annonces exécutables suivantes peuvent passer avant elle ; à l'issue du délai, la sortie indisponible est ignorée sans alerte.",
           "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
           "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
           "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
           "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
           "default_title": "Title used for visual notifications when the send action does not provide its own title.",
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
-          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "occupancy_sensor": "Entité dont l'état ou l'attribut choisi contient les noms ou ID des zones Home Assistant actuellement occupées. Elle n'est utilisée que lorsqu'un envoi active le routage vers les pièces occupées.",
+          "occupancy_attribute": "Choisissez de lire les pièces occupées dans l'état de l'entité ou dans l'un de ses attributs actuels.",
+          "fallback_room": "Zone TTS de repli utilisée uniquement lorsque l'ensemble des pièces ciblées ne contient aucun appareil fixe candidat. Les candidats fixes existants, même indisponibles ou inconnus, bloquent ce repli et restent soumis au délai normal de disponibilité.",
+          "fallback_check_door": "Lorsque cette option est activée, le repli n'est autorisé que si un capteur de porte admissible dans l'une des pièces ciblées indique explicitement que la porte est ouverte.",
+          "fallback_door_label": "Étiquette facultative de Home Assistant. Si elle est choisie, seuls les capteurs binaires de porte portant cette étiquette peuvent autoriser le repli ; laissez vide pour considérer toutes les portes des pièces ciblées.",
+          "default_use_ai": "Une fois activé, chaque annonce hérite de la reformulation par IA, sauf si son action d'envoi indique explicitement use_ai: false. L'absence de use_ai suit ce réglage. En cas d'échec de l'IA, le texte d'origine est transmis. Consultez l'état de l'IA dans response_variable de l'action d'envoi.",
+          "default_ai_agent": "La valeur Home Assistant par défaut utilise l'agent conversationnel du pipeline Assist préféré et non l'agent intégré de traitement des intentions conversation.process. L'agent est déterminé au moment de l'envoi et indiqué dans la liste. Si votre pipeline préféré utilise l'agent intégré, choisissez explicitement un agent adossé à un LLM ou configurez un agent de secours.",
+          "fallback_ai_agent": "Agent de secours facultatif utilisé en cas d'échec de l'agent principal. La valeur Home Assistant par défaut suit aussi le pipeline Assist préféré ; « Annonce d'origine » évite un second appel à l'IA. Si aucun agent ne fonctionne, le texte d'origine est toujours transmis.",
+          "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables."
         }
       },
       "reconfigure": {
@@ -192,12 +192,12 @@
           "notify_critical_outputs": "Critical only"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
-          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_outputs": "Entités de notification reconnues que le Hub peut utiliser. Tous les appareils compatibles sont sélectionnés par défaut ; retirez ceux qui ne doivent jamais recevoir de notifications.",
+          "notify_room_outputs": "Appareils de notification dont la zone Home Assistant doit correspondre à la pièce occupée ou de repli. N'ajoutez pas ici les appareils mobiles comme les téléphones, montres et ordinateurs portables.",
+          "notify_info_outputs": "Les appareils de cette liste reçoivent les annonces Info, Succès et tous les niveaux supérieurs. Ceux qui ne sont affectés à aucun niveau supérieur utilisent Debug et reçoivent donc tous les niveaux.",
+          "notify_warning_outputs": "Les appareils de cette liste reçoivent Avertissement, Erreur et Critique, mais pas Debug, Info ou Succès.",
+          "notify_error_outputs": "Les appareils de cette liste ne reçoivent que les annonces Erreur et Critique.",
+          "notify_critical_outputs": "Les appareils de cette liste ne reçoivent que les annonces Critiques."
         }
       },
       "tts": {
@@ -219,19 +219,19 @@
           "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
-          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
-          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
+          "tts_engines": "Le moteur de synthèse vocale actif. Le moteur TTS par défaut de Home Assistant est présélectionné lorsqu'il est disponible.",
+          "tts_media_player": "Le lecteur multimédia général qui lit réellement la synthèse vocale sur le flux Snapserver partagé, par exemple MPD. Il s'agit d'une infrastructure commune qui n'est jamais filtrée par pièce.",
+          "tts_min_level": "Niveau minimal autorisant la synthèse vocale. Les niveaux inférieurs restent silencieux ; le niveau Critique est toujours audible.",
           "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
           "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
           "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
           "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
+          "companion_tts_words_per_minute": "Sert uniquement à estimer la durée de la voix envoyée par l'application Companion, qui ne signale pas la fin de la lecture. La file attend cette durée estimée pour éviter le chevauchement.",
+          "snapcast_outputs": "Lecteurs clients Snapcast utilisés comme sorties physiques synchronisées par pièce. Le Hub ne leur envoie pas directement le TTS : il gère leur sourdine et leur routage tandis que le lecteur partagé alimente Snapserver.",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
+          "tts_area_players": "Lecteurs multimédias directs qui reçoivent le TTS uniquement si leur zone Home Assistant correspond à la pièce occupée ou de repli. Chaque lecteur sélectionné est automatiquement limité à sa pièce.",
           "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "direct_tts_announce": "Active le mode d'annonce de Home Assistant sur les lecteurs directs sélectionnés. Selon le fournisseur, ce mode peut jouer une courte sonnerie et reprendre la lecture ensuite. Désactivez-le pour éviter ces sonneries ; le TTS direct peut interrompre une lecture en cours. La source Snapcast partagée n'utilise jamais ce mode."
         }
       },
       "notification_profile": {
@@ -303,23 +303,23 @@
           "channel_fallback_mode": "Notification channel fallback"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
+          "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
+          "output_availability_timeout": "Durée d'attente d'une sortie indisponible. Les annonces exécutables suivantes peuvent passer avant elle ; à l'issue du délai, la sortie indisponible est ignorée sans alerte.",
           "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
           "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
           "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
           "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
           "default_title": "Title used for visual notifications when the send action does not provide its own title.",
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
-          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "occupancy_sensor": "Entité dont l'état ou l'attribut choisi contient les noms ou ID des zones Home Assistant actuellement occupées. Elle n'est utilisée que lorsqu'un envoi active le routage vers les pièces occupées.",
+          "occupancy_attribute": "Choisissez de lire les pièces occupées dans l'état de l'entité ou dans l'un de ses attributs actuels.",
+          "fallback_room": "Zone TTS de repli utilisée uniquement lorsque l'ensemble des pièces ciblées ne contient aucun appareil fixe candidat. Les candidats fixes existants, même indisponibles ou inconnus, bloquent ce repli et restent soumis au délai normal de disponibilité.",
+          "fallback_check_door": "Lorsque cette option est activée, le repli n'est autorisé que si un capteur de porte admissible dans l'une des pièces ciblées indique explicitement que la porte est ouverte.",
+          "fallback_door_label": "Étiquette facultative de Home Assistant. Si elle est choisie, seuls les capteurs binaires de porte portant cette étiquette peuvent autoriser le repli ; laissez vide pour considérer toutes les portes des pièces ciblées.",
+          "default_use_ai": "Une fois activé, chaque annonce hérite de la reformulation par IA, sauf si son action d'envoi indique explicitement use_ai: false. L'absence de use_ai suit ce réglage. En cas d'échec de l'IA, le texte d'origine est transmis. Consultez l'état de l'IA dans response_variable de l'action d'envoi.",
+          "default_ai_agent": "La valeur Home Assistant par défaut utilise l'agent conversationnel du pipeline Assist préféré et non l'agent intégré de traitement des intentions conversation.process. L'agent est déterminé au moment de l'envoi et indiqué dans la liste. Si votre pipeline préféré utilise l'agent intégré, choisissez explicitement un agent adossé à un LLM ou configurez un agent de secours.",
+          "fallback_ai_agent": "Agent de secours facultatif utilisé en cas d'échec de l'agent principal. La valeur Home Assistant par défaut suit aussi le pipeline Assist préféré ; « Annonce d'origine » évite un second appel à l'IA. Si aucun agent ne fonctionne, le texte d'origine est toujours transmis.",
+          "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables."
         }
       },
       "init": {
