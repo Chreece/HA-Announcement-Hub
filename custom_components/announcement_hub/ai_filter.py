@@ -212,9 +212,8 @@ def _parse_reply(
             data = inner_response.get("data")
             if (
                 not isinstance(data, dict)
-                or set(data) - {"success", "failed"}
-                or data.get("success")
-                or data.get("failed")
+                or set(data) - {"targets", "success", "failed"}
+                or any(data.get(field) for field in ("targets", "success", "failed"))
             ):
                 return None
     try:
@@ -427,10 +426,33 @@ async def async_filter_announcement(
                 diagnostics["agent"] = agent_label
         is_ai_task = isinstance(candidate, str) and candidate.startswith("ai_task.")
         if is_ai_task:
+            # HA's AI Task API can request real structured output, rather
+            # than relying on an LLM to write a valid JSON document in free
+            # text. Only enabled channels are requested: disabled channels
+            # are restored to null locally and can never become recipients.
+            structure = {
+                key: {
+                    "description": (
+                        "Speech-ready plain text without emoji, markup or links."
+                        if key == "text_tts" else
+                        "Concise visual notification, with restrained formatting."
+                    ),
+                    "required": True,
+                    "selector": {"text": {}},
+                }
+                for key, value in originals.items() if value is not None
+            }
+            if mode == "generate" and title_result is not None:
+                structure["title"] = {
+                    "description": "A plain-language title, maximum three words.",
+                    "required": True,
+                    "selector": {"text": {}},
+                }
             payload = {
                 "task_name": "Announcement Hub announcement",
                 "instructions": prompt,
                 "entity_id": candidate,
+                "structure": structure,
             }
         else:
             payload = {"text": prompt}
@@ -490,6 +512,16 @@ async def async_filter_announcement(
         if is_ai_task and isinstance(response, dict):
             data = response.get("data")
             if isinstance(data, dict):
+                # A structured AI Task need not include a channel that was
+                # absent in the original. Preserve the no-new-channel rule.
+                data = {
+                    **{key: data.get(key) if original is not None else None
+                       for key, original in originals.items()},
+                    **({"title": data["title"]}
+                       if mode == "generate"
+                       and title_result is not None
+                       and "title" in data else {}),
+                }
                 data = json.dumps(data, ensure_ascii=False)
             if isinstance(data, str):
                 response = {"response": {"speech": {"plain": {"speech": data}}}}
