@@ -1264,7 +1264,10 @@
     "Areas use room fallback.": "Области используют резервную доставку между комнатами.",
     "Announcement Hub chooses configured outputs using room and fallback rules.": "Hub выбирает настроенные выходы по комнатам и правилам резервной доставки.",
     "Search notify.* or media_player.* ...": "Поиск notify.* или media_player.* ...",
-    "Kitchen, Hallway": "Кухня, Прихожая"
+    "Kitchen, Hallway": "Кухня, Прихожая",
+    "Default importance": "Важность по умолчанию",
+    "Show AI wording controls": "Показывать настройки текста ИИ",
+    "Clear message after successful send": "Очищать сообщение после успешной отправки"
   },
   "tr": {
     "The message": "Mesaj",
@@ -1515,7 +1518,10 @@
     "Areas use room fallback.": "Області використовують резервну доставку між кімнатами.",
     "Announcement Hub chooses configured outputs using room and fallback rules.": "Hub обирає налаштовані виходи за кімнатами та правилами резервної доставки.",
     "Search notify.* or media_player.* ...": "Пошук notify.* або media_player.* ...",
-    "Kitchen, Hallway": "Кухня, Коридор"
+    "Kitchen, Hallway": "Кухня, Коридор",
+    "Default importance": "Важливість за замовчуванням",
+    "Show AI wording controls": "Показувати налаштування тексту ШІ",
+    "Clear message after successful send": "Очищати повідомлення після успішного надсилання"
   },
   "ar": {
     "The message": "الرسالة",
@@ -2140,7 +2146,17 @@
     "Areas use room fallback.": "Områden använder reservvägar mellan rum.",
     "Announcement Hub chooses configured outputs using room and fallback rules.": "Hub väljer inställda utgångar enligt rum och reservregler.",
     "Search notify.* or media_player.* ...": "Sök notify.* eller media_player.* ...",
-    "Kitchen, Hallway": "Kök, Hall"
+    "Kitchen, Hallway": "Kök, Hall",
+    "Search integrations...": "Sök integrationer...",
+    "Search devices...": "Sök enheter...",
+    "Notification tap destination": "Mål när aviseringen trycks på",
+    "Try occupied rooms during area fallback": "Prova upptagna rum vid reservdirigering",
+    "Send a Critical announcement?": "Skicka ett kritiskt meddelande?",
+    "Queue sensor unavailable": "Kösensorn är otillgänglig",
+    "Home Assistant is not connected.": "Home Assistant är inte anslutet.",
+    "Unknown error": "Okänt fel",
+    "Card title": "Kortets titel",
+    "Show queue count": "Visa antal i kö"
   },
   "cs": {
     "The message": "Zpráva",
@@ -2257,7 +2273,17 @@
     "Areas use room fallback.": "Oblasti používají záložní směrování mezi místnostmi.",
     "Announcement Hub chooses configured outputs using room and fallback rules.": "Hub vybírá nastavené výstupy podle místností a pravidel záložního směrování.",
     "Search notify.* or media_player.* ...": "Hledat notify.* nebo media_player.* ...",
-    "Kitchen, Hallway": "Kuchyně, Chodba"
+    "Kitchen, Hallway": "Kuchyně, Chodba",
+    "Search integrations...": "Hledat integrace...",
+    "Search devices...": "Hledat zařízení...",
+    "Notification tap destination": "Cíl při klepnutí na oznámení",
+    "Try occupied rooms during area fallback": "Při záložním směrování zkusit obsazené místnosti",
+    "Send a Critical announcement?": "Odeslat kritické oznámení?",
+    "Queue sensor unavailable": "Senzor fronty není dostupný",
+    "Home Assistant is not connected.": "Home Assistant není připojen.",
+    "Unknown error": "Neznámá chyba",
+    "Card title": "Název karty",
+    "Show queue count": "Zobrazit počet položek ve frontě"
   },
   "zh-Hant": {
     "The message": "訊息",
