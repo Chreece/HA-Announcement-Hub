@@ -4,7 +4,7 @@
     "step": {
       "outputs": {
         "title": "Salidas de notificación",
-        "description": "Se seleccionan automáticamente los dispositivos de notificación reconocidos. Excluye los que no quieras, asigna las habitaciones y configura los niveles mínimos.",
+        "description": "Elige los dispositivos de notificación por habitación y su nivel mínimo.",
         "data": {
           "notify_outputs": "Dispositivos de notificación",
           "notify_room_outputs": "Dispositivos de notificación por habitación",
@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "Salidas TTS",
-        "description": "Elige el motor TTS, el idioma y la voz, y después los reproductores por habitación y los clientes Snapcast con su reproductor compartido.",
+        "description": "Selecciona el motor TTS, la voz, los reproductores y los clientes Snapcast.",
         "data": {
           "tts_engines": "Motor TTS",
           "tts_media_player": "Reproductor compartido para Snapcast",
@@ -58,7 +58,7 @@
       },
       "notification_profile": {
         "title": "Opciones de integración: {integration}",
-        "description": "Configura las notificaciones y el enrutamiento de esta integración.",
+        "description": "Configura las notificaciones y su enrutamiento.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -104,7 +104,7 @@
       },
       "queue": {
         "title": "Opciones generales",
-        "description": "Presencia, rutas de respaldo, control de puertas, notificaciones predeterminadas y tiempos de espera.",
+        "description": "Configura presencia, respaldo, puertas, cola y tiempos de espera.",
         "data": {
           "queue_max": "Máximo de anuncios en cola",
           "output_availability_timeout": "Unavailable-output wait",
@@ -146,7 +146,7 @@
       },
       "reconfigure": {
         "title": "Reconfigurar Announcement Hub",
-        "description": "Elige la sección que quieras modificar. Al guardar volverás directamente a la integración.",
+        "description": "Elige la sección; al guardar volverás a la integración.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
@@ -182,7 +182,7 @@
     "step": {
       "outputs": {
         "title": "Salidas de notificación",
-        "description": "Se seleccionan automáticamente los dispositivos de notificación reconocidos. Excluye los que no quieras, asigna las habitaciones y configura los niveles mínimos.",
+        "description": "Elige los dispositivos de notificación por habitación y su nivel mínimo.",
         "data": {
           "notify_outputs": "Dispositivos de notificación",
           "notify_room_outputs": "Dispositivos de notificación por habitación",
@@ -202,7 +202,7 @@
       },
       "tts": {
         "title": "Salidas TTS",
-        "description": "Elige el motor TTS, el idioma y la voz, y después los reproductores por habitación y los clientes Snapcast con su reproductor compartido.",
+        "description": "Selecciona el motor TTS, la voz, los reproductores y los clientes Snapcast.",
         "data": {
           "tts_engines": "Motor TTS",
           "tts_media_player": "Reproductor compartido para Snapcast",
@@ -236,7 +236,7 @@
       },
       "notification_profile": {
         "title": "Opciones de integración: {integration}",
-        "description": "Configura las notificaciones y el enrutamiento de esta integración.",
+        "description": "Configura las notificaciones y su enrutamiento.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -282,7 +282,7 @@
       },
       "queue": {
         "title": "Opciones generales",
-        "description": "Presencia, rutas de respaldo, control de puertas, notificaciones predeterminadas y tiempos de espera.",
+        "description": "Configura presencia, respaldo, puertas, cola y tiempos de espera.",
         "data": {
           "queue_max": "Máximo de anuncios en cola",
           "output_availability_timeout": "Unavailable-output wait",
@@ -324,7 +324,7 @@
       },
       "init": {
         "title": "Configure Announcement Hub",
-        "description": "Elige la sección que quieras modificar. Al guardar volverás directamente a la integración.",
+        "description": "Elige la sección; al guardar volverás a la integración.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
