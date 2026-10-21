@@ -35,7 +35,7 @@
   }
   function translation(dict, key, params = {}) {
     const value = dict?.[key] || key;
-    return value.replace(/\\{([a-z]+)\\}/g, (_, k) => String(params[k] ?? ""));
+    return value.replace(/\{([a-z]+)\}/g, (_, k) => String(params[k] ?? ""));
   }
   function localize(root, dictionary, originals) {
     if (!root?.querySelectorAll) return;
@@ -115,18 +115,20 @@
       this._sending = false;
       this._confirming = false;
       this._localeCode = null;
+      this._localeRendered = false;
       this._translations = {};
       this._originalNodes = new WeakMap();
     }
     _t(key, args) { return translation(this._translations, key, args); }
     async _applyLocale() {
       const language = getLanguage(this._hass);
-      if (this._localeCode === language) return;
+      if (this._localeCode === language && this._localeRendered) return;
       const dictionaries = await loadLocales();
       this._localeCode = language;
       this._translations = dictionaries[language] || {};
       if (this._mounted) {
         localize(this.shadowRoot, this._translations, this._originalNodes);
+        this._localeRendered = true;
         this._sync();
         for (const kind of KINDS) this._drawOptions(kind);
       }
