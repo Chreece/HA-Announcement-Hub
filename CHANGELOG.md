@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.9.39 - 2026-10-21
+
+- **Queue liveness:** Refill bounded AI and TTS preparation slots when a
+  pending job is cancelled. A cancelled cold-start task can no longer leave
+  unrelated rooms waiting for new traffic to trigger the scheduler.
+- **Cross-room fairness:** Pending or unavailable jobs reserve their own
+  rooms, not idle physical notification targets. Explicit-device jobs with no
+  room no longer share a fictitious global FIFO lane.
+- **Snapcast isolation and recovery:** Restore a held shared-audio route while
+  unrelated rooms continue working. Retain the original mute-state snapshot
+  when restoring fails, retry with bounded backoff, refuse new shared
+  playback on an uncertain route, and requeue undelivered announcements.
+- Add executable regressions for cancelled producer slots, independent
+  device delivery, shared-output fairness, retained Snapcast restoration
+  state, fail-closed playback and concurrent room delivery. Preserve
+  existing room FIFO, occupancy fallback and explicit-target restrictions.
+
 ## 0.9.38 - 2026-10-21
 
 - Deliver announcements in **strict FIFO order per room**, including jobs awaiting
