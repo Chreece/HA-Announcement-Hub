@@ -997,3 +997,35 @@ serialized even across different rooms. For burst traffic, at most two AI
 requests and two TTS prefetched renders run at once, with fair selection
 across rooms. Service acknowledgement remains durable and prompt;
 undelivered jobs retain their original order through retries and restart.
+
+### Diagnosing unchanged announcements when AI is online
+
+Announcement Hub **never treats being online as proof of a valid rewritten result**.
+Open the `sensor.announcement_hub_queue` entity in Developer Tools → States
+and inspect the `last.ai` attribute (or `pending` / `active` entries).
+It records safe status information, not the original message or model output:
+
+- `rewritten`: the model's response passed checks and changed the text.
+- `accepted_unchanged`: AI responded and passed validation, but did not change the text.
+- `fallback_original`: AI processing failed or produced an unsafe/invalid response.
+  Inspect `failure_reason` and `attempts` to distinguish `agent_error`,
+  `provider_timeout`, `invalid_json`, `unexpected_response_fields`,
+  `number_mismatch`, `action_response_not_allowed` and unavailable
+  preferred Assist agents.
+- `disabled` or `not_applicable`: AI was not requested for this job or
+  there was no eligible text channel. Check the integration's AI default
+  and any per-announcement `use_ai` override.
+
+When selecting `ai_task.*`, the Hub requests **native structured output**
+from Home Assistant and checks both the speech and visual results. A provider
+that explicitly rejects structured schemas gets one compatibility attempt
+with an ordinary JSON-in-text task instead. Identical AI providers are not
+called concurrently for different rooms; independent rooms still keep their
+separate delivery queues. A genuine provider failure still uses the configured
+backup AI agent, then the original message—never a potentially altered
+measurement or an unintended new output channel.
+
+If unchanged announcements persist, the most useful evidence is the
+`last.ai` diagnostics and the relevant Announcement Hub warning from the
+Home Assistant log at the time. Do not share private announcement text,
+authentication tokens or provider secrets.
