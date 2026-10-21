@@ -4,7 +4,7 @@
     "step": {
       "outputs": {
         "title": "Bildirim çıkışları",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "Odalara göre bildirim cihazlarını ve asgari düzeyleri seçin.",
         "data": {
           "notify_outputs": "Bildirim cihazları",
           "notify_room_outputs": "Odaya göre bildirim cihazları",
@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "TTS çıkışları",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "TTS motorunu, sesi, oynatıcıları ve Snapcast istemcilerini seçin.",
         "data": {
           "tts_engines": "TTS motoru",
           "tts_media_player": "Snapcast için ortak medya oynatıcı",
@@ -58,7 +58,7 @@
       },
       "notification_profile": {
         "title": "Entegrasyon seçenekleri: {integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "Bildirim ve yönlendirme davranışını yapılandırın.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -104,7 +104,7 @@
       },
       "queue": {
         "title": "Genel seçenekler",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "Doluluk, yedek yönlendirme, kapılar, kuyruk ve zaman aşımlarını ayarlayın.",
         "data": {
           "queue_max": "En fazla kuyruktaki duyuru",
           "output_availability_timeout": "Unavailable-output wait",
@@ -146,7 +146,7 @@
       },
       "reconfigure": {
         "title": "Announcement Hub ayarlarını değiştir",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "Bir bölüm seçin; kaydettikten sonra entegrasyona dönersiniz.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
@@ -182,7 +182,7 @@
     "step": {
       "outputs": {
         "title": "Bildirim çıkışları",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "Odalara göre bildirim cihazlarını ve asgari düzeyleri seçin.",
         "data": {
           "notify_outputs": "Bildirim cihazları",
           "notify_room_outputs": "Odaya göre bildirim cihazları",
@@ -202,7 +202,7 @@
       },
       "tts": {
         "title": "TTS çıkışları",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "TTS motorunu, sesi, oynatıcıları ve Snapcast istemcilerini seçin.",
         "data": {
           "tts_engines": "TTS motoru",
           "tts_media_player": "Snapcast için ortak medya oynatıcı",
@@ -236,7 +236,7 @@
       },
       "notification_profile": {
         "title": "Entegrasyon seçenekleri: {integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "Bildirim ve yönlendirme davranışını yapılandırın.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -282,7 +282,7 @@
       },
       "queue": {
         "title": "Genel seçenekler",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "Doluluk, yedek yönlendirme, kapılar, kuyruk ve zaman aşımlarını ayarlayın.",
         "data": {
           "queue_max": "En fazla kuyruktaki duyuru",
           "output_availability_timeout": "Unavailable-output wait",
@@ -324,7 +324,7 @@
       },
       "init": {
         "title": "Configure Announcement Hub",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "Bir bölüm seçin; kaydettikten sonra entegrasyona dönersiniz.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
