@@ -27,11 +27,15 @@ class Harness:
         self._queue = deque()
         self._wake = SimpleNamespace(set=lambda: None)
         self._staged_calls = []
+        self._active_jobs = {}
 
     def _requeue_undelivered_stage(self, job, reason):
         self._staged_calls.append((job.job_id, reason))
         job.status = "pending"
         self._queue.append(job)
+
+    def _delivery_lane_keys(self, job):
+        return {f"room:{job.job_id}"}
 
     def _staged_route_ready(self, job):
         return False
