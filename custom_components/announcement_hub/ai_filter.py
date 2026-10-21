@@ -123,6 +123,42 @@ def _generate_prompt(
     )
 
 
+def _recovery_prompt(
+    originals: dict[str, str | None],
+    *,
+    generate: bool,
+    title_requested: bool,
+) -> str:
+    """Small second-chance prompt for an online AI with malformed output.
+
+    It never incorporates the rejected generated text, only the accepted
+    original request. That avoids reflecting an unsafe first response.
+    """
+    source = json.dumps(originals, ensure_ascii=False)
+    title_rule = (
+        ' Include an optional plain "title" string of at most three words.'
+        if generate and title_requested else ""
+    )
+    return (
+        "TEXT GENERATION ONLY. Never control Home Assistant or use tools. "
+        "Return a single raw JSON object with EXACTLY the keys text_tts "
+        f"and text_notify.{title_rule} Never add other keys, code fences, "
+        "preambles or explanations. For channels with null input return "
+        "null, and for non-null channels return a nonempty string. "
+        "Write in the language of the source. "
+        "text_tts must be natural plain speech with no emoji or markdown; "
+        "text_notify must be a concise visual notification. "
+        "Preserve every name, measurement, number, sign, unit, date, "
+        "time and factual meaning. Do not invent information. "
+        + (
+            "Produce the finished announcement from these instructions: "
+            if generate else
+            "Rewrite this announcement without changing its meaning: "
+        )
+        + source
+    )
+
+
 def _is_emoji_character(char: str) -> bool:
     """Recognize emoji while preserving ordinary units, e.g. °C and €."""
     code = ord(char)
@@ -633,6 +669,93 @@ async def async_filter_announcement(
             )
             edited = None
             validation_exception = True
+        # Small/local models may be ONLINE but occasionally violate the
+        # requested response format or numeric fidelity. Give the final
+        # provider a single, shorter request before reverting to original.
+        # Prefer an available backup provider rather than repeating primary.
+        if edited is None and index == len(agents) - 1:
+            retry_reason = (
+                "invalid_response" if validation_exception
+                else _failure_reason(
+                    response, originals, generate=(mode == "generate")
+                )
+            )
+            if retry_reason in {
+                "invalid_json", "unexpected_response_fields",
+                "missing_generated_text", "missing_channel_text",
+                "number_mismatch",
+            }:
+                if diagnostics is not None:
+                    diagnostics["attempts"].append({
+                        "agent": agent_label,
+                        "outcome": retry_reason,
+                    })
+                    diagnostics["retry_count"] = (
+                        diagnostics.get("retry_count", 0) + 1
+                    )
+                retry_payload = dict(payload)
+                retry_field = "instructions" if is_ai_task else "text"
+                retry_payload[retry_field] = _recovery_prompt(
+                    originals, generate=(mode == "generate"),
+                    title_requested=mode == "generate" and title_result is not None,
+                )
+                try:
+                    retry_response = await hass.services.async_call(
+                        "ai_task" if is_ai_task else "conversation",
+                        "generate_data" if is_ai_task else "process",
+                        retry_payload,
+                        blocking=True,
+                        return_response=True,
+                    )
+                except Exception as retry_error:
+                    retry_error_reason = (
+                        "provider_timeout"
+                        if isinstance(retry_error, TimeoutError)
+                        else "agent_error"
+                    )
+                    if diagnostics is not None:
+                        diagnostics["attempts"].append({
+                            "agent": agent_label,
+                            "outcome": retry_error_reason,
+                        })
+                        diagnostics["failure_reason"] = retry_error_reason
+                    _LOGGER.warning(
+                        "Announcement AI retry failed (%s)",
+                        type(retry_error).__name__,
+                    )
+                    continue
+                if is_ai_task and isinstance(retry_response, dict):
+                    task_data = retry_response.get("data")
+                    if isinstance(task_data, dict):
+                        task_data = {
+                            **{key: task_data.get(key)
+                               if initial is not None else None
+                               for key, initial in originals.items()},
+                            **({"title": task_data["title"]}
+                               if mode == "generate" and title_result is not None
+                               and "title" in task_data else {}),
+                        }
+                        task_data = json.dumps(task_data, ensure_ascii=False)
+                    if isinstance(task_data, str):
+                        retry_response = {
+                            "response": {"speech": {
+                                "plain": {"speech": task_data}
+                            }}
+                        }
+                response = retry_response
+                try:
+                    edited = _parse_reply(
+                        response, originals, generate=(mode == "generate"),
+                        title_result=title_result if mode == "generate" else None,
+                    )
+                    validation_exception = False
+                except Exception:  # noqa: BLE001
+                    _LOGGER.exception(
+                        "Announcement AI retry result validation failed"
+                    )
+                    validation_exception = True
+                    edited = None
+
         if edited is not None:
             if diagnostics is not None:
                 status = (
