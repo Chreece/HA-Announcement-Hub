@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.38 - 2026-10-21
+
+- Deliver announcements in **strict FIFO order per room**, including jobs awaiting
+  AI preprocessing, output readiness, fallback stages or retry backoff.
+- Dispatch independent rooms concurrently in up to four protected delivery
+  lanes. Reserve shared physical notification/speaker endpoints and the
+  common Snapcast audio source so unrelated rooms can proceed without
+  unsafe overlapping playback or cross-room announcements.
+- Limit active AI generation and TTS rendering to two jobs each; select room
+  heads fairly to prevent burst loads from monopolizing a local model.
+  Preserve durable jobs, ordering, targeted cancellation, restart recovery
+  and combined-delivery deduplication.
+- Support Home Assistant `ai_task.*` entities as primary, backup and
+  per-announcement AI providers using `ai_task.generate_data`; retain JSON
+  validation, fallback to original text and conversation-agent compatibility.
+- Recover safely from errors restoring a shared Snapcast route, retaining
+  announcements for later retry without leaking a delivery lane.
+- Add executable concurrent FIFO, shared-output isolation, AI Task and
+  burst-management regressions; refresh EN/DE/EL UI wording and documentation.
+
 ## 0.9.37 - 2026-10-20
 
 - Fix an unsafe shared TTS path that could play on the central MPD player
