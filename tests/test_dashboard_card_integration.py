@@ -15,6 +15,7 @@ def test_dashboard_assets_are_shipped_by_the_integration_and_manual_installer():
         "frontend/announcement-hub-card.js",
         "frontend/announcement-hub-card.css",
         "frontend/announcement-hub-card.html",
+        "frontend/announcement-hub-locales.json",
     }
     for name in package:
         target = COMPONENT / name
@@ -67,6 +68,8 @@ def test_card_is_english_and_readme_shows_exact_module_resource_url():
     card = (FRONTEND / "announcement-hub-card.js").read_text(encoding="utf-8")
     assert "announcement-hub-card-editor" in card
     assert "window.customCards.push" in card
+    assert "loadLocales()" in card
+    assert "getLanguage(" in card
     assert "preview: true" in card
 
 
