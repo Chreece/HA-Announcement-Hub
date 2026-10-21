@@ -116,7 +116,8 @@
     "Clear message after successful send": "Καθαρισμός μηνύματος μετά την επιτυχή αποστολή",
     "Recipients and message text are chosen when using the card, not stored in its dashboard configuration.": "Οι παραλήπτες και το μήνυμα επιλέγονται κατά τη χρήση της κάρτας και δεν αποθηκεύονται στις ρυθμίσεις του πίνακα.",
     "Announcement Hub": "Κέντρο Ανακοινώσεων",
-    "Areas use room fallback.": "Οι περιοχές χρησιμοποιούν εφεδρική δρομολόγηση."
+    "Areas use room fallback.": "Οι περιοχές χρησιμοποιούν εφεδρική δρομολόγηση.",
+    "AI provider": "Πάροχος AI"
   },
   "de": {
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · NACHRICHTEN",
@@ -235,7 +236,8 @@
     "Clear message after successful send": "Nach erfolgreichem Senden Nachricht leeren",
     "Recipients and message text are chosen when using the card, not stored in its dashboard configuration.": "Empfänger und Nachricht werden bei der Nutzung gewählt, nicht in der Dashboard-Konfiguration gespeichert.",
     "Announcement Hub": "Announcement Hub",
-    "Areas use room fallback.": "Bereiche nutzen Raum-Fallback."
+    "Areas use room fallback.": "Bereiche nutzen Raum-Fallback.",
+    "AI provider": "KI-Anbieter"
   },
   "fr": {
     "The message": "Le message",
@@ -308,7 +310,8 @@
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · MESSAGERIE",
     "Compose once. Deliver to the right place.": "Un seul message, au bon endroit.",
     "Send a Critical announcement?": "Envoyer une annonce critique ?",
-    "AI wording mode": "Mode de rédaction IA"
+    "AI wording mode": "Mode de rédaction IA",
+    "AI provider": "Fournisseur IA"
   },
   "es": {
     "The message": "El mensaje",
@@ -381,7 +384,8 @@
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · MENSAJERÍA",
     "Compose once. Deliver to the right place.": "Escribe una vez. Entrega en el lugar correcto.",
     "Send a Critical announcement?": "¿Enviar un anuncio crítico?",
-    "AI wording mode": "Modo de redacción con IA"
+    "AI wording mode": "Modo de redacción con IA",
+    "AI provider": "Proveedor de IA"
   },
   "it": {
     "The message": "Il messaggio",
@@ -452,7 +456,8 @@
     "Announcement Hub": "Centro annunci",
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · MESSAGGI",
     "Compose once. Deliver to the right place.": "Scrivi una volta. Invia nel posto giusto.",
-    "Send a Critical announcement?": "Inviare un annuncio critico?"
+    "Send a Critical announcement?": "Inviare un annuncio critico?",
+    "AI provider": "Fornitore IA"
   },
   "pt": {
     "The message": "A mensagem",
@@ -523,7 +528,8 @@
     "Announcement Hub": "Centro de anúncios",
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · MENSAGENS",
     "Compose once. Deliver to the right place.": "Escreva uma vez. Entregue no local certo.",
-    "Send a Critical announcement?": "Enviar um anúncio crítico?"
+    "Send a Critical announcement?": "Enviar um anúncio crítico?",
+    "AI provider": "Fornecedor IA"
   },
   "nl": {
     "The message": "Het bericht",
@@ -594,7 +600,8 @@
     "Announcement Hub": "Aankondigingencentrum",
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · BERICHTEN",
     "Compose once. Deliver to the right place.": "Eenmaal schrijven. Op de juiste plek afleveren.",
-    "Send a Critical announcement?": "Kritieke aankondiging verzenden?"
+    "Send a Critical announcement?": "Kritieke aankondiging verzenden?",
+    "AI provider": "AI-provider"
   },
   "pl": {
     "The message": "Wiadomość",
@@ -665,7 +672,8 @@
     "Announcement Hub": "Centrum ogłoszeń",
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · WIADOMOŚCI",
     "Compose once. Deliver to the right place.": "Napisz raz. Dostarcz we właściwe miejsce.",
-    "Send a Critical announcement?": "Wysłać krytyczne ogłoszenie?"
+    "Send a Critical announcement?": "Wysłać krytyczne ogłoszenie?",
+    "AI provider": "Dostawca AI"
   },
   "pt-BR": {
     "The message": "A mensagem",
@@ -736,7 +744,8 @@
     "Announcement Hub": "Centro de anúncios",
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · MENSAGENS",
     "Compose once. Deliver to the right place.": "Escreva uma vez. Entregue no local certo.",
-    "Send a Critical announcement?": "Enviar um anúncio crítico?"
+    "Send a Critical announcement?": "Enviar um anúncio crítico?",
+    "AI provider": "Provedor de IA"
   },
   "ru": {
     "The message": "Сообщение",
@@ -798,7 +807,8 @@
     "Announcement Hub": "Центр объявлений",
     "Send a Critical announcement?": "Отправить критическое объявление?",
     "Card title": "Название карточки",
-    "Show queue count": "Показывать очередь"
+    "Show queue count": "Показывать очередь",
+    "AI provider": "Поставщик ИИ"
   },
   "tr": {
     "The message": "Mesaj",
@@ -860,7 +870,8 @@
     "Announcement Hub": "Duyuru Merkezi",
     "Send a Critical announcement?": "Kritik duyuru gönderilsin mi?",
     "Card title": "Kart başlığı",
-    "Show queue count": "Kuyruk sayısını göster"
+    "Show queue count": "Kuyruk sayısını göster",
+    "AI provider": "YZ sağlayıcısı"
   },
   "uk": {
     "The message": "Повідомлення",
@@ -922,7 +933,8 @@
     "Announcement Hub": "Центр оголошень",
     "Send a Critical announcement?": "Надіслати критичне оголошення?",
     "Card title": "Назва картки",
-    "Show queue count": "Показувати кількість у черзі"
+    "Show queue count": "Показувати кількість у черзі",
+    "AI provider": "Постачальник ШІ"
   },
   "ar": {
     "The message": "الرسالة",
@@ -984,7 +996,8 @@
     "Announcement Hub": "مركز الإعلانات",
     "Send a Critical announcement?": "إرسال إعلان حرج؟",
     "Card title": "عنوان البطاقة",
-    "Show queue count": "إظهار عدد الانتظار"
+    "Show queue count": "إظهار عدد الانتظار",
+    "AI provider": "موفر الذكاء الاصطناعي"
   },
   "zh-Hans": {
     "The message": "消息",
@@ -1046,7 +1059,8 @@
     "Announcement Hub": "公告中心",
     "Send a Critical announcement?": "发送严重公告？",
     "Card title": "卡片标题",
-    "Show queue count": "显示队列数量"
+    "Show queue count": "显示队列数量",
+    "AI provider": "AI 提供者"
   },
   "ja": {
     "The message": "メッセージ",
@@ -1108,7 +1122,8 @@
     "Announcement Hub": "アナウンスセンター",
     "Send a Critical announcement?": "緊急アナウンスを送信しますか？",
     "Card title": "カードのタイトル",
-    "Show queue count": "キュー数を表示"
+    "Show queue count": "キュー数を表示",
+    "AI provider": "AIプロバイダー"
   },
   "ko": {
     "The message": "메시지",
@@ -1170,7 +1185,8 @@
     "Announcement Hub": "안내 센터",
     "Send a Critical announcement?": "긴급 안내를 보내시겠습니까?",
     "Card title": "카드 제목",
-    "Show queue count": "대기열 수 표시"
+    "Show queue count": "대기열 수 표시",
+    "AI provider": "AI 제공자"
   },
   "sv": {
     "The message": "Meddelandet",
@@ -1222,7 +1238,8 @@
     "Automatic recipients": "Automatiska mottagare",
     "Hub channels": "Hub-kanaler",
     "{count} waiting announcements": "{count} meddelanden väntar",
-    "Announcement Hub": "Meddelandecenter"
+    "Announcement Hub": "Meddelandecenter",
+    "AI provider": "AI-leverantör"
   },
   "cs": {
     "The message": "Zpráva",
@@ -1274,7 +1291,8 @@
     "Automatic recipients": "Automatičtí příjemci",
     "Hub channels": "Kanály Hub",
     "{count} waiting announcements": "Čeká {count} oznámení",
-    "Announcement Hub": "Centrum oznámení"
+    "Announcement Hub": "Centrum oznámení",
+    "AI provider": "Poskytovatel AI"
   },
   "zh-Hant": {
     "The message": "訊息",
@@ -1336,6 +1354,7 @@
     "Announcement Hub": "公告中心",
     "Send a Critical announcement?": "发送严重公告？",
     "Card title": "卡片标题",
-    "Show queue count": "显示队列数量"
+    "Show queue count": "显示队列数量",
+    "AI provider": "AI 提供者"
   }
 }
