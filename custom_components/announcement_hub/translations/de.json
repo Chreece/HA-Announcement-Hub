@@ -528,7 +528,7 @@
         },
         "ai_agent": {
           "name": "KI-Konversationsagent überschreiben",
-          "description": "Wähle einen verfügbaren Konversationsagenten für diese Ankündigung. Leer übernimmt die Integrationsauswahl (anfangs Home Assistant Standard)."
+          "description": "Wähle einen verfügbaren Konversationsagenten oder eine KI-Aufgabenentität für diese Ankündigung. Leer lassen, um den Standard-KI-Anbieter der Integration zu verwenden."
         },
         "click_action": {
           "name": "Klickaktion (Companion App)",
