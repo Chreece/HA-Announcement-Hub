@@ -255,6 +255,10 @@ class AnnouncementManager:
         # AI tasks are separate from the delivery worker: cold model loading
         # cannot block a later, ready announcement from another room.
         self._ai_tasks: dict[str, asyncio.Task[None]] = {}
+        # Keep outcome summaries for intermittent failures even after a
+        # later successful notification overwrites the "last" sensor field.
+        # No generated messages, source texts or model prompts are stored.
+        self._ai_history: deque[dict[str, Any]] = deque(maxlen=20)
         self._save_lock = asyncio.Lock()
         # Delivery receipts belong to a combined action's selected physical
         # recipients, preventing duplicates between room and explicit legs.
@@ -311,6 +315,7 @@ class AnnouncementManager:
                 job_id for job_id, task in self._ai_tasks.items()
                 if not task.done()
             ),
+            "recent_ai": list(self._ai_history),
             "worker_alive": bool(
                 self._worker_task is not None and not self._worker_task.done()
             ),
@@ -320,6 +325,18 @@ class AnnouncementManager:
         if self._running:
             return
         stored = await self._store.async_load() or {}
+        self._ai_history.clear()
+        for item in stored.get("ai_history", [])[-20:]:
+            if isinstance(item, dict) and isinstance(item.get("job_id"), str):
+                # Only documented, non-content diagnostic fields survive.
+                self._ai_history.append({
+                    key: item.get(key)
+                    for key in (
+                        "job_id", "created_at", "status",
+                        "failure_reason", "agent_used", "attempts",
+                        "elapsed_seconds", "retry_count"
+                    )
+                })
         for raw_job in stored.get("jobs", []):
             legacy_job = "snapcast_clients" not in raw_job
             try:
@@ -4555,6 +4572,23 @@ class AnnouncementManager:
             job.tts_text, job.notify_text = rewritten_tts, rewritten_notify
 
         ai["pending_preprocessing"] = False
+        if hasattr(self, "_ai_history"):
+            # This ring buffer makes intermittent fallback inspectable even
+            # when newer successful announcements have already been delivered.
+            self._ai_history.append({
+                "job_id": job.job_id,
+                "created_at": job.created_at,
+                "status": ai.get("status"),
+                "failure_reason": ai.get("failure_reason"),
+                "agent_used": ai.get("agent_used"),
+                "attempts": [
+                    {"agent": step.get("agent"), "outcome": step.get("outcome")}
+                    for step in ai.get("attempts", [])
+                    if isinstance(step, dict)
+                ][-6:],
+                "elapsed_seconds": ai.get("elapsed_seconds"),
+                "retry_count": ai.get("retry_count", 0),
+            })
         for key in (
             "source_tts", "source_notify",
             "requested_agent_id", "requested_fallback_agent_id",
@@ -4912,6 +4946,7 @@ class AnnouncementManager:
         return {
             "jobs": jobs,
             "last": self._last.to_dict() if self._last else None,
+            "ai_history": list(self._ai_history),
         }
 
     def _schedule_save(self) -> None:
