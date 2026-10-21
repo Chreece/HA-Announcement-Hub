@@ -391,32 +391,32 @@
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left",
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "center": "Center"
+        "bottom-right": "Κάτω δεξιά",
+        "bottom-left": "Κάτω αριστερά",
+        "top-right": "Πάνω δεξιά",
+        "top-left": "Πάνω αριστερά",
+        "center": "Κέντρο"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large",
-        "max": "Maximum"
+        "small": "Μικρό",
+        "medium": "Μεσαίο",
+        "large": "Μεγάλο",
+        "max": "Μέγιστο"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Grey",
-        "black": "Black",
-        "indigo": "Indigo",
-        "green": "Green",
-        "red": "Red",
-        "cyan": "Cyan",
-        "teal": "Teal",
-        "amber": "Amber",
-        "pink": "Pink"
+        "grey": "Γκρι",
+        "black": "Μαύρο",
+        "indigo": "Λουλακί",
+        "green": "Πράσινο",
+        "red": "Κόκκινο",
+        "cyan": "Κυανό",
+        "teal": "Πετρόλ",
+        "amber": "Κεχριμπαρί",
+        "pink": "Ροζ"
       }
     },
     "nfandroidtv_transparency": {
