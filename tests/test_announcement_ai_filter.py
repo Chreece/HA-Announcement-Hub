@@ -336,15 +336,25 @@ def test_ai_cannot_accept_reply_reporting_actions(action_data) -> None:
     assert diag["status"] == "fallback_original"
     assert diag["failure_reason"] == "action_response_not_allowed"
 
-@pytest.mark.parametrize("kind", ["error", "action_done"])
-def test_error_and_action_done_responses_are_unusable(kind) -> None:
+def test_error_response_is_unusable() -> None:
     response = ha_reply("Changed", None)
-    response["response"]["response_type"] = kind
+    response["response"]["response_type"] = "error"
     hass = Hass(response)
     got = asyncio.run(ai.async_filter_announcement(
         hass, text_tts="Original", text_notify=None, agent_id=None
     ))
     assert got == ("Original", None)
+
+
+def test_action_done_with_null_data_and_text_only_is_usable() -> None:
+    response = ha_reply("Changed", None)
+    response["response"]["response_type"] = "action_done"
+    response["response"]["data"] = None
+    got = asyncio.run(ai.async_filter_announcement(
+        Hass(response), text_tts="Original",
+        text_notify=None, agent_id="conversation.local",
+    ))
+    assert got == ("Changed", None)
 
 
 def test_rewrite_must_preserve_numeric_signs_in_both_channels() -> None:
