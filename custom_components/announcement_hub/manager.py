@@ -410,6 +410,8 @@ class AnnouncementManager:
                 self._schedule_ai_rewrite(job)
             else:
                 self._schedule_prefetch(job)
+        self._fill_ai_slots()
+        self._fill_prefetch_slots()
         if self._queue:
             self._wake.set()
         self._notify_update()
@@ -1964,8 +1966,10 @@ class AnnouncementManager:
             async with self._save_lock:
                 await self._store.async_save(self._serialize())
             self._schedule_ai_rewrite(job)
+            self._fill_ai_slots()
         else:
             self._schedule_prefetch(job)
+            self._fill_prefetch_slots()
             self._schedule_save()
         self._ensure_worker()
         self._wake.set()
@@ -1999,6 +2003,8 @@ class AnnouncementManager:
                 any(job.group_id == group_id for job in self._active_jobs.values())
             ):
                 self._group_success.pop(group_id, None)
+        self._fill_ai_slots()
+        self._fill_prefetch_slots()
         self._schedule_save()
         self.hass.bus.async_fire(
             EVENT_QUEUE_CLEARED,
@@ -2050,6 +2056,8 @@ class AnnouncementManager:
             self._last = job
             self._fire_event(EVENT_CANCELLED, job)
             self._cleanup_group_success(job)
+            self._fill_ai_slots()
+            self._fill_prefetch_slots()
             self._schedule_save()
             self._notify_update()
             return "cancelled"
@@ -4367,12 +4375,33 @@ class AnnouncementManager:
                 blocking=True,
             )
 
+    def _fill_ai_slots(self) -> None:
+        """Fairly fill bounded AI slots from the oldest available room heads."""
+        if not self._running:
+            return
+        for job in tuple(self._queue):
+            if sum(not task.done() for task in self._ai_tasks.values()) >= self._max_parallel_ai:
+                break
+            self._schedule_ai_rewrite(job)
+
     def _schedule_ai_rewrite(self, job: AnnouncementJob) -> None:
         """Rewrite independently *after* accepting the durable original."""
         if (
             not self._running
             or not job.ai.get("pending_preprocessing")
             or job.job_id in self._ai_tasks
+            or sum(not task.done() for task in self._ai_tasks.values())
+               >= self._max_parallel_ai
+        ):
+            return
+        # Same-room AI requests are serialized; keep capacity for other rooms
+        # instead of filling a local LLM with speculative same-room prompts.
+        keys = self._room_lane_keys(job)
+        if any(
+            keys & self._room_lane_keys(other)
+            for other in self._queue
+            if other.job_id in self._ai_tasks
+            and not self._ai_tasks[other.job_id].done()
         ):
             return
         task = self.entry.async_create_background_task(
@@ -4395,6 +4424,7 @@ class AnnouncementManager:
                 )
             self._schedule_save()
             self._wake.set()
+            self._fill_ai_slots()
             self._notify_update()
 
         task.add_done_callback(_done)
@@ -4461,9 +4491,19 @@ class AnnouncementManager:
         ):
             ai.pop(key, None)
         self._schedule_prefetch(job)
+        self._fill_prefetch_slots()
         self._schedule_save()
         self._wake.set()
         self._notify_update()
+
+    def _fill_prefetch_slots(self) -> None:
+        """Bound queued TTS renders; supply ready rooms instead of 100 tasks."""
+        if not self._running:
+            return
+        for pending in tuple(self._queue):
+            if sum(not task.done() for task in self._prefetch_tasks.values()) >= self._max_parallel_prefetch:
+                break
+            self._schedule_prefetch(pending)
 
     def _schedule_prefetch(self, job: AnnouncementJob) -> None:
         """Render queued speech immediately, independently of disk-cache policy."""
@@ -4477,7 +4517,11 @@ class AnnouncementManager:
         # Home Assistant always keeps rendered TTS in its short-lived memory
         # cache. job.tts_cache controls file-cache persistence only; it must not
         # disable our producer side of the playback pipeline.
-        if job.job_id in self._prefetch_tasks:
+        if (
+            job.job_id in self._prefetch_tasks
+            or sum(not task.done() for task in self._prefetch_tasks.values())
+               >= self._max_parallel_prefetch
+        ):
             return
         task = self.entry.async_create_background_task(
             self.hass,
@@ -4493,6 +4537,7 @@ class AnnouncementManager:
                 _LOGGER.debug("TTS prefetch task failed: %s", error)
             self._schedule_save()
             self._wake.set()
+            self._fill_prefetch_slots()
             self._notify_update()
 
         task.add_done_callback(_done)
