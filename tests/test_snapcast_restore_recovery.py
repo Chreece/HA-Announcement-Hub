@@ -83,3 +83,48 @@ def test_round_failure_retains_restoration_snapshot():
     last = src[src.rindex('except Exception as err:  # noqa: BLE001'):]
     assert "self._held_snapcast_snapshot = route_snapshot" in last
     assert "self._clear_held_snapcast_route()" not in last
+
+
+class PreflightHarness(Harness):
+    def __init__(self):
+        super().__init__()
+        self._running = True
+        self._active_jobs = {}
+        self._queue = []
+        self._current = None
+        self._wake = asyncio.Event()
+        self.saved = 0
+        self.processed = False
+
+    def _job_matches_held_snapcast_route(self, job):
+        return False
+
+    def _requeue_undelivered_job(self, item, reason):
+        self._queue.append(item)
+        item.status = "pending"
+
+    def _schedule_save(self):
+        self.saved += 1
+
+    async def _async_process_job(self, job):
+        self.processed = True
+        raise AssertionError("An unsafe Snapcast route must never be played")
+
+
+install(PreflightHarness, "_async_deliver_job")
+
+
+def test_failed_restore_keeps_job_pending_without_starting_delivery():
+    async def scenario():
+        h = PreflightHarness()
+        item = SimpleNamespace(job_id="announcement-one", server_tts_enabled=True)
+        h._active_jobs[item.job_id] = item
+        h._current = item
+        await h._async_deliver_job(item)
+        assert item in h._queue
+        assert item.status == "pending"
+        assert item.job_id not in h._active_jobs
+        assert h.saved == 1
+        assert not h.processed
+        assert h._held_snapcast_snapshot is not None
+    asyncio.run(scenario())
