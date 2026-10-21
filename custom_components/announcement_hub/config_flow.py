@@ -124,6 +124,7 @@ from .const import (
 )
 from .ai_filter import resolve_preferred_assist_agent
 from .flow_settings import merge_reconfiguration
+from .provider_labels import provider_label
 from .message_parts import (
     integration_label,
     normalise_notify_profile,
@@ -1230,11 +1231,11 @@ class _AnnouncementFlowMixin:
             preferred_name = (
                 preferred_state.name if preferred_state else preferred_id
             )
-            preferred_label = f"Preferred Assist pipeline: {preferred_name}"
+            preferred_label = provider_label(self.hass, "preferred", name=preferred_name)
         elif preferred_error == "preferred_assist_agent_not_generative":
-            preferred_label = "Preferred Assist pipeline: built-in (not an AI agent)"
+            preferred_label = provider_label(self.hass, "built_in")
         else:
-            preferred_label = "Preferred Assist pipeline: unavailable"
+            preferred_label = provider_label(self.hass, "unavailable")
         options = [
             selector.SelectOptionDict(
                 value=DEFAULT_AI_AGENT, label=preferred_label
@@ -1264,7 +1265,7 @@ class _AnnouncementFlowMixin:
             options.append(
                 selector.SelectOptionDict(
                     value=state.entity_id,
-                    label=f"AI Task: {state.name or state.entity_id}",
+                    label=provider_label(self.hass, "task", name=state.name or state.entity_id),
                 )
             )
         # HA also supports agents that are not represented by entities.
@@ -1285,7 +1286,7 @@ class _AnnouncementFlowMixin:
         if selected not in seen:
             options.append(
                 selector.SelectOptionDict(
-                    value=selected, label=f"Unavailable agent ({selected})"
+                    value=selected, label=provider_label(self.hass, "agent_unavailable", name=selected)
                 )
             )
         return options
@@ -1295,7 +1296,7 @@ class _AnnouncementFlowMixin:
         choices = [
             selector.SelectOptionDict(
                 value=DEFAULT_FALLBACK_AI_AGENT,
-                label="Original announcement (no backup AI)",
+                label=provider_label(self.hass, "original"),
             ),
             *self._ai_agent_options(),
         ]
@@ -1307,7 +1308,7 @@ class _AnnouncementFlowMixin:
             choices.append(
                 selector.SelectOptionDict(
                     value=configured,
-                    label=f"Unavailable backup agent ({configured})",
+                    label=provider_label(self.hass, "backup_unavailable", name=configured),
                 )
             )
         return choices
@@ -1413,7 +1414,7 @@ class _AnnouncementFlowMixin:
             state = self.hass.states.get(sensor)
             attributes = sorted(str(key) for key in (state.attributes if state else {}))
             options = [
-                selector.SelectOptionDict(value="state", label="State"),
+                selector.SelectOptionDict(value="state", label=provider_label(self.hass, "state")),
                 *[
                     selector.SelectOptionDict(value=key, label=key)
                     for key in attributes
