@@ -1072,3 +1072,89 @@ def test_ai_task_invalid_response_falls_back_to_original() -> None:
         agent_id="ai_task.bad",
     ))
     assert result == ("Temperature 23°C", "Temperature 23°C")
+
+
+def test_action_done_with_empty_targets_is_not_real_device_action():
+    """Modern HA LLMs include an empty targets field in action_done."""
+    response = ha_reply("Das Fenster ist offen.", "🪟 Fenster offen.")
+    response["response"]["response_type"] = "action_done"
+    response["response"]["data"] = {
+        "targets": [], "success": [], "failed": [],
+    }
+    diag = {}
+    result = asyncio.run(ai.async_filter_announcement(
+        Hass(response), text_tts="Fenster offen",
+        text_notify="Fenster offen", agent_id="conversation.local",
+        diagnostics=diag,
+    ))
+    assert result == ("Das Fenster ist offen.", "🪟 Fenster offen.")
+    assert diag["status"] == "rewritten"
+    assert diag["failure_reason"] is None
+
+
+def test_ai_task_native_schema_requests_only_selected_channels():
+    hass = Hass({"data": {"text_notify": "🚪 Door open!"}})
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts=None, text_notify="Door open",
+        agent_id="ai_task.local", mode="rewrite",
+    ))
+    assert result == (None, "🚪 Door open!")
+    domain, action, payload, _ = hass.services.calls[0]
+    assert (domain, action) == ("ai_task", "generate_data")
+    assert set(payload["structure"]) == {"text_notify"}
+    assert payload["structure"]["text_notify"]["required"] is True
+    assert payload["structure"]["text_notify"]["selector"] == {"text": {}}
+
+
+def test_ai_task_native_schema_includes_short_title_for_generation():
+    hass = Hass({"data": {
+        "text_tts": "Door is open.",
+        "text_notify": "🚪 Door open",
+        "title": "Front door open",
+    }})
+    title = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify="Door open",
+        agent_id="ai_task.local", mode="generate", title_result=title,
+    ))
+    assert got == ("Door is open.", "🚪 Door open")
+    assert title["title"] == "Front door open"
+    assert set(hass.services.calls[0][2]["structure"]) == {
+        "text_tts", "text_notify", "title"
+    }
+
+
+def test_ai_task_cannot_create_missing_channel_even_with_structured_response():
+    hass = Hass({"data": {
+        "text_tts": "Hello.",
+        "text_notify": "Unrequested",
+    }})
+    got = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Hello", text_notify=None,
+        agent_id="ai_task.local",
+    ))
+    assert got == ("Hello.", None)
+
+
+def test_safe_diagnostics_separate_online_invalid_json_from_timeout():
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        Hass(ha_reply("not JSON", None)),
+        text_tts="Door open", text_notify=None,
+        agent_id="conversation.local", diagnostics=diag,
+    ))
+    assert got == ("Door open", None)
+    assert diag["failure_reason"] == "invalid_json"
+    assert diag["attempts"][0]["outcome"] == "invalid_json"
+    assert "not JSON" not in str(diag)
+
+
+def test_safe_diagnostics_identify_factual_numeric_change():
+    diag = {}
+    got = asyncio.run(ai.async_filter_announcement(
+        Hass(ha_reply("Temperature 25°C", None)),
+        text_tts="Temperature 23°C", text_notify=None,
+        agent_id="conversation.local", diagnostics=diag,
+    ))
+    assert got == ("Temperature 23°C", None)
+    assert diag["failure_reason"] == "number_mismatch"
