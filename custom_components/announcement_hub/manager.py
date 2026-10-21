@@ -3730,7 +3730,12 @@ class AnnouncementManager:
                 except asyncio.CancelledError:
                     raise
                 except Exception as err:  # noqa: BLE001
-                    self._clear_held_snapcast_route()
+                    # Preserve the snapshot even if HA only restored some
+                    # clients. Future jobs must not play over an unknown route.
+                    self._held_snapcast_snapshot = route_snapshot
+                    self._held_snapcast_selected = tuple(selected_clients)
+                    self._held_snapcast_targets = tuple(route_targets)
+                    self._held_snapcast_player = player
                     self._record_channel_failure(job, "snapcast_restore", err)
 
     async def _async_available_tts_engines(
@@ -4209,13 +4214,16 @@ class AnnouncementManager:
         snapshot = self._held_snapcast_snapshot
         if snapshot is None:
             return
-        self._clear_held_snapcast_route()
         try:
             await self._async_restore_snapcast(snapshot)
         except asyncio.CancelledError:
             raise
         except Exception as err:  # noqa: BLE001
+            # Keep the *original* mute snapshot for another restoration
+            # attempt; forgetting it strands clients in an unknown state.
             _LOGGER.warning("Could not restore held Snapcast route: %s", err)
+            return
+        self._clear_held_snapcast_route()
 
     async def _async_apply_snapcast_route(
         self,
@@ -4239,6 +4247,11 @@ class AnnouncementManager:
                     self._held_snapcast_targets,
                 )
             await self._async_restore_held_snapcast_route()
+            if self._held_snapcast_snapshot is not None:
+                raise HomeAssistantError(
+                    "Refusing shared playback until prior Snapcast mute "
+                    "states can be restored"
+                )
 
         snapshot = self._routable_snapcast_snapshot(selected_clients)
         if not snapshot:
