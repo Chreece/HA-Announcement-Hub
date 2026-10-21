@@ -106,6 +106,8 @@ def test_cancelled_tts_prefetch_releases_slot_without_new_enqueue():
     async def scenario():
         jobs = [make_job(1, "kitchen"), make_job(2, "bedroom"),
                 make_job(3, "office")]
+        for item in jobs:
+            item.ai["pending_preprocessing"] = False
         h = Producers(jobs)
         h._fill_prefetch_slots()
         await wait_for(lambda: len(h._tts_started) == 2)
