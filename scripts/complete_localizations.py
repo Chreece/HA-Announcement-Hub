@@ -184,11 +184,29 @@ def main():
         candidates = candidate_texts(en, existing, english_card, current_card)
         if args.limit:
             candidates = candidates[:args.limit]
+        # Batch across unique strings: thousands of individual generate()
+        # calls would be unnecessarily slow even on an Actions runner.
+        segmented = {source: PROTECTED.split(source) for source in candidates}
+        pieces = [
+            (source, i, part)
+            for source, parts in segmented.items()
+            for i, part in enumerate(parts)
+            if i % 2 == 0 and part.strip()
+        ]
+        for start in range(0, len(pieces), 12):
+            batch = pieces[start : start + 12]
+            translated = translate_batch(
+                active_model, active_tokenizer, code,
+                [item[2] for item in batch],
+            )
+            for (source, index, _), result in zip(batch, translated):
+                segmented[source][index] = result
+            if start % 120 == 0:
+                print(f"{lang}: {min(start + 12, len(pieces))}/{len(pieces)} translated segments", flush=True)
         cache = {}
-        for i, source in enumerate(candidates, 1):
-            translate_one(active_model, active_tokenizer, code, source, cache)
-            if i % 25 == 0:
-                print(f"{lang}: {i}/{len(candidates)}", flush=True)
+        for source, parts in segmented.items():
+            guess = "".join(parts)
+            cache[source] = guess if safe_candidate(source, guess) else source
         new_locale = dict(current_card)
         for key in english_card:
             if key not in new_locale and key in cache:
