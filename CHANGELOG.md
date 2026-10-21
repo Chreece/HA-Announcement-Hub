@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.9.44 - 2026-10-21
+
+- Recover online Conversation AI responses that contain exactly one usable
+  JSON object inside a short explanation, or mark text-only action_done replies
+  as safe when HA reports no device/action data.
+- Accept an omitted null/unrequested channel and discard an unused AI title
+  without permitting extra recipients, tools, unexpected action fields,
+  missing requested text or changed numeric readings.
+- If the final AI provider returns invalid JSON, an incomplete response or
+  changed measurements, make **one bounded short-prompt retry** instead of
+  immediately delivering the original. Prefer a configured backup AI to
+  repeating the primary provider; preserve the original after unsafe retries.
+- Expose a persisted, capped **recent_ai** summary of the latest 20 AI
+  outcomes in the Hub queue sensor, including successes, failed validation,
+  exact failure category, retry count and AI-disabled requests or overrides.
+  This remains visible when a newer successful announcement replaces last.ai
+  and excludes all source text, prompts and model output.
+- Add regressions for prefaced/fenced JSON, ambiguous multiple objects,
+  actual action-field rejection, optional null channels/titles, one safe
+  retry, numeric integrity, backup precedence and diagnostic persistence.
+- Keep room-specific FIFO delivery, provider isolation and AI Task native
+  structured output unchanged.
+
 ## 0.9.43 - 2026-10-21
 
 - Fix intermittent **AI-enabled announcements delivered unchanged** when a
