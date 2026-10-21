@@ -4,7 +4,7 @@
     "step": {
       "outputs": {
         "title": "Meldingsuitgangen",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "Kies meldingsapparaten per ruimte en minimale niveaus.",
         "data": {
           "notify_outputs": "Meldingsapparaten",
           "notify_room_outputs": "Meldingsapparaten per ruimte",
@@ -24,7 +24,7 @@
       },
       "tts": {
         "title": "TTS-uitgangen",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "Kies TTS-engine, stem, spelers en Snapcast-clients.",
         "data": {
           "tts_engines": "TTS-engine",
           "tts_media_player": "Gedeelde mediaspeler voor Snapcast",
@@ -58,7 +58,7 @@
       },
       "notification_profile": {
         "title": "Integratieopties: {integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "Stel het meldings- en routeringsgedrag in.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -104,7 +104,7 @@
       },
       "queue": {
         "title": "Algemene opties",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "Configureer aanwezigheid, terugval, deuren, wachtrij en time-outs.",
         "data": {
           "queue_max": "Maximaal aantal berichten in wachtrij",
           "output_availability_timeout": "Unavailable-output wait",
@@ -146,7 +146,7 @@
       },
       "reconfigure": {
         "title": "Announcement Hub opnieuw configureren",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "Kies een sectie; na opslaan keer je terug naar de integratie.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
@@ -182,7 +182,7 @@
     "step": {
       "outputs": {
         "title": "Meldingsuitgangen",
-        "description": "All recognised notification entities are selected automatically. Deselect devices you do not want, mark room-bound devices, and assign higher minimum levels where needed. Selected devices not listed in a higher-level field use Debug.",
+        "description": "Kies meldingsapparaten per ruimte en minimale niveaus.",
         "data": {
           "notify_outputs": "Meldingsapparaten",
           "notify_room_outputs": "Meldingsapparaten per ruimte",
@@ -202,7 +202,7 @@
       },
       "tts": {
         "title": "TTS-uitgangen",
-        "description": "Choose the single TTS engine with its language, voice and provider options, then select direct room players and, when Snapcast is available, its synchronized room clients plus the shared player that feeds them.",
+        "description": "Kies TTS-engine, stem, spelers en Snapcast-clients.",
         "data": {
           "tts_engines": "TTS-engine",
           "tts_media_player": "Gedeelde mediaspeler voor Snapcast",
@@ -236,7 +236,7 @@
       },
       "notification_profile": {
         "title": "Integratieopties: {integration}",
-        "description": "Configure the selected integration's notification/routing behavior.",
+        "description": "Stel het meldings- en routeringsgedrag in.",
         "data": {
           "max_length": "Maximum characters per part",
           "reading_words_per_minute": "Reading speed",
@@ -282,7 +282,7 @@
       },
       "queue": {
         "title": "Algemene opties",
-        "description": "Presence routing, fallback behavior, optional door-label filtering, notification defaults, and queue/timeouts.",
+        "description": "Configureer aanwezigheid, terugval, deuren, wachtrij en time-outs.",
         "data": {
           "queue_max": "Maximaal aantal berichten in wachtrij",
           "output_availability_timeout": "Unavailable-output wait",
@@ -324,7 +324,7 @@
       },
       "init": {
         "title": "Configure Announcement Hub",
-        "description": "Choose the section you want to change. Saving it returns directly to the integration without opening the remaining setup steps.",
+        "description": "Kies een sectie; na opslaan keer je terug naar de integratie.",
         "menu_options": {
           "edit_outputs": "1. Notification outputs & rooms",
           "edit_tts": "2. TTS engines & devices",
