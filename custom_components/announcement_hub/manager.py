@@ -512,8 +512,8 @@ class AnnouncementManager:
                 )
             await self._async_restore_held_snapcast_route()
 
-            self._queue = deque(sorted(
-                self._queue, key=lambda item: (item.created_at, item.job_id)
+            self._queue = type(self._queue)(sorted(
+                self._queue, key=lambda item: (getattr(item, "created_at", ""), item.job_id)
             ))
 
             async with self._save_lock:
@@ -2016,7 +2016,7 @@ class AnnouncementManager:
             group = next(
                 (item for item in (
                     *self._queue,
-                    *self._active_jobs.values(),
+                    *getattr(self, "_active_jobs", {}).values(),
                 ) if item.job_id == job_id),
                 None,
             )
@@ -2024,9 +2024,9 @@ class AnnouncementManager:
                 for sibling_id in group.related_job_ids:
                     with suppress(ServiceValidationError):
                         await self.async_cancel(sibling_id, _cascade=False)
-        if job_id in self._active_jobs:
+        if job_id in getattr(self, "_active_jobs", {}):
             self._cancel_requested.add(job_id)
-            active_players = tuple(self._players_by_job.get(job_id, ()))
+            active_players = tuple(getattr(self, "_players_by_job", {}).get(job_id, ()))
             if active_players:
                 await asyncio.gather(
                     *(self._async_stop_player(player) for player in active_players),
@@ -2603,8 +2603,8 @@ class AnnouncementManager:
         job.error = None
         job.channel_errors.clear()
         self._queue.appendleft(job)
-        self._queue = deque(sorted(
-            self._queue, key=lambda item: (item.created_at, item.job_id)
+        self._queue = type(self._queue)(sorted(
+            self._queue, key=lambda item: (getattr(item, "created_at", ""), item.job_id)
         ))
 
     def _requeue_undelivered_job(
@@ -2630,8 +2630,8 @@ class AnnouncementManager:
             job.error = None
             job.channel_errors.clear()
             self._queue.append(job)
-        self._queue = deque(sorted(
-            self._queue, key=lambda item: (item.created_at, item.job_id)
+        self._queue = type(self._queue)(sorted(
+            self._queue, key=lambda item: (getattr(item, "created_at", ""), item.job_id)
         ))
         self._wake.set()
 
@@ -2788,7 +2788,7 @@ class AnnouncementManager:
         """
         # Even an older AI/preprocessing or backoff job reserves its room.
         reserved: set[str] = set()
-        for active in self._active_jobs.values():
+        for active in getattr(self, "_active_jobs", {}).values():
             reserved.update(self._delivery_lane_keys(active))
         for job in tuple(self._queue):
             keys = self._delivery_lane_keys(job)
@@ -4812,7 +4812,7 @@ class AnnouncementManager:
         self._group_success.setdefault(job.group_id, set()).add(physical)
         group_jobs = (
             *self._queue,
-            *self._active_jobs.values(),
+            *getattr(self, "_active_jobs", {}).values(),
         )
         for sibling in group_jobs:
             if (
@@ -4828,7 +4828,7 @@ class AnnouncementManager:
             queued.group_id == job.group_id for queued in self._queue
         ):
             return
-        if any(active.group_id == job.group_id for active in self._active_jobs.values()):
+        if any(active.group_id == job.group_id for active in getattr(self, "_active_jobs", {}).values()):
             return
         self._group_success.pop(job.group_id, None)
 
