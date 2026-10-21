@@ -4456,8 +4456,19 @@ class AnnouncementManager:
                >= self._max_parallel_ai
         ):
             return
-        # Same-room AI requests are serialized; keep capacity for other rooms
-        # instead of filling a local LLM with speculative same-room prompts.
+        # Same-room jobs, and jobs using the SAME AI provider, must not
+        # issue overlapping model calls. A local model may be live while
+        # simultaneously rejecting another generation request. Different
+        # agents can still work in parallel for independent rooms.
+        chosen_provider = job.ai.get("requested_agent_id")
+        if chosen_provider and any(
+            other.job_id in self._ai_tasks
+            and not self._ai_tasks[other.job_id].done()
+            and other.ai.get("requested_agent_id") == chosen_provider
+            for other in self._queue
+            if other is not job
+        ):
+            return
         keys = self._room_lane_keys(job)
         if any(
             keys & self._room_lane_keys(other)
