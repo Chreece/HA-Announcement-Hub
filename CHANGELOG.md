@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.9.42 - 2026-10-21
+
+- Complete every existing dashboard composer/card-editor locale string across
+  all 20 supported frontend languages (English source and 19 translations).
+  This includes room/explicit-device targeting help, TTS and AI choices,
+  dynamic queue messages, validation/errors, critical confirmation and
+  recipient selections, without altering entity IDs or service payloads.
+- Finish native integration Greek and German selector translations, including
+  Android TV placement, notification color, font size and severity labels.
+- Add reviewed French and Spanish native integration descriptions for 24
+  critical room routing, occupied-room, fallback-door, Snapcast/TTS and AI
+  settings, mirrored across initial configuration and options.
+- Correct the announcement action's AI provider description to explicitly
+  support both Conversation agents and AI Task entities.
+- Enforce card key coverage and interpolation parity in automated regressions.
+  Retain reviewed text and remove rejected machine translation experiments
+  that produced inaccurate fallback and room-targeting explanations.
+- Other non-Greek/German native integration catalogs still contain English
+  fallback descriptions. Their remaining review work is tracked in issue #50;
+  a full schema is not claimed to equal a complete human translation.
+
 ## 0.9.41 - 2026-10-21
 
 - Internationalize the **Announcement Hub dashboard composer and card editor**,
