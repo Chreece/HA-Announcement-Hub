@@ -85,11 +85,14 @@ selectors and service-action names now have internationalized labels.
 The shipped language files cover **Arabic, Chinese (Simplified/Traditional),
 Czech, Dutch, English, French, German, Greek, Italian, Japanese, Korean,
 Polish, Portuguese (Portugal/Brazil), Russian, Spanish, Swedish, Turkish,
-and Ukrainian**. Greek and German have detailed integration translations;
-newly added languages include translated core controls, setup summaries
-and action fields. **Untranslated explanatory text falls back to English**
-instead of appearing blank. Contributions to complete the detailed help
-translations are welcome.
+and Ukrainian**. Every localized dashboard card now has the same complete
+set of translated UI phrases, including prompts, validation errors, routing
+help and queue feedback. Greek and German native integration menus have
+comprehensive translations, including selectors; French and Spanish include
+reviewed translations for critical routing, TTS and AI explanations.
+**Some detailed native configuration and service descriptions in other
+languages still fall back to English** while they await review. We do not
+automatically replace these with unverified machine-translated text.
 
 To switch the card language, change the language under your Home Assistant
 user profile and refresh the dashboard; the card follows your selected
