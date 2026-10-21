@@ -22,6 +22,7 @@ from homeassistant.core import (
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.service import async_set_service_schema
+from homeassistant.helpers.start import async_at_started
 from homeassistant.util.yaml import load_yaml_dict
 
 from .const import (
@@ -80,9 +81,11 @@ from .const import (
     SERVICE_CANCEL,
     SERVICE_CLEAR_QUEUE,
     SERVICE_SEND,
+    VERSION,
     TARGET_ENTITY_PREFIX,
     TARGET_SERVICE_PREFIX,
 )
+from .dashboard_resource import async_ensure_card_resource
 from .manager import AnnouncementManager
 from .message_text import resolve_channel_texts
 from .outputs import area_name
@@ -520,6 +523,13 @@ async def async_setup_entry(
         )
 
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+        async def _register_dashboard_card(started_hass: HomeAssistant) -> None:
+            await async_ensure_card_resource(started_hass, VERSION)
+
+        # Lovelace may not be loaded during integration setup. Schedule once
+        # after startup; also works for integrations installed while HA runs.
+        entry.async_on_unload(async_at_started(hass, _register_dashboard_card))
     except BaseException:
         await manager.async_stop()
         if hass.data.get(DOMAIN, {}).get("manager") is manager:
