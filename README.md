@@ -75,6 +75,28 @@ The repository also includes an optional `./install.sh` installer when working
 from a local checkout. Home Assistant must still be restarted after installing
 the component.
 
+## Languages and translations
+
+Announcement Hub follows the selected **Home Assistant interface language**.
+The dashboard announcement composer, its visual card editor, severity,
+recipients, send/queue messages, and the integration's setup, options,
+selectors and service-action names now have internationalized labels.
+
+The shipped language files cover **Arabic, Chinese (Simplified/Traditional),
+Czech, Dutch, English, French, German, Greek, Italian, Japanese, Korean,
+Polish, Portuguese (Portugal/Brazil), Russian, Spanish, Swedish, Turkish,
+and Ukrainian**. Greek and German have detailed integration translations;
+newly added languages include translated core controls, setup summaries
+and action fields. **Untranslated explanatory text falls back to English**
+instead of appearing blank. Contributions to complete the detailed help
+translations are welcome.
+
+To switch the card language, change the language under your Home Assistant
+user profile and refresh the dashboard; the card follows your selected
+frontend language. Arabic layout uses right-to-left direction, and
+language-specific entity IDs, exact service names, YAML keys and automation
+payloads are never translated.
+
 ## Dashboard card
 
 Announcement Hub includes its own modern **Lovelace Announcement Composer**
