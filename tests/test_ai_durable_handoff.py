@@ -36,6 +36,9 @@ class Harness:
     def _prepare_staged_route(self, job):
         job.notify_text = job.text_notify
 
+    def _fill_prefetch_slots(self):
+        pass
+
     def _schedule_prefetch(self, job):
         self._prefetched.append(job.job_id)
 
