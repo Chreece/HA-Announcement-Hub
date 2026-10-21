@@ -120,7 +120,11 @@
     "AI provider": "Πάροχος AI",
     "Announcement Hub chooses configured outputs using room and fallback rules.": "Το Hub επιλέγει τις ρυθμισμένες εξόδους σύμφωνα με τους κανόνες δωματίων και εφεδρικής δρομολόγησης.",
     "Search notify.* or media_player.* ...": "Αναζήτηση notify.* ή media_player.* ...",
-    "Kitchen, Hallway": "Κουζίνα, Διάδρομος"
+    "Kitchen, Hallway": "Κουζίνα, Διάδρομος",
+    "Area": "Περιοχή",
+    "Integration": "Ενσωμάτωση",
+    "Device": "Συσκευή",
+    "Entity": "Οντότητα"
   },
   "de": {
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · NACHRICHTEN",
@@ -243,7 +247,11 @@
     "AI provider": "KI-Anbieter",
     "Announcement Hub chooses configured outputs using room and fallback rules.": "Announcement Hub wählt konfigurierte Ausgaben nach Raum- und Fallback-Regeln aus.",
     "Search notify.* or media_player.* ...": "notify.* oder media_player.* suchen...",
-    "Kitchen, Hallway": "Küche, Flur"
+    "Kitchen, Hallway": "Küche, Flur",
+    "Area": "Bereich",
+    "Integration": "Integration",
+    "Device": "Gerät",
+    "Entity": "Entität"
   },
   "fr": {
     "The message": "Le message",
@@ -317,7 +325,11 @@
     "Compose once. Deliver to the right place.": "Un seul message, au bon endroit.",
     "Send a Critical announcement?": "Envoyer une annonce critique ?",
     "AI wording mode": "Mode de rédaction IA",
-    "AI provider": "Fournisseur IA"
+    "AI provider": "Fournisseur IA",
+    "Area": "Pièce",
+    "Integration": "Intégration",
+    "Device": "Appareil",
+    "Entity": "Entité"
   },
   "es": {
     "The message": "El mensaje",
@@ -391,7 +403,11 @@
     "Compose once. Deliver to the right place.": "Escribe una vez. Entrega en el lugar correcto.",
     "Send a Critical announcement?": "¿Enviar un anuncio crítico?",
     "AI wording mode": "Modo de redacción con IA",
-    "AI provider": "Proveedor de IA"
+    "AI provider": "Proveedor de IA",
+    "Area": "Área",
+    "Integration": "Integración",
+    "Device": "Dispositivo",
+    "Entity": "Entidad"
   },
   "it": {
     "The message": "Il messaggio",
@@ -463,7 +479,11 @@
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · MESSAGGI",
     "Compose once. Deliver to the right place.": "Scrivi una volta. Invia nel posto giusto.",
     "Send a Critical announcement?": "Inviare un annuncio critico?",
-    "AI provider": "Fornitore IA"
+    "AI provider": "Fornitore IA",
+    "Area": "Area",
+    "Integration": "Integrazione",
+    "Device": "Dispositivo",
+    "Entity": "Entità"
   },
   "pt": {
     "The message": "A mensagem",
@@ -535,7 +555,11 @@
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · MENSAGENS",
     "Compose once. Deliver to the right place.": "Escreva uma vez. Entregue no local certo.",
     "Send a Critical announcement?": "Enviar um anúncio crítico?",
-    "AI provider": "Fornecedor IA"
+    "AI provider": "Fornecedor IA",
+    "Area": "Área",
+    "Integration": "Integração",
+    "Device": "Dispositivo",
+    "Entity": "Entidade"
   },
   "nl": {
     "The message": "Het bericht",
@@ -607,7 +631,11 @@
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · BERICHTEN",
     "Compose once. Deliver to the right place.": "Eenmaal schrijven. Op de juiste plek afleveren.",
     "Send a Critical announcement?": "Kritieke aankondiging verzenden?",
-    "AI provider": "AI-provider"
+    "AI provider": "AI-provider",
+    "Area": "Ruimte",
+    "Integration": "Integratie",
+    "Device": "Apparaat",
+    "Entity": "Entiteit"
   },
   "pl": {
     "The message": "Wiadomość",
@@ -679,7 +707,11 @@
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · WIADOMOŚCI",
     "Compose once. Deliver to the right place.": "Napisz raz. Dostarcz we właściwe miejsce.",
     "Send a Critical announcement?": "Wysłać krytyczne ogłoszenie?",
-    "AI provider": "Dostawca AI"
+    "AI provider": "Dostawca AI",
+    "Area": "Obszar",
+    "Integration": "Integracja",
+    "Device": "Urządzenie",
+    "Entity": "Encja"
   },
   "pt-BR": {
     "The message": "A mensagem",
@@ -751,7 +783,11 @@
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · MENSAGENS",
     "Compose once. Deliver to the right place.": "Escreva uma vez. Entregue no local certo.",
     "Send a Critical announcement?": "Enviar um anúncio crítico?",
-    "AI provider": "Provedor de IA"
+    "AI provider": "Provedor de IA",
+    "Area": "Área",
+    "Integration": "Integração",
+    "Device": "Dispositivo",
+    "Entity": "Entidade"
   },
   "ru": {
     "The message": "Сообщение",
@@ -814,7 +850,11 @@
     "Send a Critical announcement?": "Отправить критическое объявление?",
     "Card title": "Название карточки",
     "Show queue count": "Показывать очередь",
-    "AI provider": "Поставщик ИИ"
+    "AI provider": "Поставщик ИИ",
+    "Area": "Область",
+    "Integration": "Интеграция",
+    "Device": "Устройство",
+    "Entity": "Сущность"
   },
   "tr": {
     "The message": "Mesaj",
@@ -877,7 +917,11 @@
     "Send a Critical announcement?": "Kritik duyuru gönderilsin mi?",
     "Card title": "Kart başlığı",
     "Show queue count": "Kuyruk sayısını göster",
-    "AI provider": "YZ sağlayıcısı"
+    "AI provider": "YZ sağlayıcısı",
+    "Area": "Alan",
+    "Integration": "Entegrasyon",
+    "Device": "Cihaz",
+    "Entity": "Varlık"
   },
   "uk": {
     "The message": "Повідомлення",
@@ -940,7 +984,11 @@
     "Send a Critical announcement?": "Надіслати критичне оголошення?",
     "Card title": "Назва картки",
     "Show queue count": "Показувати кількість у черзі",
-    "AI provider": "Постачальник ШІ"
+    "AI provider": "Постачальник ШІ",
+    "Area": "Зона",
+    "Integration": "Інтеграція",
+    "Device": "Пристрій",
+    "Entity": "Сутність"
   },
   "ar": {
     "The message": "الرسالة",
@@ -1003,7 +1051,11 @@
     "Send a Critical announcement?": "إرسال إعلان حرج؟",
     "Card title": "عنوان البطاقة",
     "Show queue count": "إظهار عدد الانتظار",
-    "AI provider": "موفر الذكاء الاصطناعي"
+    "AI provider": "موفر الذكاء الاصطناعي",
+    "Area": "منطقة",
+    "Integration": "تكامل",
+    "Device": "جهاز",
+    "Entity": "كيان"
   },
   "zh-Hans": {
     "The message": "消息",
@@ -1066,7 +1118,11 @@
     "Send a Critical announcement?": "发送严重公告？",
     "Card title": "卡片标题",
     "Show queue count": "显示队列数量",
-    "AI provider": "AI 提供者"
+    "AI provider": "AI 提供者",
+    "Area": "区域",
+    "Integration": "集成",
+    "Device": "设备",
+    "Entity": "实体"
   },
   "ja": {
     "The message": "メッセージ",
@@ -1129,7 +1185,11 @@
     "Send a Critical announcement?": "緊急アナウンスを送信しますか？",
     "Card title": "カードのタイトル",
     "Show queue count": "キュー数を表示",
-    "AI provider": "AIプロバイダー"
+    "AI provider": "AIプロバイダー",
+    "Area": "エリア",
+    "Integration": "統合",
+    "Device": "デバイス",
+    "Entity": "エンティティ"
   },
   "ko": {
     "The message": "메시지",
@@ -1192,7 +1252,11 @@
     "Send a Critical announcement?": "긴급 안내를 보내시겠습니까?",
     "Card title": "카드 제목",
     "Show queue count": "대기열 수 표시",
-    "AI provider": "AI 제공자"
+    "AI provider": "AI 제공자",
+    "Area": "구역",
+    "Integration": "통합",
+    "Device": "기기",
+    "Entity": "엔티티"
   },
   "sv": {
     "The message": "Meddelandet",
@@ -1245,7 +1309,11 @@
     "Hub channels": "Hub-kanaler",
     "{count} waiting announcements": "{count} meddelanden väntar",
     "Announcement Hub": "Meddelandecenter",
-    "AI provider": "AI-leverantör"
+    "AI provider": "AI-leverantör",
+    "Area": "Område",
+    "Integration": "Integration",
+    "Device": "Enhet",
+    "Entity": "Entitet"
   },
   "cs": {
     "The message": "Zpráva",
@@ -1298,7 +1366,11 @@
     "Hub channels": "Kanály Hub",
     "{count} waiting announcements": "Čeká {count} oznámení",
     "Announcement Hub": "Centrum oznámení",
-    "AI provider": "Poskytovatel AI"
+    "AI provider": "Poskytovatel AI",
+    "Area": "Oblast",
+    "Integration": "Integrace",
+    "Device": "Zařízení",
+    "Entity": "Entita"
   },
   "zh-Hant": {
     "The message": "訊息",
@@ -1361,6 +1433,10 @@
     "Send a Critical announcement?": "发送严重公告？",
     "Card title": "卡片标题",
     "Show queue count": "显示队列数量",
-    "AI provider": "AI 提供者"
+    "AI provider": "AI 提供者",
+    "Area": "區域",
+    "Integration": "整合",
+    "Device": "裝置",
+    "Entity": "實體"
   }
 }
