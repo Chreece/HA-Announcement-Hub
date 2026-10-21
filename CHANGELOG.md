@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.41 - 2026-10-21
+
+- Internationalize the **Announcement Hub dashboard composer and card editor**,
+  including localized controls, placeholders, help, severity, AI modes,
+  recipients, queue summaries, validation feedback and send results.
+- Follow each user's Home Assistant frontend language, support region-specific
+  Portuguese and Chinese variants, right-to-left Arabic and safe English
+  fallback. Preserve all language-independent service, device and entity IDs.
+- Include **20 interface locales**: English, Greek, German, French, Spanish,
+  Italian, Portuguese (PT/BR), Dutch, Polish, Russian, Turkish, Ukrainian,
+  Arabic, Chinese (Simplified/Traditional), Japanese, Korean, Swedish, Czech.
+- Extend native integration translation catalogs from EN/EL/DE to every listed
+  locale; translate core setup headings and descriptions, routing/service
+  labels, AI provider, recipient fields and severity. Detailed help in newer
+  locales falls back to English when not yet localized.
+- Keep Greek and German integration translation coverage complete; add Greek
+  and German dashboard card strings, include the locale file in the manual
+  installer and test translations, placeholders and runtime locale changes.
+
 ## 0.9.40 - 2026-10-21
 
 - Automatically register the bundled **Announcement Hub** composer card in
