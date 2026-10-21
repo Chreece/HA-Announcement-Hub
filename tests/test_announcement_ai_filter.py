@@ -1158,3 +1158,34 @@ def test_safe_diagnostics_identify_factual_numeric_change():
     ))
     assert got == ("Temperature 23°C", None)
     assert diag["failure_reason"] == "number_mismatch"
+
+
+def test_ai_task_downgrades_only_unsupported_structure():
+    hass = Hass(responses=[
+        RuntimeError("structured output not supported by model"),
+        {"data": json.dumps({
+            "text_tts": "The door is open.",
+            "text_notify": "🚪 Door open",
+        })},
+    ])
+    diag = {}
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify="Door open",
+        agent_id="ai_task.legacy_model", diagnostics=diag,
+    ))
+    assert result == ("The door is open.", "🚪 Door open")
+    assert len(hass.services.calls) == 2
+    assert "structure" in hass.services.calls[0][2]
+    assert "structure" not in hass.services.calls[1][2]
+    assert diag["attempts"][0]["outcome"] == "structured_output_unavailable"
+    assert diag["status"] == "rewritten"
+
+
+def test_ai_task_generic_provider_error_does_not_duplicate_request():
+    hass = Hass(error=RuntimeError("model is offline"))
+    result = asyncio.run(ai.async_filter_announcement(
+        hass, text_tts="Door open", text_notify=None,
+        agent_id="ai_task.offline_model",
+    ))
+    assert result == ("Door open", None)
+    assert len(hass.services.calls) == 1
