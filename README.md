@@ -85,13 +85,13 @@ CDN, Node installation or separate JavaScript download is required.
 
 1. Install Announcement Hub through HACS and restart Home Assistant. Confirm
    the integration is configured under **Settings → Devices & services**.
-2. Open **Settings → Dashboards → ⋮ → Resources → Add resource**.
-3. Enter the URL **`/announcement_hub/announcement-hub-card.js`**, select
-   **JavaScript module** and save. This is a one-time dashboard resource
-   registration; the integration serves the JS, CSS and HTML automatically.
-4. Edit any dashboard → **Add card** → search for **Announcement Hub**.
-   The card appears in the custom-card picker and has a graphical editor.
-   Alternatively, use this YAML:
+2. Edit any dashboard → **Add card** → search for **Announcement Hub**.
+   The integration automatically registers its bundled JavaScript module in
+   Lovelace's standard **storage-mode** resource list after Home Assistant
+   finishes starting. No separate card installation or manual resource entry
+   is necessary.
+3. Select **Announcement Hub** to open the graphical editor. Alternatively,
+   use this YAML:
 
 ```yaml
 type: custom:announcement-hub-card
@@ -101,6 +101,14 @@ show_queue: true
 show_ai: true
 clear_after_send: false
 ```
+
+If the card is not shown after refreshing the browser, check **Settings →
+Dashboards → ⋮ → Resources**. For dashboards with YAML-managed resources or
+installations where automatic registration is unavailable, add
+`/announcement_hub/announcement-hub-card.js` as a **JavaScript module** and
+refresh the browser. The integration serves the JS, CSS, and HTML files itself.
+The card's exact type is `custom:announcement-hub-card`; its picker name is
+**Announcement Hub**.
 
 The visual editor controls the card heading, initial importance, queue
 counter, AI controls and whether the message fields clear after a successful
