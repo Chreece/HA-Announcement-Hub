@@ -164,7 +164,10 @@
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
           "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings."
+          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_advanced_ai": "Editar estilos opcionales de IA para reformulación, traducción y combinación, sin cambiar las reglas de seguridad.",
+          "edit_audio": "Configurar sonido previo y reducción de volumen solo para altavoces de habitación seleccionados, nunca para Snapcast compartido.",
+          "edit_room_safety": "Configurar un sensor de presencia opcional por habitación; si no está disponible no se redirige el aviso."
         }
       },
       "people": {
@@ -466,7 +469,10 @@
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
           "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings."
+          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_advanced_ai": "Editar estilos opcionales de IA para reformulación, traducción y combinación, sin cambiar las reglas de seguridad.",
+          "edit_audio": "Configurar sonido previo y reducción de volumen solo para altavoces de habitación seleccionados, nunca para Snapcast compartido.",
+          "edit_room_safety": "Configurar un sensor de presencia opcional por habitación; si no está disponible no se redirige el aviso."
         }
       },
       "people": {
