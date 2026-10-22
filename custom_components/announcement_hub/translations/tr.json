@@ -171,7 +171,7 @@
           "tracked_people": "Kişiler",
           "person_group_language": "Grup dili",
           "person_group_voice": "Grup sesi",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Grup duyurularını çevir"
         },
         "data_description": {
           "tracked_people": "Oda takibi ve kişisel ses tercihlerini yapılandırmak istediğiniz kişileri seçin.",
@@ -189,10 +189,10 @@
           "voice": "Ses",
           "ignore_home": "Evde değilken izin ver",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Telefon çıkışları",
+          "destination_watch": "Saat çıkışları",
+          "destination_tablet": "Tablet çıkışları",
+          "destination_other": "Diğer kişisel çıkışlar"
         },
         "data_description": {
           "tracker": "Kişinin bulunduğu odayı durumunda veya room/area niteliğinde bildiren sensörü ya da cihaz takipçisini seçin.",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Seçilen kişisel çıkış yok veya devre dışı."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "Kişiler",
           "person_group_language": "Grup dili",
           "person_group_voice": "Grup sesi",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Grup duyurularını çevir"
         },
         "data_description": {
           "tracked_people": "Oda takibi ve kişisel ses tercihlerini yapılandırmak istediğiniz kişileri seçin.",
@@ -412,10 +412,10 @@
           "voice": "Ses",
           "ignore_home": "Evde değilken izin ver",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Telefon çıkışları",
+          "destination_watch": "Saat çıkışları",
+          "destination_tablet": "Tablet çıkışları",
+          "destination_other": "Diğer kişisel çıkışlar"
         },
         "data_description": {
           "tracker": "Kişinin bulunduğu odayı durumunda veya room/area niteliğinde bildiren sensörü ya da cihaz takipçisini seçin.",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Seçilen kişisel çıkış yok veya devre dışı."
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "Kişisel hedefler",
           "description": "Oda veya kişiye atanmış Telefon, Saat, Tablet ve Diğer hedefleri seçin. Birlikte kullanılabilirler. Atanmamış hedefler genel yayın yapılmadan reddedilir."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "Seçilen kişilere çevir",
           "description": "Bu duyuru için kişinin veya grubun otomatik çeviri tercihini geçersiz kılar. Yapılandırılmış dil kullanılır; use_ai: false çeviriyi engeller."
         }
       }
