@@ -474,8 +474,13 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                 local["tts_options"] = options
                 if requested_translate is not None:
                     do_translate = requested_translate
-                if do_translate and local.get("language"):
-                    local["translate_to"] = str(local["language"])
+                if do_translate:
+                    chosen_language = local.get("language") or manager.settings.get("tts_language")
+                    if not chosen_language:
+                        raise ServiceValidationError(
+                            "Person translation requires a person/group or global TTS language"
+                        )
+                    local["translate_to"] = str(chosen_language)
                 return local
 
             try:
