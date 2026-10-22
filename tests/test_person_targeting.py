@@ -106,4 +106,4 @@ def test_person_routing_never_inherits_general_or_fallback_paths():
     assert 'local["_person_targeted"] = True' in service
     assert 'room_people.setdefault(area_id, []).append(person_id)' in service
     assert 'for pending_job in created:' in service
-    assert 'if any(call.data.get(key) is not None for key in (' in service
+    assert 'if (call.data.get(ATTR_MANUAL_TARGETS) or any(' in service
