@@ -625,6 +625,10 @@
         "target_person": {
           "name": "Cílové osoby",
           "description": "Target only the selected person's current room, with no other room or general fallback."
+        },
+        "manual_targets": {
+          "name": "Ruční příjemci",
+          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; no unselected outputs."
         }
       }
     },
