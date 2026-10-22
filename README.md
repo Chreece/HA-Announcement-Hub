@@ -428,6 +428,79 @@ person destination only uses its assigned outputs, never everyone else's
 Mobile App devices. For explicit device targeting without a person, use
 the existing manual recipient controls.
 
+
+## Person and room controls, AI personalization, and safe audio (beta)
+
+**Configure → People and personal voices** now supports optional person
+enable/disable, per-person presence verification, individual AI provider
+(Conversation or AI Task), AI rewriting, a TTS engine, language and voice, and
+optional greetings. The group settings offer their own AI/TTS provider,
+rewrite preference, greeting name and speech/translation settings. The provider
+drop-downs use discovered Home Assistant providers, with global defaults
+when no override is selected. These settings change generation and speech
+infrastructure, **never the physical recipient list**.
+
+For example, using a literal person name placeholder without automatically
+adding a greeting:
+
+```yaml
+action: notify.announcement_hub
+data:
+  text: "{{ name }}, your package arrived."
+  target_person: [person.alex]
+  person_destination: [room, mobile]
+```
+
+Alternatively, in the dashboard's **People** mode, set Personal greeting to
+**Yes** to prepend the person's preferred salutation automatically. Its
+default follows the individual/group configuration. No new person or room is
+added as a recipient by greeting substitution.
+
+**Enable switches:** the integration creates one enable switch for each
+configured person and each Home Assistant area, default on. Switching one off
+persists the preference across Home Assistant restarts and blocks the next
+delivery to that person or room. Queued person jobs are rechecked before
+the physical service call. A disabled Room does not get substituted by a
+General phone or unrelated speaker.
+
+**Presence verification:** select a person's binary presence sensor (and
+enable Require presence verification), or open **Configure → Room presence
+verification** to assign an optional room occupancy sensor. Only an explicit
+positive `on` reading permits that Room announcement. Missing, stale,
+unavailable and off readings are not evidence of presence. This safety check
+does not apply to that person's explicitly assigned Mobile/Watch/Tablet
+destinations.
+
+**AI style preferences:** **Configure → Advanced AI prompts** offers optional
+rewrite, translate and combined style instructions. Only literal
+`{message}` and `{language}` placeholders are accepted. The Hub's immutable
+rules for strict JSON, factual integrity, no device/tool actions and no new
+channels remain mandatory. AI fallback continues to preserve the original.
+
+**Direct-room audio:** **Configure → Audio, chime and ducking** adds optional
+pre-announcement audio from a local `/local/*.mp3`/WAV/OGG/FLAC file, and
+optional volume ducking for selected **direct room media players**. Both
+default off. Ducking stores the original volume before lowering it, restores
+it in `finally`, and attempts guarded recovery after a Home Assistant
+restart if interrupted. It does not duck or play chimes on the shared
+Snapcast source; its isolation rules are unchanged. Native announce support
+and actual restore/playback behavior depend on the media player and should
+be tested in beta.
+
+```yaml
+action: notify.announcement_hub
+data:
+  text: "Dinner is ready."
+  target_person: [person.alex]
+  person_destination: [room]
+  person_greeting: true
+  pre_announce_sound: true
+```
+
+A targeted Room still requires a valid area and a suitable output;
+Mobile/Watch continue to use only the devices assigned under that person's
+profile. Disabling a person or room never authorizes unrelated recipients.
+
 ## How delivery works
 
 ### Room routing order

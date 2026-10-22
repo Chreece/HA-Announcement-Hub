@@ -45,6 +45,9 @@ from .const import (
     ATTR_TARGET_PERSON,
     ATTR_PERSON_DESTINATION,
     ATTR_PERSON_TRANSLATE,
+    ATTR_PERSON_GREETING,
+    ATTR_PRE_ANNOUNCE_SOUND,
+    ATTR_TTS_ENGINE,
     ATTR_MANUAL_TARGETS,
     ATTR_INTEGRATION,
     ATTR_DEVICE,
@@ -72,6 +75,11 @@ from .const import (
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
     CONF_PERSON_GROUP_TRANSLATE,
+    CONF_PERSON_GROUP_AGENT,
+    CONF_PERSON_GROUP_TTS_ENGINE,
+    CONF_PERSON_GROUP_REWRITE,
+    CONF_PERSON_GROUP_ADDRESSEE,
+    CONF_PERSON_GROUP_GREETING,
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_OCCUPIED_ONLY,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
@@ -100,6 +108,7 @@ from .dashboard_resource import async_ensure_card_resource
 from .manager import AnnouncementManager
 from .message_text import resolve_channel_texts
 from .outputs import area_name
+from .person_delivery import personalized_text, person_is_enabled, allowed_person_ai
 from .person_targeting import (
     PersonTargetError, resolve_person_rooms, resolve_person_ids,
     selected_person_destinations, PERSON_DESTINATIONS,
@@ -182,6 +191,9 @@ SEND_SCHEMA = probatio.All(
                 probatio.EnsureList(), [probatio.In(PERSON_DESTINATIONS)]
             ),
             probatio.Optional(ATTR_PERSON_TRANSLATE): bool,
+            probatio.Optional(ATTR_PERSON_GREETING): bool,
+            probatio.Optional(ATTR_PRE_ANNOUNCE_SOUND): bool,
+            probatio.Optional(ATTR_TTS_ENGINE): cv.string,
             probatio.Optional(ATTR_INTEGRATION): probatio.All(
                 probatio.EnsureList(), [cv.string]
             ),
@@ -386,6 +398,8 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             use_ai=call.data.get(ATTR_USE_AI),
             ai_agent=call.data.get(ATTR_AI_AGENT),
             ai_mode=call.data[ATTR_AI_MODE],
+            tts_engine=call.data.get(ATTR_TTS_ENGINE),
+            pre_announce_sound=call.data.get(ATTR_PRE_ANNOUNCE_SOUND),
             manual_targets=call.data[ATTR_MANUAL_TARGETS],
         )
 
@@ -420,6 +434,8 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                 for person_id in people_ids:
                     profile = profiles.get(person_id, {})
                     profile = profile if isinstance(profile, dict) else {}
+                    if not person_is_enabled(profile):
+                        raise PersonTargetError(f"Announcements disabled for {person_id}")
                     slots = selected_person_destinations(profile, destinations)
                     for slot, entity_ids in slots.items():
                         if slot == "room":
@@ -462,11 +478,30 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                     lang = manager.settings.get(CONF_PERSON_GROUP_LANGUAGE)
                     voice = manager.settings.get(CONF_PERSON_GROUP_VOICE)
                     do_translate = manager.settings.get(CONF_PERSON_GROUP_TRANSLATE, False)
+                    agent = manager.settings.get(CONF_PERSON_GROUP_AGENT)
+                    engine = manager.settings.get(CONF_PERSON_GROUP_TTS_ENGINE)
+                    rewrite = manager.settings.get(CONF_PERSON_GROUP_REWRITE, False)
+                    greeting = manager.settings.get(CONF_PERSON_GROUP_GREETING, False)
+                    address = manager.settings.get(CONF_PERSON_GROUP_ADDRESSEE) or "Everyone"
                 else:
                     profile = profiles.get(recipients[0], {}) or {}
                     lang = profile.get("language")
                     voice = profile.get("voice")
                     do_translate = profile.get("translate", False)
+                    agent = profile.get("ai_agent")
+                    engine = profile.get("tts_engine")
+                    rewrite = profile.get("rewrite", False)
+                    greeting = profile.get("greeting", False)
+                    address = profile.get("address") or (
+                        getattr(hass.states.get(recipients[0]), "name", None)
+                        or recipients[0].split(".", 1)[-1]
+                    )
+                local["_person_ids"] = tuple(recipients)
+                local["_presence_sensors"] = ()
+                if not call.data.get(ATTR_AI_AGENT) and agent:
+                    local["ai_agent"] = str(agent)
+                if not call.data.get(ATTR_TTS_ENGINE) and engine:
+                    local["tts_engine"] = str(engine)
                 if not call.data.get(ATTR_LANGUAGE) and lang:
                     local["language"] = str(lang)
                 options = dict(call.data.get(ATTR_TTS_OPTIONS) or {})
@@ -475,6 +510,26 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                 local["tts_options"] = options
                 if requested_translate is not None:
                     do_translate = requested_translate
+                enabled, ai_preference = allowed_person_ai(
+                    requested_enabled=call.data.get(ATTR_USE_AI),
+                    configured_rewrite=bool(rewrite),
+                    should_translate=bool(do_translate),
+                )
+                if call.data.get(ATTR_USE_AI) is None:
+                    if enabled is not None:
+                        local["use_ai"] = enabled
+                    if ai_preference == "translate" and call.data[ATTR_AI_MODE] == "rewrite":
+                        local["ai_mode"] = "translate"
+                if bool(call.data.get(ATTR_PERSON_GREETING, greeting)):
+                    for key in ("text", "text_tts", "text_notify"):
+                        if local.get(key):
+                            local[key] = personalized_text(local[key], str(address), prepend=True)
+                    if local.get("title"):
+                        local["title"] = personalized_text(local["title"], str(address))
+                else:
+                    for key in ("text", "text_tts", "text_notify", "title"):
+                        if local.get(key):
+                            local[key] = personalized_text(local[key], str(address))
                 if do_translate:
                     chosen_language = local.get("language") or manager.settings.get("tts_language")
                     if not chosen_language:
@@ -496,6 +551,15 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                 for area_id, recipients in rooms.items():
                     local = personal_options(recipients, group=len(recipients) > 1)
                     local["areas"] = (area_id,)
+                    local["_presence_sensors"] = tuple(
+                        str(profiles.get(person_id, {}).get("presence_sensor") or "")
+                        for person_id in recipients
+                        if profiles.get(person_id, {}).get("verify_presence")
+                    )
+                    if any(not sensor for sensor in local["_presence_sensors"]):
+                        raise ServiceValidationError(
+                            "Presence verification requires a configured binary sensor"
+                        )
                     created.append(await manager.async_enqueue(**local))
                 for person_id in people_ids:
                     refs = tuple(dict.fromkeys(

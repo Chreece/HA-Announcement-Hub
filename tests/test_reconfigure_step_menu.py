@@ -26,7 +26,7 @@ def test_direct_menu_exists_on_both_config_entry_buttons() -> None:
     assert "async def async_step_reconfigure(" in FLOW_SOURCE
     assert 'step_id="reconfigure", menu_options=list(EDIT_MENU_OPTIONS)' in FLOW_SOURCE
     assert 'step_id="init", menu_options=list(EDIT_MENU_OPTIONS)' in FLOW_SOURCE
-    for choice in ("edit_outputs", "edit_tts", "edit_profiles", "edit_general", "edit_people", "edit_all"):
+    for choice in ("edit_outputs", "edit_tts", "edit_profiles", "edit_general", "edit_people", "edit_advanced_ai", "edit_audio", "edit_room_safety", "edit_all"):
         assert f'    "{choice}",' in FLOW_SOURCE
         assert f"async def async_step_{choice}(" in FLOW_SOURCE
 
@@ -79,7 +79,7 @@ def test_existing_output_selection_is_preserved_not_auto_selected() -> None:
 
 
 def test_menu_translations_match_all_languages() -> None:
-    expected = {"edit_outputs", "edit_tts", "edit_profiles", "edit_general", "edit_people", "edit_all"}
+    expected = {"edit_outputs", "edit_tts", "edit_profiles", "edit_general", "edit_people", "edit_advanced_ai", "edit_audio", "edit_room_safety", "edit_all"}
     for filename in (
         "strings.json",
         "translations/en.json",

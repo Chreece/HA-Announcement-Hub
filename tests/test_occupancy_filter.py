@@ -31,7 +31,7 @@ def test_occupied_only_defaults_true_and_does_not_touch_task_lifecycle() -> None
     assert "ATTR_OCCUPIED_ONLY" in init
     assert "default=DEFAULT_OCCUPIED_ONLY" in init
     assert "self.hass.async_create_task(" not in manager
-    assert manager.count("self.entry.async_create_background_task(") == 4
+    assert manager.count("self.entry.async_create_background_task(") == 5
 
 
 
@@ -54,7 +54,7 @@ def test_fallback_requires_zero_fixed_room_candidates_and_open_target_door() -> 
 def test_fallback_does_not_regress_background_task_lifecycle() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     assert "self.hass.async_create_task(" not in manager
-    assert manager.count("self.entry.async_create_background_task(") == 4
+    assert manager.count("self.entry.async_create_background_task(") == 5
 
 
 

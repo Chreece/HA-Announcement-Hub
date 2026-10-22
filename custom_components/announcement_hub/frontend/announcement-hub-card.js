@@ -21,6 +21,7 @@
   ];
   const KINDS = ["area", "integration", "device", "entity"];
   const PERSON_TRANSLATION = [["inherit", "Person setting"], ["on", "Translate"], ["off", "Original language"]];
+  const PERSON_SWITCH = [["inherit", "Person setting"], ["on", "Yes"], ["off", "No"]];
   const PERSON_DESTINATIONS = [["room", "Room"], ["mobile", "Mobile"], ["watch", "Watch"], ["tablet", "Tablet"], ["other", "Other"]];
   const getLanguage = (hass) => {
     const raw = String(hass?.locale?.language || hass?.language || "en").replace(/_/g, "-");
@@ -107,6 +108,8 @@
       this._selected = Object.fromEntries([...KINDS, "person"].map((kind) => [kind, new Set()]));
       this._personDestinations = new Set(["room"]);
       this._personTranslation = "inherit";
+      this._personGreeting = "inherit";
+      this._preChime = "inherit";
       this._registry = { area: [], integration: [], device: [], entity: [], person: [] };
       this._level = "info";
       this._channel = "auto";
@@ -199,6 +202,8 @@
       pick("channels", "_channel");
       pick("ai-choices", "_ai");
       pick("person-translation", "_personTranslation");
+      pick("person-greeting", "_personGreeting");
+      pick("pre-chime", "_preChime");
       this.$("target-mode").addEventListener("click", (event) => {
         const mode = event.target.closest("button[data-mode]")?.dataset.mode;
         if (!mode) return;
@@ -274,6 +279,8 @@
       this._renderButtons("channels", CHANNELS, this._channel);
       this._renderButtons("ai-choices", AI_OPTIONS, this._ai);
       this._renderButtons("person-translation", PERSON_TRANSLATION, this._personTranslation);
+      this._renderButtons("person-greeting", PERSON_SWITCH, this._personGreeting);
+      this._renderButtons("pre-chime", PERSON_SWITCH, this._preChime);
       this.$("targets").hidden = this._targetMode !== "targeted";
       this.$("person-targets").hidden = this._targetMode !== "person";
       for (const button of this.$("target-mode").querySelectorAll("button[data-mode]")) {
@@ -472,6 +479,7 @@
         payload.target_person = [...this._selected.person];
         payload.person_destination = [...this._personDestinations];
         if (this._personTranslation !== "inherit") payload.person_translate = this._personTranslation === "on";
+        if (this._personGreeting !== "inherit") payload.person_greeting = this._personGreeting === "on";
       }
       if (main) payload.text = main;
       if (textTts) payload.text_tts = textTts;
@@ -483,6 +491,9 @@
         payload.use_ai = this._ai !== "off";
         if (this._ai === "rewrite" || this._ai === "generate") payload.ai_mode = this._ai;
       }
+      if (this._preChime !== "inherit") payload.pre_announce_sound = this._preChime === "on";
+      const engine = this.$("tts-engine").value.trim();
+      if (engine) payload.tts_engine = engine;
       const agent = this.$("ai-agent").value.trim();
       if (this._config.show_ai !== false && this._ai !== "off" && agent) payload.ai_agent = agent;
       const action = this.$("click-action").value.trim();

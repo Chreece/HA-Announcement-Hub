@@ -68,6 +68,12 @@ send:
         person_translate:
           selector:
             boolean:
+        person_greeting:
+          selector:
+            boolean:
+        pre_announce_sound:
+          selector:
+            boolean:
         integration:
           example:
             - mobile_app
@@ -132,6 +138,10 @@ send:
         tts_options:
           selector:
             object:
+        tts_engine:
+          selector:
+            entity:
+              domain: tts
 
 clear_queue:
   fields:

@@ -44,6 +44,7 @@ from homeassistant.helpers.storage import Store
 
 from .ai_filter import async_filter_announcement
 from .ai_settings import resolve_ai_enabled
+from .person_delivery import person_is_enabled, presence_confirmed
 from .targeting import channel_selection, filter_selected_outputs, physical_keys, restrict_physical_keys
 from .notify_click_action import mobile_click_action_data
 from .const import (
@@ -279,6 +280,7 @@ class AnnouncementManager:
         self._held_snapcast_targets: tuple[str, ...] = ()
         self._held_snapcast_player: str | None = None
         self._held_snapcast_restore_not_before = 0.0
+        self._volume_restore: dict[str, dict[str, float]] = {}
         self._stop_lock = asyncio.Lock()
 
     @property
@@ -340,6 +342,10 @@ class AnnouncementManager:
         if self._running:
             return
         stored = await self._store.async_load() or {}
+        self._volume_restore = {
+            k: v for k, v in (stored.get("volume_restore", {}) or {}).items()
+            if isinstance(k, str) and isinstance(v, dict)
+        }
         self._ai_history.clear()
         for item in stored.get("ai_history", [])[-20:]:
             if isinstance(item, dict) and isinstance(item.get("job_id"), str):
@@ -435,6 +441,11 @@ class AnnouncementManager:
                     old_job.delivered_physical
                 )
         self._running = True
+        if self._volume_restore:
+            self.entry.async_create_background_task(
+                self.hass, self._async_recover_ducked_volumes(),
+                f"{DOMAIN} audio volume recovery",
+            )
         self._ensure_worker()
         for job in self._queue:
             if job.ai.get("pending_preprocessing"):
@@ -1023,6 +1034,8 @@ class AnnouncementManager:
         use_ai: bool | None = None,
         ai_agent: str | None = None,
         ai_mode: str = "rewrite",
+        tts_engine: str | None = None,
+        pre_announce_sound: bool | None = None,
         translate_to: str | None = None,
         text: str | None = None,
         areas: Sequence[str] | str | None = None,
@@ -1032,13 +1045,15 @@ class AnnouncementManager:
         channels: Sequence[str] | str | None = None,
         _fanout: bool = False,
         _person_targeted: bool = False,
+        _person_ids: Sequence[str] = (),
+        _presence_sensors: Sequence[str] = (),
         manual_targets: bool = False,
         _group_token: str | None = None,
         _excluded_physical: Sequence[str] = (),
     ) -> AnnouncementJob:
         if manual_targets and not any((areas, outputs, integrations, devices, entities)):
             raise ServiceValidationError("Manual targets require an explicit area, integration, device or entity")
-        if ai_mode not in {"rewrite", "generate"}:
+        if ai_mode not in {"rewrite", "generate", "translate"}:
             raise ServiceValidationError("ai_mode must be rewrite or generate")
         # Resolve the primary message into two independent inputs BEFORE
         # severity/room routing and the optional AI rewrite. Channel-specific
@@ -1152,7 +1167,9 @@ class AnnouncementManager:
                 click_action=click_action, language=language,
                 tts_options=tts_options, companion_tts=companion_tts,
                 occupied_only=occupied_only, use_ai=use_ai, ai_agent=ai_agent,
-                ai_mode=ai_mode, translate_to=translate_to,
+                ai_mode=ai_mode, tts_engine=tts_engine,
+                pre_announce_sound=pre_announce_sound,
+                translate_to=translate_to,
                 channels=channel_tokens, _fanout=True,
                 manual_targets=manual_targets,
                 _group_token=group_token,
@@ -1204,6 +1221,11 @@ class AnnouncementManager:
             if manual_targets and not requested else
             self._manual_output_catalog() if manual_targets else self._configured_outputs()
         )
+        if tts_engine:
+            engine_id = str(tts_engine).strip()
+            if not engine_id.startswith("tts.") or self.hass.states.get(engine_id) is None:
+                raise ServiceValidationError("Unknown TTS engine selected for this announcement")
+            configured = ((engine_id,), *configured[1:])
         if _person_targeted and explicit_area_routing:
             # A person's Room is a fixed physical room target, never every
             # other person's Companion App push-speech device assigned here.
@@ -2057,6 +2079,9 @@ class AnnouncementManager:
             plan=plan,
             strict_targets=bool(requested) or _person_targeted or manual_targets,
             manual_targets=manual_targets,
+            person_ids=_person_ids,
+            presence_sensors=_presence_sensors,
+            pre_announce_sound=pre_announce_sound,
             routing_mode=(
                 "person" if _person_targeted else
                 "room_fallback" if room_fallback_routing else "normal"
@@ -2362,14 +2387,17 @@ class AnnouncementManager:
         self, job: AnnouncementJob, stage: str
     ) -> tuple[str, ...]:
         """Resolve preferred, currently occupied and door-gated fallback areas."""
-        preferred = tuple(job.preferred_areas)
+        enabled = self.settings.get("person_area_enabled", {}) or {}
+        preferred = tuple(
+            area for area in job.preferred_areas if enabled.get(area, True) is not False
+        )
         occupied = tuple(
             area
             for area in (
                 (self._occupied_area_ids() or ())
                 if job.occupancy_requested else ()
             )
-            if area not in set(preferred)
+            if area not in set(preferred) and enabled.get(area, True) is not False
         )
         if stage == "primary":
             return preferred
@@ -2380,6 +2408,7 @@ class AnnouncementManager:
             source = preferred or occupied
             if (
                 fallback
+                and enabled.get(fallback, True) is not False
                 and fallback not in set((*preferred, *occupied))
                 and self._fallback_door_allows(source)
             ):
@@ -2431,6 +2460,29 @@ class AnnouncementManager:
             )
         )
 
+    def _person_authorized_now(self, job: AnnouncementJob) -> bool:
+        """Recheck queued person/room permissions before every delivery."""
+        profiles = self.settings.get("person_profiles", {}) or {}
+        area_enabled = self.settings.get("person_area_enabled", {}) or {}
+        if any(not person_is_enabled(profiles.get(person_id, {}))
+               for person_id in job.person_ids):
+            return False
+        # A room switch also applies to automatic and ordinary area jobs.
+        # Refuse a mixed-room batch rather than leak to a disabled room.
+        # A queued job may have moved to its current staged room already.
+        current_areas = tuple(getattr(job, "outputs", ())) or tuple(getattr(job, "preferred_areas", ()))
+        if any(area_enabled.get(room_id, True) is False
+               for room_id in current_areas):
+            return False
+        area_presence = self.settings.get("person_room_presence", {}) or {}
+        if job.person_ids and any(
+            not presence_confirmed(self.hass.states, area_presence[room_id])
+            for room_id in job.preferred_areas if room_id in area_presence
+        ):
+            return False
+        return all(presence_confirmed(self.hass.states, sensor)
+                   for sensor in job.presence_sensors)
+
     def _prepare_staged_route(self, job: AnnouncementJob) -> bool:
         """Choose a room's working visual/audio path before any other room.
 
@@ -2452,6 +2504,8 @@ class AnnouncementManager:
             self._manual_output_catalog() if job_manual else
             self._configured_outputs()
         )
+        if job.tts_engines:
+            configured = (tuple(job.tts_engines[:1]), *configured[1:])
         try:
             selected = restrict_physical_keys(
                 filter_selected_outputs(
@@ -2998,6 +3052,9 @@ class AnnouncementManager:
             reserved_rooms.update(rooms)
             if blocked_room or self._delivery_lane_keys(job) & active_resources:
                 continue
+            permit = getattr(self, "_person_authorized_now", None)
+            if permit is not None and not permit(job):
+                continue
             if job.ai.get("pending_preprocessing"):
                 # AI is never awaited by the delivery worker. A later ready
                 # alert can proceed while an earlier model cold-starts.
@@ -3231,6 +3288,8 @@ class AnnouncementManager:
         part_index: int,
         part_count: int,
     ) -> None:
+        if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled during delivery")
         integration_data = profile.get(PROFILE_INTEGRATION_DATA, {})
         provider_data = self._deep_merge(
             dict(integration_data) if isinstance(integration_data, Mapping) else {},
@@ -3483,6 +3542,8 @@ class AnnouncementManager:
 
     async def _async_send_tts(self, job: AnnouncementJob) -> None:
         """Launch independent audible output classes together."""
+        if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled or presence unverified")
         if not job.tts_text:
             return
 
@@ -3524,8 +3585,131 @@ class AnnouncementManager:
             await asyncio.gather(*tasks, return_exceptions=True)
             raise
 
+    async def _async_restore_volume(self, player: str) -> None:
+        """Restore a volume level only if it is still the Hub-set value."""
+        record = self._volume_restore.get(player)
+        if not record:
+            return
+        state = self.hass.states.get(player)
+        if state is None:
+            return  # Leave a recovery record for the next start.
+        actual = state.attributes.get("volume_level")
+        expected = record.get("ducked")
+        prior = record.get("original")
+        try:
+            if (
+                isinstance(actual, (int, float))
+                and isinstance(expected, (int, float))
+                and isinstance(prior, (int, float))
+                and abs(float(actual) - float(expected)) <= 0.03
+            ):
+                await self.hass.services.async_call(
+                    MEDIA_PLAYER_DOMAIN, "volume_set",
+                    {ATTR_ENTITY_ID: player, "volume_level": float(prior)},
+                    blocking=True,
+                )
+            # An external/manual volume change wins; do not overwrite it.
+        except Exception:
+            _LOGGER.warning("Could not restore ducked volume for %s", player)
+            return
+        self._volume_restore.pop(player, None)
+        self._schedule_save()
+
+    async def _async_recover_ducked_volumes(self) -> None:
+        """Recover volume snapshots after restart when devices come online."""
+        for attempt in range(3):
+            if not self._volume_restore:
+                break
+            await asyncio.sleep(2 if attempt == 0 else 5)
+            for player in tuple(self._volume_restore):
+                await self._async_restore_volume(player)
+
+    async def _async_duck_direct_player(
+        self, job: AnnouncementJob, player: str,
+    ) -> bool:
+        """Optional music ducking; never touch a shared Snapcast source."""
+        if not self.settings.get("person_output_ducking", False):
+            return False
+        if player == job.tts_media_player:
+            return False
+        if not self.settings.get(
+            CONF_DIRECT_TTS_ANNOUNCE, DEFAULT_DIRECT_TTS_ANNOUNCE
+        ):
+            return False
+        state = self.hass.states.get(player)
+        if not state or state.state != "playing":
+            return False
+        volume = state.attributes.get("volume_level")
+        if not isinstance(volume, (int, float)) or not 0.0 < volume <= 1.0:
+            return False
+        factor = max(0.1, min(1.0, float(
+            self.settings.get("person_duck_factor", 0.35)
+        )))
+        ducked = round(max(0.03, volume * factor), 3)
+        if ducked >= volume:
+            return False
+        self._volume_restore[player] = {
+            "original": float(volume), "ducked": ducked,
+        }
+        # Persist BEFORE touching audio. A crash between playback and finally
+        # cannot otherwise restore the original volume at HA restart.
+        async with self._save_lock:
+            await self._store.async_save(self._serialize())
+        try:
+            await self.hass.services.async_call(
+                MEDIA_PLAYER_DOMAIN, "volume_set",
+                {ATTR_ENTITY_ID: player, "volume_level": ducked},
+                blocking=True,
+            )
+        except Exception:
+            self._volume_restore.pop(player, None)
+            self._schedule_save()
+            raise
+        return True
+
+    async def _async_optional_direct_chime(
+        self, job: AnnouncementJob, player: str,
+    ) -> None:
+        """Only selected direct room speakers; never a shared Snapcast source."""
+        enabled = (
+            job.pre_announce_sound
+            if job.pre_announce_sound is not None
+            else self.settings.get("person_output_chime", False)
+        )
+        if not enabled:
+            return
+        if player == job.tts_media_player:
+            # Never publish pre-roll to a shared TTS source, even if it
+            # currently appears routed or muted to one room.
+            return
+        url = str(self.settings.get("person_chime_url", "") or "").strip()
+        if not url.startswith("/local/") or not url.lower().endswith(
+            (".mp3", ".wav", ".ogg", ".flac")
+        ):
+            _LOGGER.warning("Direct chime skipped: configure a /local/ audio file")
+            return
+        self._raise_if_cancelled(job)
+        if job.person_ids and not self._person_authorized_now(job):
+            raise HomeAssistantError("No longer authorized to play chime in this room")
+        await self.hass.services.async_call(
+            MEDIA_PLAYER_DOMAIN, "play_media",
+            {
+                ATTR_ENTITY_ID: player,
+                ATTR_MEDIA_CONTENT_ID: url,
+                ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
+                ATTR_MEDIA_ANNOUNCE: True,
+            },
+            blocking=True,
+        )
+        delay = float(self.settings.get("person_chime_delay", 0.5) or 0)
+        if delay:
+            await asyncio.sleep(max(0.0, min(delay, 10.0)))
+            self._raise_if_cancelled(job)
+
     async def _async_send_room_tts(self, job: AnnouncementJob) -> None:
         """Speak directly on area-bound media players using the TTS engine chain."""
+        if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled or presence unverified")
         players = [
             player
             for player in job.room_tts_players
@@ -3564,7 +3748,13 @@ class AnnouncementManager:
                 idle_timeout = float(
                     self.settings.get(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT)
                 )
-                await self._wait_audio_path_idle(player, idle_timeout, job)
+                # When a player is already playing music, supported native
+                # announce mode can interrupt and resume it. Optional ducking
+                # saves/restores the original volume in finally.
+                ducked = await self._async_duck_direct_player(job, player)
+                if not ducked:
+                    await self._wait_audio_path_idle(player, idle_timeout, job)
+                await self._async_optional_direct_chime(job, player)
                 engines = await self._async_available_tts_engines(job)
                 if not engines:
                     return
@@ -3597,6 +3787,8 @@ class AnnouncementManager:
                     + "; ".join(errors)
                 )
             finally:
+                if player in self._volume_restore:
+                    await asyncio.shield(self._async_restore_volume(player))
                 self._active_tts_players.discard(player)
                 self._players_by_job.get(job.job_id, set()).discard(player)
 
@@ -3644,6 +3836,8 @@ class AnnouncementManager:
             )
 
     async def _async_send_server_tts(self, job: AnnouncementJob) -> None:
+        if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled or presence unverified")
         # Fail closed even for jobs restored from older queued snapshots:
         # playing the shared MPD/Piper source without a physical mute route
         # broadcasts to all Snapcast clients that are currently unmuted.
@@ -3946,6 +4140,8 @@ class AnnouncementManager:
         )
 
     async def _async_send_companion_tts(self, job: AnnouncementJob) -> None:
+        if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled or presence unverified")
         outputs = [
             output
             for output in resolve_companion_tts_outputs(
@@ -3985,6 +4181,8 @@ class AnnouncementManager:
     ) -> None:
         channel = f"companion_tts:{output.entry_id}"
         self._raise_if_cancelled(job)
+        if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person disabled during Companion TTS")
         if self._group_already_delivered(job, channel):
             self._record_channel_success(job, channel)
             return
@@ -4037,6 +4235,8 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
+        if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled before audio playback")
         shared_path = bool(
             job.tts_media_player and player == job.tts_media_player
         )
@@ -4678,6 +4878,7 @@ class AnnouncementManager:
                 diagnostics=ai,
                 mode=ai.get("requested_mode", "rewrite"),
                 target_language=ai.get("requested_target_language"),
+                prompt_templates=getattr(self, "settings", {}).get("ai_prompt_templates", {}),
                 title_result=(
                     title_result if ai.get("requested_generate_title") else None
                 ),
@@ -5054,6 +5255,19 @@ class AnnouncementManager:
     def _raise_if_cancelled(self, job: AnnouncementJob) -> None:
         if job.job_id in self._cancel_requested:
             raise JobCancelled(f"Announcement {job.job_id} was cancelled")
+        # A room/person may be disabled while an older queued job is
+        # preparing speech or waiting for a media player. Check immediately
+        # before each actual physical action as well as at dequeue time.
+        permission_gate = getattr(self, "_person_authorized_now", None)
+        if callable(permission_gate) and any((
+            getattr(job, "person_ids", ()),
+            getattr(job, "presence_sensors", ()),
+            getattr(job, "outputs", ()),
+            getattr(job, "preferred_areas", ()),
+        )) and not permission_gate(job):
+            raise HomeAssistantError(
+                "Announcement recipient disabled or room presence unverified"
+            )
 
     @staticmethod
     def _ensure_list(value: Any) -> list[str]:
@@ -5088,6 +5302,7 @@ class AnnouncementManager:
             "jobs": jobs,
             "last": self._last.to_dict() if self._last else None,
             "ai_history": list(self._ai_history),
+            "volume_restore": dict(getattr(self, "_volume_restore", {})),
         }
 
     def _schedule_save(self) -> None:

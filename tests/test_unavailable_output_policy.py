@@ -33,4 +33,4 @@ def test_all_unavailable_outputs_are_a_valid_no_op() -> None:
 def test_silent_skip_change_does_not_regress_task_lifecycle() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     assert "self.hass.async_create_task(" not in manager
-    assert manager.count("self.entry.async_create_background_task(") == 4
+    assert manager.count("self.entry.async_create_background_task(") == 5

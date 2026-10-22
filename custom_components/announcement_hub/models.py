@@ -141,6 +141,9 @@ class AnnouncementJob:
     server_tts_enabled: bool
     strict_targets: bool = False
     manual_targets: bool = False
+    person_ids: tuple[str, ...] = ()
+    presence_sensors: tuple[str, ...] = ()
+    pre_announce_sound: bool | None = None
     click_action: str | None = None
     # A room request is a preference that escalates through occupied rooms,
     # the door-gated fallback room and finally general outputs. Never expire
@@ -198,6 +201,9 @@ class AnnouncementJob:
         plan: DeliveryPlan,
         strict_targets: bool = False,
         manual_targets: bool = False,
+        person_ids: Sequence[str] = (),
+        presence_sensors: Sequence[str] = (),
+        pre_announce_sound: bool | None = None,
         routing_mode: str = "normal",
         preferred_areas: Sequence[str] = (),
         companion_tts_requested: bool = False,
@@ -242,6 +248,9 @@ class AnnouncementJob:
             server_tts_enabled=plan.server_tts_enabled,
             strict_targets=bool(strict_targets),
             manual_targets=bool(manual_targets),
+            person_ids=_unique(tuple(person_ids)),
+            presence_sensors=_unique(tuple(presence_sensors)),
+            pre_announce_sound=pre_announce_sound,
             routing_mode=routing_mode,
             routing_stage="primary",
             routing_stage_started_at=utcnow_iso() if routing_mode != "normal" else None,
@@ -280,6 +289,8 @@ class AnnouncementJob:
             "channel_services",
             "excluded_physical",
             "related_job_ids",
+            "person_ids",
+            "presence_sensors",
         ):
             data[key] = list(data[key])
         return data
@@ -316,6 +327,9 @@ class AnnouncementJob:
         payload.setdefault("companion_tts_words_per_minute", 150.0)
         payload.setdefault("tts_suppressed_by_level", False)
         payload.setdefault("strict_targets", False)
+        payload.setdefault("person_ids", ())
+        payload.setdefault("presence_sensors", ())
+        payload.setdefault("pre_announce_sound", None)
         payload.setdefault("routing_mode", "normal")
         payload.setdefault("routing_stage", "primary")
         payload.setdefault("routing_stage_started_at", None)
@@ -344,6 +358,8 @@ class AnnouncementJob:
             "channel_services",
             "excluded_physical",
             "related_job_ids",
+            "person_ids",
+            "presence_sensors",
         ):
             payload[key] = tuple(payload.get(key, ()))
         payload.setdefault("media_source_ids", {})

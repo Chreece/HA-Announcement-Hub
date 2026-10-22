@@ -31,4 +31,4 @@ def test_server_tts_area_filter_applies_only_to_snapcast_outputs() -> None:
 def test_global_tts_fix_keeps_background_task_lifecycle() -> None:
     manager = (COMPONENT / "manager.py").read_text(encoding="utf-8")
     assert "self.hass.async_create_task(" not in manager
-    assert manager.count("self.entry.async_create_background_task(") == 4
+    assert manager.count("self.entry.async_create_background_task(") == 5

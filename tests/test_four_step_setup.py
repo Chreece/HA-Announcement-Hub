@@ -9,7 +9,7 @@ C = ROOT / "custom_components" / "announcement_hub"
 
 def test_original_four_setup_steps_remain_and_editing_gains_a_menu() -> None:
     strings = json.loads((C / "strings.json").read_text())
-    expected = {"outputs", "tts", "notification_profile", "queue", "people", "person_profile"}
+    expected = {"outputs", "tts", "notification_profile", "queue", "people", "person_profile", "edit_advanced_ai", "edit_audio", "edit_room_safety"}
     assert set(strings["config"]["step"]) == expected | {"reconfigure"}
     assert set(strings["options"]["step"]) == expected | {"init"}
 
@@ -74,4 +74,4 @@ def test_general_direct_tts_players_bypass_room_filter() -> None:
 def test_no_startup_task_regression() -> None:
     manager = (C / "manager.py").read_text()
     assert "self.hass.async_create_task(" not in manager
-    assert manager.count("self.entry.async_create_background_task(") == 4
+    assert manager.count("self.entry.async_create_background_task(") == 5

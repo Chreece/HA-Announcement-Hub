@@ -23,6 +23,7 @@ if "homeassistant.const" not in sys.modules:
 
     class Platform(StrEnum):
         SENSOR = "sensor"
+        SWITCH = "switch"
 
     homeassistant_const.Platform = Platform
     homeassistant.const = homeassistant_const

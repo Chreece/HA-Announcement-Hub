@@ -44,6 +44,11 @@ from .const import (
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
     CONF_PERSON_GROUP_TRANSLATE,
+    CONF_PERSON_GROUP_AGENT,
+    CONF_PERSON_GROUP_TTS_ENGINE,
+    CONF_PERSON_GROUP_REWRITE,
+    CONF_PERSON_GROUP_ADDRESSEE,
+    CONF_PERSON_GROUP_GREETING,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -204,6 +209,9 @@ EDIT_MENU_OPTIONS = (
     "edit_profiles",
     "edit_general",
     "edit_people",
+    "edit_advanced_ai",
+    "edit_audio",
+    "edit_room_safety",
     "edit_all",
 )
 
@@ -270,12 +278,170 @@ class _AnnouncementFlowMixin:
         return await self.async_step_queue()
 
 
+    async def async_step_edit_room_safety(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """One area at a time: optional independent presence verification."""
+        if user_input is not None:
+            area = str(user_input.get("area", "") or "")
+            sensor = str(user_input.get("presence_sensor", "") or "")
+            use = bool(user_input.get("verify_presence", False))
+            from homeassistant.helpers import area_registry as ar
+            if area not in ar.async_get(self.hass).areas:
+                return self.async_show_form(
+                    step_id="edit_room_safety",
+                    data_schema=self._room_safety_schema(),
+                    errors={"base": "invalid_person_area"},
+                )
+            if use and not sensor:
+                return self.async_show_form(
+                    step_id="edit_room_safety",
+                    data_schema=self._room_safety_schema(),
+                    errors={"base": "invalid_person_presence"},
+                )
+            sensors = dict(self._working.get("person_room_presence", {}) or {})
+            if use:
+                sensors[area] = sensor
+            else:
+                sensors.pop(area, None)
+            self._working["person_room_presence"] = sensors
+            return await self._async_finish()
+        return self.async_show_form(
+            step_id="edit_room_safety", data_schema=self._room_safety_schema(),
+        )
+
+    @staticmethod
+    def _room_safety_schema() -> probatio.Schema:
+        return probatio.Schema({
+            probatio.Required("area"): selector.AreaSelector(),
+            probatio.Required("verify_presence", default=False):
+                selector.BooleanSelector(),
+            probatio.Optional("presence_sensor"):
+                selector.EntitySelector(selector.EntitySelectorConfig(
+                    domain="binary_sensor",
+                )),
+        })
+
+    async def async_step_edit_audio(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Optional room-speaker chime and ducking. Shared Snapcast is excluded."""
+        keys = (
+            "person_output_chime", "person_chime_url",
+            "person_chime_delay", "person_output_ducking", "person_duck_factor",
+        )
+        if user_input is not None:
+            url = str(user_input.get("person_chime_url", "") or "")
+            if url and not url.startswith("/local/"):
+                return self.async_show_form(
+                    step_id="edit_audio", data_schema=self._audio_schema(),
+                    errors={"base": "invalid_chime_url"},
+                )
+            for key in keys:
+                self._working[key] = user_input.get(key)
+            return await self._async_finish()
+        return self.async_show_form(
+            step_id="edit_audio", data_schema=self._audio_schema(),
+        )
+
+    def _audio_schema(self) -> probatio.Schema:
+        return probatio.Schema({
+            probatio.Required(
+                "person_output_chime",
+                default=bool(self._working.get("person_output_chime", False)),
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                "person_chime_url",
+                default=str(self._working.get("person_chime_url", "") or ""),
+            ): selector.TextSelector(),
+            probatio.Required(
+                "person_chime_delay",
+                default=float(self._working.get("person_chime_delay", 0.5) or 0),
+            ): selector.NumberSelector(selector.NumberSelectorConfig(
+                min=0, max=10, step=0.5, mode=selector.NumberSelectorMode.BOX,
+            )),
+            probatio.Required(
+                "person_output_ducking",
+                default=bool(self._working.get("person_output_ducking", False)),
+            ): selector.BooleanSelector(),
+            probatio.Required(
+                "person_duck_factor",
+                default=float(self._working.get("person_duck_factor", 0.35) or 0.35),
+            ): selector.NumberSelector(selector.NumberSelectorConfig(
+                min=0.1, max=1, step=0.05, mode=selector.NumberSelectorMode.BOX,
+            )),
+        })
+
+    async def async_step_edit_advanced_ai(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Edit only safe prompt style preferences; strict AI JSON rules remain fixed."""
+        self._edit_section = "advanced_ai"
+        current = self._working.get("ai_prompt_templates", {}) or {}
+        if user_input is not None:
+            from .ai_filter import custom_style_instruction
+            try:
+                for key in ("rewrite", "translate", "both"):
+                    custom_style_instruction(
+                        {key: str(user_input.get(key, "") or "")},
+                        mode="rewrite" if key != "translate" else "translate",
+                        target_language="el" if key != "rewrite" else None,
+                        originals={"text_tts": "test", "text_notify": None},
+                    )
+            except ValueError:
+                return self.async_show_form(
+                    step_id="edit_advanced_ai",
+                    data_schema=self._ai_prompts_schema(current),
+                    errors={"base": "invalid_prompt_template"},
+                )
+            self._working["ai_prompt_templates"] = {
+                key: str(user_input.get(key, "") or "").strip()
+                for key in ("rewrite", "translate", "both")
+            }
+            return await self._async_finish()
+        return self.async_show_form(
+            step_id="edit_advanced_ai",
+            data_schema=self._ai_prompts_schema(current),
+        )
+
+    @staticmethod
+    def _ai_prompts_schema(current: dict[str, str]) -> probatio.Schema:
+        return probatio.Schema({
+            probatio.Optional(key, default=str(current.get(key, "") or "")):
+                selector.TextSelector(selector.TextSelectorConfig(multiline=True))
+            for key in ("rewrite", "translate", "both")
+        })
+
     async def async_step_edit_people(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Edit tracked people and their room tracking / voice settings."""
         self._edit_section = "people"
         return await self.async_step_people()
+
+    def _person_provider_selector(
+        self, domain: str, selected: str | None = None,
+    ) -> selector.SelectSelector:
+        """Pick by human-readable HA provider name, with a global fallback."""
+        options = [selector.SelectOptionDict(
+            value="", label="Use global default",
+        )]
+        if domain == "tts":
+            choices = tts_engine_options(self.hass)
+        else:
+            choices = self._ai_agent_options()
+        for entry in choices:
+            if str(entry["value"]) not in {item["value"] for item in options}:
+                options.append(selector.SelectOptionDict(
+                    value=str(entry["value"]), label=str(entry["label"]),
+                ))
+        if selected and selected not in {str(x["value"]) for x in options}:
+            options.append(selector.SelectOptionDict(
+                value=str(selected), label=f"Unavailable · {selected}",
+            ))
+        return selector.SelectSelector(selector.SelectSelectorConfig(
+            options=options, mode=selector.SelectSelectorMode.DROPDOWN,
+        ))
 
     async def async_step_people(
         self, user_input: dict[str, Any] | None = None
@@ -306,6 +472,11 @@ class _AnnouncementFlowMixin:
             self._working[CONF_PERSON_GROUP_TRANSLATE] = bool(
                 user_input.get(CONF_PERSON_GROUP_TRANSLATE, False)
             )
+            for key in (CONF_PERSON_GROUP_AGENT, CONF_PERSON_GROUP_TTS_ENGINE,
+                        CONF_PERSON_GROUP_ADDRESSEE):
+                self._working[key] = str(user_input.get(key, "") or "").strip()
+            for key in (CONF_PERSON_GROUP_REWRITE, CONF_PERSON_GROUP_GREETING):
+                self._working[key] = bool(user_input.get(key, False))
             self._person_config_ids = selected
             self._person_index = 0
             return await self.async_step_person_profile()
@@ -330,6 +501,30 @@ class _AnnouncementFlowMixin:
             probatio.Required(
                 CONF_PERSON_GROUP_TRANSLATE,
                 default=bool(self._working.get(CONF_PERSON_GROUP_TRANSLATE, False)),
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                CONF_PERSON_GROUP_AGENT,
+                default=str(self._working.get(CONF_PERSON_GROUP_AGENT) or ""),
+            ): self._person_provider_selector(
+                "ai", str(self._working.get(CONF_PERSON_GROUP_AGENT) or "")
+            ),
+            probatio.Optional(
+                CONF_PERSON_GROUP_TTS_ENGINE,
+                default=str(self._working.get(CONF_PERSON_GROUP_TTS_ENGINE) or ""),
+            ): self._person_provider_selector(
+                "tts", str(self._working.get(CONF_PERSON_GROUP_TTS_ENGINE) or "")
+            ),
+            probatio.Required(
+                CONF_PERSON_GROUP_REWRITE,
+                default=bool(self._working.get(CONF_PERSON_GROUP_REWRITE, False)),
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                CONF_PERSON_GROUP_ADDRESSEE,
+                default=str(self._working.get(CONF_PERSON_GROUP_ADDRESSEE) or ""),
+            ): selector.TextSelector(),
+            probatio.Required(
+                CONF_PERSON_GROUP_GREETING,
+                default=bool(self._working.get(CONF_PERSON_GROUP_GREETING, False)),
             ): selector.BooleanSelector(),
         })
         return self.async_show_form(step_id="people", data_schema=schema)
@@ -373,6 +568,14 @@ class _AnnouncementFlowMixin:
                 "language": str(user_input.get("language", "") or "").strip(),
                 "voice": str(user_input.get("voice", "") or "").strip(),
                 "translate": bool(user_input.get("translate", False)),
+                "rewrite": bool(user_input.get("rewrite", False)),
+                "ai_agent": str(user_input.get("ai_agent", "") or "").strip(),
+                "tts_engine": str(user_input.get("tts_engine", "") or "").strip(),
+                "greeting": bool(user_input.get("greeting", False)),
+                "address": str(user_input.get("address", "") or "").strip(),
+                "enabled": bool(user_input.get("enabled", True)),
+                "presence_sensor": str(user_input.get("presence_sensor", "") or "").strip(),
+                "verify_presence": bool(user_input.get("verify_presence", False)),
                 "ignore_home": bool(user_input.get("ignore_home", False)),
                 "destinations": destinations,
             }
@@ -420,6 +623,32 @@ class _AnnouncementFlowMixin:
             probatio.Required(
                 "ignore_home", default=bool(current.get("ignore_home", False))
             ): selector.BooleanSelector(),
+            probatio.Required(
+                "enabled", default=bool(current.get("enabled", True))
+            ): selector.BooleanSelector(),
+            _optional_marker(
+                "presence_sensor", current.get("presence_sensor")
+            ): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="binary_sensor")
+            ),
+            probatio.Required(
+                "verify_presence", default=bool(current.get("verify_presence", False))
+            ): selector.BooleanSelector(),
+            probatio.Required(
+                "rewrite", default=bool(current.get("rewrite", False))
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                "ai_agent", default=current.get("ai_agent", "")
+            ): self._person_provider_selector("ai", current.get("ai_agent")),
+            probatio.Optional(
+                "tts_engine", default=current.get("tts_engine", "")
+            ): self._person_provider_selector("tts", current.get("tts_engine")),
+            probatio.Required(
+                "greeting", default=bool(current.get("greeting", False))
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                "address", default=current.get("address", "")
+            ): selector.TextSelector(),
         }
         for slot in ("mobile", "watch", "tablet", "other"):
             key = "destination_" + slot

@@ -53,7 +53,7 @@ def test_snapcast_clients_remain_routing_only() -> None:
 def test_new_role_model_keeps_startup_safe_tasks() -> None:
     manager=(C/"manager.py").read_text()
     assert "self.hass.async_create_task(" not in manager
-    assert manager.count("self.entry.async_create_background_task(")==4
+    assert manager.count("self.entry.async_create_background_task(")==5
 
 
 def test_runtime_never_activates_more_than_one_tts_engine() -> None:
