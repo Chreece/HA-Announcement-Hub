@@ -140,7 +140,6 @@ from .outputs import (
     expand_notify_output_tokens,
     expand_snapcast_output_tokens,
     notify_output_options,
-    tts_media_player_options,
     area_name,
     resolve_notify_outputs,
     snapcast_output_options,
@@ -353,7 +352,8 @@ class _AnnouncementFlowMixin:
                 "other": "destination_other",
             }
             permitted = {
-                item["value"] for item in notify_output_options(self.hass)
+                item["value"].removeprefix("entity:")
+                for item in notify_output_options(self.hass)
             } | {
                 item["value"] for item in tts_media_player_options(self.hass)
             }
@@ -395,7 +395,7 @@ class _AnnouncementFlowMixin:
         """Offer only eligible HA outputs as named personal destination slots."""
         available: dict[str, str] = {}
         for item in (*notify_output_options(self.hass), *tts_media_player_options(self.hass)):
-            available[item["value"]] = item["label"]
+            available[item["value"].removeprefix("entity:")] = item["label"]
         choices = [
             selector.SelectOptionDict(value=key, label=label)
             for key, label in sorted(available.items())
