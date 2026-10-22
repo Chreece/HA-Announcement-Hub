@@ -174,10 +174,10 @@
           "person_group_translate": "Traducir anuncios de grupo"
         },
         "data_description": {
-          "tracked_people": "Select the persons for whom room trackers and optional voices can be configured.",
-          "person_group_language": "Optional language code for announcements to two or more targeted people sharing a room.",
-          "person_group_voice": "Optional TTS voice identifier used when two or more selected people share a room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "Selecciona las personas para las que quieras configurar seguimiento de habitación, idioma y voz.",
+          "person_group_language": "Código de idioma opcional para avisos dirigidos a varias personas que comparten una habitación.",
+          "person_group_voice": "Identificador opcional de voz TTS para avisos a varias personas que están en la misma habitación.",
+          "person_group_translate": "Traduce automáticamente los avisos de grupo al idioma configurado con el agente de IA seleccionado y su alternativa. Si falla, conserva el mensaje original."
         }
       },
       "person_profile": {
@@ -195,15 +195,15 @@
           "destination_other": "Otras salidas personales"
         },
         "data_description": {
-          "tracker": "Select a sensor or device tracker that reports the current room in its state or area/room attribute.",
-          "language": "Optional target speech language, overridden by an explicit action language.",
-          "voice": "Optional target TTS voice, overridden by action tts_options.voice.",
-          "ignore_home": "Allow targeting when the person entity is away; unknown or unavailable rooms still fail safely.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "Selecciona el sensor o rastreador que informa de la habitación actual de la persona mediante su estado o el atributo room/area.",
+          "language": "Idioma de voz opcional para esta persona. Tiene prioridad el idioma indicado explícitamente en la acción.",
+          "voice": "Identificador opcional de voz TTS. Tiene prioridad tts_options.voice si se indica en la acción.",
+          "ignore_home": "Permite usar el sensor de habitación aunque la persona figure fuera de casa. Una habitación desconocida nunca permite enviar el aviso a otro lugar.",
+          "translate": "Usa el agente de IA configurado para traducir por separado el mensaje hablado y el visual al idioma de la persona y pronunciarlo con la voz TTS elegida. use_ai: false desactiva la traducción.",
+          "destination_mobile": "Selecciona salidas de notificación o reproductores existentes del móvil de esta persona. Solo se usarán las salidas asignadas.",
+          "destination_watch": "Selecciona salidas de notificación o reproductores existentes del reloj de esta persona. Solo se usarán las salidas asignadas.",
+          "destination_tablet": "Selecciona salidas de notificación o reproductores existentes de la tableta de esta persona. Solo se usarán las salidas asignadas.",
+          "destination_other": "Otras salidas de Home Assistant asignadas a esta persona, que solo se usarán al seleccionar el destino «Otro»."
         }
       }
     },
@@ -397,10 +397,10 @@
           "person_group_translate": "Traducir anuncios de grupo"
         },
         "data_description": {
-          "tracked_people": "Select the persons for whom room trackers and optional voices can be configured.",
-          "person_group_language": "Optional language code for announcements to two or more targeted people sharing a room.",
-          "person_group_voice": "Optional TTS voice identifier used when two or more selected people share a room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "Selecciona las personas para las que quieras configurar seguimiento de habitación, idioma y voz.",
+          "person_group_language": "Código de idioma opcional para avisos dirigidos a varias personas que comparten una habitación.",
+          "person_group_voice": "Identificador opcional de voz TTS para avisos a varias personas que están en la misma habitación.",
+          "person_group_translate": "Traduce automáticamente los avisos de grupo al idioma configurado con el agente de IA seleccionado y su alternativa. Si falla, conserva el mensaje original."
         }
       },
       "person_profile": {
@@ -418,15 +418,15 @@
           "destination_other": "Otras salidas personales"
         },
         "data_description": {
-          "tracker": "Select a sensor or device tracker that reports the current room in its state or area/room attribute.",
-          "language": "Optional target speech language, overridden by an explicit action language.",
-          "voice": "Optional target TTS voice, overridden by action tts_options.voice.",
-          "ignore_home": "Allow targeting when the person entity is away; unknown or unavailable rooms still fail safely.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "Selecciona el sensor o rastreador que informa de la habitación actual de la persona mediante su estado o el atributo room/area.",
+          "language": "Idioma de voz opcional para esta persona. Tiene prioridad el idioma indicado explícitamente en la acción.",
+          "voice": "Identificador opcional de voz TTS. Tiene prioridad tts_options.voice si se indica en la acción.",
+          "ignore_home": "Permite usar el sensor de habitación aunque la persona figure fuera de casa. Una habitación desconocida nunca permite enviar el aviso a otro lugar.",
+          "translate": "Usa el agente de IA configurado para traducir por separado el mensaje hablado y el visual al idioma de la persona y pronunciarlo con la voz TTS elegida. use_ai: false desactiva la traducción.",
+          "destination_mobile": "Selecciona salidas de notificación o reproductores existentes del móvil de esta persona. Solo se usarán las salidas asignadas.",
+          "destination_watch": "Selecciona salidas de notificación o reproductores existentes del reloj de esta persona. Solo se usarán las salidas asignadas.",
+          "destination_tablet": "Selecciona salidas de notificación o reproductores existentes de la tableta de esta persona. Solo se usarán las salidas asignadas.",
+          "destination_other": "Otras salidas de Home Assistant asignadas a esta persona, que solo se usarán al seleccionar el destino «Otro»."
         }
       }
     },
@@ -667,11 +667,11 @@
         },
         "person_destination": {
           "name": "Destinos personales",
-          "description": "Choose Room or assigned Mobile, Watch, Tablet and Other destinations, rather than device entity IDs. Unmapped choices are rejected."
+          "description": "Selecciona Habitación, Móvil, Reloj, Tableta u Otro entre los destinos asignados a esa persona. Puedes combinarlos. Los destinos sin asignar se rechazan sin envíos generales."
         },
         "person_translate": {
           "name": "Traducir para las personas seleccionadas",
-          "description": "Override individual or group translation preferences for this announcement; requires a configured destination language."
+          "description": "Anula la preferencia de traducción automática de la persona o del grupo para este aviso. Usa el idioma configurado; use_ai: false impide la traducción."
         }
       }
     },
