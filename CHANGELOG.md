@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b16 - 2026-10-22
+
+**Beta — complete Japanese native integration localization.**
+
+- Complete all **599 Japanese native integration entries** including
+  configuration and reconfiguration, TTS/Companion App settings, person/group
+  preferences, notification device levels, provider overlays, queue timing,
+  occupancy, door-controlled fallback, audio/chime, AI prompting, service
+  action descriptions, and errors and selectors.
+- Verify explicit recipient isolation, current-person room delivery, door
+  gating, spoken versus written channels, the AI original-message fallback,
+  and no unintended shared Snapcast broadcast.
+- Preserve all template markers, technical identifiers, service names and
+  option keys. Only five numeric opacity percentages remain identical to
+  English. Setup/options mirror consistently and no English help remains.
+- Add Japanese regression tests for language completeness, original technical
+  identifiers, exact localization of the 599 native keys, safe routing
+  descriptions and configuration/options parity.
+- No announcement routing, queue scheduling, speech engine or device logic
+  changed. Issue #50 stays open for Korean, Swedish and Czech.
+
 ## 0.10.0b15 - 2026-10-22
 
 **Beta — complete Simplified and Traditional Chinese native translations.**
