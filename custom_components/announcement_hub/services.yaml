@@ -64,6 +64,7 @@ send:
                 - watch
                 - tablet
                 - other
+              translation_key: person_destination
         person_translate:
           selector:
             boolean:
