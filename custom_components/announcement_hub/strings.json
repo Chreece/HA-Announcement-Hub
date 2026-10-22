@@ -544,6 +544,15 @@
         "tts_then_visual": "TTS first → Visual on failure",
         "both": "Both eligible channels"
       }
+    },
+    "person_destination": {
+      "options": {
+        "room": "Room",
+        "mobile": "Mobile",
+        "watch": "Watch",
+        "tablet": "Tablet",
+        "other": "Other"
+      }
     }
   },
   "entity": {
