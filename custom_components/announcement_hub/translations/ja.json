@@ -625,6 +625,10 @@
         "target_person": {
           "name": "対象の人物",
           "description": "Target only the selected person's current room, with no other room or general fallback."
+        },
+        "manual_targets": {
+          "name": "手動選択した宛先",
+          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         }
       }
     },
