@@ -194,6 +194,7 @@ from .outputs import (
     NotifyOutput,
     companion_output_available,
     entity_area_id,
+    entity_integration,
     expand_companion_tts_tokens,
     expand_notify_output_tokens,
     expand_media_player_tokens,
@@ -622,6 +623,9 @@ class AnnouncementManager:
         notify_refs = tuple(
             option["value"] for option in notify_output_options(self.hass)
             if in_scope(option["value"].removeprefix(TARGET_ENTITY_PREFIX))
+            and (not scope or entity_integration(
+                self.hass, option["value"].removeprefix(TARGET_ENTITY_PREFIX)
+            ) != INTEGRATION_MOBILE_APP)
         )
         direct_players = tuple(
             option["value"] for option in tts_media_player_options(self.hass)
