@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.10.0b8 - 2026-10-22
+
+**Beta — complete European and Brazilian Portuguese native localizations.**
+
+- Localize the full current 599-key native integration interface in both
+  `pt` and `pt-BR`: all setup and options labels, descriptions, errors,
+  selector values, service-action help, queue, AI, TTS and person settings.
+- Keep Portugal and Brazil terminology distinct for rooms, portable
+  devices, audio/media players, screen display and fallback routing.
+  Correct Brazilian Portuguese gender agreement and unintended
+  replacements in the display-splitting and chime descriptions.
+- Preserve all Home Assistant identifiers and literal interpolation
+  placeholders. The only six English-identical entries in each
+  catalog are five numeric percentages and the common term Tablet.
+- Add regression tests for 599-key parity, non-English help coverage,
+  technical terms/placeholders and Brazilian grammar checks.
+- No runtime code or recipient-routing behavior changed. Issue #50
+  remains open for 12 other locales needing the older native help
+  and menu strings reviewed.
+
 ## 0.10.0b7 - 2026-10-22
 
 **Beta — complete native Italian localization for Announcement Hub.**
