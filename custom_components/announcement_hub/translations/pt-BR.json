@@ -472,7 +472,7 @@
           "edit_people": "Configure people's room trackers and individual/group voice settings.",
           "edit_advanced_ai": "Edite os estilos AI opcionais para reescrita, tradução e operações combinadas. As regras essenciais de segurança de dispositivos e ferramentas permanecem fixas.",
           "edit_audio": "Configure o aviso sonoro dos cômodos com saída direta e a redução opcional do volume musical; nunca afeta a fonte Snapcast compartilhada.",
-          "edit_room_safety": "Configure o sensor opcional de presença de um cômodo; sensores indisponíveis nunca causam recurso a outras cômodos."
+          "edit_room_safety": "Configure o sensor opcional de presença de um cômodo; sensores indisponíveis nunca provocam o encaminhamento para outros cômodos."
         }
       },
       "people": {
