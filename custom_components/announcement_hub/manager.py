@@ -4716,7 +4716,7 @@ class AnnouncementManager:
                 diagnostics=ai,
                 mode=ai.get("requested_mode", "rewrite"),
                 target_language=ai.get("requested_target_language"),
-                prompt_templates=self.settings.get("ai_prompt_templates", {}),
+                prompt_templates=getattr(self, "settings", {}).get("ai_prompt_templates", {}),
                 title_result=(
                     title_result if ai.get("requested_generate_title") else None
                 ),
