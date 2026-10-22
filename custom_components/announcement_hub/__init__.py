@@ -46,6 +46,7 @@ from .const import (
     ATTR_PERSON_DESTINATION,
     ATTR_PERSON_TRANSLATE,
     ATTR_PERSON_GREETING,
+    ATTR_PRE_ANNOUNCE_SOUND,
     ATTR_TTS_ENGINE,
     ATTR_MANUAL_TARGETS,
     ATTR_INTEGRATION,
@@ -191,6 +192,7 @@ SEND_SCHEMA = probatio.All(
             ),
             probatio.Optional(ATTR_PERSON_TRANSLATE): bool,
             probatio.Optional(ATTR_PERSON_GREETING): bool,
+            probatio.Optional(ATTR_PRE_ANNOUNCE_SOUND): bool,
             probatio.Optional(ATTR_TTS_ENGINE): cv.string,
             probatio.Optional(ATTR_INTEGRATION): probatio.All(
                 probatio.EnsureList(), [cv.string]
@@ -397,6 +399,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             ai_agent=call.data.get(ATTR_AI_AGENT),
             ai_mode=call.data[ATTR_AI_MODE],
             tts_engine=call.data.get(ATTR_TTS_ENGINE),
+            pre_announce_sound=call.data.get(ATTR_PRE_ANNOUNCE_SOUND),
             manual_targets=call.data[ATTR_MANUAL_TARGETS],
         )
 
