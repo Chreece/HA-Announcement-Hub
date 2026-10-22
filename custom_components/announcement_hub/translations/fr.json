@@ -153,7 +153,10 @@
           "edit_profiles": "3. Profils de sortie par fournisseur",
           "edit_general": "4. Paramètres généraux, présence et IA",
           "edit_all": "Modifier tous les paramètres (assistant complet)",
-          "edit_people": "5. Personnes et voix"
+          "edit_people": "5. Personnes et voix",
+          "edit_advanced_ai": "Advanced AI prompts",
+          "edit_audio": "Audio, chime and ducking",
+          "edit_room_safety": "Room presence verification"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
@@ -171,13 +174,23 @@
           "tracked_people": "Personnes à configurer",
           "person_group_language": "Langue du groupe",
           "person_group_voice": "Voix du groupe",
-          "person_group_translate": "Traduire les annonces de groupe"
+          "person_group_translate": "Traduire les annonces de groupe",
+          "person_group_agent": "Fournisseur IA du groupe",
+          "person_group_tts_engine": "Moteur TTS du groupe",
+          "person_group_rewrite": "Reformuler les annonces de groupe",
+          "person_group_addressee": "Appellation du groupe",
+          "person_group_greeting": "Saluer automatiquement le groupe"
         },
         "data_description": {
           "tracked_people": "Choisissez les personnes dont vous souhaitez configurer le suivi de pièce, la langue et la voix.",
           "person_group_language": "Code de langue facultatif pour les annonces adressées à plusieurs personnes ciblées dans la même pièce.",
           "person_group_voice": "Identifiant facultatif de voix TTS pour les annonces adressées à plusieurs personnes dans une même pièce.",
-          "person_group_translate": "Traduire automatiquement les annonces de groupe dans la langue configurée, avec l'agent IA choisi ou son remplacement. En cas d'échec, le texte original est conservé."
+          "person_group_translate": "Traduire automatiquement les annonces de groupe dans la langue configurée, avec l'agent IA choisi ou son remplacement. En cas d'échec, le texte original est conservé.",
+          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
+          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
+          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
+          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
         }
       },
       "person_profile": {
@@ -192,7 +205,15 @@
           "destination_mobile": "Sorties téléphone",
           "destination_watch": "Sorties montre",
           "destination_tablet": "Sorties tablette",
-          "destination_other": "Autres sorties personnelles"
+          "destination_other": "Autres sorties personnelles",
+          "enabled": "Autoriser les annonces à cette personne",
+          "presence_sensor": "Capteur de présence de vérification",
+          "verify_presence": "Exiger la vérification de présence",
+          "rewrite": "Reformuler les annonces de cette personne",
+          "ai_agent": "Agent IA personnel",
+          "tts_engine": "Moteur TTS personnel",
+          "greeting": "Saluer automatiquement cette personne",
+          "address": "Nom d'appel préféré"
         },
         "data_description": {
           "tracker": "Choisissez le capteur ou traceur qui indique la pièce actuelle de la personne dans son état ou son attribut room/area.",
@@ -203,7 +224,61 @@
           "destination_mobile": "Choisissez les sorties de notification ou les lecteurs existants appartenant au téléphone de cette personne. Seules les sorties attribuées sont utilisées.",
           "destination_watch": "Choisissez les sorties de notification ou les lecteurs existants appartenant à la montre de cette personne. Seules les sorties attribuées sont utilisées.",
           "destination_tablet": "Choisissez les sorties de notification ou les lecteurs existants appartenant à la tablette de cette personne. Seules les sorties attribuées sont utilisées.",
-          "destination_other": "Autres sorties Home Assistant attribuées à cette personne, utilisées uniquement quand la destination « Autre » est choisie."
+          "destination_other": "Autres sorties Home Assistant attribuées à cette personne, utilisées uniquement quand la destination « Autre » est choisie.",
+          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "rewrite": "Enable rewriting for this person independently of their translation preference.",
+          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
+          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+        }
+      },
+      "edit_advanced_ai": {
+        "title": "Advanced AI style prompts",
+        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "data": {
+          "rewrite": "Rewrite style",
+          "translate": "Translation style",
+          "both": "Combined rewrite and translation style"
+        },
+        "data_description": {
+          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
+          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
+          "both": "Optional style preference when translation and rewriting are both active."
+        }
+      },
+      "edit_audio": {
+        "title": "Direct room audio options",
+        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "data": {
+          "person_output_chime": "Enable pre-announcement chime",
+          "person_chime_url": "Local chime audio path",
+          "person_chime_delay": "Chime settle delay",
+          "person_output_ducking": "Duck playing audio",
+          "person_duck_factor": "Music volume factor"
+        },
+        "data_description": {
+          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
+          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
+          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
+          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
+          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+        }
+      },
+      "edit_room_safety": {
+        "title": "Room presence verification",
+        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "data": {
+          "area": "Area",
+          "verify_presence": "Require presence confirmation",
+          "presence_sensor": "Room occupancy sensor"
+        },
+        "data_description": {
+          "area": "Choose the area to add or clear verification.",
+          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
+          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
         }
       }
     },
@@ -217,7 +292,11 @@
       "notify_level_overlap": "Un appareil de notification ne peut avoir qu'un seul niveau minimal.",
       "room_tts_area_required": "Un lecteur vocal lié à une pièce doit avoir une zone Home Assistant.",
       "tts_player_role_overlap": "Un même lecteur ne peut pas être à la fois une sortie vocale directe et la source Snapcast partagée.",
-      "invalid_person_output": "La sortie personnelle sélectionnée n'existe pas ou est désactivée."
+      "invalid_person_output": "La sortie personnelle sélectionnée n'existe pas ou est désactivée.",
+      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
+      "invalid_chime_url": "Chime audio must use a /local/ file.",
+      "invalid_person_area": "Select a valid Home Assistant room.",
+      "invalid_person_presence": "Select a presence sensor before enabling verification."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub est déjà configuré."
@@ -376,7 +455,10 @@
           "edit_profiles": "3. Profils de sortie par fournisseur",
           "edit_general": "4. Paramètres généraux, présence et IA",
           "edit_all": "Modifier tous les paramètres (assistant complet)",
-          "edit_people": "5. Personnes et voix"
+          "edit_people": "5. Personnes et voix",
+          "edit_advanced_ai": "Advanced AI prompts",
+          "edit_audio": "Audio, chime and ducking",
+          "edit_room_safety": "Room presence verification"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
@@ -394,13 +476,23 @@
           "tracked_people": "Personnes à configurer",
           "person_group_language": "Langue du groupe",
           "person_group_voice": "Voix du groupe",
-          "person_group_translate": "Traduire les annonces de groupe"
+          "person_group_translate": "Traduire les annonces de groupe",
+          "person_group_agent": "Fournisseur IA du groupe",
+          "person_group_tts_engine": "Moteur TTS du groupe",
+          "person_group_rewrite": "Reformuler les annonces de groupe",
+          "person_group_addressee": "Appellation du groupe",
+          "person_group_greeting": "Saluer automatiquement le groupe"
         },
         "data_description": {
           "tracked_people": "Choisissez les personnes dont vous souhaitez configurer le suivi de pièce, la langue et la voix.",
           "person_group_language": "Code de langue facultatif pour les annonces adressées à plusieurs personnes ciblées dans la même pièce.",
           "person_group_voice": "Identifiant facultatif de voix TTS pour les annonces adressées à plusieurs personnes dans une même pièce.",
-          "person_group_translate": "Traduire automatiquement les annonces de groupe dans la langue configurée, avec l'agent IA choisi ou son remplacement. En cas d'échec, le texte original est conservé."
+          "person_group_translate": "Traduire automatiquement les annonces de groupe dans la langue configurée, avec l'agent IA choisi ou son remplacement. En cas d'échec, le texte original est conservé.",
+          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
+          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
+          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
+          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
         }
       },
       "person_profile": {
@@ -415,7 +507,15 @@
           "destination_mobile": "Sorties téléphone",
           "destination_watch": "Sorties montre",
           "destination_tablet": "Sorties tablette",
-          "destination_other": "Autres sorties personnelles"
+          "destination_other": "Autres sorties personnelles",
+          "enabled": "Autoriser les annonces à cette personne",
+          "presence_sensor": "Capteur de présence de vérification",
+          "verify_presence": "Exiger la vérification de présence",
+          "rewrite": "Reformuler les annonces de cette personne",
+          "ai_agent": "Agent IA personnel",
+          "tts_engine": "Moteur TTS personnel",
+          "greeting": "Saluer automatiquement cette personne",
+          "address": "Nom d'appel préféré"
         },
         "data_description": {
           "tracker": "Choisissez le capteur ou traceur qui indique la pièce actuelle de la personne dans son état ou son attribut room/area.",
@@ -426,7 +526,61 @@
           "destination_mobile": "Choisissez les sorties de notification ou les lecteurs existants appartenant au téléphone de cette personne. Seules les sorties attribuées sont utilisées.",
           "destination_watch": "Choisissez les sorties de notification ou les lecteurs existants appartenant à la montre de cette personne. Seules les sorties attribuées sont utilisées.",
           "destination_tablet": "Choisissez les sorties de notification ou les lecteurs existants appartenant à la tablette de cette personne. Seules les sorties attribuées sont utilisées.",
-          "destination_other": "Autres sorties Home Assistant attribuées à cette personne, utilisées uniquement quand la destination « Autre » est choisie."
+          "destination_other": "Autres sorties Home Assistant attribuées à cette personne, utilisées uniquement quand la destination « Autre » est choisie.",
+          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "rewrite": "Enable rewriting for this person independently of their translation preference.",
+          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
+          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+        }
+      },
+      "edit_advanced_ai": {
+        "title": "Advanced AI style prompts",
+        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "data": {
+          "rewrite": "Rewrite style",
+          "translate": "Translation style",
+          "both": "Combined rewrite and translation style"
+        },
+        "data_description": {
+          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
+          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
+          "both": "Optional style preference when translation and rewriting are both active."
+        }
+      },
+      "edit_audio": {
+        "title": "Direct room audio options",
+        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "data": {
+          "person_output_chime": "Enable pre-announcement chime",
+          "person_chime_url": "Local chime audio path",
+          "person_chime_delay": "Chime settle delay",
+          "person_output_ducking": "Duck playing audio",
+          "person_duck_factor": "Music volume factor"
+        },
+        "data_description": {
+          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
+          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
+          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
+          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
+          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+        }
+      },
+      "edit_room_safety": {
+        "title": "Room presence verification",
+        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "data": {
+          "area": "Area",
+          "verify_presence": "Require presence confirmation",
+          "presence_sensor": "Room occupancy sensor"
+        },
+        "data_description": {
+          "area": "Choose the area to add or clear verification.",
+          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
+          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
         }
       }
     },
@@ -440,7 +594,11 @@
       "notify_level_overlap": "Un appareil de notification ne peut avoir qu'un seul niveau minimal.",
       "room_tts_area_required": "Un lecteur vocal lié à une pièce doit avoir une zone Home Assistant.",
       "tts_player_role_overlap": "Un même lecteur ne peut pas être à la fois une sortie vocale directe et la source Snapcast partagée.",
-      "invalid_person_output": "La sortie personnelle sélectionnée n'existe pas ou est désactivée."
+      "invalid_person_output": "La sortie personnelle sélectionnée n'existe pas ou est désactivée.",
+      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
+      "invalid_chime_url": "Chime audio must use a /local/ file.",
+      "invalid_person_area": "Select a valid Home Assistant room.",
+      "invalid_person_presence": "Select a presence sensor before enabling verification."
     }
   },
   "selector": {
@@ -672,6 +830,18 @@
         "person_translate": {
           "name": "Traduire pour les personnes sélectionnées",
           "description": "Remplacer la préférence de traduction automatique de la personne ou du groupe pour cette annonce. La langue configurée est utilisée ; use_ai: false désactive la traduction."
+        },
+        "person_greeting": {
+          "name": "Personal greeting",
+          "description": "Override automatic salutation for a person/group; leave unset to use the configured preference."
+        },
+        "pre_announce_sound": {
+          "name": "Pre-announcement chime",
+          "description": "Optional direct-room audio chime, never sent on the shared Snapcast source."
+        },
+        "tts_engine": {
+          "name": "TTS engine override",
+          "description": "Select one existing TTS engine for this announcement without selecting extra devices."
         }
       }
     },
