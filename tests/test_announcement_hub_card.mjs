@@ -312,3 +312,15 @@ test("only room and destinations assigned for all selected people appear", () =>
   }};
   assert.deepEqual(card._availablePersonDestinations(), ["room", "mobile"]);
 });
+
+test("person translation override is optional and maps to action boolean", () => {
+  const { card, fields } = harness();
+  card._targetMode = "person";
+  card._selected.person.add("person.alex");
+  fields.message.value = "Door open";
+  assert.equal(card._buildPayload().person_translate, undefined);
+  card._personTranslation = "on";
+  assert.equal(card._buildPayload().person_translate, true);
+  card._personTranslation = "off";
+  assert.equal(card._buildPayload().person_translate, false);
+});
