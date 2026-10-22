@@ -482,7 +482,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                     engine = manager.settings.get(CONF_PERSON_GROUP_TTS_ENGINE)
                     rewrite = manager.settings.get(CONF_PERSON_GROUP_REWRITE, False)
                     greeting = manager.settings.get(CONF_PERSON_GROUP_GREETING, False)
-                    address = manager.settings.get(CONF_PERSON_GROUP_ADDRESSEE, "Everyone")
+                    address = manager.settings.get(CONF_PERSON_GROUP_ADDRESSEE) or "Everyone"
                 else:
                     profile = profiles.get(recipients[0], {}) or {}
                     lang = profile.get("language")
