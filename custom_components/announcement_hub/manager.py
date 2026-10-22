@@ -2462,7 +2462,7 @@ class AnnouncementManager:
         )
         level_priority = LEVEL_PRIORITY.get(job.level, LEVEL_PRIORITY[LEVEL_INFO])
         notify_policy = {
-            output.ref: self._notify_policy(output, manual=manual_targets)
+            output.ref: self._notify_policy(output, manual=job.manual_targets)
             for output in notifications
         }
         targets = select_stage_targets(
@@ -2485,7 +2485,7 @@ class AnnouncementManager:
                 (
                     entity_id,
                     entity_area_id(self.hass, entity_id),
-                    self._tts_player_scope(entity_id, manual=manual_targets),
+                    self._tts_player_scope(entity_id, manual=job.manual_targets),
                 )
                 for entity_id in selected[2] if selected[0]
             ),
