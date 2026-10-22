@@ -49,6 +49,7 @@
             <div id="person-destinations" class="choices spacious" role="group" aria-label="Person destinations"></div>
             <span class="field-caption">Translate into person's language</span>
             <div id="person-translation" class="choices" role="group" aria-label="Person translation"></div>
+            <span class="field-caption">Personal greeting</span><div id="person-greeting" class="choices" role="group" aria-label="Personal greeting"></div>
             <p class="hint">Room uses location tracking. Mobile, Watch, Tablet and Other target only that person's assigned output devices.</p>
           </div>
         </div>
@@ -98,9 +99,11 @@
           <summary><ha-icon icon="mdi:cog-outline"></ha-icon><strong>Advanced options</strong><small>Presence · agent · tap action</small></summary>
           <div class="columns">
             <label class="field"><span>AI provider <small>optional</small></span><input id="ai-agent" placeholder="conversation.my_agent or ai_task.my_model"></label>
+            <label class="field"><span>TTS engine <small>optional</small></span><input id="tts-engine" placeholder="tts.piper"></label>
             <label class="field"><span>Notification tap destination <small>optional</small></span><input id="click-action" placeholder="/lovelace/cameras"></label>
           </div>
           <label class="checkbox-line"><input type="checkbox" id="occupied-only" checked><span>Try occupied rooms during area fallback</span></label>
+          <span class="field-caption">Direct-room pre-announcement chime</span><div id="pre-chime" class="choices" role="group" aria-label="Pre-announcement chime"></div>
           <p class="hint">Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.</p>
         </details>
       </section>
