@@ -50,6 +50,64 @@ def _tokens(requested: Sequence[str] | str) -> list[str]:
     ]
 
 
+def resolve_person_ids(hass: Any, requested: Sequence[str] | str) -> list[str]:
+    """Find exact Home Assistant person identities without room/home restrictions."""
+    people = {item.entity_id: item for item in hass.states.async_all("person")}
+    tokens = _tokens(requested)
+    if not tokens:
+        raise PersonTargetError("target_person is empty")
+    result: list[str] = []
+    for token in tokens:
+        exact = people.get(token)
+        if exact is None:
+            matches = [
+                item for item in people.values()
+                if str(item.attributes.get("friendly_name", "")).casefold()
+                == token.casefold()
+            ]
+            if len(matches) != 1:
+                raise PersonTargetError(
+                    f"Unknown or ambiguous person {token!r}; use person.entity_id"
+                )
+            exact = matches[0]
+        if exact.entity_id not in result:
+            result.append(exact.entity_id)
+    return result
+
+
+PERSON_DESTINATIONS = ("room", "mobile", "watch", "tablet", "other")
+
+
+def selected_person_destinations(
+    profile: Mapping[str, Any], requested: Sequence[str] | str,
+) -> dict[str, tuple[str, ...]]:
+    """Map friendly destination types to explicitly configured HA entities."""
+    names = _tokens(requested)
+    if not names or any(name not in PERSON_DESTINATIONS for name in names):
+        raise PersonTargetError("Invalid person destination; choose room, mobile, watch, tablet or other")
+    configured = profile.get("destinations") or {}
+    if not isinstance(configured, Mapping):
+        configured = {}
+    result: dict[str, tuple[str, ...]] = {}
+    for name in dict.fromkeys(names):
+        if name == "room":
+            result[name] = ()
+            continue
+        value = configured.get(name, [])
+        if not isinstance(value, (list, tuple)):
+            value = ()
+        entries = tuple(dict.fromkeys(
+            str(entity).strip() for entity in value
+            if isinstance(entity, str) and str(entity).startswith(("notify.", "media_player."))
+        ))
+        if not entries:
+            raise PersonTargetError(
+                f"Destination {name!r} is not configured for this person"
+            )
+        result[name] = entries
+    return result
+
+
 def resolve_person_rooms(
     hass: Any,
     requested: Sequence[str] | str,
