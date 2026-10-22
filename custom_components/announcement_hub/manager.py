@@ -199,6 +199,11 @@ from .outputs import (
     expand_media_player_tokens,
     expand_snapcast_output_tokens,
     expand_tts_engine_tokens,
+    notify_output_options,
+    snapcast_output_options,
+    companion_tts_output_options,
+    tts_media_player_options,
+    tts_default_engine,
     mobile_app_webhook_id,
     notify_output_available,
     notify_output_legacy_service,
@@ -584,6 +589,56 @@ class AnnouncementManager:
             ),
         )
 
+    def _manual_output_catalog(
+        self, area_ids: Sequence[str] = (),
+    ) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...],
+               tuple[str, ...], tuple[str, ...]]:
+        """Discover live output endpoints for an explicit dashboard selection.
+
+        Configured output lists are NOT a whitelist in manual mode. A caller
+        must also supply actual recipients. In an area-only leg we restrict the
+        entire catalogue to the requested rooms, preventing a general-phone
+        broadcast at a later fallback stage. Configured TTS infrastructure
+        (or HA's default engine) is still needed to synthesize speech.
+        """
+        scope = set(area_ids)
+        def in_scope(entity_id: str) -> bool:
+            return not scope or entity_area_id(self.hass, entity_id) in scope
+
+        config = self._configured_outputs()
+        engine = config[0] or (
+            (tts_default_engine(self.hass),)
+            if tts_default_engine(self.hass) else ()
+        )
+        notify_refs = tuple(
+            option["value"] for option in notify_output_options(self.hass)
+            if in_scope(option["value"].removeprefix(TARGET_ENTITY_PREFIX))
+        )
+        direct_players = tuple(
+            option["value"] for option in tts_media_player_options(self.hass)
+            if in_scope(option["value"]) and option["value"] not in
+            set(self._ensure_list(self.settings.get(CONF_TTS_MEDIA_PLAYER)))
+        )
+        snapcast = expand_snapcast_output_tokens(
+            self.hass, [
+                option["value"] for option in snapcast_output_options(self.hass)
+                if in_scope(option["value"].removeprefix(TARGET_ENTITY_PREFIX))
+            ]
+        )
+        companion_ids = expand_companion_tts_tokens(
+            self.hass, [
+                option["value"] for option in companion_tts_output_options(self.hass)
+                if option["value"].startswith(TARGET_ENTRY_PREFIX)
+            ]
+        )
+        if scope:
+            companion_ids = tuple(
+                output.entry_id
+                for output in resolve_companion_tts_outputs(self.hass, companion_ids)
+                if output.area_id in scope
+            )
+        return engine, notify_refs, direct_players, snapcast, companion_ids
+
     def _select_requested_outputs(
         self,
         requested: Sequence[str],
@@ -775,6 +830,8 @@ class AnnouncementManager:
     def _explicit_recipient_tokens(
         self, integrations: Sequence[str], devices: Sequence[str],
         entities: Sequence[str],
+        *,
+        manual_targets: bool = False,
     ) -> tuple[str, ...]:
         """Resolve physical recipients using HA registry identity, not areas."""
         tokens = [
@@ -795,7 +852,8 @@ class AnnouncementManager:
                 value.removeprefix(TARGET_INTEGRATION_PREFIX)
                 for value in integrations
             }
-            configured = self._configured_outputs()
+            configured = (self._manual_output_catalog() if manual_targets
+                          else self._configured_outputs())
             tokens.extend(
                 output.ref
                 for output in resolve_notify_outputs(self.hass, configured[1])
@@ -804,7 +862,8 @@ class AnnouncementManager:
         if devices:
             device_reg = dr.async_get(self.hass)
             entity_reg = er.async_get(self.hass)
-            configured = self._configured_outputs()
+            configured = (self._manual_output_catalog() if manual_targets
+                          else self._configured_outputs())
             allowed = {
                 *(ref.removeprefix(TARGET_ENTITY_PREFIX) for ref in configured[1]
                   if ref.startswith(TARGET_ENTITY_PREFIX)),
@@ -841,9 +900,11 @@ class AnnouncementManager:
                 tokens.extend(matched)
         return tuple(dict.fromkeys(tokens))
 
-    def _tts_player_scope(self, entity_id: str) -> str:
+    def _tts_player_scope(self, entity_id: str, *, manual: bool = False) -> str:
         """Return room/general scope for one direct TTS media player."""
         configured = self.settings.get(CONF_TTS_PLAYER_POLICIES, {})
+        if manual:
+            configured = {}
         if isinstance(configured, Mapping):
             policy = configured.get(entity_id, {})
             if isinstance(policy, Mapping):
@@ -860,9 +921,11 @@ class AnnouncementManager:
     def _notify_policy(
         self,
         output: NotifyOutput,
+        *,
+        manual: bool = False,
     ) -> tuple[str, str]:
         """Return normalized scope/minimum-level policy for one notify output."""
-        configured = self.settings.get(CONF_NOTIFY_POLICIES, {})
+        configured = {} if manual else self.settings.get(CONF_NOTIFY_POLICIES, {})
         raw: Mapping[str, Any] = {}
         if isinstance(configured, Mapping):
             candidate = configured.get(output.ref, {})
@@ -955,9 +1018,12 @@ class AnnouncementManager:
         channels: Sequence[str] | str | None = None,
         _fanout: bool = False,
         _person_targeted: bool = False,
+        manual_targets: bool = False,
         _group_token: str | None = None,
         _excluded_physical: Sequence[str] = (),
     ) -> AnnouncementJob:
+        if manual_targets and not any((areas, outputs, integrations, devices, entities)):
+            raise ServiceValidationError("Manual targets require an explicit area, integration, device or entity")
         if ai_mode not in {"rewrite", "generate"}:
             raise ServiceValidationError("ai_mode must be rewrite or generate")
         # Resolve the primary message into two independent inputs BEFORE
@@ -1023,7 +1089,8 @@ class AnnouncementManager:
         requested = tuple(dict.fromkeys((
             *self._ensure_list(requested_services),
             *self._explicit_recipient_tokens(
-                integration_tokens, device_tokens, entity_tokens
+                integration_tokens, device_tokens, entity_tokens,
+                manual_targets=manual_targets,
             ),
         )))
         if channel_tokens and not requested and not explicit_area_routing:
@@ -1045,7 +1112,7 @@ class AnnouncementManager:
                 raise ServiceValidationError(
                     "Combined area and explicit recipients require two queue slots"
                 )
-            cfg = self._configured_outputs()
+            cfg = self._manual_output_catalog() if manual_targets else self._configured_outputs()
             static = filter_selected_outputs(
                 self._select_requested_outputs(
                     requested, level=level, tts_engines=cfg[0],
@@ -1072,6 +1139,7 @@ class AnnouncementManager:
                 tts_options=tts_options, companion_tts=companion_tts,
                 occupied_only=occupied_only, use_ai=use_ai, ai_agent=ai_agent,
                 ai_mode=ai_mode, channels=channel_tokens, _fanout=True,
+                manual_targets=manual_targets,
                 _group_token=group_token,
             )
             # Both legs are allowed to select overlapping physical outputs:
@@ -1116,7 +1184,11 @@ class AnnouncementManager:
             and not _person_targeted
         )
 
-        configured = self._configured_outputs()
+        configured = (
+            self._manual_output_catalog(requested_output_area_ids if explicit_area_routing else ())
+            if manual_targets and not requested else
+            self._manual_output_catalog() if manual_targets else self._configured_outputs()
+        )
         selected = filter_selected_outputs(
             self._select_requested_outputs(
                 requested, level=level, tts_engines=configured[0],
@@ -1145,8 +1217,10 @@ class AnnouncementManager:
             raise ServiceValidationError(
                 "No configured recipient matches integration/device/entity and service"
             )
-        minimum_tts_level = str(
-            self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
+        minimum_tts_level = (
+            LEVEL_INFO if manual_targets else str(
+                self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
+            )
         )
         player_value = self.settings.get(CONF_TTS_MEDIA_PLAYER)
         player = str(player_value) if player_value else None
@@ -1195,7 +1269,7 @@ class AnnouncementManager:
                     if (
                         (
                             not explicit_area_routing
-                            and self._notify_policy(output)[0]
+                            and self._notify_policy(output, manual=manual_targets)[0]
                             == NOTIFY_SCOPE_GENERAL
                         )
                         or (
@@ -1210,7 +1284,7 @@ class AnnouncementManager:
                     if (
                         (
                             not explicit_area_routing
-                            and self._tts_player_scope(entity_id)
+                            and self._tts_player_scope(entity_id, manual=manual_targets)
                             == NOTIFY_SCOPE_GENERAL
                         )
                         or (
@@ -1283,7 +1357,7 @@ class AnnouncementManager:
                 output = notify_by_ref.get(ref)
                 if output is None:
                     continue
-                policy_scope, minimum = self._notify_policy(output)
+                policy_scope, minimum = self._notify_policy(output, manual=manual_targets)
                 candidates.append(
                     {
                         "kind": "notify",
@@ -1313,11 +1387,11 @@ class AnnouncementManager:
                                 text_tts or level == LEVEL_CRITICAL
                             ),
                             "room_bound": (
-                                self._tts_player_scope(entity_id)
+                                self._tts_player_scope(entity_id, manual=manual_targets)
                                 == NOTIFY_SCOPE_ROOM
                             ),
                             "fixed_room": (
-                                self._tts_player_scope(entity_id)
+                                self._tts_player_scope(entity_id, manual=manual_targets)
                                 == NOTIFY_SCOPE_ROOM
                             ),
                         }
@@ -1803,7 +1877,7 @@ class AnnouncementManager:
         notify_output_areas = {
             output.ref: (
                 None
-                if self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL
+                if self._notify_policy(output, manual=manual_targets)[0] == NOTIFY_SCOPE_GENERAL
                 else output.area_id
             )
             for output in notify_records
@@ -1820,7 +1894,7 @@ class AnnouncementManager:
         room_tts_player_areas = {
             entity_id: (
                 None
-                if self._tts_player_scope(entity_id) == NOTIFY_SCOPE_GENERAL
+                if self._tts_player_scope(entity_id, manual=manual_targets) == NOTIFY_SCOPE_GENERAL
                 else entity_area_id(self.hass, entity_id)
             )
             for entity_id in selected[2]
@@ -1949,7 +2023,8 @@ class AnnouncementManager:
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
-            strict_targets=bool(requested) or _person_targeted,
+            strict_targets=bool(requested) or _person_targeted or manual_targets,
+            manual_targets=manual_targets,
             routing_mode=(
                 "person" if _person_targeted else
                 "room_fallback" if room_fallback_routing else "normal"
@@ -2338,7 +2413,12 @@ class AnnouncementManager:
         stage = job.routing_stage
         areas = self._staged_areas(job, stage)
         stage_kind = stage if stage in STAGES else STAGES[0]
-        configured = self._configured_outputs()
+        configured = (
+            self._manual_output_catalog(job.preferred_areas) if job.manual_targets
+            and job.preferred_areas and not job.requested_services else
+            self._manual_output_catalog() if job.manual_targets else
+            self._configured_outputs()
+        )
         try:
             selected = restrict_physical_keys(
                 filter_selected_outputs(
@@ -2368,7 +2448,7 @@ class AnnouncementManager:
 
         notifications = resolve_notify_outputs(self.hass, selected[1])
         companion = resolve_companion_tts_outputs(self.hass, selected[4])
-        minimum_tts_level = str(
+        minimum_tts_level = LEVEL_INFO if job.manual_targets else str(
             self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
         )
         speech_allowed = tts_allowed_for_level(job.level, minimum_tts_level)
@@ -2382,7 +2462,7 @@ class AnnouncementManager:
         )
         level_priority = LEVEL_PRIORITY.get(job.level, LEVEL_PRIORITY[LEVEL_INFO])
         notify_policy = {
-            output.ref: self._notify_policy(output)
+            output.ref: self._notify_policy(output, manual=manual_targets)
             for output in notifications
         }
         targets = select_stage_targets(
@@ -2405,7 +2485,7 @@ class AnnouncementManager:
                 (
                     entity_id,
                     entity_area_id(self.hass, entity_id),
-                    self._tts_player_scope(entity_id),
+                    self._tts_player_scope(entity_id, manual=manual_targets),
                 )
                 for entity_id in selected[2] if selected[0]
             ),
