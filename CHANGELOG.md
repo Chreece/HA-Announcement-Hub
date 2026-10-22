@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.10.0b7 - 2026-10-22
+
+**Beta — complete native Italian localization for Announcement Hub.**
+
+- Complete Italian wording for the 599-field current native integration
+  catalog: setup and options menus, labels, 253 duplicated explanatory
+  descriptions, output/AI/TTS and Snapcast details, selectors, action
+  fields and error messages.
+- Translate all formerly English-fallback help in Italian, including
+  optional chimes, direct room audio, queue and provider timing, AI
+  styles, notification profiles and person/group speech.
+- Keep technical identifiers, service names, numerical limits and
+  interpolation placeholders unchanged. Only 13 values intentionally
+  match English because they are common Italian technical words or
+  numerical percentages.
+- Add regression checks for Italian non-fallback coverage, technical
+  placeholders and schema parity. No delivery or routing code changes.
+- Issue #50 stays open for the other 14 languages which still contain
+  older English fallback labels and explanatory text.
+
 ## 0.10.0b6 - 2026-10-22
 
 **Beta — native translation coverage and recipient-safety terminology.**
