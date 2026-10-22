@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.10.0b6 - 2026-10-22
+
+**Beta — native translation coverage and recipient-safety terminology.**
+
+- Finish the remaining setup/option/help text, selector labels, errors and
+  service-action descriptions for **French and Spanish**. Numeric and
+  language-identical terms stay unchanged intentionally.
+- Translate 22 high-impact descriptions about occupancy, room versus exact
+  recipient targeting, AI fallback, channel separation, direct versus shared
+  Snapcast output, and the door-gated fallback into **15 further locales**
+  (including both Portuguese variants, Italian, Dutch, Slavic and Asian
+  languages). Keep initial setup and reconfiguration descriptions identical.
+- Repair stale English-only personal room tracking and manual recipient help
+  that had diverged from the current English source, and remove mixed English
+  terminology from the Greek fallback-room explanation.
+- Add regressions for 20-locale key parity, safety-critical descriptions,
+  setup/options parity, and hidden legacy English help.
+- No runtime routing or TTS behavior changes. Hardware delivery is unchanged.
+  Issue #50 stays **open**: roughly 160 duplicated descriptive field entries
+  per remaining 15 locale catalogs still use English source text and require
+  further reviewed localization. Structural key parity alone is not completion.
+
 ## 0.10.0b5 - 2026-10-22
 
 **Beta — person/group help localization regression repair.**

@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "Voz de {person_name}",
-        "description": "Seleciona o sensor da divisão atual desta pessoa. Se a divisão for desconhecida, o anúncio non passa para outra.",
+        "description": "Seleciona o sensor da divisão atual desta pessoa. Se a divisão for desconhecida, o anúncio não passa para outra.",
         "data": {
           "tracker": "Sensor de divisão",
           "language": "Idioma",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "Voz de {person_name}",
-        "description": "Seleciona o sensor da divisão atual desta pessoa. Se a divisão for desconhecida, o anúncio non passa para outra.",
+        "description": "Seleciona o sensor da divisão atual desta pessoa. Se a divisão for desconhecida, o anúncio não passa para outra.",
         "data": {
           "tracker": "Sensor de divisão",
           "language": "Idioma",
