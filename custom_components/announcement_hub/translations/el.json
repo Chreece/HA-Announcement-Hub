@@ -153,7 +153,10 @@
           "edit_profiles": "3. Προφίλ ανά υπηρεσία εξόδου",
           "edit_general": "4. Γενικά, παρουσία και AI",
           "edit_all": "Όλες οι ρυθμίσεις (πλήρης οδηγός)",
-          "edit_people": "5. Άτομα και φωνές"
+          "edit_people": "5. Άτομα και φωνές",
+          "edit_advanced_ai": "Προχωρημένες οδηγίες AI",
+          "edit_audio": "Ήχος, προειδοποιητικός τόνος και ένταση",
+          "edit_room_safety": "Έλεγχος παρουσίας ανά δωμάτιο"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Επίλεξε συσκευές ειδοποιήσεων, αντιστοίχιση δωματίων και ελάχιστα επίπεδα, χωρίς αλλαγές σε TTS ή AI.",
@@ -171,13 +174,23 @@
           "tracked_people": "Άτομα προς ρύθμιση",
           "person_group_language": "Γλώσσα ομάδας",
           "person_group_voice": "Φωνή ομάδας",
-          "person_group_translate": "Μετάφραση ομαδικών ανακοινώσεων"
+          "person_group_translate": "Μετάφραση ομαδικών ανακοινώσεων",
+          "person_group_agent": "Πάροχος AI ομάδας",
+          "person_group_tts_engine": "Μηχανή TTS ομάδας",
+          "person_group_rewrite": "Αναδιατύπωση ομαδικών ανακοινώσεων",
+          "person_group_addressee": "Προσφώνηση ομάδας",
+          "person_group_greeting": "Αυτόματη προσφώνηση ομάδας"
         },
         "data_description": {
           "tracked_people": "Επίλεξε τα άτομα για τα οποία θα ορίσεις εντοπισμό δωματίου και προσωπικές προτιμήσεις ομιλίας.",
           "person_group_language": "Προαιρετικός κωδικός γλώσσας για ανακοίνωση όταν δύο ή περισσότερα επιλεγμένα άτομα βρίσκονται στο ίδιο δωμάτιο.",
           "person_group_voice": "Προαιρετικό αναγνωριστικό φωνής TTS για ανακοινώσεις σε πολλά άτομα που βρίσκονται στο ίδιο δωμάτιο.",
-          "person_group_translate": "Μεταφράζει αυτόματα τις ομαδικές ανακοινώσεις στη γλώσσα της ομάδας μέσω του επιλεγμένου παρόχου AI. Αν αποτύχει, χρησιμοποιείται ο εφεδρικός πάροχος ή το αρχικό κείμενο."
+          "person_group_translate": "Μεταφράζει αυτόματα τις ομαδικές ανακοινώσεις στη γλώσσα της ομάδας μέσω του επιλεγμένου παρόχου AI. Αν αποτύχει, χρησιμοποιείται ο εφεδρικός πάροχος ή το αρχικό κείμενο.",
+          "person_group_agent": "Προαιρετικός Conversation ή AI Task πάροχος για ομάδες. Η ρητή επιλογή της ενέργειας υπερισχύει.",
+          "person_group_tts_engine": "Προαιρετική μηχανή TTS ομάδας χωρίς αλλαγή των επιλεγμένων συσκευών.",
+          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
+          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
+          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
         }
       },
       "person_profile": {
@@ -192,7 +205,15 @@
           "destination_mobile": "Έξοδοι κινητού",
           "destination_watch": "Έξοδοι ρολογιού",
           "destination_tablet": "Έξοδοι tablet",
-          "destination_other": "Άλλες προσωπικές έξοδοι"
+          "destination_other": "Άλλες προσωπικές έξοδοι",
+          "enabled": "Να επιτρέπονται ανακοινώσεις για το άτομο",
+          "presence_sensor": "Αισθητήρας επιβεβαίωσης παρουσίας",
+          "verify_presence": "Απαίτηση επιβεβαίωσης παρουσίας",
+          "rewrite": "Αναδιατύπωση ανακοινώσεων ατόμου",
+          "ai_agent": "Πάροχος AI ατόμου",
+          "tts_engine": "Μηχανή TTS ατόμου",
+          "greeting": "Αυτόματη προσφώνηση ατόμου",
+          "address": "Προτιμώμενη προσφώνηση"
         },
         "data_description": {
           "tracker": "Επίλεξε τον αισθητήρα ή ανιχνευτή συσκευής που δηλώνει το τρέχον δωμάτιο του ατόμου, στην κατάστασή του ή σε ιδιότητα room/area.",
@@ -203,7 +224,61 @@
           "destination_mobile": "Επίλεξε υπάρχουσες εξόδους ειδοποιήσεων ή αναπαραγωγής του κινητού αυτού του ατόμου. Χρησιμοποιούνται μόνο οι έξοδοι που του αναθέτεις.",
           "destination_watch": "Επίλεξε υπάρχουσες εξόδους ειδοποιήσεων ή αναπαραγωγής του ρολογιού αυτού του ατόμου. Χρησιμοποιούνται μόνο οι έξοδοι που του αναθέτεις.",
           "destination_tablet": "Επίλεξε υπάρχουσες εξόδους ειδοποιήσεων ή αναπαραγωγής του tablet αυτού του ατόμου. Χρησιμοποιούνται μόνο οι έξοδοι που του αναθέτεις.",
-          "destination_other": "Άλλες υπάρχουσες έξοδοι Home Assistant που αναθέτεις στο άτομο και χρησιμοποιούνται μόνο αν επιλεγεί ο προορισμός «Άλλο»."
+          "destination_other": "Άλλες υπάρχουσες έξοδοι Home Assistant που αναθέτεις στο άτομο και χρησιμοποιούνται μόνο αν επιλεγεί ο προορισμός «Άλλο».",
+          "enabled": "Όταν απενεργοποιηθεί, μπλοκάρει και τις εκκρεμείς ανακοινώσεις του ατόμου χωρίς αποστολή σε άλλον παραλήπτη.",
+          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "verify_presence": "Απαιτεί ο αισθητήρας παρουσίας να είναι ενεργός πριν από την αναπαραγωγή στο δωμάτιο. Άγνωστη κατάσταση εμποδίζει την αποστολή.",
+          "rewrite": "Enable rewriting for this person independently of their translation preference.",
+          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
+          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "greeting": "Προσθέτει προσφώνηση μόνο όταν δεν υπάρχει ήδη η μεταβλητή {{ name }}.",
+          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+        }
+      },
+      "edit_advanced_ai": {
+        "title": "Advanced AI style prompts",
+        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "data": {
+          "rewrite": "Rewrite style",
+          "translate": "Translation style",
+          "both": "Combined rewrite and translation style"
+        },
+        "data_description": {
+          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
+          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
+          "both": "Optional style preference when translation and rewriting are both active."
+        }
+      },
+      "edit_audio": {
+        "title": "Direct room audio options",
+        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "data": {
+          "person_output_chime": "Enable pre-announcement chime",
+          "person_chime_url": "Local chime audio path",
+          "person_chime_delay": "Chime settle delay",
+          "person_output_ducking": "Duck playing audio",
+          "person_duck_factor": "Music volume factor"
+        },
+        "data_description": {
+          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
+          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
+          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
+          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
+          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+        }
+      },
+      "edit_room_safety": {
+        "title": "Room presence verification",
+        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "data": {
+          "area": "Area",
+          "verify_presence": "Require presence confirmation",
+          "presence_sensor": "Room occupancy sensor"
+        },
+        "data_description": {
+          "area": "Choose the area to add or clear verification.",
+          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
+          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
         }
       }
     },
@@ -217,7 +292,11 @@
       "notify_level_overlap": "Μια συσκευή ειδοποίησης μπορεί να ανήκει μόνο σε ένα ελάχιστο επίπεδο.",
       "room_tts_area_required": "Ένας άμεσος TTS media player ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant.",
       "tts_player_role_overlap": "Ο ίδιος media player δεν μπορεί να είναι ταυτόχρονα άμεσος TTS player και ο κοινός source player του Snapcast.",
-      "invalid_person_output": "Η επιλεγμένη έξοδος δεν είναι ενεργή ή δεν υπάρχει."
+      "invalid_person_output": "Η επιλεγμένη έξοδος δεν είναι ενεργή ή δεν υπάρχει.",
+      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
+      "invalid_chime_url": "Chime audio must use a /local/ file.",
+      "invalid_person_area": "Select a valid Home Assistant room.",
+      "invalid_person_presence": "Select a presence sensor before enabling verification."
     },
     "abort": {
       "single_instance_allowed": "Το Κέντρο Ανακοινώσεων έχει ήδη ρυθμιστεί."
@@ -376,7 +455,10 @@
           "edit_profiles": "3. Προφίλ ανά υπηρεσία εξόδου",
           "edit_general": "4. Γενικά, παρουσία και AI",
           "edit_all": "Όλες οι ρυθμίσεις (πλήρης οδηγός)",
-          "edit_people": "5. Άτομα και φωνές"
+          "edit_people": "5. Άτομα και φωνές",
+          "edit_advanced_ai": "Προχωρημένες οδηγίες AI",
+          "edit_audio": "Ήχος, προειδοποιητικός τόνος και ένταση",
+          "edit_room_safety": "Έλεγχος παρουσίας ανά δωμάτιο"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Επίλεξε συσκευές ειδοποιήσεων, αντιστοίχιση δωματίων και ελάχιστα επίπεδα, χωρίς αλλαγές σε TTS ή AI.",
@@ -394,13 +476,23 @@
           "tracked_people": "Άτομα προς ρύθμιση",
           "person_group_language": "Γλώσσα ομάδας",
           "person_group_voice": "Φωνή ομάδας",
-          "person_group_translate": "Μετάφραση ομαδικών ανακοινώσεων"
+          "person_group_translate": "Μετάφραση ομαδικών ανακοινώσεων",
+          "person_group_agent": "Πάροχος AI ομάδας",
+          "person_group_tts_engine": "Μηχανή TTS ομάδας",
+          "person_group_rewrite": "Αναδιατύπωση ομαδικών ανακοινώσεων",
+          "person_group_addressee": "Προσφώνηση ομάδας",
+          "person_group_greeting": "Αυτόματη προσφώνηση ομάδας"
         },
         "data_description": {
           "tracked_people": "Επίλεξε τα άτομα για τα οποία θα ορίσεις εντοπισμό δωματίου και προσωπικές προτιμήσεις ομιλίας.",
           "person_group_language": "Προαιρετικός κωδικός γλώσσας για ανακοίνωση όταν δύο ή περισσότερα επιλεγμένα άτομα βρίσκονται στο ίδιο δωμάτιο.",
           "person_group_voice": "Προαιρετικό αναγνωριστικό φωνής TTS για ανακοινώσεις σε πολλά άτομα που βρίσκονται στο ίδιο δωμάτιο.",
-          "person_group_translate": "Μεταφράζει αυτόματα τις ομαδικές ανακοινώσεις στη γλώσσα της ομάδας μέσω του επιλεγμένου παρόχου AI. Αν αποτύχει, χρησιμοποιείται ο εφεδρικός πάροχος ή το αρχικό κείμενο."
+          "person_group_translate": "Μεταφράζει αυτόματα τις ομαδικές ανακοινώσεις στη γλώσσα της ομάδας μέσω του επιλεγμένου παρόχου AI. Αν αποτύχει, χρησιμοποιείται ο εφεδρικός πάροχος ή το αρχικό κείμενο.",
+          "person_group_agent": "Προαιρετικός Conversation ή AI Task πάροχος για ομάδες. Η ρητή επιλογή της ενέργειας υπερισχύει.",
+          "person_group_tts_engine": "Προαιρετική μηχανή TTS ομάδας χωρίς αλλαγή των επιλεγμένων συσκευών.",
+          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
+          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
+          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
         }
       },
       "person_profile": {
@@ -415,7 +507,15 @@
           "destination_mobile": "Έξοδοι κινητού",
           "destination_watch": "Έξοδοι ρολογιού",
           "destination_tablet": "Έξοδοι tablet",
-          "destination_other": "Άλλες προσωπικές έξοδοι"
+          "destination_other": "Άλλες προσωπικές έξοδοι",
+          "enabled": "Να επιτρέπονται ανακοινώσεις για το άτομο",
+          "presence_sensor": "Αισθητήρας επιβεβαίωσης παρουσίας",
+          "verify_presence": "Απαίτηση επιβεβαίωσης παρουσίας",
+          "rewrite": "Αναδιατύπωση ανακοινώσεων ατόμου",
+          "ai_agent": "Πάροχος AI ατόμου",
+          "tts_engine": "Μηχανή TTS ατόμου",
+          "greeting": "Αυτόματη προσφώνηση ατόμου",
+          "address": "Προτιμώμενη προσφώνηση"
         },
         "data_description": {
           "tracker": "Επίλεξε τον αισθητήρα ή ανιχνευτή συσκευής που δηλώνει το τρέχον δωμάτιο του ατόμου, στην κατάστασή του ή σε ιδιότητα room/area.",
@@ -426,7 +526,61 @@
           "destination_mobile": "Επίλεξε υπάρχουσες εξόδους ειδοποιήσεων ή αναπαραγωγής του κινητού αυτού του ατόμου. Χρησιμοποιούνται μόνο οι έξοδοι που του αναθέτεις.",
           "destination_watch": "Επίλεξε υπάρχουσες εξόδους ειδοποιήσεων ή αναπαραγωγής του ρολογιού αυτού του ατόμου. Χρησιμοποιούνται μόνο οι έξοδοι που του αναθέτεις.",
           "destination_tablet": "Επίλεξε υπάρχουσες εξόδους ειδοποιήσεων ή αναπαραγωγής του tablet αυτού του ατόμου. Χρησιμοποιούνται μόνο οι έξοδοι που του αναθέτεις.",
-          "destination_other": "Άλλες υπάρχουσες έξοδοι Home Assistant που αναθέτεις στο άτομο και χρησιμοποιούνται μόνο αν επιλεγεί ο προορισμός «Άλλο»."
+          "destination_other": "Άλλες υπάρχουσες έξοδοι Home Assistant που αναθέτεις στο άτομο και χρησιμοποιούνται μόνο αν επιλεγεί ο προορισμός «Άλλο».",
+          "enabled": "Όταν απενεργοποιηθεί, μπλοκάρει και τις εκκρεμείς ανακοινώσεις του ατόμου χωρίς αποστολή σε άλλον παραλήπτη.",
+          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "verify_presence": "Απαιτεί ο αισθητήρας παρουσίας να είναι ενεργός πριν από την αναπαραγωγή στο δωμάτιο. Άγνωστη κατάσταση εμποδίζει την αποστολή.",
+          "rewrite": "Enable rewriting for this person independently of their translation preference.",
+          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
+          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "greeting": "Προσθέτει προσφώνηση μόνο όταν δεν υπάρχει ήδη η μεταβλητή {{ name }}.",
+          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+        }
+      },
+      "edit_advanced_ai": {
+        "title": "Advanced AI style prompts",
+        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "data": {
+          "rewrite": "Rewrite style",
+          "translate": "Translation style",
+          "both": "Combined rewrite and translation style"
+        },
+        "data_description": {
+          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
+          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
+          "both": "Optional style preference when translation and rewriting are both active."
+        }
+      },
+      "edit_audio": {
+        "title": "Direct room audio options",
+        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "data": {
+          "person_output_chime": "Enable pre-announcement chime",
+          "person_chime_url": "Local chime audio path",
+          "person_chime_delay": "Chime settle delay",
+          "person_output_ducking": "Duck playing audio",
+          "person_duck_factor": "Music volume factor"
+        },
+        "data_description": {
+          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
+          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
+          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
+          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
+          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+        }
+      },
+      "edit_room_safety": {
+        "title": "Room presence verification",
+        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "data": {
+          "area": "Area",
+          "verify_presence": "Require presence confirmation",
+          "presence_sensor": "Room occupancy sensor"
+        },
+        "data_description": {
+          "area": "Choose the area to add or clear verification.",
+          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
+          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
         }
       }
     },
@@ -440,7 +594,11 @@
       "notify_level_overlap": "Μια συσκευή ειδοποίησης μπορεί να ανήκει μόνο σε ένα ελάχιστο επίπεδο.",
       "room_tts_area_required": "Ένας άμεσος TTS media player ανά δωμάτιο πρέπει να έχει περιοχή στο Home Assistant.",
       "tts_player_role_overlap": "Ο ίδιος media player δεν μπορεί να είναι ταυτόχρονα άμεσος TTS player και ο κοινός source player του Snapcast.",
-      "invalid_person_output": "Η επιλεγμένη έξοδος δεν είναι ενεργή ή δεν υπάρχει."
+      "invalid_person_output": "Η επιλεγμένη έξοδος δεν είναι ενεργή ή δεν υπάρχει.",
+      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
+      "invalid_chime_url": "Chime audio must use a /local/ file.",
+      "invalid_person_area": "Select a valid Home Assistant room.",
+      "invalid_person_presence": "Select a presence sensor before enabling verification."
     }
   },
   "selector": {
@@ -672,6 +830,18 @@
         "person_translate": {
           "name": "Μετάφραση για τα επιλεγμένα άτομα",
           "description": "Παράκαμψε την προτίμηση αυτόματης μετάφρασης του ατόμου ή της ομάδας για αυτήν την ανακοίνωση. Χρησιμοποιείται η ρυθμισμένη γλώσσα. Το use_ai: false απενεργοποιεί τη μετάφραση."
+        },
+        "person_greeting": {
+          "name": "Personal greeting",
+          "description": "Override automatic salutation for a person/group; leave unset to use the configured preference."
+        },
+        "pre_announce_sound": {
+          "name": "Pre-announcement chime",
+          "description": "Optional direct-room audio chime, never sent on the shared Snapcast source."
+        },
+        "tts_engine": {
+          "name": "TTS engine override",
+          "description": "Select one existing TTS engine for this announcement without selecting extra devices."
         }
       }
     },
