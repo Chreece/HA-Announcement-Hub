@@ -90,7 +90,7 @@ test("automatic routing sends no forced recipient or service", () => {
   });
 });
 
-test("a custom area uses room fallback, and a written-only service is explicit", () => {
+test("manual area sends only selected recipient channel", () => {
   const { card, fields } = harness();
   card._targetMode = "targeted";
   card._channel = "notification";
@@ -98,7 +98,7 @@ test("a custom area uses room fallback, and a written-only service is explicit",
   card._selected.area.add("kitchen");
   fields.message.value = "Kitchen window open";
   assert.deepEqual(card._buildPayload(), {
-    level: "warning", occupied_only: true, area: ["kitchen"],
+    level: "warning", occupied_only: true, manual_targets: true, area: ["kitchen"],
     text: "Kitchen window open", service: ["notification"],
   });
 });
@@ -114,7 +114,7 @@ test("combining an area, integration, device and entity preserves all targets", 
   fields["manual-entity"].value = "notify.phone,notify.tablet";
   fields.message.value = "Dinner is ready";
   assert.deepEqual(card._buildPayload(), {
-    level: "info", occupied_only: true,
+    level: "info", occupied_only: true, manual_targets: true,
     area: ["kitchen"], integration: ["nfandroidtv"],
     device: ["device-123"],
     entity: ["notify.phone", "notify.tablet"],
@@ -129,7 +129,7 @@ test("an exact phone notification never adds a TTS or Snapcast recipient", () =>
   card._selected.entity.add("notify.phone");
   fields["text-notify"].value = "Please check the door";
   assert.deepEqual(card._buildPayload(), {
-    level: "info", occupied_only: true,
+    level: "info", occupied_only: true, manual_targets: true,
     entity: ["notify.phone"], service: ["notification"],
     text_notify: "Please check the door",
   });
@@ -142,7 +142,7 @@ test("phone speech uses exactly the chosen Companion TTS service and target", ()
   card._selected.integration.add("mobile_app");
   fields["text-tts"].value = "The timer has ended";
   assert.deepEqual(card._buildPayload(), {
-    level: "info", occupied_only: true,
+    level: "info", occupied_only: true, manual_targets: true,
     integration: ["mobile_app"], service: ["companion_tts"],
     text_tts: "The timer has ended",
   });
