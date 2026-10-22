@@ -174,10 +174,10 @@
           "person_group_translate": "Translate group announcements"
         },
         "data_description": {
-          "tracked_people": "Select person entities to configure with room trackers and optional individual voices.",
-          "person_group_language": "Optional language for announcements to multiple targeted people in the same room.",
-          "person_group_voice": "Optional voice identifier for announcements to multiple targeted people in the same room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "Oda takibi ve kişisel ses tercihlerini yapılandırmak istediğiniz kişileri seçin.",
+          "person_group_language": "Aynı odadaki birden fazla hedef kişi için isteğe bağlı grup dili kodu.",
+          "person_group_voice": "Aynı odadaki birden fazla kişi için isteğe bağlı TTS ses kimliği.",
+          "person_group_translate": "Grup duyurularını seçili yapay zekâ sağlayıcısıyla grup diline otomatik çevirir. Hata durumunda yedek sağlayıcı veya özgün metin kullanılır."
         }
       },
       "person_profile": {
@@ -195,15 +195,15 @@
           "destination_other": "Other personal outputs"
         },
         "data_description": {
-          "tracker": "Select the sensor or device tracker exposing the current room as state or an area/room attribute.",
-          "language": "Optional personal speech language; the action's explicit language takes precedence.",
-          "voice": "Optional personal TTS voice; the action's explicit voice takes precedence.",
-          "ignore_home": "Allow person targeting when away; missing room tracking still fails closed.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "Kişinin bulunduğu odayı durumunda veya room/area niteliğinde bildiren sensörü ya da cihaz takipçisini seçin.",
+          "language": "Bu kişiye yönelik duyurular için isteğe bağlı dil. Eylemde açıkça belirtilen dil önceliklidir.",
+          "voice": "İsteğe bağlı TTS ses kimliği. Eylemdeki tts_options.voice önceliklidir.",
+          "ignore_home": "Kişi evde görünmese bile oda takipçisini kullanmaya izin verir. Bilinmeyen oda başka bir yere duyuru yapılmasına izin vermez.",
+          "translate": "Konuşma ve görsel bildirimi kişinin diline ayrı ayrı çevirmek ve seçili TTS sesiyle okumak için AI sağlayıcısını kullanır. use_ai: false çeviriyi kapatır.",
+          "destination_mobile": "Kişinin telefonuna ait mevcut bildirim veya medya oynatıcı çıkışlarını seçin. Yalnızca atanan çıkışlar kullanılır.",
+          "destination_watch": "Kişinin saatine ait mevcut bildirim veya medya oynatıcı çıkışlarını seçin. Yalnızca atanan çıkışlar kullanılır.",
+          "destination_tablet": "Kişinin tabletine ait mevcut bildirim veya medya oynatıcı çıkışlarını seçin. Yalnızca atanan çıkışlar kullanılır.",
+          "destination_other": "Bu kişiye atanmış ve yalnızca Diğer seçildiğinde kullanılan diğer Home Assistant çıkışları."
         }
       }
     },
@@ -397,10 +397,10 @@
           "person_group_translate": "Translate group announcements"
         },
         "data_description": {
-          "tracked_people": "Select person entities to configure with room trackers and optional individual voices.",
-          "person_group_language": "Optional language for announcements to multiple targeted people in the same room.",
-          "person_group_voice": "Optional voice identifier for announcements to multiple targeted people in the same room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "Oda takibi ve kişisel ses tercihlerini yapılandırmak istediğiniz kişileri seçin.",
+          "person_group_language": "Aynı odadaki birden fazla hedef kişi için isteğe bağlı grup dili kodu.",
+          "person_group_voice": "Aynı odadaki birden fazla kişi için isteğe bağlı TTS ses kimliği.",
+          "person_group_translate": "Grup duyurularını seçili yapay zekâ sağlayıcısıyla grup diline otomatik çevirir. Hata durumunda yedek sağlayıcı veya özgün metin kullanılır."
         }
       },
       "person_profile": {
@@ -418,15 +418,15 @@
           "destination_other": "Other personal outputs"
         },
         "data_description": {
-          "tracker": "Select the sensor or device tracker exposing the current room as state or an area/room attribute.",
-          "language": "Optional personal speech language; the action's explicit language takes precedence.",
-          "voice": "Optional personal TTS voice; the action's explicit voice takes precedence.",
-          "ignore_home": "Allow person targeting when away; missing room tracking still fails closed.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "Kişinin bulunduğu odayı durumunda veya room/area niteliğinde bildiren sensörü ya da cihaz takipçisini seçin.",
+          "language": "Bu kişiye yönelik duyurular için isteğe bağlı dil. Eylemde açıkça belirtilen dil önceliklidir.",
+          "voice": "İsteğe bağlı TTS ses kimliği. Eylemdeki tts_options.voice önceliklidir.",
+          "ignore_home": "Kişi evde görünmese bile oda takipçisini kullanmaya izin verir. Bilinmeyen oda başka bir yere duyuru yapılmasına izin vermez.",
+          "translate": "Konuşma ve görsel bildirimi kişinin diline ayrı ayrı çevirmek ve seçili TTS sesiyle okumak için AI sağlayıcısını kullanır. use_ai: false çeviriyi kapatır.",
+          "destination_mobile": "Kişinin telefonuna ait mevcut bildirim veya medya oynatıcı çıkışlarını seçin. Yalnızca atanan çıkışlar kullanılır.",
+          "destination_watch": "Kişinin saatine ait mevcut bildirim veya medya oynatıcı çıkışlarını seçin. Yalnızca atanan çıkışlar kullanılır.",
+          "destination_tablet": "Kişinin tabletine ait mevcut bildirim veya medya oynatıcı çıkışlarını seçin. Yalnızca atanan çıkışlar kullanılır.",
+          "destination_other": "Bu kişiye atanmış ve yalnızca Diğer seçildiğinde kullanılan diğer Home Assistant çıkışları."
         }
       }
     },
@@ -667,11 +667,11 @@
         },
         "person_destination": {
           "name": "Person destinations",
-          "description": "Choose Room or assigned Mobile, Watch, Tablet and Other destinations, rather than device entity IDs. Unmapped choices are rejected."
+          "description": "Oda veya kişiye atanmış Telefon, Saat, Tablet ve Diğer hedefleri seçin. Birlikte kullanılabilirler. Atanmamış hedefler genel yayın yapılmadan reddedilir."
         },
         "person_translate": {
           "name": "Translate for selected people",
-          "description": "Override individual or group translation preferences for this announcement; requires a configured destination language."
+          "description": "Bu duyuru için kişinin veya grubun otomatik çeviri tercihini geçersiz kılar. Yapılandırılmış dil kullanılır; use_ai: false çeviriyi engeller."
         }
       }
     },
