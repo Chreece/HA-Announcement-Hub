@@ -106,4 +106,4 @@ def test_manual_and_person_routing_cannot_become_global_without_targets():
     assert 'if (this._targetMode === "targeted") payload.manual_targets = true;' in card
     assert 'if (call.data.get(ATTR_MANUAL_TARGETS) or any(' in service
     assert "and not _person_targeted" in source
-    assert "job.manual_targets" in source
+    assert 'getattr(job, "manual_targets", False)' in source
