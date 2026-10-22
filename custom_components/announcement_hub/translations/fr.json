@@ -164,7 +164,10 @@
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
           "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
-          "edit_people": "Configurer les personnes, capteurs de pièce, langues et voix individuelles ou de groupe."
+          "edit_people": "Configurer les personnes, capteurs de pièce, langues et voix individuelles ou de groupe.",
+          "edit_advanced_ai": "Définir des préférences facultatives de style IA pour reformulation, traduction et combinaison, sans changer les règles de sécurité.",
+          "edit_audio": "Configurer le carillon et la baisse de volume uniquement pour les haut-parleurs de pièces choisis, jamais pour la source Snapcast partagée.",
+          "edit_room_safety": "Définir un capteur de présence facultatif par pièce ; un capteur indisponible ne redirige pas l'annonce."
         }
       },
       "people": {
@@ -466,7 +469,10 @@
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
           "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
-          "edit_people": "Configurer les personnes, capteurs de pièce, langues et voix individuelles ou de groupe."
+          "edit_people": "Configurer les personnes, capteurs de pièce, langues et voix individuelles ou de groupe.",
+          "edit_advanced_ai": "Définir des préférences facultatives de style IA pour reformulation, traduction et combinaison, sans changer les règles de sécurité.",
+          "edit_audio": "Configurer le carillon et la baisse de volume uniquement pour les haut-parleurs de pièces choisis, jamais pour la source Snapcast partagée.",
+          "edit_room_safety": "Définir un capteur de présence facultatif par pièce ; un capteur indisponible ne redirige pas l'annonce."
         }
       },
       "people": {
