@@ -3699,11 +3699,8 @@ class AnnouncementManager:
         )
         delay = float(self.settings.get("person_chime_delay", 0.5) or 0)
         if delay:
-            await self._wait_for(
-                lambda: not self._is_player_busy(player),
-                timeout=min(delay, 10.0),
-                job=job,
-            )
+            await asyncio.sleep(max(0.0, min(delay, 10.0)))
+            self._raise_if_cancelled(job)
 
     async def _async_send_room_tts(self, job: AnnouncementJob) -> None:
         """Speak directly on area-bound media players using the TTS engine chain."""
