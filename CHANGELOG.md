@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.10.0b4 - 2026-10-22
+
+**Beta — Smart Announcements feature-parity additions (opt-in by default).**
+
+- Add persisted **per-person and per-area enable/disable switches** and
+  positive, fail-closed binary-sensor presence verification for person
+  and room routes. Recheck live permissions during queue selection and
+  again before device service calls; disabled or unverified rooms must
+  never substitute unrelated receivers.
+- Configure a different **AI provider (Conversation or AI Task), rewrite
+  preference and TTS engine per person and for a shared-room group**.
+  Explicit action overrides take priority, then person/group settings,
+  then global defaults; explicit AI off remains authoritative. Preserve
+  existing per-person language, voice and translation preferences.
+- Support optional literal `{{ name }}` replacement and **opt-in personal
+  and group greetings**. Default is no automatic prefix, avoiding
+  unsolicited names in shared-room or sensitive messages.
+- Add validated **Advanced AI style templates** for rewrite, translation,
+  and the combined operation with only `{message}` and `{language}`
+  placeholders. Existing non-action/tool restrictions, strict JSON,
+  channel separation, factual validation and fallback remain enforced.
+- Add optional **direct-room chimes and audio ducking**, both disabled
+  by default. Chimes accept local audio files; ducking snapshots current
+  media-player volume before adjusting and restores it if unchanged,
+  with guarded recovery after interruption. Neither touches the shared
+  Snapcast source or authorizes a new recipient.
+- Expand the Lovelace People composer with greeting and audio/engine
+  overrides, and add associated provider selectors, configuration menus
+  and localization fields, including reviewed Greek and German help.
+  Add tests for the presence, routing isolation, audio and AI contracts.
+- This is an opt-in hardware-testing beta. Older native help descriptions
+  in some locales remain on the localization issue tracker.
+
+
 ## 0.10.0b3 - 2026-10-22
 
 **Beta — room-tracker verification and international localization**
