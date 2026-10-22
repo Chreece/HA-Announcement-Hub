@@ -544,6 +544,15 @@
         "tts_then_visual": "TTS first → Visual if unsuccessful",
         "both": "Both eligible channels"
       }
+    },
+    "person_destination": {
+      "options": {
+        "room": "방",
+        "mobile": "휴대폰",
+        "watch": "시계",
+        "tablet": "태블릿",
+        "other": "기타"
+      }
     }
   },
   "entity": {
