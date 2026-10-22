@@ -1025,6 +1025,7 @@ class AnnouncementManager:
         ai_agent: str | None = None,
         ai_mode: str = "rewrite",
         tts_engine: str | None = None,
+        pre_announce_sound: bool | None = None,
         translate_to: str | None = None,
         text: str | None = None,
         areas: Sequence[str] | str | None = None,
@@ -1157,6 +1158,7 @@ class AnnouncementManager:
                 tts_options=tts_options, companion_tts=companion_tts,
                 occupied_only=occupied_only, use_ai=use_ai, ai_agent=ai_agent,
                 ai_mode=ai_mode, tts_engine=tts_engine,
+                pre_announce_sound=pre_announce_sound,
                 translate_to=translate_to,
                 channels=channel_tokens, _fanout=True,
                 manual_targets=manual_targets,
@@ -2069,6 +2071,7 @@ class AnnouncementManager:
             manual_targets=manual_targets,
             person_ids=_person_ids,
             presence_sensors=_presence_sensors,
+            pre_announce_sound=pre_announce_sound,
             routing_mode=(
                 "person" if _person_targeted else
                 "room_fallback" if room_fallback_routing else "normal"
@@ -3556,6 +3559,48 @@ class AnnouncementManager:
             await asyncio.gather(*tasks, return_exceptions=True)
             raise
 
+    async def _async_optional_direct_chime(
+        self, job: AnnouncementJob, player: str,
+    ) -> None:
+        """Only selected direct room speakers; never a shared Snapcast source."""
+        enabled = (
+            job.pre_announce_sound
+            if job.pre_announce_sound is not None
+            else self.settings.get("person_output_chime", False)
+        )
+        if not enabled:
+            return
+        if player == job.tts_media_player:
+            # Never publish pre-roll to a shared TTS source, even if it
+            # currently appears routed or muted to one room.
+            return
+        url = str(self.settings.get("person_chime_url", "") or "").strip()
+        if not url.startswith("/local/") or not url.lower().endswith(
+            (".mp3", ".wav", ".ogg", ".flac")
+        ):
+            _LOGGER.warning("Direct chime skipped: configure a /local/ audio file")
+            return
+        self._raise_if_cancelled(job)
+        if job.person_ids and not self._person_authorized_now(job):
+            raise HomeAssistantError("No longer authorized to play chime in this room")
+        await self.hass.services.async_call(
+            MEDIA_PLAYER_DOMAIN, "play_media",
+            {
+                ATTR_ENTITY_ID: player,
+                ATTR_MEDIA_CONTENT_ID: url,
+                ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
+                ATTR_MEDIA_ANNOUNCE: True,
+            },
+            blocking=True,
+        )
+        delay = float(self.settings.get("person_chime_delay", 0.5) or 0)
+        if delay:
+            await self._wait_for(
+                lambda: not self._is_player_busy(player),
+                timeout=min(delay, 10.0),
+                job=job,
+            )
+
     async def _async_send_room_tts(self, job: AnnouncementJob) -> None:
         """Speak directly on area-bound media players using the TTS engine chain."""
         if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
@@ -3599,6 +3644,7 @@ class AnnouncementManager:
                     self.settings.get(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT)
                 )
                 await self._wait_audio_path_idle(player, idle_timeout, job)
+                await self._async_optional_direct_chime(job, player)
                 engines = await self._async_available_tts_engines(job)
                 if not engines:
                     return
