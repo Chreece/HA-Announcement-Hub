@@ -3027,7 +3027,7 @@ class AnnouncementManager:
             reserved_rooms.update(rooms)
             if blocked_room or self._delivery_lane_keys(job) & active_resources:
                 continue
-            if not self._person_authorized_now(job):
+            if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
                 continue
             if job.ai.get("pending_preprocessing"):
                 # AI is never awaited by the delivery worker. A later ready
