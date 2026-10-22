@@ -22,6 +22,7 @@ from homeassistant.core import (
 )
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.service import async_set_service_schema
 from homeassistant.helpers.start import async_at_started
 from homeassistant.util.yaml import load_yaml_dict
@@ -41,6 +42,8 @@ from .const import (
     ATTR_OUTPUT,
     ATTR_AREA,
     ATTR_TARGET_PERSON,
+    ATTR_PERSON_DESTINATION,
+    ATTR_PERSON_TRANSLATE,
     ATTR_MANUAL_TARGETS,
     ATTR_INTEGRATION,
     ATTR_DEVICE,
@@ -67,6 +70,7 @@ from .const import (
     CONF_PERSON_PROFILES,
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
+    CONF_PERSON_GROUP_TRANSLATE,
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_OCCUPIED_ONLY,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
@@ -95,7 +99,10 @@ from .dashboard_resource import async_ensure_card_resource
 from .manager import AnnouncementManager
 from .message_text import resolve_channel_texts
 from .outputs import area_name
-from .person_targeting import PersonTargetError, resolve_person_rooms
+from .person_targeting import (
+    PersonTargetError, resolve_person_rooms, resolve_person_ids,
+    selected_person_destinations, PERSON_DESTINATIONS,
+)
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -170,6 +177,10 @@ SEND_SCHEMA = probatio.All(
             probatio.Optional(ATTR_TARGET_PERSON): probatio.All(
                 probatio.EnsureList(), [cv.string]
             ),
+            probatio.Optional(ATTR_PERSON_DESTINATION, default=["room"]): probatio.All(
+                probatio.EnsureList(), [probatio.In(PERSON_DESTINATIONS)]
+            ),
+            probatio.Optional(ATTR_PERSON_TRANSLATE): bool,
             probatio.Optional(ATTR_INTEGRATION): probatio.All(
                 probatio.EnsureList(), [cv.string]
             ),
@@ -378,11 +389,14 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
         )
 
         people = call.data.get(ATTR_TARGET_PERSON)
+        destinations = tuple(dict.fromkeys(call.data[ATTR_PERSON_DESTINATION]))
         if people is None:
+            if destinations != ("room",) or ATTR_PERSON_TRANSLATE in call.data:
+                raise ServiceValidationError(
+                    "person_destination and person_translate require target_person"
+                )
             job = await manager.async_enqueue(**params)
         else:
-            # A person is a location-based recipient, not an extra delivery
-            # channel. Reject combinations that could widen the audience.
             if (call.data.get(ATTR_MANUAL_TARGETS) or any(
                 call.data.get(key) is not None for key in (
                     ATTR_AREA, ATTR_OUTPUT, ATTR_INTEGRATION, ATTR_DEVICE, ATTR_ENTITY,
@@ -396,54 +410,101 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             if not isinstance(profiles, dict):
                 profiles = {}
             try:
-                locations = resolve_person_rooms(hass, people, profiles)
-                room_people: dict[str, list[str]] = {}
-                for person_id, raw_room in locations:
-                    area_id = manager._resolve_area_ids((raw_room,))[0]
-                    room_people.setdefault(area_id, []).append(person_id)
+                people_ids = resolve_person_ids(hass, people)
+                # Validate *all* requested named destinations before queueing
+                # any job. Never infer a watch from its name or broadcast to an
+                # entire mobile_app integration when a slot is missing.
+                assigned: dict[str, dict[str, tuple[str, ...]]] = {}
+                registry = er.async_get(hass)
+                for person_id in people_ids:
+                    profile = profiles.get(person_id, {})
+                    profile = profile if isinstance(profile, dict) else {}
+                    slots = selected_person_destinations(profile, destinations)
+                    for slot, entity_ids in slots.items():
+                        if slot == "room":
+                            continue
+                        for entity_id in entity_ids:
+                            entry = registry.async_get(entity_id)
+                            if entry is None or entry.disabled_by is not None:
+                                raise PersonTargetError(
+                                    f"Assigned {slot} output {entity_id} for "
+                                    f"{person_id} is missing or disabled"
+                                )
+                    assigned[person_id] = slots
+                rooms: dict[str, list[str]] = {}
+                if "room" in destinations:
+                    locations = resolve_person_rooms(hass, people_ids, profiles)
+                    for person_id, raw_room in locations:
+                        area_id = manager._resolve_area_ids((raw_room,))[0]
+                        rooms.setdefault(area_id, []).append(person_id)
             except PersonTargetError as error:
                 raise ServiceValidationError(str(error)) from error
 
-            # One job per actual room. Distinct rooms can deliver in parallel
-            # while each room retains its original FIFO ordering. A group in
-            # the same room is announced once, never once per person.
-            group_token = uuid4().hex if len(room_people) > 1 else None
+            # Every distinct room gets one group/individual speech job.
+            # Mapped personal endpoints get one *separate* exact-target job
+            # per person, regardless of current room or home/away state.
+            group_token = uuid4().hex
+            requested_translate = call.data.get(ATTR_PERSON_TRANSLATE)
             created = []
+
+            def personal_options(recipients: list[str], group: bool = False) -> dict[str, Any]:
+                local = dict(params)
+                local["outputs"] = None
+                local["areas"] = None
+                local["integrations"] = None
+                local["devices"] = None
+                local["entities"] = None
+                local["_person_targeted"] = True
+                local["_group_token"] = group_token
+                local["manual_targets"] = True
+                if group:
+                    lang = manager.settings.get(CONF_PERSON_GROUP_LANGUAGE)
+                    voice = manager.settings.get(CONF_PERSON_GROUP_VOICE)
+                    do_translate = manager.settings.get(CONF_PERSON_GROUP_TRANSLATE, False)
+                else:
+                    profile = profiles.get(recipients[0], {}) or {}
+                    lang = profile.get("language")
+                    voice = profile.get("voice")
+                    do_translate = profile.get("translate", False)
+                if not call.data.get(ATTR_LANGUAGE) and lang:
+                    local["language"] = str(lang)
+                options = dict(call.data.get(ATTR_TTS_OPTIONS) or {})
+                if voice:
+                    options.setdefault("voice", str(voice))
+                local["tts_options"] = options
+                if requested_translate is not None:
+                    do_translate = requested_translate
+                if do_translate and local.get("language"):
+                    local["translate_to"] = str(local["language"])
+                return local
+
             try:
-                for area_id, recipients in room_people.items():
-                    local = dict(params)
-                    local["outputs"] = None
+                for area_id, recipients in rooms.items():
+                    local = personal_options(recipients, group=len(recipients) > 1)
                     local["areas"] = (area_id,)
-                    local["_person_targeted"] = True
-                    local["_group_token"] = group_token
-                    if len(recipients) == 1:
-                        profile = profiles.get(recipients[0], {}) or {}
-                        preferred_language = profile.get("language")
-                        preferred_voice = profile.get("voice")
-                    else:
-                        preferred_language = manager.settings.get(
-                            CONF_PERSON_GROUP_LANGUAGE
-                        )
-                        preferred_voice = manager.settings.get(
-                            CONF_PERSON_GROUP_VOICE
-                        )
-                    if not call.data.get(ATTR_LANGUAGE) and preferred_language:
-                        local["language"] = str(preferred_language)
-                    options = dict(call.data.get(ATTR_TTS_OPTIONS) or {})
-                    if preferred_voice:
-                        options.setdefault("voice", str(preferred_voice))
-                    local["tts_options"] = options
+                    created.append(await manager.async_enqueue(**local))
+                for person_id in people_ids:
+                    refs = tuple(dict.fromkeys(
+                        entity_id
+                        for slot, values in assigned[person_id].items()
+                        if slot != "room"
+                        for entity_id in values
+                    ))
+                    if not refs:
+                        continue
+                    local = personal_options([person_id])
+                    local["entities"] = refs
                     created.append(await manager.async_enqueue(**local))
             except BaseException:
-                # Reject all-or-nothing as far as practical. Cancellation is
-                # requested even for an already-running first room.
                 for pending_job in created:
                     await manager.async_cancel(pending_job.job_id)
                 raise
+            if not created:
+                raise ServiceValidationError(
+                    "No person destinations are available for the announcement"
+                )
             job = created[0]
-            job.related_job_ids = tuple(
-                item.job_id for item in created[1:]
-            )
+            job.related_job_ids = tuple(item.job_id for item in created[1:])
             manager._schedule_save()
             manager._notify_update()
 
