@@ -171,7 +171,7 @@
           "tracked_people": "Personer",
           "person_group_language": "Gruppspråk",
           "person_group_voice": "Gruppröst",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Översätt gruppmeddelanden"
         },
         "data_description": {
           "tracked_people": "Välj personer som ska få inställningar för rumsspårning och personliga talpreferenser.",
@@ -189,10 +189,10 @@
           "voice": "Röst",
           "ignore_home": "Tillåt utanför hemmet",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Mobilutgångar",
+          "destination_watch": "Klockutgångar",
+          "destination_tablet": "Surfplatteutgångar",
+          "destination_other": "Övriga personliga utgångar"
         },
         "data_description": {
           "tracker": "Välj sensorn eller enhetsspåraren som anger personens aktuella rum via tillstånd eller attributet room/area.",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Den valda personliga utgången finns inte eller är inaktiverad."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "Personer",
           "person_group_language": "Gruppspråk",
           "person_group_voice": "Gruppröst",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Översätt gruppmeddelanden"
         },
         "data_description": {
           "tracked_people": "Välj personer som ska få inställningar för rumsspårning och personliga talpreferenser.",
@@ -412,10 +412,10 @@
           "voice": "Röst",
           "ignore_home": "Tillåt utanför hemmet",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Mobilutgångar",
+          "destination_watch": "Klockutgångar",
+          "destination_tablet": "Surfplatteutgångar",
+          "destination_other": "Övriga personliga utgångar"
         },
         "data_description": {
           "tracker": "Välj sensorn eller enhetsspåraren som anger personens aktuella rum via tillstånd eller attributet room/area.",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Den valda personliga utgången finns inte eller är inaktiverad."
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "Personliga mottagare",
           "description": "Välj Rum eller tilldelad Mobil, Klocka, Surfplatta och Annat. De kan kombineras. Ej tilldelade mål nekas utan allmän utsändning."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "Översätt för valda personer",
           "description": "Åsidosätt personens eller gruppens automatiska översättning för detta meddelande. Inställt språk används; use_ai: false förhindrar översättning."
         }
       }
