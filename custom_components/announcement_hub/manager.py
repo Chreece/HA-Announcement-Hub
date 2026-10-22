@@ -306,6 +306,15 @@ class AnnouncementManager:
     def status_dict(self) -> dict[str, Any]:
         return {
             "running": self._running,
+            "person_destinations": {
+                person: ["room", *[
+                    slot for slot, outputs in (profile.get("destinations") or {}).items()
+                    if slot in {"mobile", "watch", "tablet", "other"} and outputs
+                ]]
+                for person, profile in (
+                    self.settings.get("person_profiles", {}) or {}
+                ).items() if isinstance(profile, dict)
+            },
             "queue_size": len(self._queue),
             "current": self._current.public_dict() if self._current else None,
             "active": [job.public_dict() for job in self._active_jobs.values()],
