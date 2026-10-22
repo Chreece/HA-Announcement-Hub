@@ -22,6 +22,7 @@ ATTR_TEXT_NOTIFY: Final = "text_notify"
 ATTR_OUTPUT: Final = "output"  # Hidden legacy alias; use area for new actions.
 ATTR_AREA: Final = "area"
 ATTR_TARGET_PERSON: Final = "target_person"
+ATTR_MANUAL_TARGETS: Final = "manual_targets"
 ATTR_INTEGRATION: Final = "integration"
 ATTR_DEVICE: Final = "device"
 ATTR_ENTITY: Final = "entity"
