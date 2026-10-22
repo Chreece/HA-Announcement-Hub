@@ -41,6 +41,7 @@ from .const import (
     ATTR_OUTPUT,
     ATTR_AREA,
     ATTR_TARGET_PERSON,
+    ATTR_MANUAL_TARGETS,
     ATTR_INTEGRATION,
     ATTR_DEVICE,
     ATTR_ENTITY,
@@ -165,6 +166,7 @@ SEND_SCHEMA = probatio.All(
             probatio.Optional(ATTR_AREA): probatio.All(
                 probatio.EnsureList(), [cv.string]
             ),
+            probatio.Optional(ATTR_MANUAL_TARGETS, default=False): bool,
             probatio.Optional(ATTR_TARGET_PERSON): probatio.All(
                 probatio.EnsureList(), [cv.string]
             ),
@@ -372,6 +374,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             use_ai=call.data.get(ATTR_USE_AI),
             ai_agent=call.data.get(ATTR_AI_AGENT),
             ai_mode=call.data[ATTR_AI_MODE],
+            manual_targets=call.data[ATTR_MANUAL_TARGETS],
         )
 
         people = call.data.get(ATTR_TARGET_PERSON)
@@ -382,6 +385,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             # channel. Reject combinations that could widen the audience.
             if any(call.data.get(key) is not None for key in (
                 ATTR_AREA, ATTR_OUTPUT, ATTR_INTEGRATION, ATTR_DEVICE, ATTR_ENTITY,
+                ATTR_MANUAL_TARGETS,
             )):
                 raise ServiceValidationError(
                     "target_person cannot be combined with area, output, "
