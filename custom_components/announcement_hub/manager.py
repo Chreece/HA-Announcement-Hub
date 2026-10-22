@@ -5258,12 +5258,13 @@ class AnnouncementManager:
         # A room/person may be disabled while an older queued job is
         # preparing speech or waiting for a media player. Check immediately
         # before each actual physical action as well as at dequeue time.
-        if any((
+        permission_gate = getattr(self, "_person_authorized_now", None)
+        if callable(permission_gate) and any((
             getattr(job, "person_ids", ()),
             getattr(job, "presence_sensors", ()),
             getattr(job, "outputs", ()),
             getattr(job, "preferred_areas", ()),
-        )) and not self._person_authorized_now(job):
+        )) and not permission_gate(job):
             raise HomeAssistantError(
                 "Announcement recipient disabled or room presence unverified"
             )
