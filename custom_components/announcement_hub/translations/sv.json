@@ -174,10 +174,10 @@
           "person_group_translate": "Translate group announcements"
         },
         "data_description": {
-          "tracked_people": "Select people to configure with room sensors and optional personal language or voice.",
-          "person_group_language": "Optional language for announcements to targeted people sharing a room.",
-          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "Välj personer som ska få inställningar för rumsspårning och personliga talpreferenser.",
+          "person_group_language": "Valfri språkkod för meddelanden till flera valda personer i samma rum.",
+          "person_group_voice": "Valfritt TTS-röst-ID för meddelanden till flera personer i samma rum.",
+          "person_group_translate": "Översätt gruppmeddelanden automatiskt till gruppens språk med vald AI-agent eller reservagent. Vid fel används originaltexten."
         }
       },
       "person_profile": {
@@ -195,15 +195,15 @@
           "destination_other": "Other personal outputs"
         },
         "data_description": {
-          "tracker": "Select a sensor or device tracker reporting the current room via state or the area/room attribute.",
-          "language": "Personal speech language, overridden by an explicit announcement action language.",
-          "voice": "Personal TTS voice, overridden by an explicit announcement action voice.",
-          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "Välj sensorn eller enhetsspåraren som anger personens aktuella rum via tillstånd eller attributet room/area.",
+          "language": "Valfritt språk för talmeddelanden till personen. Ett språk som uttryckligen anges i åtgärden har företräde.",
+          "voice": "Valfritt TTS-röst-ID. tts_options.voice i åtgärden har företräde.",
+          "ignore_home": "Tillåt rumsspårning även när personen inte är hemma. Ett okänt rum medger aldrig meddelanden i andra rum.",
+          "translate": "Använd vald AI-agent för att översätta tal och visuellt meddelande var för sig till personens språk med vald TTS-röst. use_ai: false inaktiverar översättning.",
+          "destination_mobile": "Välj befintliga notifierings- eller mediaspelarutgångar för personens mobil. Endast tilldelade utgångar används.",
+          "destination_watch": "Välj befintliga notifierings- eller mediaspelarutgångar för personens klocka. Endast tilldelade utgångar används.",
+          "destination_tablet": "Välj befintliga notifierings- eller mediaspelarutgångar för personens surfplatta. Endast tilldelade utgångar används.",
+          "destination_other": "Andra befintliga Home Assistant-utgångar som tilldelats personen och används endast när Annat väljs."
         }
       }
     },
@@ -397,10 +397,10 @@
           "person_group_translate": "Translate group announcements"
         },
         "data_description": {
-          "tracked_people": "Select people to configure with room sensors and optional personal language or voice.",
-          "person_group_language": "Optional language for announcements to targeted people sharing a room.",
-          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "Välj personer som ska få inställningar för rumsspårning och personliga talpreferenser.",
+          "person_group_language": "Valfri språkkod för meddelanden till flera valda personer i samma rum.",
+          "person_group_voice": "Valfritt TTS-röst-ID för meddelanden till flera personer i samma rum.",
+          "person_group_translate": "Översätt gruppmeddelanden automatiskt till gruppens språk med vald AI-agent eller reservagent. Vid fel används originaltexten."
         }
       },
       "person_profile": {
@@ -418,15 +418,15 @@
           "destination_other": "Other personal outputs"
         },
         "data_description": {
-          "tracker": "Select a sensor or device tracker reporting the current room via state or the area/room attribute.",
-          "language": "Personal speech language, overridden by an explicit announcement action language.",
-          "voice": "Personal TTS voice, overridden by an explicit announcement action voice.",
-          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "Välj sensorn eller enhetsspåraren som anger personens aktuella rum via tillstånd eller attributet room/area.",
+          "language": "Valfritt språk för talmeddelanden till personen. Ett språk som uttryckligen anges i åtgärden har företräde.",
+          "voice": "Valfritt TTS-röst-ID. tts_options.voice i åtgärden har företräde.",
+          "ignore_home": "Tillåt rumsspårning även när personen inte är hemma. Ett okänt rum medger aldrig meddelanden i andra rum.",
+          "translate": "Använd vald AI-agent för att översätta tal och visuellt meddelande var för sig till personens språk med vald TTS-röst. use_ai: false inaktiverar översättning.",
+          "destination_mobile": "Välj befintliga notifierings- eller mediaspelarutgångar för personens mobil. Endast tilldelade utgångar används.",
+          "destination_watch": "Välj befintliga notifierings- eller mediaspelarutgångar för personens klocka. Endast tilldelade utgångar används.",
+          "destination_tablet": "Välj befintliga notifierings- eller mediaspelarutgångar för personens surfplatta. Endast tilldelade utgångar används.",
+          "destination_other": "Andra befintliga Home Assistant-utgångar som tilldelats personen och används endast när Annat väljs."
         }
       }
     },
@@ -667,11 +667,11 @@
         },
         "person_destination": {
           "name": "Person destinations",
-          "description": "Choose Room or assigned Mobile, Watch, Tablet and Other destinations, rather than device entity IDs. Unmapped choices are rejected."
+          "description": "Välj Rum eller tilldelad Mobil, Klocka, Surfplatta och Annat. De kan kombineras. Ej tilldelade mål nekas utan allmän utsändning."
         },
         "person_translate": {
           "name": "Translate for selected people",
-          "description": "Override individual or group translation preferences for this announcement; requires a configured destination language."
+          "description": "Åsidosätt personens eller gruppens automatiska översättning för detta meddelande. Inställt språk används; use_ai: false förhindrar översättning."
         }
       }
     },
