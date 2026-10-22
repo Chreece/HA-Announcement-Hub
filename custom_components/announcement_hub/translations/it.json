@@ -8,10 +8,10 @@
         "data": {
           "notify_outputs": "Dispositivi di notifica",
           "notify_room_outputs": "Dispositivi di notifica per stanza",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Minimo Info / Success",
+          "notify_warning_outputs": "Minimo Warning",
+          "notify_error_outputs": "Minimo Error",
+          "notify_critical_outputs": "Solo Critical"
         },
         "data_description": {
           "notify_outputs": "Entità di notifica riconosciute che Announcement Hub può utilizzare. Tutti i dispositivi compatibili vengono selezionati automaticamente; rimuovi quelli a cui non vuoi mai inviare notifiche.",
@@ -29,16 +29,16 @@
           "tts_engines": "Motore TTS",
           "tts_media_player": "Lettore condiviso per Snapcast",
           "snapcast_outputs": "Client Snapcast per stanza",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "Usa TTS a partire dal livello",
+          "tts_cache": "Genera e memorizza in cache la voce in anticipo",
+          "tts_language": "Lingua TTS",
+          "tts_options": "Opzioni del motore TTS",
+          "companion_tts_media_stream": "Flusso audio della Companion App",
+          "companion_tts_words_per_minute": "Stima durata voce TTS Companion",
+          "tts_area_players": "Lettori TTS diretti per stanza",
+          "companion_tts_outputs": "Dispositivi TTS Companion App",
+          "tts_voice": "Voce TTS",
+          "direct_tts_announce": "Modalità annuncio sugli altoparlanti diretti (può suonare)"
         },
         "data_description": {
           "tts_engines": "Unico motore vocale attivo. Quando disponibile, viene preselezionato il motore TTS predefinito di Home Assistant.",
@@ -60,25 +60,25 @@
         "title": "Opzioni integrazione: {integration}",
         "description": "Configura le notifiche e il loro instradamento.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
+          "max_length": "Caratteri massimi per parte",
+          "reading_words_per_minute": "Velocità di lettura",
+          "minimum_display_seconds": "Tempo minimo di visualizzazione",
+          "maximum_display_seconds": "Tempo massimo di visualizzazione",
+          "display_buffer_seconds": "Margine tempo di lettura",
+          "part_gap_seconds": "Pausa tra le parti",
+          "show_part_number": "Mostra il numero di parte nel titolo",
+          "integration_data": "Dati aggiuntivi dell'integrazione",
+          "replace_parts": "Sostituisci la parte precedente della Companion App",
           "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "fontsize": "Dimensione del carattere",
+          "color": "Colore di sfondo",
+          "transparency": "Trasparenza dello sfondo",
+          "interrupt": "Notifica interattiva",
+          "snapcast_source": "Sorgente Snapcast degli annunci",
+          "snapcast_only_source": "Gestisci solo i client già sulla sorgente annunci",
+          "snapcast_settle_delay": "Attesa stabilizzazione instradamento Snapcast",
+          "snapcast_verify_timeout": "Timeout di verifica instradamento Snapcast",
+          "snapcast_restore": "Ripristina stati di silenziamento Snapcast"
         },
         "data_description": {
           "max_length": "Numero massimo di caratteri inviati in una parte della notifica visiva. I testi più lunghi vengono divisi in punti naturali; 0 disattiva la suddivisione.",
@@ -107,22 +107,22 @@
         "description": "Configura presenza, ripiego, porte, coda e tempi di attesa.",
         "data": {
           "queue_max": "Numero massimo di annunci in coda",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Attesa uscita non disponibile",
+          "idle_timeout": "Attesa inattività audio",
+          "start_timeout": "Timeout di avvio riproduzione",
+          "playback_timeout": "Durata massima riproduzione TTS",
+          "post_play_delay": "Pausa dopo la riproduzione",
+          "default_title": "Titolo predefinito delle notifiche",
+          "critical_notify_data": "Dati delle notifiche Critical",
           "occupancy_sensor": "Entità di presenza della stanza",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "Valore delle stanze occupate",
           "fallback_room": "Stanza di riserva",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Richiedi una porta aperta nella stanza occupata per il ripiego",
+          "fallback_door_label": "Filtro etichetta sensori porta",
           "default_use_ai": "Riscrivi annunci con IA",
           "default_ai_agent": "Provider IA predefinito (conversazione o attività IA)",
           "fallback_ai_agent": "Provider IA di riserva (conversazione o attività IA)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Ripiego fra canali di notifica"
         },
         "data_description": {
           "queue_max": "Numero massimo di lavori di annuncio in attesa o attivi che possono essere accettati. Le nuove richieste vengono rifiutate quando viene raggiunto questo limite.",
@@ -148,15 +148,15 @@
         "title": "Riconfigura Announcement Hub",
         "description": "Scegli una sezione; dopo il salvataggio torni all'integrazione.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. Uscite di notifica e stanze",
+          "edit_tts": "2. Motori e dispositivi TTS",
+          "edit_profiles": "3. Profili di uscita specifici dei provider",
+          "edit_general": "4. Impostazioni generali, presenza e AI",
+          "edit_all": "Modifica tutte le impostazioni (procedura completa)",
           "edit_people": "5. Persone e voci",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "Istruzioni AI avanzate",
+          "edit_audio": "Audio, campanello e riduzione del volume",
+          "edit_room_safety": "Verifica della presenza nella stanza"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Seleziona dispositivi di notifica, associazione alle stanze e livelli minimi di allerta senza modificare le impostazioni di TTS o AI.",
@@ -178,8 +178,8 @@
           "person_group_language": "Lingua del gruppo",
           "person_group_voice": "Voce del gruppo",
           "person_group_translate": "Traduci gli annunci di gruppo",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "Provider AI del gruppo",
+          "person_group_tts_engine": "Motore TTS del gruppo",
           "person_group_rewrite": "Riformula annunci di gruppo",
           "person_group_addressee": "Saluto del gruppo",
           "person_group_greeting": "Saluta il gruppo"
@@ -210,7 +210,7 @@
           "destination_tablet": "Uscite tablet",
           "destination_other": "Altre uscite personali",
           "enabled": "Abilita annunci per questa persona",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "Sensore per verifica presenza",
           "verify_presence": "Verifica la presenza",
           "rewrite": "Riformula gli annunci",
           "ai_agent": "Agente IA personale",
@@ -239,12 +239,12 @@
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
+        "title": "Istruzioni avanzate di stile AI",
         "description": "Istruzioni facoltative di stile per riformulazione, traduzione o entrambe. Le regole fisse di sicurezza e del formato JSON restano vincolanti.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "Stile di riformulazione",
+          "translate": "Stile di traduzione",
+          "both": "Stile combinato di riformulazione e traduzione"
         },
         "data_description": {
           "rewrite": "Preferenza facoltativa in testo semplice; come segnaposto sono consentiti soltanto {message} e {language}.",
@@ -253,14 +253,14 @@
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
+        "title": "Opzioni audio delle stanze con uscita diretta",
         "description": "Campanello e riduzione del volume facoltativi solo per gli altoparlanti diretti delle stanze selezionate, mai per il flusso Snapcast condiviso.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "Attiva il campanello prima dell'annuncio",
+          "person_chime_url": "Percorso locale del file audio del campanello",
+          "person_chime_delay": "Ritardo di stabilizzazione del campanello",
+          "person_output_ducking": "Riduci il volume della riproduzione in corso",
+          "person_duck_factor": "Fattore del volume musicale"
         },
         "data_description": {
           "person_output_chime": "Disattivato per impostazione predefinita. Il campanello suona solo su un lettore diretto di stanza scelto esplicitamente.",
@@ -271,12 +271,12 @@
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
+        "title": "Verifica della presenza nella stanza",
         "description": "Configura un sensore facoltativo che confermi esplicitamente la presenza in una determinata area Home Assistant.",
         "data": {
           "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "verify_presence": "Richiedi conferma di presenza",
+          "presence_sensor": "Sensore di occupazione della stanza"
         },
         "data_description": {
           "area": "Seleziona l'area per aggiungere o eliminare la verifica.",
@@ -286,23 +286,23 @@
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "Seleziona un lettore multimediale TTS quando è selezionato un motore TTS.",
+      "tts_engine_required": "Seleziona un motore TTS quando è selezionato un lettore TTS.",
+      "snapcast_tts_path_required": "Le uscite Snapcast richiedono almeno un motore TTS e un lettore multimediale TTS.",
+      "output_required": "Seleziona almeno un'uscita visiva, TTS del server o TTS della Companion App.",
+      "display_time_order": "Il tempo massimo di visualizzazione deve essere maggiore o uguale al tempo minimo.",
+      "room_notify_area_required": "Un dispositivo di notifica associato a una stanza deve avere un'area Home Assistant.",
+      "notify_level_overlap": "Un dispositivo di notifica può avere una sola assegnazione di livello minimo.",
+      "room_tts_area_required": "Un lettore multimediale TTS diretto associato a una stanza deve avere un'area Home Assistant.",
+      "tts_player_role_overlap": "Lo stesso lettore multimediale non può essere contemporaneamente un lettore TTS diretto e quello della sorgente Snapcast condivisa.",
       "invalid_person_output": "L'uscita personale scelta non esiste o è disabilitata.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "Lo stile AI personalizzato deve contenere soltanto i segnaposto {message} e {language} e non superare 1200 caratteri.",
+      "invalid_chime_url": "L'audio del campanello deve usare un file /local/.",
+      "invalid_person_area": "Seleziona una stanza Home Assistant valida.",
+      "invalid_person_presence": "Seleziona un sensore di presenza prima di attivare la verifica."
     },
     "abort": {
-      "single_instance_allowed": "Announcement Hub is already configured."
+      "single_instance_allowed": "Announcement Hub è già configurato."
     }
   },
   "options": {
@@ -313,10 +313,10 @@
         "data": {
           "notify_outputs": "Dispositivi di notifica",
           "notify_room_outputs": "Dispositivi di notifica per stanza",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Minimo Info / Success",
+          "notify_warning_outputs": "Minimo Warning",
+          "notify_error_outputs": "Minimo Error",
+          "notify_critical_outputs": "Solo Critical"
         },
         "data_description": {
           "notify_outputs": "Entità di notifica riconosciute che Announcement Hub può utilizzare. Tutti i dispositivi compatibili vengono selezionati automaticamente; rimuovi quelli a cui non vuoi mai inviare notifiche.",
@@ -334,16 +334,16 @@
           "tts_engines": "Motore TTS",
           "tts_media_player": "Lettore condiviso per Snapcast",
           "snapcast_outputs": "Client Snapcast per stanza",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "Usa TTS a partire dal livello",
+          "tts_cache": "Genera e memorizza in cache la voce in anticipo",
+          "tts_language": "Lingua TTS",
+          "tts_options": "Opzioni del motore TTS",
+          "companion_tts_media_stream": "Flusso audio della Companion App",
+          "companion_tts_words_per_minute": "Stima durata voce TTS Companion",
+          "tts_area_players": "Lettori TTS diretti per stanza",
+          "companion_tts_outputs": "Dispositivi TTS Companion App",
+          "tts_voice": "Voce TTS",
+          "direct_tts_announce": "Modalità annuncio sugli altoparlanti diretti (può suonare)"
         },
         "data_description": {
           "tts_engines": "Unico motore vocale attivo. Quando disponibile, viene preselezionato il motore TTS predefinito di Home Assistant.",
@@ -365,25 +365,25 @@
         "title": "Opzioni integrazione: {integration}",
         "description": "Configura le notifiche e il loro instradamento.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
+          "max_length": "Caratteri massimi per parte",
+          "reading_words_per_minute": "Velocità di lettura",
+          "minimum_display_seconds": "Tempo minimo di visualizzazione",
+          "maximum_display_seconds": "Tempo massimo di visualizzazione",
+          "display_buffer_seconds": "Margine tempo di lettura",
+          "part_gap_seconds": "Pausa tra le parti",
+          "show_part_number": "Mostra il numero di parte nel titolo",
+          "integration_data": "Dati aggiuntivi dell'integrazione",
+          "replace_parts": "Sostituisci la parte precedente della Companion App",
           "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "fontsize": "Dimensione del carattere",
+          "color": "Colore di sfondo",
+          "transparency": "Trasparenza dello sfondo",
+          "interrupt": "Notifica interattiva",
+          "snapcast_source": "Sorgente Snapcast degli annunci",
+          "snapcast_only_source": "Gestisci solo i client già sulla sorgente annunci",
+          "snapcast_settle_delay": "Attesa stabilizzazione instradamento Snapcast",
+          "snapcast_verify_timeout": "Timeout di verifica instradamento Snapcast",
+          "snapcast_restore": "Ripristina stati di silenziamento Snapcast"
         },
         "data_description": {
           "max_length": "Numero massimo di caratteri inviati in una parte della notifica visiva. I testi più lunghi vengono divisi in punti naturali; 0 disattiva la suddivisione.",
@@ -412,22 +412,22 @@
         "description": "Configura presenza, ripiego, porte, coda e tempi di attesa.",
         "data": {
           "queue_max": "Numero massimo di annunci in coda",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Attesa uscita non disponibile",
+          "idle_timeout": "Attesa inattività audio",
+          "start_timeout": "Timeout di avvio riproduzione",
+          "playback_timeout": "Durata massima riproduzione TTS",
+          "post_play_delay": "Pausa dopo la riproduzione",
+          "default_title": "Titolo predefinito delle notifiche",
+          "critical_notify_data": "Dati delle notifiche Critical",
           "occupancy_sensor": "Entità di presenza della stanza",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "Valore delle stanze occupate",
           "fallback_room": "Stanza di riserva",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Richiedi una porta aperta nella stanza occupata per il ripiego",
+          "fallback_door_label": "Filtro etichetta sensori porta",
           "default_use_ai": "Riscrivi annunci con IA",
           "default_ai_agent": "Provider IA predefinito (conversazione o attività IA)",
           "fallback_ai_agent": "Provider IA di riserva (conversazione o attività IA)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Ripiego fra canali di notifica"
         },
         "data_description": {
           "queue_max": "Numero massimo di lavori di annuncio in attesa o attivi che possono essere accettati. Le nuove richieste vengono rifiutate quando viene raggiunto questo limite.",
@@ -453,15 +453,15 @@
         "title": "Configure Announcement Hub",
         "description": "Scegli una sezione; dopo il salvataggio torni all'integrazione.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. Uscite di notifica e stanze",
+          "edit_tts": "2. Motori e dispositivi TTS",
+          "edit_profiles": "3. Profili di uscita specifici dei provider",
+          "edit_general": "4. Impostazioni generali, presenza e AI",
+          "edit_all": "Modifica tutte le impostazioni (procedura completa)",
           "edit_people": "5. Persone e voci",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "Istruzioni AI avanzate",
+          "edit_audio": "Audio, campanello e riduzione del volume",
+          "edit_room_safety": "Verifica della presenza nella stanza"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Seleziona dispositivi di notifica, associazione alle stanze e livelli minimi di allerta senza modificare le impostazioni di TTS o AI.",
@@ -483,8 +483,8 @@
           "person_group_language": "Lingua del gruppo",
           "person_group_voice": "Voce del gruppo",
           "person_group_translate": "Traduci gli annunci di gruppo",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "Provider AI del gruppo",
+          "person_group_tts_engine": "Motore TTS del gruppo",
           "person_group_rewrite": "Riformula annunci di gruppo",
           "person_group_addressee": "Saluto del gruppo",
           "person_group_greeting": "Saluta il gruppo"
@@ -515,7 +515,7 @@
           "destination_tablet": "Uscite tablet",
           "destination_other": "Altre uscite personali",
           "enabled": "Abilita annunci per questa persona",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "Sensore per verifica presenza",
           "verify_presence": "Verifica la presenza",
           "rewrite": "Riformula gli annunci",
           "ai_agent": "Agente IA personale",
@@ -544,12 +544,12 @@
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
+        "title": "Istruzioni avanzate di stile AI",
         "description": "Istruzioni facoltative di stile per riformulazione, traduzione o entrambe. Le regole fisse di sicurezza e del formato JSON restano vincolanti.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "Stile di riformulazione",
+          "translate": "Stile di traduzione",
+          "both": "Stile combinato di riformulazione e traduzione"
         },
         "data_description": {
           "rewrite": "Preferenza facoltativa in testo semplice; come segnaposto sono consentiti soltanto {message} e {language}.",
@@ -558,14 +558,14 @@
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
+        "title": "Opzioni audio delle stanze con uscita diretta",
         "description": "Campanello e riduzione del volume facoltativi solo per gli altoparlanti diretti delle stanze selezionate, mai per il flusso Snapcast condiviso.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "Attiva il campanello prima dell'annuncio",
+          "person_chime_url": "Percorso locale del file audio del campanello",
+          "person_chime_delay": "Ritardo di stabilizzazione del campanello",
+          "person_output_ducking": "Riduci il volume della riproduzione in corso",
+          "person_duck_factor": "Fattore del volume musicale"
         },
         "data_description": {
           "person_output_chime": "Disattivato per impostazione predefinita. Il campanello suona solo su un lettore diretto di stanza scelto esplicitamente.",
@@ -576,12 +576,12 @@
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
+        "title": "Verifica della presenza nella stanza",
         "description": "Configura un sensore facoltativo che confermi esplicitamente la presenza in una determinata area Home Assistant.",
         "data": {
           "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "verify_presence": "Richiedi conferma di presenza",
+          "presence_sensor": "Sensore di occupazione della stanza"
         },
         "data_description": {
           "area": "Seleziona l'area per aggiungere o eliminare la verifica.",
@@ -591,20 +591,20 @@
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "Seleziona un lettore multimediale TTS quando è selezionato un motore TTS.",
+      "tts_engine_required": "Seleziona un motore TTS quando è selezionato un lettore TTS.",
+      "snapcast_tts_path_required": "Le uscite Snapcast richiedono almeno un motore TTS e un lettore multimediale TTS.",
+      "output_required": "Seleziona almeno un'uscita visiva, TTS del server o TTS della Companion App.",
+      "display_time_order": "Il tempo massimo di visualizzazione deve essere maggiore o uguale al tempo minimo.",
+      "room_notify_area_required": "Un dispositivo di notifica associato a una stanza deve avere un'area Home Assistant.",
+      "notify_level_overlap": "Un dispositivo di notifica può avere una sola assegnazione di livello minimo.",
+      "room_tts_area_required": "Un lettore multimediale TTS diretto associato a una stanza deve avere un'area Home Assistant.",
+      "tts_player_role_overlap": "Lo stesso lettore multimediale non può essere contemporaneamente un lettore TTS diretto e quello della sorgente Snapcast condivisa.",
       "invalid_person_output": "L'uscita personale scelta non esiste o è disabilitata.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "Lo stile AI personalizzato deve contenere soltanto i segnaposto {message} e {language} e non superare 1200 caratteri.",
+      "invalid_chime_url": "L'audio del campanello deve usare un file /local/.",
+      "invalid_person_area": "Seleziona una stanza Home Assistant valida.",
+      "invalid_person_presence": "Seleziona un sensore di presenza prima di attivare la verifica."
     }
   },
   "selector": {
@@ -770,7 +770,7 @@
           "description": "Dati facoltativi specifici dell'integrazione per questa notifica visiva."
         },
         "language": {
-          "name": "TTS language",
+          "name": "Lingua TTS",
           "description": "Lingua facoltativa che sostituisce quella impostata per questo lavoro."
         },
         "tts_options": {
