@@ -494,12 +494,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                         or recipients[0].split(".", 1)[-1]
                     )
                 local["_person_ids"] = tuple(recipients)
-                local["_presence_sensors"] = tuple(
-                    str(profiles.get(person_id, {}).get("presence_sensor") or "")
-                    for person_id in recipients
-                    if profiles.get(person_id, {}).get("verify_presence")
-                    and local.get("areas") is not None
-                )
+                local["_presence_sensors"] = ()
                 if not call.data.get(ATTR_AI_AGENT) and agent:
                     local["ai_agent"] = str(agent)
                 if not call.data.get(ATTR_TTS_ENGINE) and engine:
@@ -553,6 +548,15 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                 for area_id, recipients in rooms.items():
                     local = personal_options(recipients, group=len(recipients) > 1)
                     local["areas"] = (area_id,)
+                    local["_presence_sensors"] = tuple(
+                        str(profiles.get(person_id, {}).get("presence_sensor") or "")
+                        for person_id in recipients
+                        if profiles.get(person_id, {}).get("verify_presence")
+                    )
+                    if any(not sensor for sensor in local["_presence_sensors"]):
+                        raise ServiceValidationError(
+                            "Presence verification requires a configured binary sensor"
+                        )
                     created.append(await manager.async_enqueue(**local))
                 for person_id in people_ids:
                     refs = tuple(dict.fromkeys(
