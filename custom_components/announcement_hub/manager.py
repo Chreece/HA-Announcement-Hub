@@ -2467,8 +2467,12 @@ class AnnouncementManager:
         if any(not person_is_enabled(profiles.get(person_id, {}))
                for person_id in job.person_ids):
             return False
+        # A room switch also applies to automatic and ordinary area jobs.
+        # Refuse a mixed-room batch rather than leak to a disabled room.
+        # A queued job may have moved to its current staged room already.
+        current_areas = tuple(job.outputs) or tuple(job.preferred_areas)
         if any(area_enabled.get(room_id, True) is False
-               for room_id in job.preferred_areas):
+               for room_id in current_areas):
             return False
         area_presence = self.settings.get("person_room_presence", {}) or {}
         if job.person_ids and any(
