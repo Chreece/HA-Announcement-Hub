@@ -29,7 +29,7 @@ def _calls(path: Path) -> list[str]:
 def test_manager_uses_only_config_entry_background_tasks() -> None:
     calls = _calls(COMPONENT / "manager.py")
     assert "self.hass.async_create_task" not in calls
-    assert calls.count("self.entry.async_create_background_task") == 4
+    assert calls.count("self.entry.async_create_background_task") == 5
 
 
 def test_graceful_shutdown_job_is_registered() -> None:
