@@ -2445,8 +2445,6 @@ class AnnouncementManager:
 
     def _person_authorized_now(self, job: AnnouncementJob) -> bool:
         """Recheck queued person/room permissions before every delivery."""
-        if not job.person_ids and not job.presence_sensors:
-            return True
         profiles = self.settings.get("person_profiles", {}) or {}
         area_enabled = self.settings.get("person_area_enabled", {}) or {}
         if any(not person_is_enabled(profiles.get(person_id, {}))
@@ -3027,7 +3025,8 @@ class AnnouncementManager:
             reserved_rooms.update(rooms)
             if blocked_room or self._delivery_lane_keys(job) & active_resources:
                 continue
-            if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
+            permit = getattr(self, "_person_authorized_now", None)
+            if permit is not None and not permit(job):
                 continue
             if job.ai.get("pending_preprocessing"):
                 # AI is never awaited by the delivery worker. A later ready
