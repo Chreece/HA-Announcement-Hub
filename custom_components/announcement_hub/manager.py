@@ -5278,7 +5278,7 @@ class AnnouncementManager:
             "jobs": jobs,
             "last": self._last.to_dict() if self._last else None,
             "ai_history": list(self._ai_history),
-            "volume_restore": dict(self._volume_restore),
+            "volume_restore": dict(getattr(self, "_volume_restore", {})),
         }
 
     def _schedule_save(self) -> None:
