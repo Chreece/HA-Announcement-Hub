@@ -419,6 +419,30 @@ class _AnnouncementFlowMixin:
         self._edit_section = "people"
         return await self.async_step_people()
 
+    def _person_provider_selector(
+        self, domain: str, selected: str | None = None,
+    ) -> selector.SelectSelector:
+        """Pick by human-readable HA provider name, with a global fallback."""
+        options = [selector.SelectOptionDict(
+            value="", label="Use global default",
+        )]
+        if domain == "tts":
+            choices = tts_engine_options(self.hass)
+        else:
+            choices = self._ai_agent_options()
+        for entry in choices:
+            if str(entry["value"]) not in {item["value"] for item in options}:
+                options.append(selector.SelectOptionDict(
+                    value=str(entry["value"]), label=str(entry["label"]),
+                ))
+        if selected and selected not in {str(x["value"]) for x in options}:
+            options.append(selector.SelectOptionDict(
+                value=str(selected), label=f"Unavailable · {selected}",
+            ))
+        return selector.SelectSelector(selector.SelectSelectorConfig(
+            options=options, mode=selector.SelectSelectorMode.DROPDOWN,
+        ))
+
     async def async_step_people(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -481,11 +505,15 @@ class _AnnouncementFlowMixin:
             probatio.Optional(
                 CONF_PERSON_GROUP_AGENT,
                 default=str(self._working.get(CONF_PERSON_GROUP_AGENT) or ""),
-            ): selector.TextSelector(),
+            ): self._person_provider_selector(
+                "ai", str(self._working.get(CONF_PERSON_GROUP_AGENT) or "")
+            ),
             probatio.Optional(
                 CONF_PERSON_GROUP_TTS_ENGINE,
                 default=str(self._working.get(CONF_PERSON_GROUP_TTS_ENGINE) or ""),
-            ): selector.TextSelector(),
+            ): self._person_provider_selector(
+                "tts", str(self._working.get(CONF_PERSON_GROUP_TTS_ENGINE) or "")
+            ),
             probatio.Required(
                 CONF_PERSON_GROUP_REWRITE,
                 default=bool(self._working.get(CONF_PERSON_GROUP_REWRITE, False)),
@@ -611,10 +639,10 @@ class _AnnouncementFlowMixin:
             ): selector.BooleanSelector(),
             probatio.Optional(
                 "ai_agent", default=current.get("ai_agent", "")
-            ): selector.TextSelector(),
+            ): self._person_provider_selector("ai", current.get("ai_agent")),
             probatio.Optional(
                 "tts_engine", default=current.get("tts_engine", "")
-            ): selector.TextSelector(),
+            ): self._person_provider_selector("tts", current.get("tts_engine")),
             probatio.Required(
                 "greeting", default=bool(current.get("greeting", False))
             ): selector.BooleanSelector(),
