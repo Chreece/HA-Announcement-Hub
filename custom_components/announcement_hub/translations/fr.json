@@ -189,9 +189,9 @@
           "voice": "Voix",
           "ignore_home": "Autoriser en absence",
           "translate": "Translate to person's language",
-          "destination_mobile": "Sorties du téléphone",
-          "destination_watch": "Sorties de la montre",
-          "destination_tablet": "Sorties de la tablette",
+          "destination_mobile": "Sorties téléphone",
+          "destination_watch": "Sorties montre",
+          "destination_tablet": "Sorties tablette",
           "destination_other": "Autres sorties personnelles"
         },
         "data_description": {
@@ -412,9 +412,9 @@
           "voice": "Voix",
           "ignore_home": "Autoriser en absence",
           "translate": "Translate to person's language",
-          "destination_mobile": "Sorties du téléphone",
-          "destination_watch": "Sorties de la montre",
-          "destination_tablet": "Sorties de la tablette",
+          "destination_mobile": "Sorties téléphone",
+          "destination_watch": "Sorties montre",
+          "destination_tablet": "Sorties tablette",
           "destination_other": "Autres sorties personnelles"
         },
         "data_description": {
