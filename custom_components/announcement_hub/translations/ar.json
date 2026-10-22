@@ -625,6 +625,10 @@
         "target_person": {
           "name": "الأشخاص المستهدفون",
           "description": "Announce in each selected person's current room only. Never fall back to another room."
+        },
+        "manual_targets": {
+          "name": "المستلمون المحددون",
+          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         }
       }
     },
