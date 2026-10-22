@@ -43,6 +43,11 @@ send:
           selector:
             area:
               multiple: true
+        target_person:
+          selector:
+            entity:
+              domain: person
+              multiple: true
         integration:
           example:
             - mobile_app
