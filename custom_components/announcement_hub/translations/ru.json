@@ -171,7 +171,7 @@
           "tracked_people": "Люди",
           "person_group_language": "Язык группы",
           "person_group_voice": "Голос группы",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Переводить групповые объявления"
         },
         "data_description": {
           "tracked_people": "Выберите людей, для которых нужно настроить отслеживание комнаты и параметры речи.",
@@ -189,10 +189,10 @@
           "voice": "Голос",
           "ignore_home": "Разрешить вне дома",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Выходы телефона",
+          "destination_watch": "Выходы часов",
+          "destination_tablet": "Выходы планшета",
+          "destination_other": "Другие личные выходы"
         },
         "data_description": {
           "tracker": "Выберите датчик или трекер устройства, сообщающий текущую комнату человека в состоянии или атрибуте room/area.",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Выбранный личный выход не существует или отключён."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "Люди",
           "person_group_language": "Язык группы",
           "person_group_voice": "Голос группы",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Переводить групповые объявления"
         },
         "data_description": {
           "tracked_people": "Выберите людей, для которых нужно настроить отслеживание комнаты и параметры речи.",
@@ -412,10 +412,10 @@
           "voice": "Голос",
           "ignore_home": "Разрешить вне дома",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Выходы телефона",
+          "destination_watch": "Выходы часов",
+          "destination_tablet": "Выходы планшета",
+          "destination_other": "Другие личные выходы"
         },
         "data_description": {
           "tracker": "Выберите датчик или трекер устройства, сообщающий текущую комнату человека в состоянии или атрибуте room/area.",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Выбранный личный выход не существует или отключён."
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "Личные адресаты",
           "description": "Выберите Комнату или назначенные Телефон, Часы, Планшет и Другое. Цели можно объединять. Неназначенные цели отклоняются без общей рассылки."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "Перевести для выбранных людей",
           "description": "Переопределить автоматический перевод человека или группы для этого объявления. Используется заданный язык; use_ai: false отключает перевод."
         }
       }
