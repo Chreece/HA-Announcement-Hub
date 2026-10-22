@@ -150,18 +150,29 @@ and an optional conversation-agent override. When AI generation is selected
 with a blank title, Hub can produce a title of up to three words.
 
 **Automatic routing** leaves recipient choice to the integration's configured
-occupancy/fallback rules. **Choose recipients** lets you select one or more
-areas (room-first routing) and also integrations, exact Home Assistant devices,
-and notify/media-player entities. The optional channel selector filters the
+occupancy/fallback rules and selected default output lists. **Choose recipients**
+uses live Home Assistant endpoints **independently of those output lists**:
+areas, integrations, exact devices, and notify/media-player entities. The optional channel selector filters the
 authorized deliveries to Written, Speech, Both, Snapcast or Companion App TTS.
 A channel cannot be selected by itself: choose an area or explicit recipient
 first. Device/integration selections do not authorize unrelated room speakers.
+Automatic mode continues to obey the configured output allow-list. In manual
+mode, a room selector authorizes the physical devices in that room; it never
+implicitly selects other rooms or general mobile notifications.
 
 The card discovers area and recipient names from Home Assistant registries
-when allowed. Manual comma-separated target IDs are available if those lists
-are empty or registry access is restricted. Your actual eligible outputs are
-still determined by Announcement Hub's configuration, and the integration
-validates every request.
+when allowed. Manual comma-separated IDs remain available if registry access
+is restricted. In **Choose recipients**, the card passes `manual_targets: true`
+and the integration discovers real eligible Home Assistant entities, including
+those not selected in the Hub's automatic-output configuration. The selected
+areas are kept to their physical outputs; their room leg cannot accidentally
+escalate to a general-phone broadcast. Selected integrations intentionally
+target **all their eligible devices**, and exact device/entity selections remain
+strict. Unknown, disabled, unavailable or incompatible outputs are not
+invented. Server TTS still needs an available TTS engine; shared Snapcast
+playback still needs its safely configured central audio path and verified
+client isolation. The integration enforces those infrastructure and safety
+requirements even in manual mode.
 
 The Send button uses the native `notify.announcement_hub` action and requests
 the queue response. It displays the accepted job ID, or an error without an
