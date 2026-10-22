@@ -1204,6 +1204,11 @@ class AnnouncementManager:
             if manual_targets and not requested else
             self._manual_output_catalog() if manual_targets else self._configured_outputs()
         )
+        if _person_targeted and explicit_area_routing:
+            # A person's Room is a fixed physical room target, never every
+            # other person's Companion App push-speech device assigned here.
+            # Mobile/Watch require their individually assigned destination.
+            configured = (*configured[:4], ())
         selected = filter_selected_outputs(
             self._select_requested_outputs(
                 requested, level=level, tts_engines=configured[0],
