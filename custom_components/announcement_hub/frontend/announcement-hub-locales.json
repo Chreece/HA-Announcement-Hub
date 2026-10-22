@@ -143,7 +143,12 @@
     "{count} selected people": "{count} επιλεγμένα άτομα",
     "Explicit room outputs only": "Μόνο έξοδοι του επιλεγμένου δωματίου",
     "All eligible HA outputs from this integration": "Όλες οι κατάλληλες έξοδοι αυτής της ενσωμάτωσης",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Στη χειροκίνητη λειτουργία χρησιμοποιούνται μόνο οι επιλεγμένοι παραλήπτες. Αν λείπει συσκευή, δεν γίνεται γενική μετάδοση."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Στη χειροκίνητη λειτουργία χρησιμοποιούνται μόνο οι επιλεγμένοι παραλήπτες. Αν λείπει συσκευή, δεν γίνεται γενική μετάδοση.",
+    "Translate into person's language": "Μετάφραση στη γλώσσα του ατόμου",
+    "Person translation": "Μετάφραση ατόμου",
+    "Person setting": "Ρύθμιση ατόμου",
+    "Translate": "Μετάφραση",
+    "Original language": "Αρχική γλώσσα"
   },
   "de": {
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · NACHRICHTEN",
@@ -289,7 +294,12 @@
     "{count} selected people": "{count} ausgewählte Personen",
     "Explicit room outputs only": "Nur Ausgaben des gewählten Raums",
     "All eligible HA outputs from this integration": "Alle geeigneten HA-Ausgaben dieser Integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Im manuellen Modus sind nur gewählte Empfänger erlaubt. Fehlende Geräte lösen keine Rundsendung aus."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Im manuellen Modus sind nur gewählte Empfänger erlaubt. Fehlende Geräte lösen keine Rundsendung aus.",
+    "Translate into person's language": "In die Sprache der Person übersetzen",
+    "Person translation": "Personenübersetzung",
+    "Person setting": "Personeneinstellung",
+    "Translate": "Übersetzen",
+    "Original language": "Originalsprache"
   },
   "fr": {
     "The message": "Le message",
@@ -435,7 +445,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Traduire dans la langue de la personne",
+    "Person translation": "Traduction personnelle",
+    "Person setting": "Préférence individuelle",
+    "Translate": "Traduire",
+    "Original language": "Langue originale"
   },
   "es": {
     "The message": "El mensaje",
@@ -581,7 +596,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Traducir al idioma de la persona",
+    "Person translation": "Traducción personal",
+    "Person setting": "Preferencia individual",
+    "Translate": "Traducir",
+    "Original language": "Idioma original"
   },
   "it": {
     "The message": "Il messaggio",
@@ -727,7 +747,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "pt": {
     "The message": "A mensagem",
@@ -873,7 +898,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "nl": {
     "The message": "Het bericht",
@@ -1019,7 +1049,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "pl": {
     "The message": "Wiadomość",
@@ -1165,7 +1200,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "pt-BR": {
     "The message": "A mensagem",
@@ -1311,7 +1351,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "ru": {
     "The message": "Сообщение",
@@ -1457,7 +1502,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "tr": {
     "The message": "Mesaj",
@@ -1603,7 +1653,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "uk": {
     "The message": "Повідомлення",
@@ -1749,7 +1804,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "ar": {
     "The message": "الرسالة",
@@ -1895,7 +1955,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "zh-Hans": {
     "The message": "消息",
@@ -2041,7 +2106,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "ja": {
     "The message": "メッセージ",
@@ -2187,7 +2257,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "ko": {
     "The message": "메시지",
@@ -2333,7 +2408,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "sv": {
     "The message": "Meddelandet",
@@ -2479,7 +2559,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "cs": {
     "The message": "Zpráva",
@@ -2625,7 +2710,12 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   },
   "zh-Hant": {
     "The message": "訊息",
@@ -2771,6 +2861,11 @@
     "{count} selected people": "{count} selected people",
     "Explicit room outputs only": "Explicit room outputs only",
     "All eligible HA outputs from this integration": "All eligible HA outputs from this integration",
-    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast."
+    "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.": "Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.",
+    "Translate into person's language": "Translate into person's language",
+    "Person translation": "Person translation",
+    "Person setting": "Person setting",
+    "Translate": "Translate",
+    "Original language": "Original language"
   }
 }
