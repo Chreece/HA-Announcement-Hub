@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.10.0b2 - 2026-10-22
+
+**Beta — person language translation and named personal destinations**
+
+- Introduce assigned personal destinations **Room, Mobile, Watch, Tablet, Other**
+  for person announcements. Assign each person's existing HA notify or
+  media-player entities in **Configure → People**. The service and dashboard
+  choose human-readable destination names, not physical entity IDs.
+- Room targeting retains strict person-room tracking and group deduplication.
+  Mobile, Watch, Tablet and Other reach only their specifically assigned
+  outputs, including when a person is away or room tracking is unavailable.
+  Missing/disabled or unassigned outputs cause validation errors rather
+  than routing to another person's devices or broadcasting an integration.
+- Add opt-in individual and group AI translation into the intended language
+  with TTS voice/language options. Separate visual and spoken text remain
+  isolated, numeric readings and meaning are safeguarded, and AI failure
+  preserves the original announcement. An explicit use_ai: false disables AI.
+- Add per-action person_destination and person_translate options, plus
+  People mode and optional translation override in the Lovelace card.
+  Expose only configured personal destination labels (not entity mappings)
+  through the queue sensor for the card's recipient picker.
+- Add regression tests, native service/config field and selector translations,
+  updated dashboard translations and documentation. Leave automatic routing
+  and existing exact device/integration actions unchanged.
+
+
 ## 0.10.0b1 - 2026-10-22
 
 **Beta — person-aware and manual-recipient routing.**
