@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.10.0b1 - 2026-10-22
+
+**Beta — person-aware and manual-recipient routing.**
+
+- Add `target_person` announcements with per-person room tracking
+  (Bermuda/ESPresense or other room sensors), optional individual language/
+  voice settings and single group announcements for shared rooms.
+  Separate targeted rooms retain independent FIFO delivery and fail closed
+  for unknown locations or away persons unless expressly allowed.
+- Extend the integration's People configuration and native translations;
+  preserve existing devices, notify services, TTS engine and shared Snapcast
+  configuration rather than create redundant phone/watch outputs.
+- Make dashboard **Choose recipients** independent of integration default
+  output selections: discover HA area/integration/device/entity endpoints at
+  send time and freeze only the selected output paths. Automatic routing
+  retains the configured defaults.
+- Manual area targeting never escalates into generic mobile broadcasts;
+  integration selectors intentionally include eligible devices in that
+  integration; service/channel filtering and Snapcast isolation remain strict.
+- Add tests for missing/away people, group fan-out, dashboard requests and
+  manual-room discovery. This pre-release is intended for real-hardware beta
+  verification before a stable release.
+
+
 ## 0.9.44 - 2026-10-21
 
 - Recover online Conversation AI responses that contain exactly one usable
