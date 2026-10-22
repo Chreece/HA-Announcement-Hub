@@ -164,7 +164,10 @@
           "edit_profiles": "Anzeigedauer, Darstellung und Snapcast-Wiedergabe für die ausgewählten Integrationen konfigurieren.",
           "edit_general": "Direkt zu KI- und Ersatzagenten, Anwesenheit, Raum-Fallback, Warteschlange und Zeitlimits wechseln.",
           "edit_all": "Alle Einrichtungsseiten wie beim ursprünglichen Konfigurationsassistenten nacheinander bearbeiten.",
-          "edit_people": "Personen, Raumsensoren und individuelle bzw. Gruppenstimmen konfigurieren."
+          "edit_people": "Personen, Raumsensoren und individuelle bzw. Gruppenstimmen konfigurieren.",
+          "edit_advanced_ai": "Optionale KI-Stilvorgaben für Umformulierung, Übersetzung und Kombination bearbeiten. Geräte- und Sicherheitsregeln bleiben fest.",
+          "edit_audio": "Vorgong und optionale Lautstärkeabsenkung nur für direkt ausgewählte Raumlautsprecher einstellen, niemals für eine gemeinsame Snapcast-Quelle.",
+          "edit_room_safety": "Optionalen Anwesenheitssensor je Raum konfigurieren. Nicht verfügbare Sensoren führen zu keiner Umleitung."
         }
       },
       "people": {
@@ -466,7 +469,10 @@
           "edit_profiles": "Anzeigedauer, Darstellung und Snapcast-Wiedergabe für die ausgewählten Integrationen konfigurieren.",
           "edit_general": "Direkt zu KI- und Ersatzagenten, Anwesenheit, Raum-Fallback, Warteschlange und Zeitlimits wechseln.",
           "edit_all": "Alle Einrichtungsseiten wie beim ursprünglichen Konfigurationsassistenten nacheinander bearbeiten.",
-          "edit_people": "Personen, Raumsensoren und individuelle bzw. Gruppenstimmen konfigurieren."
+          "edit_people": "Personen, Raumsensoren und individuelle bzw. Gruppenstimmen konfigurieren.",
+          "edit_advanced_ai": "Optionale KI-Stilvorgaben für Umformulierung, Übersetzung und Kombination bearbeiten. Geräte- und Sicherheitsregeln bleiben fest.",
+          "edit_audio": "Vorgong und optionale Lautstärkeabsenkung nur für direkt ausgewählte Raumlautsprecher einstellen, niemals für eine gemeinsame Snapcast-Quelle.",
+          "edit_room_safety": "Optionalen Anwesenheitssensor je Raum konfigurieren. Nicht verfügbare Sensoren führen zu keiner Umleitung."
         }
       },
       "people": {
