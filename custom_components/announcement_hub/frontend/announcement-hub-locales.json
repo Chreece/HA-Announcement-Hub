@@ -148,7 +148,14 @@
     "Person translation": "Μετάφραση ατόμου",
     "Person setting": "Ρύθμιση ατόμου",
     "Translate": "Μετάφραση",
-    "Original language": "Αρχική γλώσσα"
+    "Original language": "Αρχική γλώσσα",
+    "Personal greeting": "Προσωπική προσφώνηση",
+    "Yes": "Ναι",
+    "No": "Όχι",
+    "TTS engine": "Μηχανή TTS",
+    "Direct-room pre-announcement chime": "Προειδοποιητικός ήχος δωματίου",
+    "Pre-announcement chime": "Ήχος πριν από την ανακοίνωση",
+    "tts.piper": "tts.piper"
   },
   "de": {
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · NACHRICHTEN",
@@ -299,7 +306,14 @@
     "Person translation": "Personenübersetzung",
     "Person setting": "Personeneinstellung",
     "Translate": "Übersetzen",
-    "Original language": "Originalsprache"
+    "Original language": "Originalsprache",
+    "Personal greeting": "Persönliche Anrede",
+    "Yes": "Ja",
+    "No": "Nein",
+    "TTS engine": "TTS-Engine",
+    "Direct-room pre-announcement chime": "Vorgong im gewählten Raum",
+    "Pre-announcement chime": "Vorgong vor der Ansage",
+    "tts.piper": "tts.piper"
   },
   "fr": {
     "The message": "Le message",
@@ -450,7 +464,14 @@
     "Person translation": "Traduction personnelle",
     "Person setting": "Préférence de la personne",
     "Translate": "Traduire",
-    "Original language": "Langue d'origine"
+    "Original language": "Langue d'origine",
+    "Personal greeting": "Salutation personnelle",
+    "Yes": "Oui",
+    "No": "Non",
+    "TTS engine": "Moteur TTS",
+    "Direct-room pre-announcement chime": "Carillon avant annonce dans la pièce",
+    "Pre-announcement chime": "Carillon avant annonce",
+    "tts.piper": "tts.piper"
   },
   "es": {
     "The message": "El mensaje",
@@ -601,7 +622,14 @@
     "Person translation": "Traducción personal",
     "Person setting": "Preferencia de la persona",
     "Translate": "Traducir",
-    "Original language": "Idioma original"
+    "Original language": "Idioma original",
+    "Personal greeting": "Saludo personal",
+    "Yes": "Sí",
+    "No": "No",
+    "TTS engine": "Motor TTS",
+    "Direct-room pre-announcement chime": "Aviso sonoro previo en la habitación",
+    "Pre-announcement chime": "Sonido antes del anuncio",
+    "tts.piper": "tts.piper"
   },
   "it": {
     "The message": "Il messaggio",
@@ -752,7 +780,14 @@
     "Person translation": "Traduzione personale",
     "Person setting": "Impostazione della persona",
     "Translate": "Traduci",
-    "Original language": "Lingua originale"
+    "Original language": "Lingua originale",
+    "Personal greeting": "Saluto personale",
+    "Yes": "Sì",
+    "No": "No",
+    "TTS engine": "Motore TTS",
+    "Direct-room pre-announcement chime": "Suono prima dell'annuncio nella stanza",
+    "Pre-announcement chime": "Suono prima dell'annuncio",
+    "tts.piper": "tts.piper"
   },
   "pt": {
     "The message": "A mensagem",
@@ -903,7 +938,14 @@
     "Person translation": "Tradução pessoal",
     "Person setting": "Preferência da pessoa",
     "Translate": "Traduzir",
-    "Original language": "Língua original"
+    "Original language": "Língua original",
+    "Personal greeting": "Saudação pessoal",
+    "Yes": "Sim",
+    "No": "Não",
+    "TTS engine": "Motor TTS",
+    "Direct-room pre-announcement chime": "Som prévio na divisão",
+    "Pre-announcement chime": "Som antes do anúncio",
+    "tts.piper": "tts.piper"
   },
   "nl": {
     "The message": "Het bericht",
@@ -1054,7 +1096,14 @@
     "Person translation": "Vertaling per persoon",
     "Person setting": "Persoonlijke instelling",
     "Translate": "Vertalen",
-    "Original language": "Oorspronkelijke taal"
+    "Original language": "Oorspronkelijke taal",
+    "Personal greeting": "Persoonlijke begroeting",
+    "Yes": "Ja",
+    "No": "Nee",
+    "TTS engine": "TTS-engine",
+    "Direct-room pre-announcement chime": "Vooraankondigingsgeluid in kamer",
+    "Pre-announcement chime": "Vooraankondigingsgeluid",
+    "tts.piper": "tts.piper"
   },
   "pl": {
     "The message": "Wiadomość",
@@ -1205,7 +1254,14 @@
     "Person translation": "Tłumaczenie dla osoby",
     "Person setting": "Ustawienie osoby",
     "Translate": "Tłumacz",
-    "Original language": "Język oryginalny"
+    "Original language": "Język oryginalny",
+    "Personal greeting": "Osobiste powitanie",
+    "Yes": "Tak",
+    "No": "Nie",
+    "TTS engine": "Silnik TTS",
+    "Direct-room pre-announcement chime": "Dźwięk przed ogłoszeniem w pokoju",
+    "Pre-announcement chime": "Dźwięk przed ogłoszeniem",
+    "tts.piper": "tts.piper"
   },
   "pt-BR": {
     "The message": "A mensagem",
@@ -1356,7 +1412,14 @@
     "Person translation": "Tradução pessoal",
     "Person setting": "Preferência da pessoa",
     "Translate": "Traduzir",
-    "Original language": "Idioma original"
+    "Original language": "Idioma original",
+    "Personal greeting": "Saudação pessoal",
+    "Yes": "Sim",
+    "No": "Não",
+    "TTS engine": "Motor TTS",
+    "Direct-room pre-announcement chime": "Som antes do anúncio no cômodo",
+    "Pre-announcement chime": "Som antes do anúncio",
+    "tts.piper": "tts.piper"
   },
   "ru": {
     "The message": "Сообщение",
@@ -1507,7 +1570,14 @@
     "Person translation": "Персональный перевод",
     "Person setting": "Настройка человека",
     "Translate": "Перевести",
-    "Original language": "Исходный язык"
+    "Original language": "Исходный язык",
+    "Personal greeting": "Персональное обращение",
+    "Yes": "Да",
+    "No": "Нет",
+    "TTS engine": "Движок TTS",
+    "Direct-room pre-announcement chime": "Звук перед объявлением в комнате",
+    "Pre-announcement chime": "Звук перед объявлением",
+    "tts.piper": "tts.piper"
   },
   "tr": {
     "The message": "Mesaj",
@@ -1658,7 +1728,14 @@
     "Person translation": "Kişisel çeviri",
     "Person setting": "Kişi ayarı",
     "Translate": "Çevir",
-    "Original language": "Özgün dil"
+    "Original language": "Özgün dil",
+    "Personal greeting": "Kişisel hitap",
+    "Yes": "Evet",
+    "No": "Hayır",
+    "TTS engine": "TTS motoru",
+    "Direct-room pre-announcement chime": "Oda duyurusundan önce ses",
+    "Pre-announcement chime": "Duyuru öncesi ses",
+    "tts.piper": "tts.piper"
   },
   "uk": {
     "The message": "Повідомлення",
@@ -1809,7 +1886,14 @@
     "Person translation": "Персональний переклад",
     "Person setting": "Налаштування людини",
     "Translate": "Перекласти",
-    "Original language": "Початкова мова"
+    "Original language": "Початкова мова",
+    "Personal greeting": "Особисте звертання",
+    "Yes": "Так",
+    "No": "Ні",
+    "TTS engine": "Рушій TTS",
+    "Direct-room pre-announcement chime": "Звук перед оголошенням у кімнаті",
+    "Pre-announcement chime": "Звук перед оголошенням",
+    "tts.piper": "tts.piper"
   },
   "ar": {
     "The message": "الرسالة",
@@ -1960,7 +2044,14 @@
     "Person translation": "ترجمة للشخص",
     "Person setting": "إعدادات الشخص",
     "Translate": "ترجمة",
-    "Original language": "اللغة الأصلية"
+    "Original language": "اللغة الأصلية",
+    "Personal greeting": "نداء شخصي",
+    "Yes": "نعم",
+    "No": "لا",
+    "TTS engine": "محرك TTS",
+    "Direct-room pre-announcement chime": "صوت قبل الإعلان في الغرفة",
+    "Pre-announcement chime": "صوت ما قبل الإعلان",
+    "tts.piper": "tts.piper"
   },
   "zh-Hans": {
     "The message": "消息",
@@ -2111,7 +2202,14 @@
     "Person translation": "个人翻译",
     "Person setting": "个人设置",
     "Translate": "翻译",
-    "Original language": "原始语言"
+    "Original language": "原始语言",
+    "Personal greeting": "个人称呼",
+    "Yes": "是",
+    "No": "否",
+    "TTS engine": "TTS 引擎",
+    "Direct-room pre-announcement chime": "房间公告提示音",
+    "Pre-announcement chime": "公告前提示音",
+    "tts.piper": "tts.piper"
   },
   "ja": {
     "The message": "メッセージ",
@@ -2262,7 +2360,14 @@
     "Person translation": "個人向け翻訳",
     "Person setting": "人物の設定",
     "Translate": "翻訳する",
-    "Original language": "元の言語"
+    "Original language": "元の言語",
+    "Personal greeting": "個人への呼びかけ",
+    "Yes": "はい",
+    "No": "いいえ",
+    "TTS engine": "TTSエンジン",
+    "Direct-room pre-announcement chime": "部屋の通知前の音",
+    "Pre-announcement chime": "通知前の音",
+    "tts.piper": "tts.piper"
   },
   "ko": {
     "The message": "메시지",
@@ -2413,7 +2518,14 @@
     "Person translation": "개인별 번역",
     "Person setting": "개인 설정",
     "Translate": "번역",
-    "Original language": "원본 언어"
+    "Original language": "원본 언어",
+    "Personal greeting": "개인 호칭",
+    "Yes": "예",
+    "No": "아니요",
+    "TTS engine": "TTS 엔진",
+    "Direct-room pre-announcement chime": "방 알림 전 소리",
+    "Pre-announcement chime": "알림 전 소리",
+    "tts.piper": "tts.piper"
   },
   "sv": {
     "The message": "Meddelandet",
@@ -2564,7 +2676,14 @@
     "Person translation": "Personlig översättning",
     "Person setting": "Personinställning",
     "Translate": "Översätt",
-    "Original language": "Originalspråk"
+    "Original language": "Originalspråk",
+    "Personal greeting": "Personlig hälsning",
+    "Yes": "Ja",
+    "No": "Nej",
+    "TTS engine": "TTS-motor",
+    "Direct-room pre-announcement chime": "Försignal i rummet",
+    "Pre-announcement chime": "Försignal före meddelande",
+    "tts.piper": "tts.piper"
   },
   "cs": {
     "The message": "Zpráva",
@@ -2715,7 +2834,14 @@
     "Person translation": "Osobní překlad",
     "Person setting": "Nastavení osoby",
     "Translate": "Přeložit",
-    "Original language": "Původní jazyk"
+    "Original language": "Původní jazyk",
+    "Personal greeting": "Osobní oslovení",
+    "Yes": "Ano",
+    "No": "Ne",
+    "TTS engine": "TTS engine",
+    "Direct-room pre-announcement chime": "Zvuk před oznámením v místnosti",
+    "Pre-announcement chime": "Zvuk před oznámením",
+    "tts.piper": "tts.piper"
   },
   "zh-Hant": {
     "The message": "訊息",
@@ -2866,6 +2992,13 @@
     "Person translation": "個人翻譯",
     "Person setting": "個人設定",
     "Translate": "翻譯",
-    "Original language": "原始語言"
+    "Original language": "原始語言",
+    "Personal greeting": "個人稱呼",
+    "Yes": "是",
+    "No": "否",
+    "TTS engine": "TTS 引擎",
+    "Direct-room pre-announcement chime": "房間公告提示音",
+    "Pre-announcement chime": "公告前提示音",
+    "tts.piper": "tts.piper"
   }
 }
