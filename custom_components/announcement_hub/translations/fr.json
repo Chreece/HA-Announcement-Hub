@@ -152,14 +152,46 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_all": "Edit all settings (full wizard)",
+          "edit_people": "5. Personnes et voix"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
           "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_people": "Configurer les personnes, capteurs de pièce, langues et voix individuelles ou de groupe."
+        }
+      },
+      "people": {
+        "title": "Personnes et voix du groupe",
+        "description": "Configurer les personnes destinataires d'annonces dans leur pièce.",
+        "data": {
+          "tracked_people": "Personnes à configurer",
+          "person_group_language": "Langue du groupe",
+          "person_group_voice": "Voix du groupe"
+        },
+        "data_description": {
+          "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
+          "person_group_language": "Optional language code to use when targeted people share the same room.",
+          "person_group_voice": "Optional TTS voice identifier to use when targeted people share the same room."
+        }
+      },
+      "person_profile": {
+        "title": "Voix de {person_name}",
+        "description": "Choisir le capteur de pièce et la voix. Aucun repli en cas de pièce inconnue.",
+        "data": {
+          "tracker": "Capteur de pièce",
+          "language": "Langue",
+          "voice": "Voix",
+          "ignore_home": "Autoriser en absence"
+        },
+        "data_description": {
+          "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
+          "language": "Optional language code for targeted speech. An explicit action language overrides this preference.",
+          "voice": "Optional TTS voice identifier. Explicit action tts_options.voice takes precedence.",
+          "ignore_home": "Permit this person's room tracker even when the person entity is not home. Unknown rooms still fail closed."
         }
       }
     },
@@ -330,14 +362,46 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_all": "Edit all settings (full wizard)",
+          "edit_people": "5. Personnes et voix"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
           "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_people": "Configurer les personnes, capteurs de pièce, langues et voix individuelles ou de groupe."
+        }
+      },
+      "people": {
+        "title": "Personnes et voix du groupe",
+        "description": "Configurer les personnes destinataires d'annonces dans leur pièce.",
+        "data": {
+          "tracked_people": "Personnes à configurer",
+          "person_group_language": "Langue du groupe",
+          "person_group_voice": "Voix du groupe"
+        },
+        "data_description": {
+          "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
+          "person_group_language": "Optional language code to use when targeted people share the same room.",
+          "person_group_voice": "Optional TTS voice identifier to use when targeted people share the same room."
+        }
+      },
+      "person_profile": {
+        "title": "Voix de {person_name}",
+        "description": "Choisir le capteur de pièce et la voix. Aucun repli en cas de pièce inconnue.",
+        "data": {
+          "tracker": "Capteur de pièce",
+          "language": "Langue",
+          "voice": "Voix",
+          "ignore_home": "Autoriser en absence"
+        },
+        "data_description": {
+          "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
+          "language": "Optional language code for targeted speech. An explicit action language overrides this preference.",
+          "voice": "Optional TTS voice identifier. Explicit action tts_options.voice takes precedence.",
+          "ignore_home": "Permit this person's room tracker even when the person entity is not home. Unknown rooms still fail closed."
         }
       }
     },
@@ -557,6 +621,10 @@
         "ai_mode": {
           "name": "Texte avec IA",
           "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
+        },
+        "target_person": {
+          "name": "Personnes ciblées",
+          "description": "Annoncer uniquement dans la pièce de chaque personne, sans repli."
         }
       }
     },
