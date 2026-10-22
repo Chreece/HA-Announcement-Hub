@@ -209,6 +209,7 @@ EDIT_MENU_OPTIONS = (
     "edit_profiles",
     "edit_general",
     "edit_people",
+    "edit_advanced_ai",
     "edit_all",
 )
 
@@ -274,6 +275,46 @@ class _AnnouncementFlowMixin:
         self._edit_section = "queue"
         return await self.async_step_queue()
 
+
+    async def async_step_edit_advanced_ai(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Edit only safe prompt style preferences; strict AI JSON rules remain fixed."""
+        self._edit_section = "advanced_ai"
+        current = self._working.get("ai_prompt_templates", {}) or {}
+        if user_input is not None:
+            from .ai_filter import custom_style_instruction
+            try:
+                for key in ("rewrite", "translate", "both"):
+                    custom_style_instruction(
+                        {key: str(user_input.get(key, "") or "")},
+                        mode="rewrite" if key != "translate" else "translate",
+                        target_language="el" if key != "rewrite" else None,
+                        originals={"text_tts": "test", "text_notify": None},
+                    )
+            except ValueError:
+                return self.async_show_form(
+                    step_id="edit_advanced_ai",
+                    data_schema=self._ai_prompts_schema(current),
+                    errors={"base": "invalid_prompt_template"},
+                )
+            self._working["ai_prompt_templates"] = {
+                key: str(user_input.get(key, "") or "").strip()
+                for key in ("rewrite", "translate", "both")
+            }
+            return await self._async_finish()
+        return self.async_show_form(
+            step_id="edit_advanced_ai",
+            data_schema=self._ai_prompts_schema(current),
+        )
+
+    @staticmethod
+    def _ai_prompts_schema(current: dict[str, str]) -> probatio.Schema:
+        return probatio.Schema({
+            probatio.Optional(key, default=str(current.get(key, "") or "")):
+                selector.TextSelector(selector.TextSelectorConfig(multiline=True))
+            for key in ("rewrite", "translate", "both")
+        })
 
     async def async_step_edit_people(
         self, user_input: dict[str, Any] | None = None
