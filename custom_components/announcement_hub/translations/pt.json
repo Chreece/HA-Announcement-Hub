@@ -450,7 +450,7 @@
         }
       },
       "init": {
-        "title": "Configure Announcement Hub",
+        "title": "Configurar Announcement Hub",
         "description": "Escolha uma secção; após guardar regressa à integração.",
         "menu_options": {
           "edit_outputs": "1. Saídas de notificação e divisões",
@@ -610,8 +610,8 @@
   "selector": {
     "dispatch_order": {
       "options": {
-        "notify_then_tts": "Visual notifications first, then speech",
-        "tts_then_notify": "Speech first, then visual notifications"
+        "notify_then_tts": "Primeiro notificações visuais, depois voz",
+        "tts_then_notify": "Primeiro voz, depois notificações visuais"
       }
     },
     "tts_min_level": {
@@ -622,15 +622,15 @@
         "info": "Informação",
         "success": "Sucesso",
         "debug": "Depuração",
-        "never": "Never"
+        "never": "Nunca"
       }
     },
     "companion_tts_media_stream": {
       "options": {
-        "default": "App default",
-        "music_stream": "Music stream",
-        "alarm_stream": "Alarm stream",
-        "alarm_stream_max": "Alarm stream at maximum volume"
+        "default": "Predefinição da aplicação",
+        "music_stream": "Fluxo de música",
+        "alarm_stream": "Fluxo de alarme",
+        "alarm_stream_max": "Fluxo de alarme no volume máximo"
       }
     },
     "level": {
@@ -645,32 +645,32 @@
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left",
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "center": "Center"
+        "bottom-right": "Em baixo à direita",
+        "bottom-left": "Em baixo à esquerda",
+        "top-right": "Em cima à direita",
+        "top-left": "Em cima à esquerda",
+        "center": "Centro"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large",
-        "max": "Maximum"
+        "small": "Pequeno",
+        "medium": "Médio",
+        "large": "Grande",
+        "max": "Máximo"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Grey",
-        "black": "Black",
-        "indigo": "Indigo",
-        "green": "Green",
-        "red": "Red",
-        "cyan": "Cyan",
-        "teal": "Teal",
-        "amber": "Amber",
-        "pink": "Pink"
+        "grey": "Cinzento",
+        "black": "Preto",
+        "indigo": "Índigo",
+        "green": "Verde",
+        "red": "Vermelho",
+        "cyan": "Ciano",
+        "teal": "Verde-azulado",
+        "amber": "Âmbar",
+        "pink": "Rosa"
       }
     },
     "nfandroidtv_transparency": {
@@ -684,13 +684,13 @@
     },
     "occupancy_source": {
       "options": {
-        "state": "State"
+        "state": "Estado"
       }
     },
     "notify_scope": {
       "options": {
-        "room": "Room-based",
-        "general": "General / movable"
+        "room": "Associado a divisão",
+        "general": "Geral / móvel"
       }
     },
     "notify_level": {
@@ -704,9 +704,9 @@
     },
     "channel_fallback_mode": {
       "options": {
-        "visual_then_tts": "Visual first → TTS if unsuccessful",
-        "tts_then_visual": "TTS first → Visual if unsuccessful",
-        "both": "Both eligible channels"
+        "visual_then_tts": "Primeiro visual → TTS se falhar",
+        "tts_then_visual": "Primeiro TTS → visual se falhar",
+        "both": "Ambos os canais elegíveis"
       }
     },
     "person_destination": {
@@ -722,7 +722,7 @@
   "entity": {
     "sensor": {
       "queue": {
-        "name": "Queue"
+        "name": "Fila"
       }
     }
   },
@@ -766,7 +766,7 @@
           "description": "Escolhe notification (escrito), tts (falado), snapcast ou companion_tts (voz especializada), ou all. Filtra os dispositivos selecionados e nunca escolhe destinatários não relacionados."
         },
         "notify_data": {
-          "name": "Notification data",
+          "name": "Dados da notificação",
           "description": "Dados opcionais específicos da integração para esta notificação visual."
         },
         "language": {
@@ -774,11 +774,11 @@
           "description": "Idioma opcional que substitui o definido para este trabalho."
         },
         "tts_options": {
-          "name": "TTS options",
+          "name": "Opções TTS",
           "description": "Opções opcionais de voz ou motor para este trabalho."
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
+          "name": "Permitir voz da Companion App",
           "description": "Opção antiga para permitir a fala da Companion App. As novas ações podem solicitar tts ou companion_tts no campo service, limitadas aos destinatários selecionados."
         },
         "occupied_only": {
@@ -826,7 +826,7 @@
           "description": "Envia apenas para as divisões atuais das pessoas selecionadas, sem recurso a outras divisões nem a saídas Gerais."
         },
         "manual_targets": {
-          "name": "Manual recipients",
+          "name": "Destinatários manuais",
           "description": "Quando ativado, procura os destinatários escolhidos explicitamente no Home Assistant, independentemente das saídas padrão configuradas no Announcement Hub. Requer uma area, integração, dispositivo ou entidade selecionada. Nunca ativa saídas não selecionadas nem expande uma divisão para todos os telemóveis."
         },
         "person_destination": {
@@ -838,15 +838,15 @@
           "description": "Substitui a preferência de tradução automática da pessoa ou do grupo para este anúncio. Usa o idioma configurado; use_ai: false impede a tradução."
         },
         "person_greeting": {
-          "name": "Personal greeting",
+          "name": "Saudação pessoal",
           "description": "Substitua a preferência de saudação automática de uma pessoa ou grupo; se ficar por definir, aplica-se a preferência configurada."
         },
         "pre_announce_sound": {
-          "name": "Pre-announcement chime",
+          "name": "Sinal sonoro antes do anúncio",
           "description": "Sinal sonoro opcional reservado aos reprodutores diretos das divisões, nunca à fonte Snapcast partilhada."
         },
         "tts_engine": {
-          "name": "TTS engine override",
+          "name": "Substituir motor TTS",
           "description": "Escolha um motor TTS existente para este anúncio sem selecionar dispositivos adicionais."
         }
       }
@@ -856,7 +856,7 @@
       "description": "Cancela todos os trabalhos em espera e pode interromper também o anúncio ativo.",
       "fields": {
         "include_current": {
-          "name": "Include active announcement",
+          "name": "Incluir anúncio ativo",
           "description": "Solicita também o cancelamento do trabalho atualmente em execução."
         }
       }
@@ -866,7 +866,7 @@
       "description": "Cancela um único trabalho em espera ou ativo através do respetivo ID.",
       "fields": {
         "job_id": {
-          "name": "Job ID",
+          "name": "ID do trabalho",
           "description": "O ID de trabalho devolvido por announcement_hub.send."
         }
       }
