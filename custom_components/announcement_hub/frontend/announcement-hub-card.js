@@ -20,6 +20,7 @@
     ["rewrite", "Rewrite"], ["generate", "Generate"],
   ];
   const KINDS = ["area", "integration", "device", "entity"];
+  const PERSON_TRANSLATION = [["inherit", "Person setting"], ["on", "Translate"], ["off", "Original language"]];
   const PERSON_DESTINATIONS = [["room", "Room"], ["mobile", "Mobile"], ["watch", "Watch"], ["tablet", "Tablet"], ["other", "Other"]];
   const getLanguage = (hass) => {
     const raw = String(hass?.locale?.language || hass?.language || "en").replace(/_/g, "-");
@@ -105,6 +106,7 @@
       this._config = AnnouncementHubCard.getStubConfig();
       this._selected = Object.fromEntries([...KINDS, "person"].map((kind) => [kind, new Set()]));
       this._personDestinations = new Set(["room"]);
+      this._personTranslation = "inherit";
       this._registry = { area: [], integration: [], device: [], entity: [], person: [] };
       this._level = "info";
       this._channel = "auto";
@@ -196,6 +198,7 @@
       pick("levels", "_level");
       pick("channels", "_channel");
       pick("ai-choices", "_ai");
+      pick("person-translation", "_personTranslation");
       this.$("target-mode").addEventListener("click", (event) => {
         const mode = event.target.closest("button[data-mode]")?.dataset.mode;
         if (!mode) return;
@@ -270,6 +273,7 @@
       this._renderButtons("levels", LEVELS, this._level);
       this._renderButtons("channels", CHANNELS, this._channel);
       this._renderButtons("ai-choices", AI_OPTIONS, this._ai);
+      this._renderButtons("person-translation", PERSON_TRANSLATION, this._personTranslation);
       this.$("targets").hidden = this._targetMode !== "targeted";
       this.$("person-targets").hidden = this._targetMode !== "person";
       for (const button of this.$("target-mode").querySelectorAll("button[data-mode]")) {
@@ -467,6 +471,7 @@
       if (this._targetMode === "person") {
         payload.target_person = [...this._selected.person];
         payload.person_destination = [...this._personDestinations];
+        if (this._personTranslation !== "inherit") payload.person_translate = this._personTranslation === "on";
       }
       if (main) payload.text = main;
       if (textTts) payload.text_tts = textTts;
