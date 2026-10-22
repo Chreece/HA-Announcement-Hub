@@ -91,7 +91,7 @@ def test_ai_translation_respects_tts_voice_language_and_channel_shape():
     prompt = services.calls[0][2]["text"]
     assert "Translate each non-null announcement channel into el" in prompt
     assert "Do not invent details" in prompt
-    assert services.calls[0][2].get("language") is None  # explicit agent
+    assert services.calls[0][2].get("language") == "el"  # explicit translation target
 
 
 def test_translation_preserves_original_if_ai_unavailable():
