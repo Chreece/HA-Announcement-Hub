@@ -280,6 +280,7 @@ class AnnouncementManager:
         self._held_snapcast_targets: tuple[str, ...] = ()
         self._held_snapcast_player: str | None = None
         self._held_snapcast_restore_not_before = 0.0
+        self._volume_restore: dict[str, dict[str, float]] = {}
         self._stop_lock = asyncio.Lock()
 
     @property
@@ -341,6 +342,10 @@ class AnnouncementManager:
         if self._running:
             return
         stored = await self._store.async_load() or {}
+        self._volume_restore = {
+            k: v for k, v in (stored.get("volume_restore", {}) or {}).items()
+            if isinstance(k, str) and isinstance(v, dict)
+        }
         self._ai_history.clear()
         for item in stored.get("ai_history", [])[-20:]:
             if isinstance(item, dict) and isinstance(item.get("job_id"), str):
@@ -436,6 +441,11 @@ class AnnouncementManager:
                     old_job.delivered_physical
                 )
         self._running = True
+        if self._volume_restore:
+            self.entry.async_create_background_task(
+                self.hass, self._async_recover_ducked_volumes(),
+                f"{DOMAIN} audio volume recovery",
+            )
         self._ensure_worker()
         for job in self._queue:
             if job.ai.get("pending_preprocessing"):
@@ -3565,6 +3575,88 @@ class AnnouncementManager:
             await asyncio.gather(*tasks, return_exceptions=True)
             raise
 
+    async def _async_restore_volume(self, player: str) -> None:
+        """Restore a volume level only if it is still the Hub-set value."""
+        record = self._volume_restore.get(player)
+        if not record:
+            return
+        state = self.hass.states.get(player)
+        if state is None:
+            return  # Leave a recovery record for the next start.
+        actual = state.attributes.get("volume_level")
+        expected = record.get("ducked")
+        prior = record.get("original")
+        try:
+            if (
+                isinstance(actual, (int, float))
+                and isinstance(expected, (int, float))
+                and isinstance(prior, (int, float))
+                and abs(float(actual) - float(expected)) <= 0.03
+            ):
+                await self.hass.services.async_call(
+                    MEDIA_PLAYER_DOMAIN, "volume_set",
+                    {ATTR_ENTITY_ID: player, "volume_level": float(prior)},
+                    blocking=True,
+                )
+            # An external/manual volume change wins; do not overwrite it.
+        except Exception:
+            _LOGGER.warning("Could not restore ducked volume for %s", player)
+            return
+        self._volume_restore.pop(player, None)
+        self._schedule_save()
+
+    async def _async_recover_ducked_volumes(self) -> None:
+        """Recover volume snapshots after restart when devices come online."""
+        for attempt in range(3):
+            if not self._volume_restore:
+                break
+            await asyncio.sleep(2 if attempt == 0 else 5)
+            for player in tuple(self._volume_restore):
+                await self._async_restore_volume(player)
+
+    async def _async_duck_direct_player(
+        self, job: AnnouncementJob, player: str,
+    ) -> bool:
+        """Optional music ducking; never touch a shared Snapcast source."""
+        if not self.settings.get("person_output_ducking", False):
+            return False
+        if player == job.tts_media_player:
+            return False
+        if not self.settings.get(
+            CONF_DIRECT_TTS_ANNOUNCE, DEFAULT_DIRECT_TTS_ANNOUNCE
+        ):
+            return False
+        state = self.hass.states.get(player)
+        if not state or state.state != "playing":
+            return False
+        volume = state.attributes.get("volume_level")
+        if not isinstance(volume, (int, float)) or not 0.0 < volume <= 1.0:
+            return False
+        factor = max(0.1, min(1.0, float(
+            self.settings.get("person_duck_factor", 0.35)
+        )))
+        ducked = round(max(0.03, volume * factor), 3)
+        if ducked >= volume:
+            return False
+        self._volume_restore[player] = {
+            "original": float(volume), "ducked": ducked,
+        }
+        # Persist BEFORE touching audio. A crash between playback and finally
+        # cannot otherwise restore the original volume at HA restart.
+        async with self._save_lock:
+            await self._store.async_save(self._serialize())
+        try:
+            await self.hass.services.async_call(
+                MEDIA_PLAYER_DOMAIN, "volume_set",
+                {ATTR_ENTITY_ID: player, "volume_level": ducked},
+                blocking=True,
+            )
+        except Exception:
+            self._volume_restore.pop(player, None)
+            self._schedule_save()
+            raise
+        return True
+
     async def _async_optional_direct_chime(
         self, job: AnnouncementJob, player: str,
     ) -> None:
@@ -3649,7 +3741,12 @@ class AnnouncementManager:
                 idle_timeout = float(
                     self.settings.get(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT)
                 )
-                await self._wait_audio_path_idle(player, idle_timeout, job)
+                # When a player is already playing music, supported native
+                # announce mode can interrupt and resume it. Optional ducking
+                # saves/restores the original volume in finally.
+                ducked = await self._async_duck_direct_player(job, player)
+                if not ducked:
+                    await self._wait_audio_path_idle(player, idle_timeout, job)
                 await self._async_optional_direct_chime(job, player)
                 engines = await self._async_available_tts_engines(job)
                 if not engines:
@@ -3683,6 +3780,8 @@ class AnnouncementManager:
                     + "; ".join(errors)
                 )
             finally:
+                if player in self._volume_restore:
+                    await asyncio.shield(self._async_restore_volume(player))
                 self._active_tts_players.discard(player)
                 self._players_by_job.get(job.job_id, set()).discard(player)
 
@@ -5179,6 +5278,7 @@ class AnnouncementManager:
             "jobs": jobs,
             "last": self._last.to_dict() if self._last else None,
             "ai_history": list(self._ai_history),
+            "volume_restore": dict(self._volume_restore),
         }
 
     def _schedule_save(self) -> None:
