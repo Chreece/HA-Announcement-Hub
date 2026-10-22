@@ -312,7 +312,7 @@ class AnnouncementManager:
                     if slot in {"mobile", "watch", "tablet", "other"} and outputs
                 ]]
                 for person, profile in (
-                    self.settings.get("person_profiles", {}) or {}
+                    getattr(self, "settings", {}).get("person_profiles", {}) or {}
                 ).items() if isinstance(profile, dict)
             },
             "queue_size": len(self._queue),
