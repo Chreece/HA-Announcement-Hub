@@ -33,7 +33,7 @@ const Card = registered.get("announcement-hub-card");
 const Editor = registered.get("announcement-hub-card-editor");
 const inputIds = [
   "message", "text-tts", "text-notify", "message-title", "ai-agent",
-  "click-action", "occupied-only", "manual-area", "manual-integration",
+  "click-action", "tts-engine", "occupied-only", "manual-area", "manual-integration",
   "manual-device", "manual-entity",
 ];
 
@@ -323,4 +323,21 @@ test("person translation override is optional and maps to action boolean", () =>
   assert.equal(card._buildPayload().person_translate, true);
   card._personTranslation = "off";
   assert.equal(card._buildPayload().person_translate, false);
+});
+
+test("person greeting and room chime are explicit tri-state overrides", () => {
+  const { card, fields } = harness();
+  card._targetMode = "person";
+  card._selected.person.add("person.alex");
+  fields.message.value = "Dinner ready";
+  const baseline = card._buildPayload();
+  assert.equal(baseline.person_greeting, undefined);
+  assert.equal(baseline.pre_announce_sound, undefined);
+  card._personGreeting = "on";
+  card._preChime = "off";
+  fields["tts-engine"].value = "tts.piper";
+  const changed = card._buildPayload();
+  assert.equal(changed.person_greeting, true);
+  assert.equal(changed.pre_announce_sound, false);
+  assert.equal(changed.tts_engine, "tts.piper");
 });
