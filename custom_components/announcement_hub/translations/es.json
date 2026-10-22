@@ -625,6 +625,10 @@
         "target_person": {
           "name": "Personas destinatarias",
           "description": "Send to the selected people's current rooms only, without escalating to other rooms or general outputs."
+        },
+        "manual_targets": {
+          "name": "Destinatarios manuales",
+          "description": "Descubre los destinatarios seleccionados directamente en Home Assistant, sin depender de las salidas predeterminadas del Hub. Requiere seleccionar área, integración, dispositivo o entidad."
         }
       }
     },
