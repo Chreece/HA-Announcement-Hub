@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.10.0b14 - 2026-10-22
+
+**Beta — complete Arabic native integration localization.**
+
+- Translate all remaining Arabic native setup, options, selector, error,
+  queue, TTS and Companion App, notification profile, Snapcast, AI style,
+  room/person configuration and service-action help strings. Cover all
+  **599** native entries, including the older long explanatory text.
+- Preserve the semantics of explicit recipients, no unintended mobile or
+  shared Snapcast broadcast, door-gated room fallback, AI original-message
+  recovery, and written-versus-spoken channel isolation.
+- Keep Arabic text available for RTL presentation while preserving exact
+  Home Assistant field names and interpolation placeholders. Only five
+  numeric transparency percentages remain identical to English; no
+  English fallback help descriptions remain.
+- Add automated Arabic native catalog tests for coverage, safety wording,
+  placeholders, API identifiers, and setup/options consistency.
+- No runtime routing, audio or queue logic changes. Issue #50 remains
+  open for the six remaining native locale catalogs.
+
 ## 0.10.0b13 - 2026-10-22
 
 **Beta — complete Ukrainian native integration localization.**
