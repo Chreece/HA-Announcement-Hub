@@ -194,6 +194,7 @@ from .outputs import (
     NotifyOutput,
     companion_output_available,
     entity_area_id,
+    entity_integration,
     expand_companion_tts_tokens,
     expand_notify_output_tokens,
     expand_media_player_tokens,
@@ -306,6 +307,15 @@ class AnnouncementManager:
     def status_dict(self) -> dict[str, Any]:
         return {
             "running": self._running,
+            "person_destinations": {
+                person: ["room", *[
+                    slot for slot, outputs in (profile.get("destinations") or {}).items()
+                    if slot in {"mobile", "watch", "tablet", "other"} and outputs
+                ]]
+                for person, profile in (
+                    getattr(self, "settings", {}).get("person_profiles", {}) or {}
+                ).items() if isinstance(profile, dict)
+            },
             "queue_size": len(self._queue),
             "current": self._current.public_dict() if self._current else None,
             "active": [job.public_dict() for job in self._active_jobs.values()],
@@ -613,6 +623,9 @@ class AnnouncementManager:
         notify_refs = tuple(
             option["value"] for option in notify_output_options(self.hass)
             if in_scope(option["value"].removeprefix(TARGET_ENTITY_PREFIX))
+            and (not scope or entity_integration(
+                self.hass, option["value"].removeprefix(TARGET_ENTITY_PREFIX)
+            ) != INTEGRATION_MOBILE_APP)
         )
         direct_players = tuple(
             option["value"] for option in tts_media_player_options(self.hass)
@@ -1010,6 +1023,7 @@ class AnnouncementManager:
         use_ai: bool | None = None,
         ai_agent: str | None = None,
         ai_mode: str = "rewrite",
+        translate_to: str | None = None,
         text: str | None = None,
         areas: Sequence[str] | str | None = None,
         integrations: Sequence[str] | str | None = None,
@@ -1138,7 +1152,8 @@ class AnnouncementManager:
                 click_action=click_action, language=language,
                 tts_options=tts_options, companion_tts=companion_tts,
                 occupied_only=occupied_only, use_ai=use_ai, ai_agent=ai_agent,
-                ai_mode=ai_mode, channels=channel_tokens, _fanout=True,
+                ai_mode=ai_mode, translate_to=translate_to,
+                channels=channel_tokens, _fanout=True,
                 manual_targets=manual_targets,
                 _group_token=group_token,
             )
@@ -1189,6 +1204,11 @@ class AnnouncementManager:
             if manual_targets and not requested else
             self._manual_output_catalog() if manual_targets else self._configured_outputs()
         )
+        if _person_targeted and explicit_area_routing:
+            # A person's Room is a fixed physical room target, never every
+            # other person's Companion App push-speech device assigned here.
+            # Mobile/Watch require their individually assigned destination.
+            configured = (*configured[:4], ())
         selected = filter_selected_outputs(
             self._select_requested_outputs(
                 requested, level=level, tts_engines=configured[0],
@@ -1951,6 +1971,17 @@ class AnnouncementManager:
             self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
             use_ai,
         )
+        # Translation is an independent per-person preference. An explicit
+        # use_ai: false remains a hard opt-out for this individual action.
+        if translate_to and use_ai is not False:
+            ai_enabled = True
+            ai_source = "person_translation"
+        actual_ai_mode = (
+            "translate"
+            if translate_to and use_ai is None
+            and not self.settings.get(CONF_DEFAULT_USE_AI, DEFAULT_USE_AI)
+            else ai_mode
+        )
         # Only a genuinely omitted action title allows AI to replace the
         # configured fallback title. An explicit title always wins.
         generate_title = bool(
@@ -1959,7 +1990,7 @@ class AnnouncementManager:
         ai_info: dict[str, Any] = {
             "enabled": ai_enabled,
             "source": ai_source,
-            "mode": ai_mode,
+            "mode": actual_ai_mode,
             "status": "pending" if ai_enabled else "disabled",
             "attempted": False,
             "agent": None,
@@ -2004,7 +2035,8 @@ class AnnouncementManager:
                     "source_notify": plan.notify_text,
                     "requested_agent_id": agent_id,
                     "requested_fallback_agent_id": fallback_agent_id,
-                    "requested_mode": ai_mode,
+                    "requested_mode": actual_ai_mode,
+                    "requested_target_language": str(translate_to) if translate_to else None,
                     "requested_generate_title": generate_title,
                 })
             else:
@@ -4645,6 +4677,7 @@ class AnnouncementManager:
                 fallback_agent_id=ai.get("requested_fallback_agent_id"),
                 diagnostics=ai,
                 mode=ai.get("requested_mode", "rewrite"),
+                target_language=ai.get("requested_target_language"),
                 title_result=(
                     title_result if ai.get("requested_generate_title") else None
                 ),
@@ -4700,7 +4733,7 @@ class AnnouncementManager:
         for key in (
             "source_tts", "source_notify",
             "requested_agent_id", "requested_fallback_agent_id",
-            "requested_mode", "requested_generate_title",
+            "requested_mode", "requested_target_language", "requested_generate_title",
         ):
             ai.pop(key, None)
         self._schedule_prefetch(job)

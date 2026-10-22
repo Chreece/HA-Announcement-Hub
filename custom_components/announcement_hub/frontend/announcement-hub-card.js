@@ -20,6 +20,8 @@
     ["rewrite", "Rewrite"], ["generate", "Generate"],
   ];
   const KINDS = ["area", "integration", "device", "entity"];
+  const PERSON_TRANSLATION = [["inherit", "Person setting"], ["on", "Translate"], ["off", "Original language"]];
+  const PERSON_DESTINATIONS = [["room", "Room"], ["mobile", "Mobile"], ["watch", "Watch"], ["tablet", "Tablet"], ["other", "Other"]];
   const getLanguage = (hass) => {
     const raw = String(hass?.locale?.language || hass?.language || "en").replace(/_/g, "-");
     if (/^zh-(tw|hk|hant)/i.test(raw)) return "zh-Hant";
@@ -102,8 +104,10 @@
       super();
       this.attachShadow({ mode: "open" });
       this._config = AnnouncementHubCard.getStubConfig();
-      this._selected = Object.fromEntries(KINDS.map((kind) => [kind, new Set()]));
-      this._registry = { area: [], integration: [], device: [], entity: [] };
+      this._selected = Object.fromEntries([...KINDS, "person"].map((kind) => [kind, new Set()]));
+      this._personDestinations = new Set(["room"]);
+      this._personTranslation = "inherit";
+      this._registry = { area: [], integration: [], device: [], entity: [], person: [] };
       this._level = "info";
       this._channel = "auto";
       this._ai = "inherit";
@@ -131,7 +135,7 @@
         localize(this.shadowRoot, this._translations, this._originalNodes);
         this._localeRendered = true;
         this._sync();
-        for (const kind of KINDS) this._drawOptions(kind);
+        for (const kind of [...KINDS, "person"]) this._drawOptions(kind);
       }
     }
     setConfig(config) {
@@ -147,6 +151,7 @@
       void this._applyLocale();
       if (this._mounted) {
         this._updateQueue();
+        this._refreshPeople();
         if (!this._loaded && !this._loading) void this._loadRegistry();
       }
     }
@@ -193,6 +198,7 @@
       pick("levels", "_level");
       pick("channels", "_channel");
       pick("ai-choices", "_ai");
+      pick("person-translation", "_personTranslation");
       this.$("target-mode").addEventListener("click", (event) => {
         const mode = event.target.closest("button[data-mode]")?.dataset.mode;
         if (!mode) return;
@@ -201,7 +207,7 @@
         this.$("critical-confirm").hidden = true;
         this._sync();
       });
-      this.$("targets").addEventListener("click", (event) => {
+      for (const container of ["targets", "person-targets"]) this.$(container).addEventListener("click", (event) => {
         const button = event.target.closest("button[data-kind][data-value]");
         if (!button) return;
         const kind = button.dataset.kind;
@@ -216,6 +222,14 @@
         this.$(kind + "-search").addEventListener("input", () => this._drawOptions(kind));
         this.$("manual-" + kind).addEventListener("input", () => this._updateSummary());
       }
+      this.$("person-search").addEventListener("input", () => this._drawOptions("person"));
+      this.$("person-destinations").addEventListener("click", (event) => {
+        const selected = event.target.closest("button[data-destination]")?.dataset.destination;
+        if (!selected) return;
+        if (this._personDestinations.has(selected)) this._personDestinations.delete(selected);
+        else this._personDestinations.add(selected);
+        this._sync();
+      });
       this.$("message-title").addEventListener("input", () => this._updateAIHint());
       this.$("message").addEventListener("input", () => this._clearNotice());
       this.$("send").addEventListener("click", () => {
@@ -259,15 +273,20 @@
       this._renderButtons("levels", LEVELS, this._level);
       this._renderButtons("channels", CHANNELS, this._channel);
       this._renderButtons("ai-choices", AI_OPTIONS, this._ai);
+      this._renderButtons("person-translation", PERSON_TRANSLATION, this._personTranslation);
       this.$("targets").hidden = this._targetMode !== "targeted";
+      this.$("person-targets").hidden = this._targetMode !== "person";
       for (const button of this.$("target-mode").querySelectorAll("button[data-mode]")) {
         button.setAttribute("aria-pressed", String(button.dataset.mode === this._targetMode));
       }
       this.$("routing-explanation").textContent = this._targetMode === "automatic"
         ? this._t("Announcement Hub chooses configured recipients using occupancy and fallback rules.")
-        : this._t("Select recipients bypasses the default output lists: only chosen rooms and exact integrations/devices/entities are eligible.");
+        : this._targetMode === "person"
+          ? this._t("Choose people, then select Room, Mobile, Watch or other destinations assigned in their Hub settings.")
+          : this._t("Select recipients bypasses the default output lists: only chosen rooms and exact integrations/devices/entities are eligible.");
       this._updateAIHint();
       this._drawChosen();
+      this._drawPersonDestinations();
       this._updateQueue();
     }
 
@@ -306,6 +325,7 @@
         integrations.add("mobile_app");
         integrations.add("nfandroidtv");
         this._registry.integration = [...integrations].map((value) => ({ value, label: titleCase(value) }));
+        this._refreshPeople();
         for (const kind of KINDS) {
           this._registry[kind].sort((a, b) => a.label.localeCompare(b.label));
         }
@@ -313,9 +333,50 @@
         this._loading = false;
         this._loaded = true;
         if (this._mounted) {
-          for (const kind of KINDS) this._drawOptions(kind);
+          for (const kind of [...KINDS, "person"]) this._drawOptions(kind);
           this._drawChosen();
         }
+      }
+    }
+
+    _refreshPeople() {
+      const all = Object.entries(this._hass?.states || {});
+      const persons = all
+        .filter(([key]) => key.startsWith("person."))
+        .map(([value, state]) => ({
+          value, label: state.attributes?.friendly_name || value,
+        }));
+      this._registry.person = persons.sort((a, b) => a.label.localeCompare(b.label));
+      if (this._mounted) this._drawOptions("person");
+    }
+
+    _availablePersonDestinations() {
+      const chosen = [...this._selected.person];
+      if (!chosen.length) return ["room"];
+      const states = Object.values(this._hass?.states || {});
+      const registry = states.find((state) =>
+        state.entity_id?.startsWith("sensor.") &&
+        state.attributes?.person_destinations
+      )?.attributes?.person_destinations || {};
+      return PERSON_DESTINATIONS.map(([key]) => key).filter((key) =>
+        chosen.every((person) => key === "room" ||
+          Array.isArray(registry[person]) && registry[person].includes(key))
+      );
+    }
+
+    _drawPersonDestinations() {
+      if (!this._mounted) return;
+      const holder = this.$("person-destinations");
+      holder.replaceChildren();
+      const allowed = new Set(this._availablePersonDestinations());
+      for (const [value, name] of PERSON_DESTINATIONS) {
+        if (!allowed.has(value)) continue;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.destination = value;
+        button.textContent = this._t(name);
+        button.setAttribute("aria-pressed", String(this._personDestinations.has(value)));
+        holder.appendChild(button);
       }
     }
 
@@ -363,6 +424,17 @@
           target.appendChild(button);
         }
       }
+      const people = this.$("person-chosen");
+      people.replaceChildren();
+      for (const value of this._selected.person) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.kind = "person";
+        button.dataset.value = value;
+        button.textContent = this._registry.person.find((item) => item.value === value)?.label || value;
+        people.appendChild(button);
+      }
+      this._drawPersonDestinations();
       this._updateSummary();
     }
 
@@ -382,6 +454,12 @@
       const textNotify = this.$("text-notify").value.trim();
       if (!main && !textTts && !textNotify) throw new Error(this._t("Enter an announcement or a spoken/written version."));
       const recipients = this._targets();
+      if (this._targetMode === "person" && !this._selected.person.size) {
+        throw new Error(this._t("Choose at least one person."));
+      }
+      if (this._targetMode === "person" && !this._personDestinations.size) {
+        throw new Error(this._t("Choose at least one person destination."));
+      }
       if (this._targetMode === "targeted" && !Object.keys(recipients).length) {
         throw new Error(this._t("Choose a room or explicit recipient, or switch to Automatic routing."));
       }
@@ -390,6 +468,11 @@
       }
       const payload = { level: this._level, occupied_only: this.$("occupied-only").checked, ...recipients };
       if (this._targetMode === "targeted") payload.manual_targets = true;
+      if (this._targetMode === "person") {
+        payload.target_person = [...this._selected.person];
+        payload.person_destination = [...this._personDestinations];
+        if (this._personTranslation !== "inherit") payload.person_translate = this._personTranslation === "on";
+      }
       if (main) payload.text = main;
       if (textTts) payload.text_tts = textTts;
       if (textNotify) payload.text_notify = textNotify;
@@ -410,9 +493,11 @@
     _updateSummary() {
       if (!this._mounted) return;
       const targets = this._targets();
-      const count = Object.values(targets).reduce((sum, values) => sum + values.length, 0);
+      const count = this._targetMode === "person" ? this._selected.person.size
+        : Object.values(targets).reduce((sum, values) => sum + values.length, 0);
       const destination = this._targetMode === "automatic"
-        ? this._t("Automatic recipients") : count ? this._t(count === 1 ? "{count} selected target" : "{count} selected targets", { count }) : this._t("Choose recipients");
+        ? this._t("Automatic recipients") : this._targetMode === "person"
+          ? this._t("{count} selected people", { count }) : count ? this._t(count === 1 ? "{count} selected target" : "{count} selected targets", { count }) : this._t("Choose recipients");
       const labelForChannel = this._t(CHANNELS.find((channel) => channel[0] === this._channel)?.[1] || "Hub channels");
       this.$("summary").textContent = destination + " · " + (this._channel === "auto" ? this._t("Hub channels") : labelForChannel);
     }

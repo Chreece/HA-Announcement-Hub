@@ -47,6 +47,10 @@ def test_manual_output_pool_selects_live_endpoints_not_configured_allow_list():
         "TARGET_ENTRY_PREFIX": "entry:",
         "CONF_TTS_MEDIA_PLAYER": "tts_media_player",
         "entity_area_id": lambda hass, entity_id: areas.get(entity_id),
+        "entity_integration": lambda hass, entity_id: (
+            "mobile_app" if entity_id == "notify.phone" else "nfandroidtv"
+        ),
+        "INTEGRATION_MOBILE_APP": "mobile_app",
         "notify_output_options": lambda hass: [
             {"value": "entity:notify.kitchen"},
             {"value": "entity:notify.phone"},

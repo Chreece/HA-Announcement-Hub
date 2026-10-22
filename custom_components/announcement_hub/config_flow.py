@@ -43,6 +43,7 @@ from .const import (
     CONF_PERSON_PROFILES,
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
+    CONF_PERSON_GROUP_TRANSLATE,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -302,6 +303,9 @@ class _AnnouncementFlowMixin:
             self._working[CONF_PERSON_GROUP_VOICE] = (
                 str(user_input.get(CONF_PERSON_GROUP_VOICE, "") or "").strip()
             )
+            self._working[CONF_PERSON_GROUP_TRANSLATE] = bool(
+                user_input.get(CONF_PERSON_GROUP_TRANSLATE, False)
+            )
             self._person_config_ids = selected
             self._person_index = 0
             return await self.async_step_person_profile()
@@ -323,6 +327,10 @@ class _AnnouncementFlowMixin:
                 CONF_PERSON_GROUP_VOICE,
                 default=str(self._working.get(CONF_PERSON_GROUP_VOICE) or ""),
             ): selector.TextSelector(),
+            probatio.Required(
+                CONF_PERSON_GROUP_TRANSLATE,
+                default=bool(self._working.get(CONF_PERSON_GROUP_TRANSLATE, False)),
+            ): selector.BooleanSelector(),
         })
         return self.async_show_form(step_id="people", data_schema=schema)
 
@@ -337,16 +345,65 @@ class _AnnouncementFlowMixin:
         profiles = self._working.get(CONF_PERSON_PROFILES, {}) or {}
         current = dict(profiles.get(person_id, {}))
         if user_input is not None:
+            destination_options = {
+                "mobile": "destination_mobile",
+                "watch": "destination_watch",
+                "tablet": "destination_tablet",
+                "other": "destination_other",
+            }
+            permitted = {
+                item["value"].removeprefix("entity:")
+                for item in notify_output_options(self.hass)
+            } | {
+                item["value"] for item in tts_media_player_options(self.hass)
+            }
+            destinations = {}
+            for slot, key in destination_options.items():
+                values = user_input.get(key, [])
+                if any(value not in permitted for value in values):
+                    return self.async_show_form(
+                        step_id="person_profile",
+                        data_schema=self._person_profile_schema(current),
+                        errors={"base": "invalid_person_output"},
+                        description_placeholders={"person_name": person_id},
+                    )
+                destinations[slot] = list(dict.fromkeys(values))
             profiles[person_id] = {
                 "tracker": str(user_input.get("tracker", "") or "").strip(),
                 "language": str(user_input.get("language", "") or "").strip(),
                 "voice": str(user_input.get("voice", "") or "").strip(),
+                "translate": bool(user_input.get("translate", False)),
                 "ignore_home": bool(user_input.get("ignore_home", False)),
+                "destinations": destinations,
             }
             self._working[CONF_PERSON_PROFILES] = profiles
             self._person_index += 1
             return await self.async_step_person_profile()
-        schema = probatio.Schema({
+        schema = self._person_profile_schema(current)
+        return self.async_show_form(
+            step_id="person_profile",
+            data_schema=schema,
+            description_placeholders={
+                "person_name": (
+                    str(person.attributes.get("friendly_name") or person_id)
+                    if person else person_id
+                )
+            },
+        )
+
+    def _person_profile_schema(self, current: dict[str, Any]) -> probatio.Schema:
+        """Offer only eligible HA outputs as named personal destination slots."""
+        available: dict[str, str] = {}
+        for item in (*notify_output_options(self.hass), *tts_media_player_options(self.hass)):
+            available[item["value"].removeprefix("entity:")] = item["label"]
+        choices = [
+            selector.SelectOptionDict(value=key, label=label)
+            for key, label in sorted(available.items())
+        ]
+        previous = current.get("destinations") or {}
+        if not isinstance(previous, dict):
+            previous = {}
+        fields: dict[Any, Any] = {
             _optional_marker("tracker", current.get("tracker")):
                 selector.EntitySelector(
                     selector.EntitySelectorConfig(domain=["sensor", "device_tracker"])
@@ -358,19 +415,18 @@ class _AnnouncementFlowMixin:
                 "voice", default=current.get("voice", "")
             ): selector.TextSelector(),
             probatio.Required(
+                "translate", default=bool(current.get("translate", False))
+            ): selector.BooleanSelector(),
+            probatio.Required(
                 "ignore_home", default=bool(current.get("ignore_home", False))
             ): selector.BooleanSelector(),
-        })
-        return self.async_show_form(
-            step_id="person_profile",
-            data_schema=schema,
-            description_placeholders={
-                "person_name": (
-                    str(person.attributes.get("friendly_name") or person_id)
-                    if person else person_id
-                )
-            },
-        )
+        }
+        for slot in ("mobile", "watch", "tablet", "other"):
+            key = "destination_" + slot
+            saved = [v for v in previous.get(slot, []) if v in available]
+            fields[probatio.Optional(key, default=saved)] = _known_multi_select(choices)
+        return probatio.Schema(fields)
+
 
     async def async_step_edit_all(
         self, user_input: dict[str, Any] | None = None

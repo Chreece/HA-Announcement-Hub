@@ -268,3 +268,59 @@ test("Greek, German and regional languages use correct card translations", async
   await card._applyLocale();
   assert.equal(card._t("Send announcement"), "Send announcement");
 });
+
+
+test("person mode selects named destinations, not device entity IDs", () => {
+  const { card, fields } = harness();
+  fields.message.value = "Η πόρτα είναι ανοιχτή.";
+  card._targetMode = "person";
+  card._selected.person.add("person.alex");
+  card._selected.person.add("person.maria");
+  card._personDestinations = new Set(["mobile", "watch"]);
+  assert.deepEqual(card._buildPayload(), {
+    level: "info", occupied_only: true,
+    target_person: ["person.alex", "person.maria"],
+    person_destination: ["mobile", "watch"],
+    text: "Η πόρτα είναι ανοιχτή.",
+  });
+  assert.ok(!Object.hasOwn(card._buildPayload(), "entity"));
+  assert.ok(!Object.hasOwn(card._buildPayload(), "manual_targets"));
+});
+
+test("person mode rejects unselected people or empty destinations", () => {
+  const { card, fields } = harness();
+  card._targetMode = "person";
+  fields.message.value = "Alert";
+  assert.throws(() => card._buildPayload(), /Choose at least one person/);
+  card._selected.person.add("person.alex");
+  card._personDestinations.clear();
+  assert.throws(() => card._buildPayload(), /Choose at least one person destination/);
+});
+
+test("only room and destinations assigned for all selected people appear", () => {
+  const { card } = harness();
+  card._selected.person.add("person.alex");
+  card._selected.person.add("person.maria");
+  card._hass = { states: {
+    "sensor.announcement_hub_queue": {
+      entity_id: "sensor.announcement_hub_queue",
+      attributes: { person_destinations: {
+        "person.alex": ["room", "mobile", "watch"],
+        "person.maria": ["room", "mobile"],
+      }},
+    },
+  }};
+  assert.deepEqual(card._availablePersonDestinations(), ["room", "mobile"]);
+});
+
+test("person translation override is optional and maps to action boolean", () => {
+  const { card, fields } = harness();
+  card._targetMode = "person";
+  card._selected.person.add("person.alex");
+  fields.message.value = "Door open";
+  assert.equal(card._buildPayload().person_translate, undefined);
+  card._personTranslation = "on";
+  assert.equal(card._buildPayload().person_translate, true);
+  card._personTranslation = "off";
+  assert.equal(card._buildPayload().person_translate, false);
+});
