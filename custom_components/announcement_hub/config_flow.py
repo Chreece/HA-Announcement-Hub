@@ -210,6 +210,7 @@ EDIT_MENU_OPTIONS = (
     "edit_general",
     "edit_people",
     "edit_advanced_ai",
+    "edit_audio",
     "edit_all",
 )
 
@@ -275,6 +276,56 @@ class _AnnouncementFlowMixin:
         self._edit_section = "queue"
         return await self.async_step_queue()
 
+
+    async def async_step_edit_audio(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Optional room-speaker chime and ducking. Shared Snapcast is excluded."""
+        keys = (
+            "person_output_chime", "person_chime_url",
+            "person_chime_delay", "person_output_ducking", "person_duck_factor",
+        )
+        if user_input is not None:
+            url = str(user_input.get("person_chime_url", "") or "")
+            if url and not url.startswith("/local/"):
+                return self.async_show_form(
+                    step_id="edit_audio", data_schema=self._audio_schema(),
+                    errors={"base": "invalid_chime_url"},
+                )
+            for key in keys:
+                self._working[key] = user_input.get(key)
+            return await self._async_finish()
+        return self.async_show_form(
+            step_id="edit_audio", data_schema=self._audio_schema(),
+        )
+
+    def _audio_schema(self) -> probatio.Schema:
+        return probatio.Schema({
+            probatio.Required(
+                "person_output_chime",
+                default=bool(self._working.get("person_output_chime", False)),
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                "person_chime_url",
+                default=str(self._working.get("person_chime_url", "") or ""),
+            ): selector.TextSelector(),
+            probatio.Required(
+                "person_chime_delay",
+                default=float(self._working.get("person_chime_delay", 0.5) or 0),
+            ): selector.NumberSelector(selector.NumberSelectorConfig(
+                min=0, max=10, step=0.5, mode=selector.NumberSelectorMode.BOX,
+            )),
+            probatio.Required(
+                "person_output_ducking",
+                default=bool(self._working.get("person_output_ducking", False)),
+            ): selector.BooleanSelector(),
+            probatio.Required(
+                "person_duck_factor",
+                default=float(self._working.get("person_duck_factor", 0.35) or 0.35),
+            ): selector.NumberSelector(selector.NumberSelectorConfig(
+                min=0.1, max=1, step=0.05, mode=selector.NumberSelectorMode.BOX,
+            )),
+        })
 
     async def async_step_edit_advanced_ai(
         self, user_input: dict[str, Any] | None = None
@@ -502,8 +553,8 @@ class _AnnouncementFlowMixin:
             probatio.Required(
                 "enabled", default=bool(current.get("enabled", True))
             ): selector.BooleanSelector(),
-            probatio.Optional(
-                "presence_sensor", default=current.get("presence_sensor", "")
+            _optional_marker(
+                "presence_sensor", current.get("presence_sensor")
             ): selector.EntitySelector(
                 selector.EntitySelectorConfig(domain="binary_sensor")
             ),
