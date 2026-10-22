@@ -625,6 +625,10 @@
         "target_person": {
           "name": "Personnes ciblées",
           "description": "Annoncer uniquement dans la pièce de chaque personne, sans repli."
+        },
+        "manual_targets": {
+          "name": "Destinataires manuels",
+          "description": "Utiliser uniquement les destinataires explicitement choisis dans Home Assistant, sans dépendre des sorties par défaut du Hub. Une pièce, intégration, appareil ou entité est requis."
         }
       }
     },
