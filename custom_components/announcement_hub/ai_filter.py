@@ -526,6 +526,10 @@ async def async_filter_announcement(
         if target_language and mode != "generate" else
         _generate_prompt(
             text_tts, text_notify, generate_title=title_result is not None
+        ).replace(
+            "Respect the source language and requested tone;",
+            "Write in the requested target language and tone;"
+            if target_language else "Respect the source language and requested tone;",
         ) + (f" Translate the finished content and title into {target_language}."
              if target_language else "")
         if mode == "generate" else _rewrite_prompt(text_tts, text_notify)
