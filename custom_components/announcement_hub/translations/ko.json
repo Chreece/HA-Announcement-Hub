@@ -171,7 +171,7 @@
           "tracked_people": "사람",
           "person_group_language": "그룹 언어",
           "person_group_voice": "그룹 음성",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "그룹 알림 번역"
         },
         "data_description": {
           "tracked_people": "방 위치 추적과 개인 음성 설정을 구성할 사람을 선택하세요.",
@@ -189,10 +189,10 @@
           "voice": "음성",
           "ignore_home": "외출 중에도 허용",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "휴대폰 출력",
+          "destination_watch": "시계 출력",
+          "destination_tablet": "태블릿 출력",
+          "destination_other": "기타 개인 출력"
         },
         "data_description": {
           "tracker": "상태 또는 room/area 속성으로 사람의 현재 방을 보고하는 센서나 기기 추적기를 선택하세요.",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "선택한 개인 출력이 없거나 비활성화되었습니다."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "사람",
           "person_group_language": "그룹 언어",
           "person_group_voice": "그룹 음성",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "그룹 알림 번역"
         },
         "data_description": {
           "tracked_people": "방 위치 추적과 개인 음성 설정을 구성할 사람을 선택하세요.",
@@ -412,10 +412,10 @@
           "voice": "음성",
           "ignore_home": "외출 중에도 허용",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "휴대폰 출력",
+          "destination_watch": "시계 출력",
+          "destination_tablet": "태블릿 출력",
+          "destination_other": "기타 개인 출력"
         },
         "data_description": {
           "tracker": "상태 또는 room/area 속성으로 사람의 현재 방을 보고하는 센서나 기기 추적기를 선택하세요.",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "선택한 개인 출력이 없거나 비활성화되었습니다."
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "개인별 수신 대상",
           "description": "방 또는 해당 사람에게 할당된 휴대폰, 시계, 태블릿 및 기타 대상을 선택합니다. 여러 개를 선택할 수 있습니다. 할당되지 않은 대상은 전체 방송 없이 거부됩니다."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "선택한 사람에게 번역",
           "description": "이 알림에서 개인 또는 그룹의 자동 번역 설정을 덮어씁니다. 설정된 언어를 사용하며 use_ai: false는 번역을 막습니다."
         }
       }
