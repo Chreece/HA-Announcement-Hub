@@ -152,14 +152,46 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_all": "Edit all settings (full wizard)",
+          "edit_people": "5. Personen en stemmen"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
           "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_people": "Configure people's room trackers and individual/group voice settings."
+        }
+      },
+      "people": {
+        "title": "Personen en groepsstem",
+        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "data": {
+          "tracked_people": "Personen",
+          "person_group_language": "Groepstaal",
+          "person_group_voice": "Groepsstem"
+        },
+        "data_description": {
+          "tracked_people": "Select the persons for whom room trackers and optional voices can be configured.",
+          "person_group_language": "Optional language code for announcements to two or more targeted people sharing a room.",
+          "person_group_voice": "Optional TTS voice identifier used when two or more selected people share a room."
+        }
+      },
+      "person_profile": {
+        "title": "Stem voor {person_name}",
+        "description": "Choose this person's current-room tracker. If the room is unknown, the announcement never falls back to another room.",
+        "data": {
+          "tracker": "Kamersensor",
+          "language": "Taal",
+          "voice": "Stem",
+          "ignore_home": "Toestaan bij afwezigheid"
+        },
+        "data_description": {
+          "tracker": "Select a sensor or device tracker that reports the current room in its state or area/room attribute.",
+          "language": "Optional target speech language, overridden by an explicit action language.",
+          "voice": "Optional target TTS voice, overridden by action tts_options.voice.",
+          "ignore_home": "Allow targeting when the person entity is away; unknown or unavailable rooms still fail safely."
         }
       }
     },
@@ -330,14 +362,46 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_all": "Edit all settings (full wizard)",
+          "edit_people": "5. Personen en stemmen"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
           "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_people": "Configure people's room trackers and individual/group voice settings."
+        }
+      },
+      "people": {
+        "title": "Personen en groepsstem",
+        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "data": {
+          "tracked_people": "Personen",
+          "person_group_language": "Groepstaal",
+          "person_group_voice": "Groepsstem"
+        },
+        "data_description": {
+          "tracked_people": "Select the persons for whom room trackers and optional voices can be configured.",
+          "person_group_language": "Optional language code for announcements to two or more targeted people sharing a room.",
+          "person_group_voice": "Optional TTS voice identifier used when two or more selected people share a room."
+        }
+      },
+      "person_profile": {
+        "title": "Stem voor {person_name}",
+        "description": "Choose this person's current-room tracker. If the room is unknown, the announcement never falls back to another room.",
+        "data": {
+          "tracker": "Kamersensor",
+          "language": "Taal",
+          "voice": "Stem",
+          "ignore_home": "Toestaan bij afwezigheid"
+        },
+        "data_description": {
+          "tracker": "Select a sensor or device tracker that reports the current room in its state or area/room attribute.",
+          "language": "Optional target speech language, overridden by an explicit action language.",
+          "voice": "Optional target TTS voice, overridden by action tts_options.voice.",
+          "ignore_home": "Allow targeting when the person entity is away; unknown or unavailable rooms still fail safely."
         }
       }
     },
@@ -557,6 +621,10 @@
         "ai_mode": {
           "name": "AI-tekst",
           "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
+        },
+        "target_person": {
+          "name": "Doelpersonen",
+          "description": "Send to the selected people's current rooms only, without escalating to other rooms or general outputs."
         }
       }
     },
