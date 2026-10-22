@@ -152,14 +152,46 @@
           "edit_tts": "2. TTS-Engines und Geräte",
           "edit_profiles": "3. Ausgabespezifische Profile",
           "edit_general": "4. Allgemein, Anwesenheit und KI",
-          "edit_all": "Alle Einstellungen bearbeiten (Assistent)"
+          "edit_all": "Alle Einstellungen bearbeiten (Assistent)",
+          "edit_people": "5. Personen und Stimmen"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Benachrichtigungsgeräte, Raumzuordnung und Mindestprioritäten ändern, ohne TTS- oder KI-Einstellungen anzupassen.",
           "edit_tts": "Sprach-Engine, Stimme, Raumplayer, Snapcast-Clients und Companion-App-Sprachausgabe ändern.",
           "edit_profiles": "Anzeigedauer, Darstellung und Snapcast-Wiedergabe für die ausgewählten Integrationen konfigurieren.",
           "edit_general": "Direkt zu KI- und Ersatzagenten, Anwesenheit, Raum-Fallback, Warteschlange und Zeitlimits wechseln.",
-          "edit_all": "Alle Einrichtungsseiten wie beim ursprünglichen Konfigurationsassistenten nacheinander bearbeiten."
+          "edit_all": "Alle Einrichtungsseiten wie beim ursprünglichen Konfigurationsassistenten nacheinander bearbeiten.",
+          "edit_people": "Personen, Raumsensoren und individuelle bzw. Gruppenstimmen konfigurieren."
+        }
+      },
+      "people": {
+        "title": "Personen und Gruppenansagen",
+        "description": "Personen für gezielte Ansagen im jeweiligen Zimmer konfigurieren.",
+        "data": {
+          "tracked_people": "Personen auswählen",
+          "person_group_language": "Gruppensprache",
+          "person_group_voice": "Gruppenstimme"
+        },
+        "data_description": {
+          "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
+          "person_group_language": "Optional language code to use when targeted people share the same room.",
+          "person_group_voice": "Optional TTS voice identifier to use when targeted people share the same room."
+        }
+      },
+      "person_profile": {
+        "title": "Sprachausgabe für {person_name}",
+        "description": "Raumsensor und optionale Sprache/Stimme auswählen. Unbekannte Räume führen nie zu Durchsagen anderswo.",
+        "data": {
+          "tracker": "Raumtracking-Sensor",
+          "language": "Sprache",
+          "voice": "Stimme",
+          "ignore_home": "Auch außer Haus erlauben"
+        },
+        "data_description": {
+          "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
+          "language": "Optional language code for targeted speech. An explicit action language overrides this preference.",
+          "voice": "Optional TTS voice identifier. Explicit action tts_options.voice takes precedence.",
+          "ignore_home": "Permit this person's room tracker even when the person entity is not home. Unknown rooms still fail closed."
         }
       }
     },
@@ -330,14 +362,46 @@
           "edit_tts": "2. TTS-Engines und Geräte",
           "edit_profiles": "3. Ausgabespezifische Profile",
           "edit_general": "4. Allgemein, Anwesenheit und KI",
-          "edit_all": "Alle Einstellungen bearbeiten (Assistent)"
+          "edit_all": "Alle Einstellungen bearbeiten (Assistent)",
+          "edit_people": "5. Personen und Stimmen"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Benachrichtigungsgeräte, Raumzuordnung und Mindestprioritäten ändern, ohne TTS- oder KI-Einstellungen anzupassen.",
           "edit_tts": "Sprach-Engine, Stimme, Raumplayer, Snapcast-Clients und Companion-App-Sprachausgabe ändern.",
           "edit_profiles": "Anzeigedauer, Darstellung und Snapcast-Wiedergabe für die ausgewählten Integrationen konfigurieren.",
           "edit_general": "Direkt zu KI- und Ersatzagenten, Anwesenheit, Raum-Fallback, Warteschlange und Zeitlimits wechseln.",
-          "edit_all": "Alle Einrichtungsseiten wie beim ursprünglichen Konfigurationsassistenten nacheinander bearbeiten."
+          "edit_all": "Alle Einrichtungsseiten wie beim ursprünglichen Konfigurationsassistenten nacheinander bearbeiten.",
+          "edit_people": "Personen, Raumsensoren und individuelle bzw. Gruppenstimmen konfigurieren."
+        }
+      },
+      "people": {
+        "title": "Personen und Gruppenansagen",
+        "description": "Personen für gezielte Ansagen im jeweiligen Zimmer konfigurieren.",
+        "data": {
+          "tracked_people": "Personen auswählen",
+          "person_group_language": "Gruppensprache",
+          "person_group_voice": "Gruppenstimme"
+        },
+        "data_description": {
+          "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
+          "person_group_language": "Optional language code to use when targeted people share the same room.",
+          "person_group_voice": "Optional TTS voice identifier to use when targeted people share the same room."
+        }
+      },
+      "person_profile": {
+        "title": "Sprachausgabe für {person_name}",
+        "description": "Raumsensor und optionale Sprache/Stimme auswählen. Unbekannte Räume führen nie zu Durchsagen anderswo.",
+        "data": {
+          "tracker": "Raumtracking-Sensor",
+          "language": "Sprache",
+          "voice": "Stimme",
+          "ignore_home": "Auch außer Haus erlauben"
+        },
+        "data_description": {
+          "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
+          "language": "Optional language code for targeted speech. An explicit action language overrides this preference.",
+          "voice": "Optional TTS voice identifier. Explicit action tts_options.voice takes precedence.",
+          "ignore_home": "Permit this person's room tracker even when the person entity is not home. Unknown rooms still fail closed."
         }
       }
     },
@@ -557,6 +621,10 @@
         "ai_mode": {
           "name": "KI-Textmodus",
           "description": "Rewrite überarbeitet eine fertige Mitteilung. Generate erstellt aus beschreibenden Anweisungen eine Mitteilung. Die Originalanweisung bleibt bei KI-Fehlern als Rückfall erhalten."
+        },
+        "target_person": {
+          "name": "Zielpersonen",
+          "description": "Nur im Zimmer der gewählten Person sprechen, ohne Raum-Fallback."
         }
       }
     },
