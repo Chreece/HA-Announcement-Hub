@@ -211,6 +211,7 @@ EDIT_MENU_OPTIONS = (
     "edit_people",
     "edit_advanced_ai",
     "edit_audio",
+    "edit_room_safety",
     "edit_all",
 )
 
@@ -276,6 +277,50 @@ class _AnnouncementFlowMixin:
         self._edit_section = "queue"
         return await self.async_step_queue()
 
+
+    async def async_step_edit_room_safety(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """One area at a time: optional independent presence verification."""
+        if user_input is not None:
+            area = str(user_input.get("area", "") or "")
+            sensor = str(user_input.get("presence_sensor", "") or "")
+            use = bool(user_input.get("verify_presence", False))
+            from homeassistant.helpers import area_registry as ar
+            if area not in ar.async_get(self.hass).areas:
+                return self.async_show_form(
+                    step_id="edit_room_safety",
+                    data_schema=self._room_safety_schema(),
+                    errors={"base": "invalid_person_area"},
+                )
+            if use and not sensor:
+                return self.async_show_form(
+                    step_id="edit_room_safety",
+                    data_schema=self._room_safety_schema(),
+                    errors={"base": "invalid_person_presence"},
+                )
+            sensors = dict(self._working.get("person_room_presence", {}) or {})
+            if use:
+                sensors[area] = sensor
+            else:
+                sensors.pop(area, None)
+            self._working["person_room_presence"] = sensors
+            return await self._async_finish()
+        return self.async_show_form(
+            step_id="edit_room_safety", data_schema=self._room_safety_schema(),
+        )
+
+    @staticmethod
+    def _room_safety_schema() -> probatio.Schema:
+        return probatio.Schema({
+            probatio.Required("area"): selector.AreaSelector(),
+            probatio.Required("verify_presence", default=False):
+                selector.BooleanSelector(),
+            probatio.Optional("presence_sensor"):
+                selector.EntitySelector(selector.EntitySelectorConfig(
+                    domain="binary_sensor",
+                )),
+        })
 
     async def async_step_edit_audio(
         self, user_input: dict[str, Any] | None = None
