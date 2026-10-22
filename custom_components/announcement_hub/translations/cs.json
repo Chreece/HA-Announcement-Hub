@@ -171,13 +171,13 @@
           "tracked_people": "Osoby",
           "person_group_language": "Jazyk skupiny",
           "person_group_voice": "Hlas skupiny",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Překládat skupinová oznámení"
         },
         "data_description": {
-          "tracked_people": "Select people to configure with room sensors and optional personal language or voice.",
-          "person_group_language": "Optional language for announcements to targeted people sharing a room.",
-          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "Vyberte osoby, u kterých chcete nastavit sledování místnosti a osobní hlasové preference.",
+          "person_group_language": "Volitelný kód jazyka pro oznámení více vybraným osobám ve stejné místnosti.",
+          "person_group_voice": "Volitelné ID hlasu TTS pro oznámení více osobám ve stejné místnosti.",
+          "person_group_translate": "Automaticky překládat skupinová oznámení do jazyka skupiny pomocí vybrané AI nebo záložního agenta. Při chybě zachovat původní text."
         }
       },
       "person_profile": {
@@ -189,21 +189,21 @@
           "voice": "Hlas",
           "ignore_home": "Povolit mimo domov",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Výstupy mobilu",
+          "destination_watch": "Výstupy hodinek",
+          "destination_tablet": "Výstupy tabletu",
+          "destination_other": "Další osobní výstupy"
         },
         "data_description": {
-          "tracker": "Select a sensor or device tracker reporting the current room via state or the area/room attribute.",
-          "language": "Personal speech language, overridden by an explicit announcement action language.",
-          "voice": "Personal TTS voice, overridden by an explicit announcement action voice.",
-          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "Vyberte senzor nebo sledovač zařízení, který hlásí aktuální místnost osoby ve stavu nebo atributu room/area.",
+          "language": "Volitelný jazyk pro oznámení této osobě. Jazyk výslovně určený v akci má přednost.",
+          "voice": "Volitelné ID hlasu TTS. Nastavení tts_options.voice v akci má přednost.",
+          "ignore_home": "Povolit sledování místnosti, i když osoba není doma. Neznámá místnost nikdy neopravňuje oznámení jinam.",
+          "translate": "Pomocí nastaveného agenta AI překládat zvlášť mluvená a vizuální oznámení do jazyka osoby a použít zvolený hlas TTS. use_ai: false vypne překlad.",
+          "destination_mobile": "Vyberte existující výstupy oznámení nebo přehrávače telefonu této osoby. Použijí se jen přiřazené výstupy.",
+          "destination_watch": "Vyberte existující výstupy oznámení nebo přehrávače hodinek této osoby. Použijí se jen přiřazené výstupy.",
+          "destination_tablet": "Vyberte existující výstupy oznámení nebo přehrávače tabletu této osoby. Použijí se jen přiřazené výstupy.",
+          "destination_other": "Další výstupy Home Assistant přiřazené této osobě, používané jen při volbě Jiné."
         }
       }
     },
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Vybraný osobní výstup neexistuje nebo je zakázán."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,13 +394,13 @@
           "tracked_people": "Osoby",
           "person_group_language": "Jazyk skupiny",
           "person_group_voice": "Hlas skupiny",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Překládat skupinová oznámení"
         },
         "data_description": {
-          "tracked_people": "Select people to configure with room sensors and optional personal language or voice.",
-          "person_group_language": "Optional language for announcements to targeted people sharing a room.",
-          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "Vyberte osoby, u kterých chcete nastavit sledování místnosti a osobní hlasové preference.",
+          "person_group_language": "Volitelný kód jazyka pro oznámení více vybraným osobám ve stejné místnosti.",
+          "person_group_voice": "Volitelné ID hlasu TTS pro oznámení více osobám ve stejné místnosti.",
+          "person_group_translate": "Automaticky překládat skupinová oznámení do jazyka skupiny pomocí vybrané AI nebo záložního agenta. Při chybě zachovat původní text."
         }
       },
       "person_profile": {
@@ -412,21 +412,21 @@
           "voice": "Hlas",
           "ignore_home": "Povolit mimo domov",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Výstupy mobilu",
+          "destination_watch": "Výstupy hodinek",
+          "destination_tablet": "Výstupy tabletu",
+          "destination_other": "Další osobní výstupy"
         },
         "data_description": {
-          "tracker": "Select a sensor or device tracker reporting the current room via state or the area/room attribute.",
-          "language": "Personal speech language, overridden by an explicit announcement action language.",
-          "voice": "Personal TTS voice, overridden by an explicit announcement action voice.",
-          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "Vyberte senzor nebo sledovač zařízení, který hlásí aktuální místnost osoby ve stavu nebo atributu room/area.",
+          "language": "Volitelný jazyk pro oznámení této osobě. Jazyk výslovně určený v akci má přednost.",
+          "voice": "Volitelné ID hlasu TTS. Nastavení tts_options.voice v akci má přednost.",
+          "ignore_home": "Povolit sledování místnosti, i když osoba není doma. Neznámá místnost nikdy neopravňuje oznámení jinam.",
+          "translate": "Pomocí nastaveného agenta AI překládat zvlášť mluvená a vizuální oznámení do jazyka osoby a použít zvolený hlas TTS. use_ai: false vypne překlad.",
+          "destination_mobile": "Vyberte existující výstupy oznámení nebo přehrávače telefonu této osoby. Použijí se jen přiřazené výstupy.",
+          "destination_watch": "Vyberte existující výstupy oznámení nebo přehrávače hodinek této osoby. Použijí se jen přiřazené výstupy.",
+          "destination_tablet": "Vyberte existující výstupy oznámení nebo přehrávače tabletu této osoby. Použijí se jen přiřazené výstupy.",
+          "destination_other": "Další výstupy Home Assistant přiřazené této osobě, používané jen při volbě Jiné."
         }
       }
     },
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Vybraný osobní výstup neexistuje nebo je zakázán."
     }
   },
   "selector": {
@@ -666,12 +666,12 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; no unselected outputs."
         },
         "person_destination": {
-          "name": "Person destinations",
-          "description": "Choose Room or assigned Mobile, Watch, Tablet and Other destinations, rather than device entity IDs. Unmapped choices are rejected."
+          "name": "Osobní cíle",
+          "description": "Vyberte Místnost nebo přiřazený Mobil, Hodinky, Tablet a Jiné. Cíle lze kombinovat. Nepřiřazené cíle budou odmítnuty bez hromadného vysílání."
         },
         "person_translate": {
-          "name": "Translate for selected people",
-          "description": "Override individual or group translation preferences for this announcement; requires a configured destination language."
+          "name": "Překládat pro vybrané osoby",
+          "description": "Přepište pro toto oznámení automatické nastavení překladu osoby nebo skupiny. Použije se nastavený jazyk; use_ai: false překlad vypne."
         }
       }
     },

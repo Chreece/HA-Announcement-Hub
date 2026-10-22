@@ -107,3 +107,35 @@ def test_person_routing_never_inherits_general_or_fallback_paths():
     assert 'rooms.setdefault(area_id, []).append(person_id)' in service
     assert 'for pending_job in created:' in service
     assert 'if (call.data.get(ATTR_MANUAL_TARGETS) or any(' in service
+
+
+def test_bermuda_room_sensor_state_and_espresense_room_attribute():
+    """Support tracker formats without integration-specific dependencies."""
+    hass = household()
+    hass.states.records["sensor.bermuda_john_area"] = state(
+        "sensor.bermuda_john_area", "Küche", friendly_name="John Room"
+    )
+    hass.states.records["device_tracker.espresense_alice"] = state(
+        "device_tracker.espresense_alice", "home", area="Living Room"
+    )
+    assert resolve_person_rooms(hass, "person.john", {
+        "person.john": {"tracker": "sensor.bermuda_john_area"}
+    }) == [("person.john", "Küche")]
+    assert resolve_person_rooms(hass, "person.alice", {
+        "person.alice": {"tracker": "device_tracker.espresense_alice"}
+    }) == [("person.alice", "Living Room")]
+
+
+def test_room_tracker_accepts_area_id_and_does_not_use_stale_unavailable_attributes():
+    hass = household()
+    hass.states.records["sensor.john_room"] = state(
+        "sensor.john_room", "home", area_id="wohnzimmer"
+    )
+    assert resolve_person_rooms(hass, "person.john", {
+        "person.john": {"tracker": "sensor.john_room"}
+    }) == [("person.john", "wohnzimmer")]
+    hass.states.records["sensor.john_room"].state = "unavailable"
+    with pytest.raises(PersonTargetError, match="No current room"):
+        resolve_person_rooms(hass, "person.john", {
+            "person.john": {"tracker": "sensor.john_room"}
+        })

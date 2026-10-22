@@ -88,10 +88,12 @@ Polish, Portuguese (Portugal/Brazil), Russian, Spanish, Swedish, Turkish,
 and Ukrainian**. Every localized dashboard card now has the same complete
 set of translated UI phrases, including prompts, validation errors, routing
 help and queue feedback. Greek and German native integration menus have
-comprehensive translations, including selectors; French and Spanish include
-reviewed translations for critical routing, TTS and AI explanations.
-**Some detailed native configuration and service descriptions in other
-languages still fall back to English** while they await review. We do not
+comprehensive translations, including selectors. **All shipped languages now
+translate the complete People and personal-destination setup, help text,
+translation preferences, errors, and action field descriptions.** French and
+Spanish also have expanded, reviewed labels for TTS, notification profiles,
+queue and configuration errors. **Some older native configuration and service
+descriptions in other languages still fall back to English** pending review. We do not
 automatically replace these with unverified machine-translated text.
 
 To switch the card language, change the language under your Home Assistant
@@ -344,6 +346,26 @@ For each person you can set a room-tracking sensor, language, TTS voice,
 assignments: **Mobile**, **Watch**, **Tablet**, and **Other**. Each assignment
 references your *existing* HA `notify` or supported `media_player` entities.
 It does **not** create a second mobile/watch messaging subsystem.
+
+### Room tracking: Bermuda, ESPresense and other sensors
+
+In **Configure → People and personal voices → [person] → Room tracker**, choose
+the **specific sensor or device tracker for that person**. A Bermuda area
+sensor can report the actual room in its state, such as `Küche` or
+`living_room`. ESPresense or another tracker can report `home` as its
+state with the real room in an `area` or `room` attribute. Room values in
+`area_id` and `room_name` are supported too.
+
+Only a valid Home Assistant area ID, name or alias is accepted. A tracker
+whose sole value is `home` does not identify a room. A configured tracker
+takes precedence over the person entity's own location and is never replaced
+by a stale fallback if it becomes unavailable. A `person.*` entity must
+normally be `home` for **Room** announcements, unless **Allow when away**
+is selected. Mobile and Watch deliveries do not require the room tracker.
+
+The integration **reads these sensor states**; it does not install Bermuda,
+ESPresense or perform beacon detection itself. You must configure room
+tracking separately in Home Assistant.
 
 ### Send by person and destination name
 

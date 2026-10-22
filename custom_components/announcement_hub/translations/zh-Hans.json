@@ -171,13 +171,13 @@
           "tracked_people": "人员",
           "person_group_language": "群组语言",
           "person_group_voice": "群组音色",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "翻译群组公告"
         },
         "data_description": {
-          "tracked_people": "Select person entities to configure with room trackers and optional individual voices.",
-          "person_group_language": "Optional language for announcements to multiple targeted people in the same room.",
-          "person_group_voice": "Optional voice identifier for announcements to multiple targeted people in the same room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "选择要配置房间跟踪和个人语音偏好的人员。",
+          "person_group_language": "当多个目标人员在同一房间时，可选的群组公告语言代码。",
+          "person_group_voice": "当多个目标人员在同一房间时，可选的群组 TTS 音色标识。",
+          "person_group_translate": "使用选定或备用 AI 服务将群组公告自动翻译成群组语言；失败时保留原始文本。"
         }
       },
       "person_profile": {
@@ -189,21 +189,21 @@
           "voice": "音色",
           "ignore_home": "离家时允许",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "手机输出",
+          "destination_watch": "手表输出",
+          "destination_tablet": "平板输出",
+          "destination_other": "其他个人输出"
         },
         "data_description": {
-          "tracker": "Select the sensor or device tracker exposing the current room as state or an area/room attribute.",
-          "language": "Optional personal speech language; the action's explicit language takes precedence.",
-          "voice": "Optional personal TTS voice; the action's explicit voice takes precedence.",
-          "ignore_home": "Allow person targeting when away; missing room tracking still fails closed.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "选择通过状态或 room/area 属性报告此人当前房间的传感器或设备跟踪器。",
+          "language": "此人公告的可选语音语言。操作中明确指定的语言优先。",
+          "voice": "可选的 TTS 音色标识。操作中的 tts_options.voice 优先。",
+          "ignore_home": "即使此人显示不在家，也允许使用房间跟踪器。未知房间绝不会将公告发送到其他房间。",
+          "translate": "使用已配置的 AI 分别将语音和视觉通知翻译为此人的语言，再使用选定的 TTS 音色播报。use_ai: false 将停用翻译。",
+          "destination_mobile": "选择此人手机现有的通知或媒体播放器输出。仅使用分配的输出。",
+          "destination_watch": "选择此人手表现有的通知或媒体播放器输出。仅使用分配的输出。",
+          "destination_tablet": "选择此人平板现有的通知或媒体播放器输出。仅使用分配的输出。",
+          "destination_other": "分配给此人的其他 Home Assistant 输出，仅在选择“其他”目的地时使用。"
         }
       }
     },
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "所选个人输出不存在或已禁用。"
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,13 +394,13 @@
           "tracked_people": "人员",
           "person_group_language": "群组语言",
           "person_group_voice": "群组音色",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "翻译群组公告"
         },
         "data_description": {
-          "tracked_people": "Select person entities to configure with room trackers and optional individual voices.",
-          "person_group_language": "Optional language for announcements to multiple targeted people in the same room.",
-          "person_group_voice": "Optional voice identifier for announcements to multiple targeted people in the same room.",
-          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
+          "tracked_people": "选择要配置房间跟踪和个人语音偏好的人员。",
+          "person_group_language": "当多个目标人员在同一房间时，可选的群组公告语言代码。",
+          "person_group_voice": "当多个目标人员在同一房间时，可选的群组 TTS 音色标识。",
+          "person_group_translate": "使用选定或备用 AI 服务将群组公告自动翻译成群组语言；失败时保留原始文本。"
         }
       },
       "person_profile": {
@@ -412,21 +412,21 @@
           "voice": "音色",
           "ignore_home": "离家时允许",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "手机输出",
+          "destination_watch": "手表输出",
+          "destination_tablet": "平板输出",
+          "destination_other": "其他个人输出"
         },
         "data_description": {
-          "tracker": "Select the sensor or device tracker exposing the current room as state or an area/room attribute.",
-          "language": "Optional personal speech language; the action's explicit language takes precedence.",
-          "voice": "Optional personal TTS voice; the action's explicit voice takes precedence.",
-          "ignore_home": "Allow person targeting when away; missing room tracking still fails closed.",
-          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
-          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
-          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
-          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
-          "destination_other": "Assign other specific notify or media-player entities for this person."
+          "tracker": "选择通过状态或 room/area 属性报告此人当前房间的传感器或设备跟踪器。",
+          "language": "此人公告的可选语音语言。操作中明确指定的语言优先。",
+          "voice": "可选的 TTS 音色标识。操作中的 tts_options.voice 优先。",
+          "ignore_home": "即使此人显示不在家，也允许使用房间跟踪器。未知房间绝不会将公告发送到其他房间。",
+          "translate": "使用已配置的 AI 分别将语音和视觉通知翻译为此人的语言，再使用选定的 TTS 音色播报。use_ai: false 将停用翻译。",
+          "destination_mobile": "选择此人手机现有的通知或媒体播放器输出。仅使用分配的输出。",
+          "destination_watch": "选择此人手表现有的通知或媒体播放器输出。仅使用分配的输出。",
+          "destination_tablet": "选择此人平板现有的通知或媒体播放器输出。仅使用分配的输出。",
+          "destination_other": "分配给此人的其他 Home Assistant 输出，仅在选择“其他”目的地时使用。"
         }
       }
     },
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "所选个人输出不存在或已禁用。"
     }
   },
   "selector": {
@@ -666,12 +666,12 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         },
         "person_destination": {
-          "name": "Person destinations",
-          "description": "Choose Room or assigned Mobile, Watch, Tablet and Other destinations, rather than device entity IDs. Unmapped choices are rejected."
+          "name": "个人接收目标",
+          "description": "选择房间，或此人已分配的手机、手表、平板和其他目的地。可以组合选择；未分配的目的地将被拒绝，不会广播。"
         },
         "person_translate": {
-          "name": "Translate for selected people",
-          "description": "Override individual or group translation preferences for this announcement; requires a configured destination language."
+          "name": "为所选人员翻译",
+          "description": "覆盖此人或群组在本次公告中的自动翻译偏好。使用配置的目标语言；use_ai: false 禁止翻译。"
         }
       }
     },
