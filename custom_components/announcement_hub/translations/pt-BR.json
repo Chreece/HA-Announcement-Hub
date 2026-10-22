@@ -164,7 +164,10 @@
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
           "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings."
+          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
+          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
+          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
         }
       },
       "people": {
@@ -466,7 +469,10 @@
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
           "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings."
+          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
+          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
+          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
         }
       },
       "people": {
