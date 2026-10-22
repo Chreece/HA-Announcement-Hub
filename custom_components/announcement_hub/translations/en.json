@@ -152,14 +152,46 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_all": "Edit all settings (full wizard)",
+          "edit_people": "5. People and voices"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
           "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_people": "Configure tracked people, room sensors, individual/group language and voice."
+        }
+      },
+      "people": {
+        "title": "People and group speech",
+        "description": "Configure people who can receive explicitly targeted room announcements.",
+        "data": {
+          "tracked_people": "People to configure",
+          "person_group_language": "Group language",
+          "person_group_voice": "Group TTS voice"
+        },
+        "data_description": {
+          "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
+          "person_group_language": "Optional language code to use when targeted people share the same room.",
+          "person_group_voice": "Optional TTS voice identifier to use when targeted people share the same room."
+        }
+      },
+      "person_profile": {
+        "title": "Speech for {person_name}",
+        "description": "Select a room tracker and optional personal language/voice. Unknown rooms never trigger fallback.",
+        "data": {
+          "tracker": "Room tracker",
+          "language": "Language",
+          "voice": "Voice",
+          "ignore_home": "Allow when away"
+        },
+        "data_description": {
+          "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
+          "language": "Optional language code for targeted speech. An explicit action language overrides this preference.",
+          "voice": "Optional TTS voice identifier. Explicit action tts_options.voice takes precedence.",
+          "ignore_home": "Permit this person's room tracker even when the person entity is not home. Unknown rooms still fail closed."
         }
       }
     },
@@ -330,14 +362,46 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_all": "Edit all settings (full wizard)",
+          "edit_people": "5. People and voices"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
           "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_people": "Configure tracked people, room sensors, individual/group language and voice."
+        }
+      },
+      "people": {
+        "title": "People and group speech",
+        "description": "Configure people who can receive explicitly targeted room announcements.",
+        "data": {
+          "tracked_people": "People to configure",
+          "person_group_language": "Group language",
+          "person_group_voice": "Group TTS voice"
+        },
+        "data_description": {
+          "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
+          "person_group_language": "Optional language code to use when targeted people share the same room.",
+          "person_group_voice": "Optional TTS voice identifier to use when targeted people share the same room."
+        }
+      },
+      "person_profile": {
+        "title": "Speech for {person_name}",
+        "description": "Select a room tracker and optional personal language/voice. Unknown rooms never trigger fallback.",
+        "data": {
+          "tracker": "Room tracker",
+          "language": "Language",
+          "voice": "Voice",
+          "ignore_home": "Allow when away"
+        },
+        "data_description": {
+          "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
+          "language": "Optional language code for targeted speech. An explicit action language overrides this preference.",
+          "voice": "Optional TTS voice identifier. Explicit action tts_options.voice takes precedence.",
+          "ignore_home": "Permit this person's room tracker even when the person entity is not home. Unknown rooms still fail closed."
         }
       }
     },
@@ -557,6 +621,10 @@
         "ai_mode": {
           "name": "AI writing mode",
           "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
+        },
+        "target_person": {
+          "name": "Target people",
+          "description": "Only the people's current rooms receive the announcement; no fallback or unrelated devices."
         }
       }
     },
