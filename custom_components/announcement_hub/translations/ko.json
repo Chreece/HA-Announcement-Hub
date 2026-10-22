@@ -170,12 +170,14 @@
         "data": {
           "tracked_people": "사람",
           "person_group_language": "그룹 언어",
-          "person_group_voice": "그룹 음성"
+          "person_group_voice": "그룹 음성",
+          "person_group_translate": "Translate group announcements"
         },
         "data_description": {
           "tracked_people": "Select people to configure with room sensors and optional personal language or voice.",
           "person_group_language": "Optional language for announcements to targeted people sharing a room.",
-          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room."
+          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room.",
+          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
         }
       },
       "person_profile": {
@@ -185,13 +187,23 @@
           "tracker": "방 센서",
           "language": "언어",
           "voice": "음성",
-          "ignore_home": "외출 중에도 허용"
+          "ignore_home": "외출 중에도 허용",
+          "translate": "Translate to person's language",
+          "destination_mobile": "Mobile outputs",
+          "destination_watch": "Watch outputs",
+          "destination_tablet": "Tablet outputs",
+          "destination_other": "Other personal outputs"
         },
         "data_description": {
           "tracker": "Select a sensor or device tracker reporting the current room via state or the area/room attribute.",
           "language": "Personal speech language, overridden by an explicit announcement action language.",
           "voice": "Personal TTS voice, overridden by an explicit announcement action voice.",
-          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms."
+          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms.",
+          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
+          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
+          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
+          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
+          "destination_other": "Assign other specific notify or media-player entities for this person."
         }
       }
     },
@@ -204,7 +216,8 @@
       "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player."
+      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "invalid_person_output": "The selected personal output does not exist or is disabled."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -380,12 +393,14 @@
         "data": {
           "tracked_people": "사람",
           "person_group_language": "그룹 언어",
-          "person_group_voice": "그룹 음성"
+          "person_group_voice": "그룹 음성",
+          "person_group_translate": "Translate group announcements"
         },
         "data_description": {
           "tracked_people": "Select people to configure with room sensors and optional personal language or voice.",
           "person_group_language": "Optional language for announcements to targeted people sharing a room.",
-          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room."
+          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room.",
+          "person_group_translate": "Use AI to translate a shared-room announcement to the group language, with original-text fallback."
         }
       },
       "person_profile": {
@@ -395,13 +410,23 @@
           "tracker": "방 센서",
           "language": "언어",
           "voice": "음성",
-          "ignore_home": "외출 중에도 허용"
+          "ignore_home": "외출 중에도 허용",
+          "translate": "Translate to person's language",
+          "destination_mobile": "Mobile outputs",
+          "destination_watch": "Watch outputs",
+          "destination_tablet": "Tablet outputs",
+          "destination_other": "Other personal outputs"
         },
         "data_description": {
           "tracker": "Select a sensor or device tracker reporting the current room via state or the area/room attribute.",
           "language": "Personal speech language, overridden by an explicit announcement action language.",
           "voice": "Personal TTS voice, overridden by an explicit announcement action voice.",
-          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms."
+          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms.",
+          "translate": "Translate speech and visual text into this person's chosen language using the AI agent, then render speech using that voice. use_ai: false disables translation.",
+          "destination_mobile": "Assign existing Home Assistant notify or media-player entities to the person's Mobile destination.",
+          "destination_watch": "Assign existing Home Assistant notify or media-player entities to the person's Watch destination.",
+          "destination_tablet": "Assign existing Home Assistant notify or media-player entities to the person's Tablet destination.",
+          "destination_other": "Assign other specific notify or media-player entities for this person."
         }
       }
     },
@@ -414,7 +439,8 @@
       "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player."
+      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "invalid_person_output": "The selected personal output does not exist or is disabled."
     }
   },
   "selector": {
@@ -629,6 +655,14 @@
         "manual_targets": {
           "name": "수동 수신자",
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+        },
+        "person_destination": {
+          "name": "Person destinations",
+          "description": "Choose Room or assigned Mobile, Watch, Tablet and Other destinations, rather than device entity IDs. Unmapped choices are rejected."
+        },
+        "person_translate": {
+          "name": "Translate for selected people",
+          "description": "Override individual or group translation preferences for this announcement; requires a configured destination language."
         }
       }
     },
