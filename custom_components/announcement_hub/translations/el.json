@@ -152,14 +152,46 @@
           "edit_tts": "2. Μηχανές TTS και συσκευές",
           "edit_profiles": "3. Προφίλ ανά υπηρεσία εξόδου",
           "edit_general": "4. Γενικά, παρουσία και AI",
-          "edit_all": "Όλες οι ρυθμίσεις (πλήρης οδηγός)"
+          "edit_all": "Όλες οι ρυθμίσεις (πλήρης οδηγός)",
+          "edit_people": "5. Άτομα και φωνές"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Επίλεξε συσκευές ειδοποιήσεων, αντιστοίχιση δωματίων και ελάχιστα επίπεδα, χωρίς αλλαγές σε TTS ή AI.",
           "edit_tts": "Άλλαξε μηχανή ομιλίας, φωνή, αναπαραγωγείς δωματίων, Snapcast και συσκευές Companion App TTS.",
           "edit_profiles": "Ρύθμισε χρόνους εμφάνισης, οπτική μορφή ειδοποιήσεων και αναπαραγωγή Snapcast ανά πάροχο.",
           "edit_general": "Άμεση πρόσβαση σε AI και εφεδρικό πράκτορα, παρουσία, εφεδρικό δωμάτιο, ουρά και χρονικά όρια.",
-          "edit_all": "Πέρασε από όλες τις σελίδες ρύθμισης, όπως στον αρχικό οδηγό."
+          "edit_all": "Πέρασε από όλες τις σελίδες ρύθμισης, όπως στον αρχικό οδηγό.",
+          "edit_people": "Ρυθμίστε άτομα, αισθητήρες δωματίου και προσωπική/ομαδική φωνή."
+        }
+      },
+      "people": {
+        "title": "Άτομα και ομαδική ομιλία",
+        "description": "Ρυθμίστε άτομα για στοχευμένες ανακοινώσεις στο δωμάτιό τους.",
+        "data": {
+          "tracked_people": "Άτομα προς ρύθμιση",
+          "person_group_language": "Γλώσσα ομάδας",
+          "person_group_voice": "Φωνή ομάδας"
+        },
+        "data_description": {
+          "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
+          "person_group_language": "Optional language code to use when targeted people share the same room.",
+          "person_group_voice": "Optional TTS voice identifier to use when targeted people share the same room."
+        }
+      },
+      "person_profile": {
+        "title": "Ομιλία για {person_name}",
+        "description": "Επιλέξτε αισθητήρα δωματίου και προσωπική γλώσσα/φωνή. Άγνωστο δωμάτιο δεν ενεργοποιεί άλλους ομιλητές.",
+        "data": {
+          "tracker": "Αισθητήρας δωματίου",
+          "language": "Γλώσσα",
+          "voice": "Φωνή",
+          "ignore_home": "Να επιτρέπεται εκτός σπιτιού"
+        },
+        "data_description": {
+          "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
+          "language": "Optional language code for targeted speech. An explicit action language overrides this preference.",
+          "voice": "Optional TTS voice identifier. Explicit action tts_options.voice takes precedence.",
+          "ignore_home": "Permit this person's room tracker even when the person entity is not home. Unknown rooms still fail closed."
         }
       }
     },
@@ -330,14 +362,46 @@
           "edit_tts": "2. Μηχανές TTS και συσκευές",
           "edit_profiles": "3. Προφίλ ανά υπηρεσία εξόδου",
           "edit_general": "4. Γενικά, παρουσία και AI",
-          "edit_all": "Όλες οι ρυθμίσεις (πλήρης οδηγός)"
+          "edit_all": "Όλες οι ρυθμίσεις (πλήρης οδηγός)",
+          "edit_people": "5. Άτομα και φωνές"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Επίλεξε συσκευές ειδοποιήσεων, αντιστοίχιση δωματίων και ελάχιστα επίπεδα, χωρίς αλλαγές σε TTS ή AI.",
           "edit_tts": "Άλλαξε μηχανή ομιλίας, φωνή, αναπαραγωγείς δωματίων, Snapcast και συσκευές Companion App TTS.",
           "edit_profiles": "Ρύθμισε χρόνους εμφάνισης, οπτική μορφή ειδοποιήσεων και αναπαραγωγή Snapcast ανά πάροχο.",
           "edit_general": "Άμεση πρόσβαση σε AI και εφεδρικό πράκτορα, παρουσία, εφεδρικό δωμάτιο, ουρά και χρονικά όρια.",
-          "edit_all": "Πέρασε από όλες τις σελίδες ρύθμισης, όπως στον αρχικό οδηγό."
+          "edit_all": "Πέρασε από όλες τις σελίδες ρύθμισης, όπως στον αρχικό οδηγό.",
+          "edit_people": "Ρυθμίστε άτομα, αισθητήρες δωματίου και προσωπική/ομαδική φωνή."
+        }
+      },
+      "people": {
+        "title": "Άτομα και ομαδική ομιλία",
+        "description": "Ρυθμίστε άτομα για στοχευμένες ανακοινώσεις στο δωμάτιό τους.",
+        "data": {
+          "tracked_people": "Άτομα προς ρύθμιση",
+          "person_group_language": "Γλώσσα ομάδας",
+          "person_group_voice": "Φωνή ομάδας"
+        },
+        "data_description": {
+          "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
+          "person_group_language": "Optional language code to use when targeted people share the same room.",
+          "person_group_voice": "Optional TTS voice identifier to use when targeted people share the same room."
+        }
+      },
+      "person_profile": {
+        "title": "Ομιλία για {person_name}",
+        "description": "Επιλέξτε αισθητήρα δωματίου και προσωπική γλώσσα/φωνή. Άγνωστο δωμάτιο δεν ενεργοποιεί άλλους ομιλητές.",
+        "data": {
+          "tracker": "Αισθητήρας δωματίου",
+          "language": "Γλώσσα",
+          "voice": "Φωνή",
+          "ignore_home": "Να επιτρέπεται εκτός σπιτιού"
+        },
+        "data_description": {
+          "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
+          "language": "Optional language code for targeted speech. An explicit action language overrides this preference.",
+          "voice": "Optional TTS voice identifier. Explicit action tts_options.voice takes precedence.",
+          "ignore_home": "Permit this person's room tracker even when the person entity is not home. Unknown rooms still fail closed."
         }
       }
     },
@@ -557,6 +621,10 @@
         "ai_mode": {
           "name": "Λειτουργία κειμένου AI",
           "description": "Rewrite διορθώνει ένα ήδη έτοιμο μήνυμα. Generate δημιουργεί πραγματική ανακοίνωση από οδηγίες σύνταξης. Αν αποτύχει η AI, διατηρούνται οι αρχικές οδηγίες."
+        },
+        "target_person": {
+          "name": "Παραλήπτες (άτομα)",
+          "description": "Ανακοίνωση μόνο στο τρέχον δωμάτιο των ατόμων, χωρίς εναλλακτική δρομολόγηση."
         }
       }
     },
