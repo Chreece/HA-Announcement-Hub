@@ -5255,6 +5255,18 @@ class AnnouncementManager:
     def _raise_if_cancelled(self, job: AnnouncementJob) -> None:
         if job.job_id in self._cancel_requested:
             raise JobCancelled(f"Announcement {job.job_id} was cancelled")
+        # A room/person may be disabled while an older queued job is
+        # preparing speech or waiting for a media player. Check immediately
+        # before each actual physical action as well as at dequeue time.
+        if any((
+            getattr(job, "person_ids", ()),
+            getattr(job, "presence_sensors", ()),
+            getattr(job, "outputs", ()),
+            getattr(job, "preferred_areas", ()),
+        )) and not self._person_authorized_now(job):
+            raise HomeAssistantError(
+                "Announcement recipient disabled or room presence unverified"
+            )
 
     @staticmethod
     def _ensure_list(value: Any) -> list[str]:
