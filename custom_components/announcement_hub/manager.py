@@ -954,6 +954,7 @@ class AnnouncementManager:
         entities: Sequence[str] | str | None = None,
         channels: Sequence[str] | str | None = None,
         _fanout: bool = False,
+        _person_targeted: bool = False,
         _group_token: str | None = None,
         _excluded_physical: Sequence[str] = (),
     ) -> AnnouncementJob:
@@ -1096,7 +1097,7 @@ class AnnouncementManager:
         # Exact integration/device/entity recipients never inherit occupancy
         # or another room's outputs. Without ANY destination constraint,
         # preserve the existing occupancy-based automatic room routing.
-        explicit_targeting = bool(requested) or bool(channel_tokens)
+        explicit_targeting = bool(requested) or bool(channel_tokens) or _person_targeted
         occupied_area_ids = (
             self._occupied_area_ids()
             if occupied_only and not explicit_area_routing and not requested
@@ -1111,7 +1112,8 @@ class AnnouncementManager:
         area_filter_active = explicit_area_routing or occupancy_filter_active
         target_room_routing_active = bool(output_area_ids)
         room_fallback_routing = bool(
-            explicit_area_routing or occupancy_filter_active
+            (explicit_area_routing or occupancy_filter_active)
+            and not _person_targeted
         )
 
         configured = self._configured_outputs()
@@ -1947,8 +1949,11 @@ class AnnouncementManager:
             tts_options=effective_tts_options,
             tts_cache=bool(self.settings.get(CONF_TTS_CACHE, DEFAULT_TTS_CACHE)),
             plan=plan,
-            strict_targets=bool(requested),
-            routing_mode="room_fallback" if room_fallback_routing else "normal",
+            strict_targets=bool(requested) or _person_targeted,
+            routing_mode=(
+                "person" if _person_targeted else
+                "room_fallback" if room_fallback_routing else "normal"
+            ),
             preferred_areas=requested_output_area_ids,
             channel_services=tuple(channel_tokens),
             excluded_physical=tuple(_excluded_physical),
