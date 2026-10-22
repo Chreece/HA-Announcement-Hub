@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.10.0b15 - 2026-10-22
+
+**Beta — complete Simplified and Traditional Chinese native translations.**
+
+- Complete native Home Assistant setup, options, help, error, selector,
+  action/service, person/group, AI, occupancy, notification, TTS,
+  Companion App, queue and Snapcast descriptions for **both Chinese scripts**
+  (zh-Hans and zh-Hant), with all 599 catalog entries per script.
+- Preserve the previously localized Traditional Chinese text and translate
+  the remaining English fallbacks with script-aware terminology. Use
+  Traditional Chinese UI terms such as 預設, 用戶端, 伺服器, 音訊 and 快取,
+  while keeping API field names and template variables untouched.
+- Review strict recipient selection, room/person occupancy and door-gated
+  fallback, AI original-message fallback, separate spoken/visual channels,
+  and isolation of the shared Snapcast source. No runtime routing changed.
+- Five numeric transparency percentages intentionally remain identical
+  to English. All other native values are translated, including all help.
+- Add regression tests for key/schema parity, setup/options consistency,
+  placeholders, technical identifiers, script-specific terminology, and
+  recipient safety. Issue #50 remains open for Japanese, Korean, Swedish,
+  and Czech, whose legacy strings still need localization.
+
 ## 0.10.0b14 - 2026-10-22
 
 **Beta — complete Arabic native integration localization.**
