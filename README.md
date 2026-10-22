@@ -325,6 +325,45 @@ can also interpret area IDs and supported string/mapping representations.
 Unknown or missing room values do not authorize a broadcast to unrelated
 room devices.
 
+## Person-targeted announcements (new)
+
+Announcement Hub also supports **explicit targeting by person** while retaining
+the existing strict area/device routing contract. Use **Configure → People and
+personal voices** to select Home Assistant people and configure an optional
+Bermuda, ESPresense or other sensor/device tracker reporting each person's
+current Home Assistant room.
+
+You can leave the room sensor blank only when the person entity itself exposes
+a valid `room`/`area` attribute, or its `source` device tracker reports a
+room. If you enter a room sensor, it is **authoritative**: an unavailable sensor
+does not fall back to stale person/tracker data.
+
+```yaml
+action: notify.announcement_hub
+data:
+  text: "Your laundry is ready"
+  target_person:
+    - person.john
+```
+
+Multiple people are supported. People sharing a room produce **one** room
+announcement using the configured group language/voice (or global defaults);
+people in separate rooms receive separate room jobs that can run concurrently
+while preserving each room's FIFO order. A person's configured language and
+voice apply when they are the only targeted person in a room. An explicit
+`language` or `tts_options.voice` in an action takes precedence.
+
+**Safety and privacy:** person delivery never escalates to other occupied
+rooms, the door-gated fallback room, or General/movable outputs. If the person
+is away, has no current recognized room, or the configured room has no eligible
+output, the action is rejected rather than broadcasting. The per-person
+`Allow when away` option permits trusting that person's room tracker even
+when the person entity is not home; it does not permit unknown destinations.
+Person names must be unambiguous; `person.entity_id` is preferred. You cannot
+combine `target_person` with area, integration, device, entity or legacy
+output selectors. The existing severity, channel, TTS, AI, queue and delivery
+rules still apply.
+
 ## How delivery works
 
 ### Room routing order
