@@ -19,5 +19,5 @@ jobs:
       - name: Check translation schemas, card and provider labels
         run: |
           python -m compileall -q custom_components tests
-          python -m pytest -q tests/test_international_localizations.py tests/test_localized_provider_labels.py tests/test_dashboard_card_integration.py tests/test_person_locales_completion.py tests/test_native_locale_safety.py tests/test_italian_locale_completion.py tests/test_portuguese_locale_completion.py tests/test_dutch_locale_completion.py tests/test_polish_locale_completion.py tests/test_russian_locale_completion.py
+          python -m pytest -q tests/test_international_localizations.py tests/test_localized_provider_labels.py tests/test_dashboard_card_integration.py tests/test_person_locales_completion.py tests/test_native_locale_safety.py tests/test_italian_locale_completion.py tests/test_portuguese_locale_completion.py tests/test_dutch_locale_completion.py tests/test_polish_locale_completion.py tests/test_russian_locale_completion.py tests/test_turkish_locale_completion.py
           node --test tests/test_announcement_hub_card.mjs

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.10.0b12 - 2026-10-22
+
+**Beta — complete Turkish native integration localization.**
+
+- Complete the Turkish native configuration, options, error, selector,
+  person/group, output, TTS and Companion App, AI, queue, notification
+  display, Snapcast and service-action descriptions across all **599** keys.
+- Preserve strict explicit recipients, person-only room routing, occupied
+  and door-checked room fallback, original-message AI failure recovery,
+  distinct spoken and written content, and shared Snapcast source isolation.
+- Preserve every interpolation placeholder and Home Assistant API
+  identifier. Only five numeric transparency options and the widely
+  used Turkish word Tablet remain identical to English. No English
+  help-description copies remain.
+- Add full catalog tests for coverage, exact placeholders, service IDs,
+  setup/options parity, and recipient-safety explanations.
+- No announcement routing, queue scheduling or audio runtime code changed.
+  Issue #50 remains open for the eight remaining locale catalogs.
+
 ## 0.10.0b11 - 2026-10-22
 
 **Beta — complete Russian native integration localization.**
