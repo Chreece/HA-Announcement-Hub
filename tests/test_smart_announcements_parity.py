@@ -100,7 +100,7 @@ def test_switches_and_recovery_are_scoped_to_exact_person_or_area():
     assert 'if player == job.tts_media_player:' in manager
     assert '"/local/"' in manager
     assert 'self._volume_restore[player]' in manager
-    assert '"volume_restore": dict(self._volume_restore)' in manager
+    assert '"volume_restore": dict(getattr(self, "_volume_restore", {}))' in manager
     assert "finally:" in manager
     assert "await asyncio.shield(self._async_restore_volume(player))" in manager
     assert "pre_announce_sound:" in services
