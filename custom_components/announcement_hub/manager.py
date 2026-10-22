@@ -2410,13 +2410,14 @@ class AnnouncementManager:
         TTS "Never" still forbids these relaxations (except Critical).
         Strict per-action output restrictions and door checks remain mandatory.
         """
+        job_manual = bool(getattr(job, "manual_targets", False))
         stage = job.routing_stage
         areas = self._staged_areas(job, stage)
         stage_kind = stage if stage in STAGES else STAGES[0]
         configured = (
-            self._manual_output_catalog(job.preferred_areas) if job.manual_targets
+            self._manual_output_catalog(job.preferred_areas) if job_manual
             and job.preferred_areas and not job.requested_services else
-            self._manual_output_catalog() if job.manual_targets else
+            self._manual_output_catalog() if job_manual else
             self._configured_outputs()
         )
         try:
@@ -2448,7 +2449,7 @@ class AnnouncementManager:
 
         notifications = resolve_notify_outputs(self.hass, selected[1])
         companion = resolve_companion_tts_outputs(self.hass, selected[4])
-        minimum_tts_level = LEVEL_INFO if job.manual_targets else str(
+        minimum_tts_level = LEVEL_INFO if job_manual else str(
             self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
         )
         speech_allowed = tts_allowed_for_level(job.level, minimum_tts_level)
@@ -2462,7 +2463,8 @@ class AnnouncementManager:
         )
         level_priority = LEVEL_PRIORITY.get(job.level, LEVEL_PRIORITY[LEVEL_INFO])
         notify_policy = {
-            output.ref: self._notify_policy(output, manual=job.manual_targets)
+            output.ref: (self._notify_policy(output, manual=True)
+                         if job_manual else self._notify_policy(output))
             for output in notifications
         }
         targets = select_stage_targets(
@@ -2485,7 +2487,8 @@ class AnnouncementManager:
                 (
                     entity_id,
                     entity_area_id(self.hass, entity_id),
-                    self._tts_player_scope(entity_id, manual=job.manual_targets),
+                    (self._tts_player_scope(entity_id, manual=True)
+                 if job_manual else self._tts_player_scope(entity_id)),
                 )
                 for entity_id in selected[2] if selected[0]
             ),
