@@ -2387,14 +2387,17 @@ class AnnouncementManager:
         self, job: AnnouncementJob, stage: str
     ) -> tuple[str, ...]:
         """Resolve preferred, currently occupied and door-gated fallback areas."""
-        preferred = tuple(job.preferred_areas)
+        enabled = self.settings.get("person_area_enabled", {}) or {}
+        preferred = tuple(
+            area for area in job.preferred_areas if enabled.get(area, True) is not False
+        )
         occupied = tuple(
             area
             for area in (
                 (self._occupied_area_ids() or ())
                 if job.occupancy_requested else ()
             )
-            if area not in set(preferred)
+            if area not in set(preferred) and enabled.get(area, True) is not False
         )
         if stage == "primary":
             return preferred
@@ -2405,6 +2408,7 @@ class AnnouncementManager:
             source = preferred or occupied
             if (
                 fallback
+                and enabled.get(fallback, True) is not False
                 and fallback not in set((*preferred, *occupied))
                 and self._fallback_door_allows(source)
             ):
@@ -3280,6 +3284,8 @@ class AnnouncementManager:
         part_index: int,
         part_count: int,
     ) -> None:
+        if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled during delivery")
         integration_data = profile.get(PROFILE_INTEGRATION_DATA, {})
         provider_data = self._deep_merge(
             dict(integration_data) if isinstance(integration_data, Mapping) else {},
@@ -4174,6 +4180,8 @@ class AnnouncementManager:
     ) -> None:
         channel = f"companion_tts:{output.entry_id}"
         self._raise_if_cancelled(job)
+        if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person disabled during Companion TTS")
         if self._group_already_delivered(job, channel):
             self._record_channel_success(job, channel)
             return
@@ -4226,6 +4234,8 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
+        if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled before audio playback")
         shared_path = bool(
             job.tts_media_player and player == job.tts_media_player
         )
