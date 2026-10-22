@@ -125,3 +125,20 @@ def test_card_shows_named_person_destinations_without_exposing_entity_ids():
     assert 'payload.target_person = [...this._selected.person]' in js
     assert 'state.attributes?.person_destinations' in js
     assert 'id="person-destinations"' in html
+
+def test_person_room_never_selects_companion_app_without_named_assignment():
+    source = (COMPONENT / "manager.py").read_text(encoding="utf-8")
+    assert "if _person_targeted and explicit_area_routing:" in source
+    assert "configured = (*configured[:4], ())" in source
+    assert "entity_integration(" in source
+    assert "!= INTEGRATION_MOBILE_APP" in source
+    service = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
+    assert 'local["entities"] = refs' in service
+    assert 'local["manual_targets"] = True' in service
+
+
+def test_language_and_missing_destination_fail_closed():
+    service = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
+    assert "Person translation requires a person/group or global TTS language" in service
+    assert "Person translation language must be a language name" in service
+    assert "entry is None or entry.disabled_by is not None" in service
