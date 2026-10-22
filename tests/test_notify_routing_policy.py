@@ -23,7 +23,7 @@ def test_runtime_filters_level_and_only_room_scope_by_occupancy() -> None:
     assert "def _notify_level_allowed(" in manager
     assert "NOTIFY_SCOPE_GENERAL" in manager
     assert "LEVEL_PRIORITY.get(level" in manager
-    assert "self._notify_policy(output)[0] == NOTIFY_SCOPE_GENERAL" in manager
+    assert "self._notify_policy(output, manual=manual_targets)[0] == NOTIFY_SCOPE_GENERAL" in manager
 
 
 def test_general_outputs_freeze_without_area_binding() -> None:

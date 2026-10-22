@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.9.44"
+VERSION: Final = "0.10.0b1"
 PLATFORMS: Final = [Platform.SENSOR]
 
 SERVICE_SEND: Final = "send"
@@ -21,6 +21,8 @@ ATTR_TEXT_TTS: Final = "text_tts"
 ATTR_TEXT_NOTIFY: Final = "text_notify"
 ATTR_OUTPUT: Final = "output"  # Hidden legacy alias; use area for new actions.
 ATTR_AREA: Final = "area"
+ATTR_TARGET_PERSON: Final = "target_person"
+ATTR_MANUAL_TARGETS: Final = "manual_targets"
 ATTR_INTEGRATION: Final = "integration"
 ATTR_DEVICE: Final = "device"
 ATTR_ENTITY: Final = "entity"
@@ -115,6 +117,9 @@ CONF_NOTIFY_CRITICAL_OUTPUTS: Final = "notify_critical_outputs"
 CONF_OCCUPANCY_SENSOR: Final = "occupancy_sensor"
 CONF_OCCUPANCY_ATTRIBUTE: Final = "occupancy_attribute"
 CONF_FALLBACK_ROOM: Final = "fallback_room"
+CONF_PERSON_PROFILES: Final = "person_profiles"
+CONF_PERSON_GROUP_LANGUAGE: Final = "person_group_language"
+CONF_PERSON_GROUP_VOICE: Final = "person_group_voice"
 CONF_FALLBACK_CHECK_DOOR: Final = "fallback_check_door"
 CONF_FALLBACK_DOOR_LABEL: Final = "fallback_door_label"
 

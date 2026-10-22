@@ -140,6 +140,7 @@ class AnnouncementJob:
     notify_text: str | None
     server_tts_enabled: bool
     strict_targets: bool = False
+    manual_targets: bool = False
     click_action: str | None = None
     # A room request is a preference that escalates through occupied rooms,
     # the door-gated fallback room and finally general outputs. Never expire
@@ -196,6 +197,7 @@ class AnnouncementJob:
         tts_cache: bool,
         plan: DeliveryPlan,
         strict_targets: bool = False,
+        manual_targets: bool = False,
         routing_mode: str = "normal",
         preferred_areas: Sequence[str] = (),
         companion_tts_requested: bool = False,
@@ -239,6 +241,7 @@ class AnnouncementJob:
             notify_text=plan.notify_text,
             server_tts_enabled=plan.server_tts_enabled,
             strict_targets=bool(strict_targets),
+            manual_targets=bool(manual_targets),
             routing_mode=routing_mode,
             routing_stage="primary",
             routing_stage_started_at=utcnow_iso() if routing_mode != "normal" else None,
@@ -367,6 +370,7 @@ class AnnouncementJob:
             "outputs": list(self.outputs),
             "requested_services": list(self.requested_services),
             "strict_targets": self.strict_targets,
+            "manual_targets": self.manual_targets,
             "channel_services": list(self.channel_services),
             "related_job_ids": list(self.related_job_ids),
             "group_id": self.group_id,

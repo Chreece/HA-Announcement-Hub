@@ -265,7 +265,7 @@
       }
       this.$("routing-explanation").textContent = this._targetMode === "automatic"
         ? this._t("Announcement Hub chooses configured recipients using occupancy and fallback rules.")
-        : this._t("Areas use room fallback. Integrations, devices and entities are exact additional recipients.");
+        : this._t("Select recipients bypasses the default output lists: only chosen rooms and exact integrations/devices/entities are eligible.");
       this._updateAIHint();
       this._drawChosen();
       this._updateQueue();
@@ -389,6 +389,7 @@
         throw new Error(this._t("Selecting a delivery service requires a room or exact recipient. Use Automatic channel for automatic routing."));
       }
       const payload = { level: this._level, occupied_only: this.$("occupied-only").checked, ...recipients };
+      if (this._targetMode === "targeted") payload.manual_targets = true;
       if (main) payload.text = main;
       if (textTts) payload.text_tts = textTts;
       if (textNotify) payload.text_notify = textNotify;

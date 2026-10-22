@@ -150,18 +150,29 @@ and an optional conversation-agent override. When AI generation is selected
 with a blank title, Hub can produce a title of up to three words.
 
 **Automatic routing** leaves recipient choice to the integration's configured
-occupancy/fallback rules. **Choose recipients** lets you select one or more
-areas (room-first routing) and also integrations, exact Home Assistant devices,
-and notify/media-player entities. The optional channel selector filters the
+occupancy/fallback rules and selected default output lists. **Choose recipients**
+uses live Home Assistant endpoints **independently of those output lists**:
+areas, integrations, exact devices, and notify/media-player entities. The optional channel selector filters the
 authorized deliveries to Written, Speech, Both, Snapcast or Companion App TTS.
 A channel cannot be selected by itself: choose an area or explicit recipient
 first. Device/integration selections do not authorize unrelated room speakers.
+Automatic mode continues to obey the configured output allow-list. In manual
+mode, a room selector authorizes the physical devices in that room; it never
+implicitly selects other rooms or general mobile notifications.
 
 The card discovers area and recipient names from Home Assistant registries
-when allowed. Manual comma-separated target IDs are available if those lists
-are empty or registry access is restricted. Your actual eligible outputs are
-still determined by Announcement Hub's configuration, and the integration
-validates every request.
+when allowed. Manual comma-separated IDs remain available if registry access
+is restricted. In **Choose recipients**, the card passes `manual_targets: true`
+and the integration discovers real eligible Home Assistant entities, including
+those not selected in the Hub's automatic-output configuration. The selected
+areas are kept to their physical outputs; their room leg cannot accidentally
+escalate to a general-phone broadcast. Selected integrations intentionally
+target **all their eligible devices**, and exact device/entity selections remain
+strict. Unknown, disabled, unavailable or incompatible outputs are not
+invented. Server TTS still needs an available TTS engine; shared Snapcast
+playback still needs its safely configured central audio path and verified
+client isolation. The integration enforces those infrastructure and safety
+requirements even in manual mode.
 
 The Send button uses the native `notify.announcement_hub` action and requests
 the queue response. It displays the accepted job ID, or an error without an
@@ -324,6 +335,45 @@ Select the sensor and set **Occupied rooms value** to `rooms`. The integration
 can also interpret area IDs and supported string/mapping representations.
 Unknown or missing room values do not authorize a broadcast to unrelated
 room devices.
+
+## Person-targeted announcements (new)
+
+Announcement Hub also supports **explicit targeting by person** while retaining
+the existing strict area/device routing contract. Use **Configure → People and
+personal voices** to select Home Assistant people and configure an optional
+Bermuda, ESPresense or other sensor/device tracker reporting each person's
+current Home Assistant room.
+
+You can leave the room sensor blank only when the person entity itself exposes
+a valid `room`/`area` attribute, or its `source` device tracker reports a
+room. If you enter a room sensor, it is **authoritative**: an unavailable sensor
+does not fall back to stale person/tracker data.
+
+```yaml
+action: notify.announcement_hub
+data:
+  text: "Your laundry is ready"
+  target_person:
+    - person.john
+```
+
+Multiple people are supported. People sharing a room produce **one** room
+announcement using the configured group language/voice (or global defaults);
+people in separate rooms receive separate room jobs that can run concurrently
+while preserving each room's FIFO order. A person's configured language and
+voice apply when they are the only targeted person in a room. An explicit
+`language` or `tts_options.voice` in an action takes precedence.
+
+**Safety and privacy:** person delivery never escalates to other occupied
+rooms, the door-gated fallback room, or General/movable outputs. If the person
+is away, has no current recognized room, or the configured room has no eligible
+output, the action is rejected rather than broadcasting. The per-person
+`Allow when away` option permits trusting that person's room tracker even
+when the person entity is not home; it does not permit unknown destinations.
+Person names must be unambiguous; `person.entity_id` is preferred. You cannot
+combine `target_person` with area, integration, device, entity or legacy
+output selectors. The existing severity, channel, TTS, AI, queue and delivery
+rules still apply.
 
 ## How delivery works
 

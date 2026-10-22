@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+from uuid import uuid4
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +40,8 @@ from .const import (
     ATTR_AI_MODE,
     ATTR_OUTPUT,
     ATTR_AREA,
+    ATTR_TARGET_PERSON,
+    ATTR_MANUAL_TARGETS,
     ATTR_INTEGRATION,
     ATTR_DEVICE,
     ATTR_ENTITY,
@@ -61,6 +64,9 @@ from .const import (
     CONF_TTS_ENGINES,
     CONF_TTS_MIN_LEVEL,
     CONF_TTS_ROOM_PLAYERS,
+    CONF_PERSON_PROFILES,
+    CONF_PERSON_GROUP_LANGUAGE,
+    CONF_PERSON_GROUP_VOICE,
     DEFAULT_COMPANION_TTS_WPM,
     DEFAULT_OCCUPIED_ONLY,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
@@ -89,6 +95,7 @@ from .dashboard_resource import async_ensure_card_resource
 from .manager import AnnouncementManager
 from .message_text import resolve_channel_texts
 from .outputs import area_name
+from .person_targeting import PersonTargetError, resolve_person_rooms
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -157,6 +164,10 @@ SEND_SCHEMA = probatio.All(
                 probatio.EnsureList(), [cv.string]
             ),
             probatio.Optional(ATTR_AREA): probatio.All(
+                probatio.EnsureList(), [cv.string]
+            ),
+            probatio.Optional(ATTR_MANUAL_TARGETS, default=False): bool,
+            probatio.Optional(ATTR_TARGET_PERSON): probatio.All(
                 probatio.EnsureList(), [cv.string]
             ),
             probatio.Optional(ATTR_INTEGRATION): probatio.All(
@@ -341,7 +352,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
 
     async def async_send(call: ServiceCall) -> ServiceResponse:
         manager = _get_manager(hass)
-        job = await manager.async_enqueue(
+        params = dict(
             text=call.data.get(ATTR_TEXT),
             text_tts=call.data.get(ATTR_TEXT_TTS),
             text_notify=call.data.get(ATTR_TEXT_NOTIFY),
@@ -363,7 +374,79 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             use_ai=call.data.get(ATTR_USE_AI),
             ai_agent=call.data.get(ATTR_AI_AGENT),
             ai_mode=call.data[ATTR_AI_MODE],
+            manual_targets=call.data[ATTR_MANUAL_TARGETS],
         )
+
+        people = call.data.get(ATTR_TARGET_PERSON)
+        if people is None:
+            job = await manager.async_enqueue(**params)
+        else:
+            # A person is a location-based recipient, not an extra delivery
+            # channel. Reject combinations that could widen the audience.
+            if (call.data.get(ATTR_MANUAL_TARGETS) or any(
+                call.data.get(key) is not None for key in (
+                    ATTR_AREA, ATTR_OUTPUT, ATTR_INTEGRATION, ATTR_DEVICE, ATTR_ENTITY,
+                )
+            )):
+                raise ServiceValidationError(
+                    "target_person cannot be combined with area, output, "
+                    "integration, device or entity"
+                )
+            profiles = manager.settings.get(CONF_PERSON_PROFILES, {})
+            if not isinstance(profiles, dict):
+                profiles = {}
+            try:
+                locations = resolve_person_rooms(hass, people, profiles)
+                room_people: dict[str, list[str]] = {}
+                for person_id, raw_room in locations:
+                    area_id = manager._resolve_area_ids((raw_room,))[0]
+                    room_people.setdefault(area_id, []).append(person_id)
+            except PersonTargetError as error:
+                raise ServiceValidationError(str(error)) from error
+
+            # One job per actual room. Distinct rooms can deliver in parallel
+            # while each room retains its original FIFO ordering. A group in
+            # the same room is announced once, never once per person.
+            group_token = uuid4().hex if len(room_people) > 1 else None
+            created = []
+            try:
+                for area_id, recipients in room_people.items():
+                    local = dict(params)
+                    local["outputs"] = None
+                    local["areas"] = (area_id,)
+                    local["_person_targeted"] = True
+                    local["_group_token"] = group_token
+                    if len(recipients) == 1:
+                        profile = profiles.get(recipients[0], {}) or {}
+                        preferred_language = profile.get("language")
+                        preferred_voice = profile.get("voice")
+                    else:
+                        preferred_language = manager.settings.get(
+                            CONF_PERSON_GROUP_LANGUAGE
+                        )
+                        preferred_voice = manager.settings.get(
+                            CONF_PERSON_GROUP_VOICE
+                        )
+                    if not call.data.get(ATTR_LANGUAGE) and preferred_language:
+                        local["language"] = str(preferred_language)
+                    options = dict(call.data.get(ATTR_TTS_OPTIONS) or {})
+                    if preferred_voice:
+                        options.setdefault("voice", str(preferred_voice))
+                    local["tts_options"] = options
+                    created.append(await manager.async_enqueue(**local))
+            except BaseException:
+                # Reject all-or-nothing as far as practical. Cancellation is
+                # requested even for an already-running first room.
+                for pending_job in created:
+                    await manager.async_cancel(pending_job.job_id)
+                raise
+            job = created[0]
+            job.related_job_ids = tuple(
+                item.job_id for item in created[1:]
+            )
+            manager._schedule_save()
+            manager._notify_update()
+
         pending = manager.pending_jobs()
         position = next(
             (

@@ -38,7 +38,7 @@
         <p id="routing-explanation" class="hint">Announcement Hub chooses configured outputs using room and fallback rules.</p>
         <div id="targets" hidden>
           <div class="target-group">
-            <div class="target-label"><ha-icon icon="mdi:floor-plan"></ha-icon><div><strong>Areas</strong><small>Preferred rooms with Hub fallback</small></div></div>
+            <div class="target-label"><ha-icon icon="mdi:floor-plan"></ha-icon><div><strong>Areas</strong><small>Explicit room outputs only</small></div></div>
             <input id="area-search" class="search" placeholder="Search rooms..." aria-label="Search Home Assistant areas" autocomplete="off">
             <div id="area-options" class="options"></div>
           </div>
@@ -46,7 +46,7 @@
             <summary><ha-icon icon="mdi:devices"></ha-icon><strong>Exact recipients</strong><small>Integrations · devices · entities</small></summary>
             <p class="hint">Explicit recipients are additional destinations; Hub never substitutes unrelated devices.</p>
             <div class="target-group">
-              <div class="target-label"><ha-icon icon="mdi:puzzle-outline"></ha-icon><div><strong>Integrations</strong><small>All Hub-configured outputs from an integration</small></div></div>
+              <div class="target-label"><ha-icon icon="mdi:puzzle-outline"></ha-icon><div><strong>Integrations</strong><small>All eligible HA outputs from this integration</small></div></div>
               <input id="integration-search" class="search" placeholder="Search integrations..." aria-label="Search integrations" autocomplete="off">
               <div id="integration-options" class="options"></div>
             </div>
@@ -85,7 +85,7 @@
             <label class="field"><span>Notification tap destination <small>optional</small></span><input id="click-action" placeholder="/lovelace/cameras"></label>
           </div>
           <label class="checkbox-line"><input type="checkbox" id="occupied-only" checked><span>Try occupied rooms during area fallback</span></label>
-          <p class="hint">Explicit devices, configured severity limits and door checks remain enforced by Announcement Hub.</p>
+          <p class="hint">Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.</p>
         </details>
       </section>
     </div>

@@ -78,11 +78,11 @@ def _planner(
         hass = SimpleNamespace()
 
         @staticmethod
-        def _notify_policy(output):
+        def _notify_policy(output, **kwargs):
             return ("room" if output.area_id else "general", "debug")
 
         @staticmethod
-        def _tts_player_scope(entity_id):
+        def _tts_player_scope(entity_id, **kwargs):
             return "room"
 
         @staticmethod
@@ -121,6 +121,7 @@ def _planner(
         "text_notify": text_notify,
         "explicit_area_routing": explicit_area_routing,
         "explicit_targeting": explicit_targeting,
+        "manual_targets": False,
         "minimum_tts_level": "debug",
         "LEVEL_CRITICAL": "critical",
         "LEVEL_INFO": "info",
@@ -249,7 +250,8 @@ def test_action_response_reports_authoritative_strict_target_mode() -> None:
     action = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
     assert '"strict_targets": job.strict_targets' in action
     assert "strict_targets=bool(requested)" in SOURCE
-    assert "routing_mode=\"room_fallback\" if room_fallback_routing else \"normal\"" in SOURCE
+    assert '"person" if _person_targeted else' in SOURCE
+    assert '"room_fallback" if room_fallback_routing else "normal"' in SOURCE
 
 
 def test_empty_selectors_fail_closed_before_broadcast() -> None:

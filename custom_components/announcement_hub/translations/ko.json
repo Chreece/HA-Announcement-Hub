@@ -152,14 +152,46 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_all": "Edit all settings (full wizard)",
+          "edit_people": "5. 사람과 음성"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
           "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_people": "Configure tracked people, room sensors, languages and voices."
+        }
+      },
+      "people": {
+        "title": "사람과 그룹 음성",
+        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "data": {
+          "tracked_people": "사람",
+          "person_group_language": "그룹 언어",
+          "person_group_voice": "그룹 음성"
+        },
+        "data_description": {
+          "tracked_people": "Select people to configure with room sensors and optional personal language or voice.",
+          "person_group_language": "Optional language for announcements to targeted people sharing a room.",
+          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room."
+        }
+      },
+      "person_profile": {
+        "title": "{person_name} 음성",
+        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "data": {
+          "tracker": "방 센서",
+          "language": "언어",
+          "voice": "음성",
+          "ignore_home": "외출 중에도 허용"
+        },
+        "data_description": {
+          "tracker": "Select a sensor or device tracker reporting the current room via state or the area/room attribute.",
+          "language": "Personal speech language, overridden by an explicit announcement action language.",
+          "voice": "Personal TTS voice, overridden by an explicit announcement action voice.",
+          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms."
         }
       }
     },
@@ -330,14 +362,46 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)"
+          "edit_all": "Edit all settings (full wizard)",
+          "edit_people": "5. 사람과 음성"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
           "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
           "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
           "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard."
+          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_people": "Configure tracked people, room sensors, languages and voices."
+        }
+      },
+      "people": {
+        "title": "사람과 그룹 음성",
+        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "data": {
+          "tracked_people": "사람",
+          "person_group_language": "그룹 언어",
+          "person_group_voice": "그룹 음성"
+        },
+        "data_description": {
+          "tracked_people": "Select people to configure with room sensors and optional personal language or voice.",
+          "person_group_language": "Optional language for announcements to targeted people sharing a room.",
+          "person_group_voice": "Optional TTS voice for announcements to targeted people sharing a room."
+        }
+      },
+      "person_profile": {
+        "title": "{person_name} 음성",
+        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "data": {
+          "tracker": "방 센서",
+          "language": "언어",
+          "voice": "음성",
+          "ignore_home": "외출 중에도 허용"
+        },
+        "data_description": {
+          "tracker": "Select a sensor or device tracker reporting the current room via state or the area/room attribute.",
+          "language": "Personal speech language, overridden by an explicit announcement action language.",
+          "voice": "Personal TTS voice, overridden by an explicit announcement action voice.",
+          "ignore_home": "Trust the room tracker when this person is away, but still fail closed on unknown rooms."
         }
       }
     },
@@ -557,6 +621,14 @@
         "ai_mode": {
           "name": "AI 문구",
           "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
+        },
+        "target_person": {
+          "name": "대상 사람",
+          "description": "Target only the selected person's current room, with no other room or general fallback."
+        },
+        "manual_targets": {
+          "name": "수동 수신자",
+          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         }
       }
     },
