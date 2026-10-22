@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b10 - 2026-10-22
+
+**Beta — complete Polish native integration localization.**
+
+- Finish all **599 Polish native UI entries** covering output devices,
+  minimum announcement levels, TTS/Companion App voices and language,
+  notification timing and display settings, AI provider and prompt styles,
+  Snapcast physical clients and shared source, queue options, room and person
+  safety, configuration/reconfiguration menus, selectors, errors, diagnostics
+  and service-action help.
+- Review semantics around explicit recipients, occupied rooms, door-checked
+  fallback, original-message recovery after AI failures, channel separation,
+  and direct-speaker versus shared Snapcast delivery.
+- All interpolation placeholders and technical Home Assistant service names
+  are preserved; there are only six English-identical values by design:
+  five transparency percentages and Tablet. No English fallback help remains.
+- Add automated regressions for Polish key completeness, exact action and
+  template identifiers, configuration/option parity, and recipient safety.
+- No output-routing or TTS runtime behavior changed. Issue #50 remains open
+  for ten other native language catalogs needing reviewed translations.
+
 ## 0.10.0b9 - 2026-10-22
 
 **Beta — complete Dutch native integration localization.**
