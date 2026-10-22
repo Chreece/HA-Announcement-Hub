@@ -171,7 +171,7 @@
           "tracked_people": "Pessoas",
           "person_group_language": "Idioma do grupo",
           "person_group_voice": "Voz do grupo",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Traduzir anúncios de grupo"
         },
         "data_description": {
           "tracked_people": "Seleciona as pessoas para as quais queres configurar o rastreio de divisão e as preferências de voz.",
@@ -189,10 +189,10 @@
           "voice": "Voz",
           "ignore_home": "Permitir ausente",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Saídas do telemóvel",
+          "destination_watch": "Saídas do relógio",
+          "destination_tablet": "Saídas do tablet",
+          "destination_other": "Outras saídas pessoais"
         },
         "data_description": {
           "tracker": "Seleciona o sensor ou rastreador que indica a divisão atual da pessoa no estado ou no atributo room/area.",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "A saída pessoal selecionada não existe ou está desativada."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "Pessoas",
           "person_group_language": "Idioma do grupo",
           "person_group_voice": "Voz do grupo",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Traduzir anúncios de grupo"
         },
         "data_description": {
           "tracked_people": "Seleciona as pessoas para as quais queres configurar o rastreio de divisão e as preferências de voz.",
@@ -412,10 +412,10 @@
           "voice": "Voz",
           "ignore_home": "Permitir ausente",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Saídas do telemóvel",
+          "destination_watch": "Saídas do relógio",
+          "destination_tablet": "Saídas do tablet",
+          "destination_other": "Outras saídas pessoais"
         },
         "data_description": {
           "tracker": "Seleciona o sensor ou rastreador que indica a divisão atual da pessoa no estado ou no atributo room/area.",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "A saída pessoal selecionada não existe ou está desativada."
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "When enabled, discover explicitly chosen recipients from Home Assistant independently of Announcement Hub's configured default outputs. Requires a selected area, integration, device or entity. Never enables an unselected output or expands a selected room to every phone."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "Destinos pessoais",
           "description": "Escolhe Divisão, Telemóvel, Relógio, Tablet ou Outro entre os destinos atribuídos. Podem combinar-se. Destinos não atribuídos são rejeitados sem difusão geral."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "Traduzir para as pessoas selecionadas",
           "description": "Substitui a preferência de tradução automática da pessoa ou do grupo para este anúncio. Usa o idioma configurado; use_ai: false impede a tradução."
         }
       }
