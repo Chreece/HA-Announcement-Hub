@@ -3513,7 +3513,7 @@ class AnnouncementManager:
 
     async def _async_send_tts(self, job: AnnouncementJob) -> None:
         """Launch independent audible output classes together."""
-        if not self._person_authorized_now(job):
+        if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled or presence unverified")
         if not job.tts_text:
             return
@@ -3558,7 +3558,7 @@ class AnnouncementManager:
 
     async def _async_send_room_tts(self, job: AnnouncementJob) -> None:
         """Speak directly on area-bound media players using the TTS engine chain."""
-        if not self._person_authorized_now(job):
+        if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled or presence unverified")
         players = [
             player
@@ -3678,7 +3678,7 @@ class AnnouncementManager:
             )
 
     async def _async_send_server_tts(self, job: AnnouncementJob) -> None:
-        if not self._person_authorized_now(job):
+        if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled or presence unverified")
         # Fail closed even for jobs restored from older queued snapshots:
         # playing the shared MPD/Piper source without a physical mute route
@@ -3982,7 +3982,7 @@ class AnnouncementManager:
         )
 
     async def _async_send_companion_tts(self, job: AnnouncementJob) -> None:
-        if not self._person_authorized_now(job):
+        if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled or presence unverified")
         outputs = [
             output
