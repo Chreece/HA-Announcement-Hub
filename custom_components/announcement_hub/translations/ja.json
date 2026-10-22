@@ -15,7 +15,7 @@
         },
         "data_description": {
           "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
-          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
+          "notify_room_outputs": "Home Assistant のエリアが在室中または代替先のルームに一致する必要がある通知機器です。携帯電話、腕時計、ノートパソコンなどの移動機器は選択しないでください。",
           "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
           "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
           "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
@@ -42,14 +42,14 @@
         },
         "data_description": {
           "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
-          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
-          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
+          "tts_media_player": "生成した TTS を共有 Snapserver ストリームに実際に再生する共通メディアプレーヤーです（例：MPD）。全体共通の設備であり、部屋によって絞り込みません。",
+          "tts_min_level": "音声読み上げが許可される最低のお知らせレベルです。それより低いレベルは無音になり、重大レベルは常に音声で通知されます。",
           "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
           "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
           "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
           "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
           "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
+          "snapcast_outputs": "各ルームで同期された物理出力として使う Snapcast クライアントのメディアプレーヤーです。Announcement Hub は直接 TTS を送信せず、共有プレーヤーが Snapserver に音声を送る間、ミュートと経路を管理します。",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
           "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
           "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
@@ -96,7 +96,7 @@
           "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
           "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
           "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
-          "snapcast_only_source": "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
+          "snapcast_only_source": "有効時、Announcement Hub は設定済みお知らせ音源にすでにつながっているクライアントのミュート状態だけを変更します。他の Snapcast グループや音源には触れません。",
           "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
           "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
           "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
@@ -133,15 +133,15 @@
           "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
           "default_title": "Title used for visual notifications when the send action does not provide its own title.",
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
-          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
+          "occupancy_sensor": "現在使用中の Home Assistant エリア名または ID を、状態または選択した属性に含むエンティティです。送信アクションで在室エリアへのルーティングを有効にした場合だけ使用します。",
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
+          "fallback_room": "代替 TTS エリアは、現在の対象ルームに固定のルーム候補が一つも存在しない場合にだけ使われます。使用不可や状態不明でも固定候補があれば代替処理を妨げ、通常の可用性待機時間が適用されます。",
+          "fallback_check_door": "有効にすると、対象ルームのいずれかにある適切なドアセンサーが明確に開いていると報告した場合のみ代替ルートを許可します。",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
+          "default_use_ai": "有効時は、送信アクションで use_ai: false を明示しない限り、すべてのお知らせに AI 書き換えを適用します。use_ai を省略するとこの設定に従います。AI が失敗した場合は元の文章を配信します。アクションの response_variable で ai 状態を確認できます。",
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "channel_fallback_mode": "音声 text_tts と文字 text_notify の両方があり、対応する TTS・視覚出力機器もある場合のみ適用します。「視覚 → TTS」は先に通知し失敗時に読み上げ、「TTS → 視覚」は先に読み上げ失敗時に通知、「両方」は両チャネルを試みます。一方だけなら通常どおりです。不足した文章を作成したり送信先を拡大したりせず、レベル制限も保持します。"
         }
       },
       "reconfigure": {
@@ -320,7 +320,7 @@
         },
         "data_description": {
           "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
-          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
+          "notify_room_outputs": "Home Assistant のエリアが在室中または代替先のルームに一致する必要がある通知機器です。携帯電話、腕時計、ノートパソコンなどの移動機器は選択しないでください。",
           "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
           "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
           "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
@@ -347,14 +347,14 @@
         },
         "data_description": {
           "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
-          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
-          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
+          "tts_media_player": "生成した TTS を共有 Snapserver ストリームに実際に再生する共通メディアプレーヤーです（例：MPD）。全体共通の設備であり、部屋によって絞り込みません。",
+          "tts_min_level": "音声読み上げが許可される最低のお知らせレベルです。それより低いレベルは無音になり、重大レベルは常に音声で通知されます。",
           "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
           "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
           "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
           "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
           "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
+          "snapcast_outputs": "各ルームで同期された物理出力として使う Snapcast クライアントのメディアプレーヤーです。Announcement Hub は直接 TTS を送信せず、共有プレーヤーが Snapserver に音声を送る間、ミュートと経路を管理します。",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
           "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
           "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
@@ -401,7 +401,7 @@
           "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
           "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
           "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
-          "snapcast_only_source": "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
+          "snapcast_only_source": "有効時、Announcement Hub は設定済みお知らせ音源にすでにつながっているクライアントのミュート状態だけを変更します。他の Snapcast グループや音源には触れません。",
           "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
           "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
           "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
@@ -438,15 +438,15 @@
           "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
           "default_title": "Title used for visual notifications when the send action does not provide its own title.",
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
-          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
+          "occupancy_sensor": "現在使用中の Home Assistant エリア名または ID を、状態または選択した属性に含むエンティティです。送信アクションで在室エリアへのルーティングを有効にした場合だけ使用します。",
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
+          "fallback_room": "代替 TTS エリアは、現在の対象ルームに固定のルーム候補が一つも存在しない場合にだけ使われます。使用不可や状態不明でも固定候補があれば代替処理を妨げ、通常の可用性待機時間が適用されます。",
+          "fallback_check_door": "有効にすると、対象ルームのいずれかにある適切なドアセンサーが明確に開いていると報告した場合のみ代替ルートを許可します。",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
+          "default_use_ai": "有効時は、送信アクションで use_ai: false を明示しない限り、すべてのお知らせに AI 書き換えを適用します。use_ai を省略するとこの設定に従います。AI が失敗した場合は元の文章を配信します。アクションの response_variable で ai 状態を確認できます。",
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "channel_fallback_mode": "音声 text_tts と文字 text_notify の両方があり、対応する TTS・視覚出力機器もある場合のみ適用します。「視覚 → TTS」は先に通知し失敗時に読み上げ、「TTS → 視覚」は先に読み上げ失敗時に通知、「両方」は両チャネルを試みます。一方だけなら通常どおりです。不足した文章を作成したり送信先を拡大したりせず、レベル制限も保持します。"
         }
       },
       "init": {
@@ -747,11 +747,11 @@
       "fields": {
         "text_tts": {
           "name": "読み上げテキスト (TTS)",
-          "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
+          "description": "音声専用メッセージです。文字通知には転送しません。text が指定された場合、その読み上げ用の内容だけを上書きします。"
         },
         "text_notify": {
           "name": "文字通知",
-          "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
+          "description": "視覚通知専用の内容です。TTS では読み上げません。text が指定された場合、その文字通知用の内容だけを上書きします。"
         },
         "title": {
           "name": "タイトル",
@@ -759,11 +759,11 @@
         },
         "level": {
           "name": "重要度",
-          "description": "Announcement severity. Critical uses every configured matching output only when no explicit service or output target is supplied. Explicit selections remain authoritative even for Critical and never enable unrequested TTS."
+          "description": "お知らせの重要度です。重大レベルが設定済みの一致する全出力を使うのは、サービスも出力先も明示指定されていない場合だけです。重大でも明示指定が優先され、要求されていない TTS は起動しません。"
         },
         "service": {
           "name": "送信サービス",
-          "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
+          "description": "notification（文字）、tts（音声）、snapcast、companion_tts（専用音声）または all を選びます。選択済み機器を絞り込むだけで、無関係な受信者は追加しません。"
         },
         "notify_data": {
           "name": "Notification data",
@@ -783,11 +783,11 @@
         },
         "occupied_only": {
           "name": "代替送信時に在室中の部屋を試す",
-          "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
+          "description": "エリア宛て送信では、最初に選択したルーム、設定が有効なら次に他の在室エリアを試します。明示指定したインテグレーション、機器、エンティティの送信先は変更しません。"
         },
         "use_ai": {
           "name": "AIによる文章調整",
-          "description": "Optional override for this announcement. Leave unset to inherit the integration setting; true enables AI and false bypasses it even if globally enabled."
+          "description": "このお知らせだけの任意の上書き設定です。空ならインテグレーションの設定を継承し、true は AI を有効にし、false は全体で有効でも AI を使いません。"
         },
         "ai_agent": {
           "name": "AIプロバイダー",
@@ -803,23 +803,23 @@
         },
         "area": {
           "name": "エリア",
-          "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
+          "description": "代替経路付きのルーム配信では、最初に指定した Home Assistant エリア、次に他の在室エリア、続いてドアの状態で制限された代替エリア、最後に共通出力を試します。併用した明示指定の受信者は独立して処理されます。"
         },
         "integration": {
           "name": "統合",
-          "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
+          "description": "指定したインテグレーションドメインに属する設定済みの物理出力すべてに送信します。無関係な機器やインテグレーションは追加しません。area や正確な機器・エンティティ指定と併用できます。"
         },
         "device": {
           "name": "デバイス",
-          "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
+          "description": "これらの正確な Home Assistant デバイス ID に対応する出力だけに送信します。Snapcast や他のスピーカーを推測して追加しません。area、integration と併用できます。"
         },
         "entity": {
           "name": "エンティティ",
-          "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
+          "description": "正確に指定した設定済み notify または media_player エンティティだけに送信します。他の受信者は追加しません。area、integration と併用できます。"
         },
         "ai_mode": {
           "name": "AIによる文章調整",
-          "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
+          "description": "Rewrite は完成済みのお知らせを編集し、Generate は情報を含む作成指示からお知らせを生成します。AI が失敗した場合は元の指示文が保持されます。"
         },
         "target_person": {
           "name": "対象の人物",
