@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.10.0b9 - 2026-10-22
+
+**Beta — complete Dutch native integration localization.**
+
+- Complete all **599 native Dutch UI entries** across initial setup,
+  reconfiguration, person/group settings, TTS and Companion App settings,
+  provider notification profiles, Snapcast routing, queue controls, AI
+  styles, room safety, selector options, validation errors, service actions
+  and diagnostics.
+- Review room-scoped versus exact-recipient explanations, door-gated
+  fallback, AI failure recovery, speaking versus written channels, and
+  isolation of the shared Snapcast source. No runtime routing changed.
+- Preserve all technical service names, entity identifiers, callback keys
+  and template parameters. The only ten values identical to English
+  are intentionally shared names: Debug, Indigo, Tablet, and numeric
+  transparency choices.
+- Add strict Dutch regression tests for all 599 keys, 0 English fallback
+  descriptions or errors, config/options consistency, placeholder parity,
+  and exact technical identifiers.
+- Keep issue #50 open for the remaining eleven non-English native catalogs.
+  Live output/device verification is unchanged from prior betas.
+
 ## 0.10.0b8 - 2026-10-22
 
 **Beta — complete European and Brazilian Portuguese native localizations.**

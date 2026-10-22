@@ -8,18 +8,18 @@
         "data": {
           "notify_outputs": "Meldingsapparaten",
           "notify_room_outputs": "Meldingsapparaten per ruimte",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Minimum Info / Succes",
+          "notify_warning_outputs": "Minimum Waarschuwing",
+          "notify_error_outputs": "Minimum Fout",
+          "notify_critical_outputs": "Alleen kritiek"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_outputs": "Herkende meldingsentiteiten die Announcement Hub kan gebruiken. Alle ondersteunde apparaten worden automatisch geselecteerd; verwijder apparaten waarop Announcement Hub nooit meldingen mag afleveren.",
           "notify_room_outputs": "Geselecteerde meldingsapparaten waarvan de Home Assistant-ruimte moet overeenkomen met de bezette of uitwijkruimte. Laat verplaatsbare apparaten zoals telefoons, horloges en laptops buiten deze lijst.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_info_outputs": "Apparaten in deze lijst ontvangen meldingen van niveau Info en Succes en alle hogere niveaus. Apparaten die niet aan een hoger minimumniveau zijn toegewezen, gebruiken Debug en ontvangen daardoor alle niveaus.",
+          "notify_warning_outputs": "Apparaten in deze lijst ontvangen meldingen van niveau Waarschuwing, Fout en Kritiek, maar geen Debug, Info of Succes.",
+          "notify_error_outputs": "Apparaten in deze lijst ontvangen alleen meldingen van niveau Fout en Kritiek.",
+          "notify_critical_outputs": "Apparaten in deze lijst ontvangen uitsluitend kritieke meldingen."
         }
       },
       "tts": {
@@ -29,77 +29,77 @@
           "tts_engines": "TTS-engine",
           "tts_media_player": "Gedeelde mediaspeler voor Snapcast",
           "snapcast_outputs": "Snapcast-clients per ruimte",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "TTS gebruiken vanaf niveau",
+          "tts_cache": "Spraak vooraf genereren en cachen",
+          "tts_language": "TTS-taal",
+          "tts_options": "TTS-engineopties",
+          "companion_tts_media_stream": "Audiostream van de Companion App",
+          "companion_tts_words_per_minute": "Geschatte spreektijd van Companion TTS",
+          "tts_area_players": "Directe TTS-spelers per kamer",
+          "companion_tts_outputs": "Companion App TTS-apparaten",
+          "tts_voice": "TTS-stem",
+          "direct_tts_announce": "Aankondigingsmodus voor directe luidsprekers (kan een beltoon afspelen)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_engines": "De enige actieve spraakengine. De standaard-TTS-engine van Home Assistant is vooraf geselecteerd wanneer deze beschikbaar is.",
           "tts_media_player": "De algemene mediaspeler die de gegenereerde TTS werkelijk afspeelt naar de gedeelde Snapserver-stream, bijvoorbeeld MPD. Dit is algemene infrastructuur en wordt nooit op ruimte gefilterd.",
           "tts_min_level": "Minimaal aankondigingsniveau waarop gesproken mag worden. Lagere niveaus blijven stil; Kritiek is altijd hoorbaar.",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "tts_cache": "Genereer de TTS-audio zo mogelijk vóór het afspelen en sla deze op in de cache. Dit beperkt de vertraging bij het starten en maakt hergebruik van dezelfde audio via het gekozen uitvoerpad mogelijk.",
+          "tts_language": "De taal die aan de geselecteerde TTS-engine wordt doorgegeven. De keuzelijst komt rechtstreeks uit de talen die de engine als ondersteund opgeeft.",
+          "tts_options": "Extra enginespecifieke TTS-opties. Taal en ondersteunde stem worden hierboven afzonderlijk ingesteld; gebruik dit alleen voor andere provideropties.",
+          "companion_tts_media_stream": "Android-audiostream voor push-TTS via de Companion App. Bepaalt hoe de telefoon omgaat met volume en audiofocus.",
+          "companion_tts_words_per_minute": "Alleen gebruikt om te schatten hoe lang de Companion App push-TTS afspeelt, omdat de app niet meldt wanneer het afspelen is voltooid. De wachtrij wacht gedurende deze geschatte tijd om overlap te voorkomen.",
           "snapcast_outputs": "Snapcast-clientmediaspelers die als gesynchroniseerde fysieke ruimte-uitgangen dienen. Announcement Hub verzendt TTS niet rechtstreeks naar hen, maar beheert dempen en routering terwijl de gedeelde speler Snapserver voedt.",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "companion_tts_outputs": "Android-apparaten met de Companion App die push-TTS mogen ontvangen. Dit staat los van gewone visuele meldingen op de telefoon.",
+          "tts_area_players": "Directe mediaspelers die gegenereerde TTS alleen ontvangen wanneer hun Home Assistant-ruimte overeenkomt met de bezette of uitwijkkamer. Elke speler die hier is geselecteerd, wordt automatisch aan een ruimte gebonden.",
+          "tts_voice": "De stem die de actieve TTS-engine aanbiedt voor de gekozen taal. Compatibele regionale stemmen worden meegenomen (bijvoorbeeld el en el_GR). Als de provider stemmen ondersteunt maar deze niet kan opsommen, blijft het veld beschikbaar voor een handmatig ingevoerde stem-ID.",
+          "direct_tts_announce": "Gebruik de aankondigingsmodus (announce) van Home Assistant voor de geselecteerde directe mediaspelers. Dit kan een korte beltoon afspelen en daarna de media hervatten, indien ondersteund. Schakel dit uit om door de provider gegenereerde beltonen te vermijden; directe TTS kan andere media onderbreken. De gedeelde Snapcast-bron gebruikt nooit de aankondigingsmodus."
         }
       },
       "notification_profile": {
         "title": "Integratieopties: {integration}",
         "description": "Stel het meldings- en routeringsgedrag in.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "Maximumaantal tekens per deel",
+          "reading_words_per_minute": "Leessnelheid",
+          "minimum_display_seconds": "Minimale weergaveduur",
+          "maximum_display_seconds": "Maximale weergaveduur",
+          "display_buffer_seconds": "Extra leestijd",
+          "part_gap_seconds": "Pauze tussen delen",
+          "show_part_number": "Deelnummer in titel tonen",
+          "integration_data": "Aanvullende integratiegegevens",
+          "replace_parts": "Vorig deel van de Companion App vervangen",
+          "position": "Positie",
+          "fontsize": "Tekengrootte",
+          "color": "Achtergrondkleur",
+          "transparency": "Achtergrondtransparantie",
+          "interrupt": "Interactieve melding",
+          "snapcast_source": "Snapcast-bron voor aankondigingen",
+          "snapcast_only_source": "Alleen clients beheren die al op de aankondigingsbron zitten",
+          "snapcast_settle_delay": "Wachttijd voor Snapcast-routering",
+          "snapcast_verify_timeout": "Time-out voor verificatie van Snapcast-routering",
+          "snapcast_restore": "Snapcast-dempstanden herstellen"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "max_length": "Maximumaantal tekens per deel van een visuele melding. Langere tekst wordt op natuurlijke grenzen opgesplitst; met 0 wordt splitsen uitgeschakeld.",
+          "reading_words_per_minute": "Leessnelheid die wordt gebruikt om te bepalen hoelang elk deel van een visuele melding zichtbaar moet blijven voordat het volgende wordt verzonden.",
+          "minimum_display_seconds": "Ondergrens voor de berekende weergaveduur van elk deel van een visuele melding, ook als de tekst erg kort is.",
+          "maximum_display_seconds": "Bovengrens voor de berekende weergaveduur van elk deel van een visuele melding, zodat lange berichten de wachtrij niet onbeperkt blokkeren.",
+          "display_buffer_seconds": "Extra seconden die worden opgeteld bij de geschatte leestijd voor elk deel van een visuele melding.",
+          "part_gap_seconds": "Pauze tussen opgesplitste delen van een visuele melding, zodat het vorige deel kan verdwijnen voordat het volgende wordt afgeleverd.",
+          "show_part_number": "Als dit is ingeschakeld, verschijnt in de titel van opgesplitste meldingen een teller zoals 1/3 of 2/3.",
+          "integration_data": "Optionele providergegevens die aan elke visuele melding via deze integratie worden toegevoegd. Bij een afzonderlijke aanroep hebben overeenkomende sleutels uit notify_data voorrang.",
+          "replace_parts": "Gebruik voor gesplitste Companion App-berichten steeds dezelfde meldingstag, zodat elk nieuw deel het vorige vervangt in plaats van meldingen op te stapelen.",
+          "position": "Schermpositie waarop Notifications for Android TV / Fire TV de melding als overlay toont.",
+          "fontsize": "Tekengrootte waarmee Notifications for Android TV / Fire TV de melding als overlay weergeeft.",
+          "color": "Achtergrondkleur van de meldingsoverlay van Notifications for Android TV / Fire TV.",
+          "transparency": "Transparantie van de achtergrond van de meldingsoverlay van Notifications for Android TV / Fire TV.",
+          "interrupt": "Als dit is ingeschakeld, is de Android TV-melding interactief en kan deze de huidige tv-app onderbreken of de focus overnemen.",
+          "snapcast_source": "Naam van de Snapcast-bron of -stream met het aankondigingsgeluid. De clients van de geselecteerde ruimtes worden vóór het spreken naar deze bron gerouteerd.",
           "snapcast_only_source": "Als dit aanstaat, wijzigt Announcement Hub de dempstatus alleen van clients die al op de ingestelde aankondigingsbron staan; andere Snapcast-groepen en -bronnen blijven ongemoeid.",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "snapcast_settle_delay": "Korte vertraging nadat de Snapcast-routering of dempstand is gewijzigd, voordat TTS begint. Zo kunnen clients de wijziging toepassen.",
+          "snapcast_verify_timeout": "Maximale wachttijd tot Snapcast-clients de gevraagde routering en dempstand bevestigen, voordat wordt doorgegaan of de uitvoer als niet beschikbaar wordt beschouwd.",
+          "snapcast_restore": "Herstel na de aankondiging de vorige dempstand van iedere beheerde Snapcast-client, zodat het gewone afspelen precies als daarvoor wordt hervat."
         }
       },
       "queue": {
@@ -107,40 +107,40 @@
         "description": "Configureer aanwezigheid, terugval, deuren, wachtrij en time-outs.",
         "data": {
           "queue_max": "Maximaal aantal berichten in wachtrij",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Wachttijd voor niet-beschikbare uitvoer",
+          "idle_timeout": "Wachten tot audio inactief is",
+          "start_timeout": "Time-out bij starten van afspelen",
+          "playback_timeout": "Maximale TTS-afspeeltijd",
+          "post_play_delay": "Pauze na afspelen",
+          "default_title": "Standaardtitel voor meldingen",
+          "critical_notify_data": "Gegevens voor kritieke meldingen",
           "occupancy_sensor": "Ruimte-aanwezigheidsentiteit",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "Waarde van bezette ruimtes",
           "fallback_room": "Terugvalruimte",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Open deur in bezette ruimte vereisen voor uitwijken",
+          "fallback_door_label": "Filter op deurlabel",
           "default_use_ai": "Aankondigingen herschrijven met AI",
           "default_ai_agent": "Standaard AI-provider (gesprek of AI-taak)",
           "fallback_ai_agent": "Reserve AI-provider (gesprek of AI-taak)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Terugvalkanaal voor meldingen"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
+          "output_availability_timeout": "Hoelang een niet-beschikbare uitvoer mag blijven wachten. Andere uitvoerbare aankondigingen kunnen deze passeren; na de ingestelde tijd wordt de niet-beschikbare uitvoer zonder melding overgeslagen.",
+          "idle_timeout": "Maximale tijd om te wachten totdat het geselecteerde audiopad inactief is voordat TTS start, zodat lopende media niet worden onderbroken.",
+          "start_timeout": "Maximale tijd waarbinnen een mediaspeler met TTS moet beginnen nadat het afspeelverzoek is verzonden.",
+          "playback_timeout": "Veiligheidslimiet voor hoelang Announcement Hub wacht totdat één gesproken aankondiging is afgelopen voordat de wachtrij wordt vrijgegeven.",
+          "post_play_delay": "Korte stille pauze na gesproken audio voordat de volgende uitvoer of taak mag beginnen, om afgekapt geluid bij opeenvolgende aankondigingen te voorkomen.",
+          "default_title": "Titel voor visuele meldingen als de verzendactie geen eigen titel bevat.",
+          "critical_notify_data": "Providerspecifieke gegevens die alleen aan visuele meldingen van niveau Kritiek worden toegevoegd, zoals urgentie- of prioriteitsopties die de meldingsintegratie ondersteunt.",
           "occupancy_sensor": "Entiteit waarvan de status of het gekozen attribuut de namen of ID's bevat van momenteel bezette Home Assistant-ruimtes. Wordt alleen gebruikt als een verzendactie routering naar bezette ruimtes inschakelt.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "occupancy_attribute": "Geef aan of bezette ruimtes worden uitgelezen uit de entiteitsstatus of een van de actuele attributen.",
           "fallback_room": "TTS-uitwijkruimte die alleen wordt gebruikt als er onder de huidige doelruimtes helemaal geen vaste ruimtekandidaten bestaan. Bestaande vaste kandidaten, ook als ze onbekend of onbeschikbaar zijn, verhinderen uitwijken en blijven onder de normale beschikbaarheidswachttijd vallen.",
           "fallback_check_door": "Als dit aanstaat, is uitwijken alleen toegestaan wanneer een geschikte deursensor in een van de huidige doelruimtes uitdrukkelijk 'open' meldt.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "fallback_door_label": "Optioneel Home Assistant-label. Als er een label is gekozen, mogen alleen binaire deursensoren met dat label het uitwijken toestaan. Laat dit veld leeg om alle deursensoren in de huidige doelruimtes mee te nemen.",
           "default_use_ai": "Wanneer ingeschakeld erven alle aankondigingen AI-herschrijving, tenzij de verzendactie expliciet use_ai: false opgeeft. Zonder use_ai geldt deze instelling. Als AI faalt, wordt de oorspronkelijke tekst afgeleverd. Controleer de ai-status in de response_variable van de verzendactie.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "default_ai_agent": "De standaardoptie van Home Assistant volgt de conversatieagent van je voorkeurs-Assist-pijplijn, niet de ingebouwde intent-agent conversation.process. De agent wordt bij het verzenden bepaald en in de keuzelijst getoond. Als de voorkeurs-pijplijn de ingebouwde agent gebruikt, kies dan expliciet een LLM-agent of stel een reserveagent in.",
+          "fallback_ai_agent": "Optionele reserve-AI-agent als de primaire agent faalt. Ook de Home Assistant-standaard volgt de voorkeurs-Assist-pijplijn; de optie 'Oorspronkelijke aankondiging' slaat een tweede AI-poging over. Als beide AI-agents falen, wordt altijd de oorspronkelijke tekst afgeleverd.",
           "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden."
         }
       },
@@ -148,26 +148,26 @@
         "title": "Announcement Hub opnieuw configureren",
         "description": "Kies een sectie; na opslaan keer je terug naar de integratie.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. Meldingsuitgangen en ruimtes",
+          "edit_tts": "2. TTS-engines en apparaten",
+          "edit_profiles": "3. Providerspecifieke uitvoerprofielen",
+          "edit_general": "4. Algemene instellingen, aanwezigheid en AI",
+          "edit_all": "Alle instellingen bewerken (volledige wizard)",
           "edit_people": "5. Personen en stemmen",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "Geavanceerde AI-prompts",
+          "edit_audio": "Audio, beltoon en volumeverlaging",
+          "edit_room_safety": "Aanwezigheidsverificatie per ruimte"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_outputs": "Kies meldingsapparaten, ruimtebindingen en minimale waarschuwingsniveaus zonder de TTS- of AI-instellingen te wijzigen.",
+          "edit_tts": "Wijzig de actieve spraakengine, stem, mediaspelers per ruimte, Snapcast-clients en spraakapparaten van de Companion App.",
+          "edit_profiles": "Stel meldingsduur, weergavestijlen en Snapcast-afspeelinstellingen in voor de gekozen providers.",
+          "edit_general": "Ga rechtstreeks naar AI-agents en reserveagents, aanwezigheid, uitwijkruimtes, wachtrijen en time-outs.",
+          "edit_all": "Doorloop alle configuratiepagina's in volgorde, zoals in de oorspronkelijke configuratiewizard.",
           "edit_people": "Configure people's room trackers and individual/group voice settings.",
-          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
-          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
-          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
+          "edit_advanced_ai": "Bewerk optionele AI-stijlen voor herschrijven, vertalen en beide samen. De vaste veiligheidsregels voor apparaten en tools blijven van kracht.",
+          "edit_audio": "Stel de beltoon alleen voor directe kamerspeakers en de optionele verlaging van muziekvolume in; nooit voor een gedeelde Snapcast-bron.",
+          "edit_room_safety": "Stel de optionele aanwezigheidssensor voor een ruimte in; niet-beschikbare sensoren mogen nooit uitwijken naar een andere ruimte veroorzaken."
         }
       },
       "people": {
@@ -178,8 +178,8 @@
           "person_group_language": "Groepstaal",
           "person_group_voice": "Groepsstem",
           "person_group_translate": "Groepsaankondigingen vertalen",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "AI-provider van de groep",
+          "person_group_tts_engine": "TTS-engine van de groep",
           "person_group_rewrite": "Groepsaankondigingen herschrijven",
           "person_group_addressee": "Groepsaanhef",
           "person_group_greeting": "Groep begroeten"
@@ -189,8 +189,8 @@
           "person_group_language": "Optionele taalcode voor aankondigingen aan meerdere geselecteerde personen in dezelfde kamer.",
           "person_group_voice": "Optionele TTS-stemcode voor aankondigingen aan meerdere geselecteerde personen in dezelfde kamer.",
           "person_group_translate": "Vertaal groepsaankondigingen automatisch naar de ingestelde groepstaal met de gekozen AI-agent of de reserveagent. Bij fouten wordt de oorspronkelijke tekst gebruikt.",
-          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
-          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_agent": "Optionele Conversation- of AI Task-agent voor groepsontvangers. Een agent die expliciet in de actie is opgegeven, heeft voorrang.",
+          "person_group_tts_engine": "Optionele TTS-engine voor personen die dezelfde ruimte delen. Dit kiest alleen de spraakinfrastructuur en voegt nooit andere uitvoerapparaten toe.",
           "person_group_rewrite": "Aankondigingen herschrijven met de AI-agent van de groep. Vertaling kan afzonderlijk worden ingesteld.",
           "person_group_addressee": "Optionele groepsaanspreking (bijvoorbeeld Familie). Alleen gebruikt als begroetingen zijn ingeschakeld of {{ name }} letterlijk aanwezig is.",
           "person_group_greeting": "Plaats de groepsaanspreking voor groepsaankondigingen. Standaard uitgeschakeld; voegt geen ontvangers toe."
@@ -210,7 +210,7 @@
           "destination_tablet": "Tabletuitgangen",
           "destination_other": "Overige persoonlijke uitgangen",
           "enabled": "Aankondigingen voor deze persoon toestaan",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "Sensor voor aanwezigheidsverificatie",
           "verify_presence": "Aanwezigheid verifiëren",
           "rewrite": "Aankondigingen herschrijven",
           "ai_agent": "Persoonlijke AI-agent",
@@ -228,81 +228,81 @@
           "destination_watch": "Selecteer bestaande meldings- of mediaspeleruitgangen van het horloge van deze persoon. Alleen toegewezen uitgangen worden gebruikt.",
           "destination_tablet": "Selecteer bestaande meldings- of mediaspeleruitgangen van de tablet van deze persoon. Alleen toegewezen uitgangen worden gebruikt.",
           "destination_other": "Andere bestaande Home Assistant-uitgangen die aan deze persoon zijn toegewezen en alleen bij de keuze 'Overig' worden gebruikt.",
-          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "enabled": "Schakel dit uit om nieuwe en al in de wachtrij staande aankondigingen voor deze persoon te blokkeren. Er wordt niet naar een andere persoon of ruimte omgeleid.",
           "presence_sensor": "Optionele binaire sensor om de aanwezigheid van deze persoon te bevestigen bij levering aan een kamer.",
-          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "verify_presence": "De gekozen aanwezigheidssensor moet bij aflevering aan staan. Ontbrekende of niet-beschikbare sensoren blokkeren aflevering aan de persoon in de ruimte.",
           "rewrite": "Herschrijven voor deze persoon inschakelen, onafhankelijk van diens vertaalvoorkeur.",
           "ai_agent": "Optionele AI Task- of Conversation-agent voor deze persoon. Overschrijft de algemene provider, tenzij de actie een andere kiest.",
           "tts_engine": "Optionele TTS-entiteit voor deze persoon; overschrijft de algemene spraakengine zonder de doelapparaten te wijzigen.",
-          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "greeting": "Plaats de voorkeursnaam vooraan in aankondigingen, tenzij de tekst de letterlijke placeholder {{ name }} al bevat.",
           "address": "Optionele aanspreekvorm voor deze persoon. Indien leeg wordt de weergavenaam uit Home Assistant gebruikt."
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "Geavanceerde AI-stijlpompts",
+        "description": "Optionele stijlinstructies voor herschrijven, vertalen of beide. De vaste veiligheidsregels en JSON-vereisten blijven leidend.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "Herschrijfstijl",
+          "translate": "Vertaalstijl",
+          "both": "Gecombineerde herschrijf- en vertaalstijl"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "Optionele voorkeur in gewone tekst; alleen {message} en {language} mogen als placeholders worden gebruikt.",
+          "translate": "Optionele vertaalvoorkeur voor de gekozen AI, zonder feiten te wijzigen of acties mogelijk te maken.",
+          "both": "Optionele stijlvoorkeur wanneer vertalen en herschrijven beide zijn ingeschakeld."
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "Audio-opties voor directe kamerspeakers",
+        "description": "Optionele beltoon en volumeverlaging uitsluitend voor geselecteerde directe kamerspeakers, nooit voor gedeelde Snapcast-weergave.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "Beltoon vóór aankondiging inschakelen",
+          "person_chime_url": "Lokaal pad naar beltoonaudio",
+          "person_chime_delay": "Wachttijd na de beltoon",
+          "person_output_ducking": "Volume van afgespeelde media verlagen",
+          "person_duck_factor": "Factor voor muziekvolume"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "Standaard uitgeschakeld. De beltoon wordt alleen afgespeeld op een expliciet geselecteerde directe speler in de ruimte.",
+          "person_chime_url": "Een lokaal audiobestand, bijvoorbeeld /local/chime.mp3; externe URL's worden niet geaccepteerd.",
+          "person_chime_delay": "Maximale tijd die de beltoon in de ruimte mag duren voordat TTS begint.",
+          "person_output_ducking": "Standaard uitgeschakeld. Sla het volume van een actieve directe kamerspeler op, verlaag dit tijdens de aankondiging en herstel het daarna.",
+          "person_duck_factor": "Deel van het oorspronkelijke muziekvolume tijdens de aankondiging; alleen directe kamerspelers worden beïnvloed."
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "Aanwezigheidsverificatie per ruimte",
+        "description": "Stel een optionele sensor in die de aanwezigheid in één geselecteerde Home Assistant-ruimte positief bevestigt.",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "Ruimte",
+          "verify_presence": "Aanwezigheidsbevestiging vereisen",
+          "presence_sensor": "Bezettingssensor van de ruimte"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "Kies de ruimte waarvoor de verificatie moet worden toegevoegd of verwijderd.",
+          "verify_presence": "Speel aankondigingen voor een persoon in diens ruimte alleen af wanneer de geselecteerde sensor aan staat; ontbrekende gegevens blokkeren de aflevering.",
+          "presence_sensor": "Kies een binary_sensor-entiteit voor aanwezigheid of bezetting die zich fysiek in deze ruimte bevindt."
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "Selecteer een TTS-mediaspeler wanneer TTS-engines zijn geselecteerd.",
+      "tts_engine_required": "Selecteer een TTS-engine wanneer een TTS-speler is geselecteerd.",
+      "snapcast_tts_path_required": "Snapcast-uitgangen vereisen minstens één TTS-engine en een TTS-mediaspeler.",
+      "output_required": "Selecteer minimaal één visuele, server-TTS- of Companion App TTS-uitgang.",
+      "display_time_order": "De maximale weergaveduur moet groter dan of gelijk aan de minimale weergaveduur zijn.",
+      "room_notify_area_required": "Een meldingsapparaat dat aan een ruimte is gebonden, moet een Home Assistant-ruimte hebben.",
+      "notify_level_overlap": "Een meldingsapparaat mag aan slechts één minimumniveau worden toegewezen.",
+      "room_tts_area_required": "Een directe TTS-mediaspeler die aan een ruimte is gebonden, moet een Home Assistant-ruimte hebben.",
+      "tts_player_role_overlap": "Dezelfde mediaspeler kan niet tegelijk een directe TTS-speler en de speler van de gedeelde Snapcast-bron zijn.",
       "invalid_person_output": "De geselecteerde persoonlijke uitgang bestaat niet of is uitgeschakeld.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "De aangepaste AI-stijl mag alleen {message} en {language} als placeholders gebruiken en mag maximaal 1200 tekens bevatten.",
+      "invalid_chime_url": "De beltoonaudio moet een bestand onder /local/ gebruiken.",
+      "invalid_person_area": "Selecteer een geldige Home Assistant-ruimte.",
+      "invalid_person_presence": "Selecteer een aanwezigheidssensor voordat verificatie wordt ingeschakeld."
     },
     "abort": {
-      "single_instance_allowed": "Announcement Hub is already configured."
+      "single_instance_allowed": "Announcement Hub is al geconfigureerd."
     }
   },
   "options": {
@@ -313,18 +313,18 @@
         "data": {
           "notify_outputs": "Meldingsapparaten",
           "notify_room_outputs": "Meldingsapparaten per ruimte",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Minimum Info / Succes",
+          "notify_warning_outputs": "Minimum Waarschuwing",
+          "notify_error_outputs": "Minimum Fout",
+          "notify_critical_outputs": "Alleen kritiek"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_outputs": "Herkende meldingsentiteiten die Announcement Hub kan gebruiken. Alle ondersteunde apparaten worden automatisch geselecteerd; verwijder apparaten waarop Announcement Hub nooit meldingen mag afleveren.",
           "notify_room_outputs": "Geselecteerde meldingsapparaten waarvan de Home Assistant-ruimte moet overeenkomen met de bezette of uitwijkruimte. Laat verplaatsbare apparaten zoals telefoons, horloges en laptops buiten deze lijst.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_info_outputs": "Apparaten in deze lijst ontvangen meldingen van niveau Info en Succes en alle hogere niveaus. Apparaten die niet aan een hoger minimumniveau zijn toegewezen, gebruiken Debug en ontvangen daardoor alle niveaus.",
+          "notify_warning_outputs": "Apparaten in deze lijst ontvangen meldingen van niveau Waarschuwing, Fout en Kritiek, maar geen Debug, Info of Succes.",
+          "notify_error_outputs": "Apparaten in deze lijst ontvangen alleen meldingen van niveau Fout en Kritiek.",
+          "notify_critical_outputs": "Apparaten in deze lijst ontvangen uitsluitend kritieke meldingen."
         }
       },
       "tts": {
@@ -334,77 +334,77 @@
           "tts_engines": "TTS-engine",
           "tts_media_player": "Gedeelde mediaspeler voor Snapcast",
           "snapcast_outputs": "Snapcast-clients per ruimte",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "TTS gebruiken vanaf niveau",
+          "tts_cache": "Spraak vooraf genereren en cachen",
+          "tts_language": "TTS-taal",
+          "tts_options": "TTS-engineopties",
+          "companion_tts_media_stream": "Audiostream van de Companion App",
+          "companion_tts_words_per_minute": "Geschatte spreektijd van Companion TTS",
+          "tts_area_players": "Directe TTS-spelers per kamer",
+          "companion_tts_outputs": "Companion App TTS-apparaten",
+          "tts_voice": "TTS-stem",
+          "direct_tts_announce": "Aankondigingsmodus voor directe luidsprekers (kan een beltoon afspelen)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_engines": "De enige actieve spraakengine. De standaard-TTS-engine van Home Assistant is vooraf geselecteerd wanneer deze beschikbaar is.",
           "tts_media_player": "De algemene mediaspeler die de gegenereerde TTS werkelijk afspeelt naar de gedeelde Snapserver-stream, bijvoorbeeld MPD. Dit is algemene infrastructuur en wordt nooit op ruimte gefilterd.",
           "tts_min_level": "Minimaal aankondigingsniveau waarop gesproken mag worden. Lagere niveaus blijven stil; Kritiek is altijd hoorbaar.",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "tts_cache": "Genereer de TTS-audio zo mogelijk vóór het afspelen en sla deze op in de cache. Dit beperkt de vertraging bij het starten en maakt hergebruik van dezelfde audio via het gekozen uitvoerpad mogelijk.",
+          "tts_language": "De taal die aan de geselecteerde TTS-engine wordt doorgegeven. De keuzelijst komt rechtstreeks uit de talen die de engine als ondersteund opgeeft.",
+          "tts_options": "Extra enginespecifieke TTS-opties. Taal en ondersteunde stem worden hierboven afzonderlijk ingesteld; gebruik dit alleen voor andere provideropties.",
+          "companion_tts_media_stream": "Android-audiostream voor push-TTS via de Companion App. Bepaalt hoe de telefoon omgaat met volume en audiofocus.",
+          "companion_tts_words_per_minute": "Alleen gebruikt om te schatten hoe lang de Companion App push-TTS afspeelt, omdat de app niet meldt wanneer het afspelen is voltooid. De wachtrij wacht gedurende deze geschatte tijd om overlap te voorkomen.",
           "snapcast_outputs": "Snapcast-clientmediaspelers die als gesynchroniseerde fysieke ruimte-uitgangen dienen. Announcement Hub verzendt TTS niet rechtstreeks naar hen, maar beheert dempen en routering terwijl de gedeelde speler Snapserver voedt.",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "companion_tts_outputs": "Android-apparaten met de Companion App die push-TTS mogen ontvangen. Dit staat los van gewone visuele meldingen op de telefoon.",
+          "tts_area_players": "Directe mediaspelers die gegenereerde TTS alleen ontvangen wanneer hun Home Assistant-ruimte overeenkomt met de bezette of uitwijkkamer. Elke speler die hier is geselecteerd, wordt automatisch aan een ruimte gebonden.",
+          "tts_voice": "De stem die de actieve TTS-engine aanbiedt voor de gekozen taal. Compatibele regionale stemmen worden meegenomen (bijvoorbeeld el en el_GR). Als de provider stemmen ondersteunt maar deze niet kan opsommen, blijft het veld beschikbaar voor een handmatig ingevoerde stem-ID.",
+          "direct_tts_announce": "Gebruik de aankondigingsmodus (announce) van Home Assistant voor de geselecteerde directe mediaspelers. Dit kan een korte beltoon afspelen en daarna de media hervatten, indien ondersteund. Schakel dit uit om door de provider gegenereerde beltonen te vermijden; directe TTS kan andere media onderbreken. De gedeelde Snapcast-bron gebruikt nooit de aankondigingsmodus."
         }
       },
       "notification_profile": {
         "title": "Integratieopties: {integration}",
         "description": "Stel het meldings- en routeringsgedrag in.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "Maximumaantal tekens per deel",
+          "reading_words_per_minute": "Leessnelheid",
+          "minimum_display_seconds": "Minimale weergaveduur",
+          "maximum_display_seconds": "Maximale weergaveduur",
+          "display_buffer_seconds": "Extra leestijd",
+          "part_gap_seconds": "Pauze tussen delen",
+          "show_part_number": "Deelnummer in titel tonen",
+          "integration_data": "Aanvullende integratiegegevens",
+          "replace_parts": "Vorig deel van de Companion App vervangen",
+          "position": "Positie",
+          "fontsize": "Tekengrootte",
+          "color": "Achtergrondkleur",
+          "transparency": "Achtergrondtransparantie",
+          "interrupt": "Interactieve melding",
+          "snapcast_source": "Snapcast-bron voor aankondigingen",
+          "snapcast_only_source": "Alleen clients beheren die al op de aankondigingsbron zitten",
+          "snapcast_settle_delay": "Wachttijd voor Snapcast-routering",
+          "snapcast_verify_timeout": "Time-out voor verificatie van Snapcast-routering",
+          "snapcast_restore": "Snapcast-dempstanden herstellen"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "max_length": "Maximumaantal tekens per deel van een visuele melding. Langere tekst wordt op natuurlijke grenzen opgesplitst; met 0 wordt splitsen uitgeschakeld.",
+          "reading_words_per_minute": "Leessnelheid die wordt gebruikt om te bepalen hoelang elk deel van een visuele melding zichtbaar moet blijven voordat het volgende wordt verzonden.",
+          "minimum_display_seconds": "Ondergrens voor de berekende weergaveduur van elk deel van een visuele melding, ook als de tekst erg kort is.",
+          "maximum_display_seconds": "Bovengrens voor de berekende weergaveduur van elk deel van een visuele melding, zodat lange berichten de wachtrij niet onbeperkt blokkeren.",
+          "display_buffer_seconds": "Extra seconden die worden opgeteld bij de geschatte leestijd voor elk deel van een visuele melding.",
+          "part_gap_seconds": "Pauze tussen opgesplitste delen van een visuele melding, zodat het vorige deel kan verdwijnen voordat het volgende wordt afgeleverd.",
+          "show_part_number": "Als dit is ingeschakeld, verschijnt in de titel van opgesplitste meldingen een teller zoals 1/3 of 2/3.",
+          "integration_data": "Optionele providergegevens die aan elke visuele melding via deze integratie worden toegevoegd. Bij een afzonderlijke aanroep hebben overeenkomende sleutels uit notify_data voorrang.",
+          "replace_parts": "Gebruik voor gesplitste Companion App-berichten steeds dezelfde meldingstag, zodat elk nieuw deel het vorige vervangt in plaats van meldingen op te stapelen.",
+          "position": "Schermpositie waarop Notifications for Android TV / Fire TV de melding als overlay toont.",
+          "fontsize": "Tekengrootte waarmee Notifications for Android TV / Fire TV de melding als overlay weergeeft.",
+          "color": "Achtergrondkleur van de meldingsoverlay van Notifications for Android TV / Fire TV.",
+          "transparency": "Transparantie van de achtergrond van de meldingsoverlay van Notifications for Android TV / Fire TV.",
+          "interrupt": "Als dit is ingeschakeld, is de Android TV-melding interactief en kan deze de huidige tv-app onderbreken of de focus overnemen.",
+          "snapcast_source": "Naam van de Snapcast-bron of -stream met het aankondigingsgeluid. De clients van de geselecteerde ruimtes worden vóór het spreken naar deze bron gerouteerd.",
           "snapcast_only_source": "Als dit aanstaat, wijzigt Announcement Hub de dempstatus alleen van clients die al op de ingestelde aankondigingsbron staan; andere Snapcast-groepen en -bronnen blijven ongemoeid.",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "snapcast_settle_delay": "Korte vertraging nadat de Snapcast-routering of dempstand is gewijzigd, voordat TTS begint. Zo kunnen clients de wijziging toepassen.",
+          "snapcast_verify_timeout": "Maximale wachttijd tot Snapcast-clients de gevraagde routering en dempstand bevestigen, voordat wordt doorgegaan of de uitvoer als niet beschikbaar wordt beschouwd.",
+          "snapcast_restore": "Herstel na de aankondiging de vorige dempstand van iedere beheerde Snapcast-client, zodat het gewone afspelen precies als daarvoor wordt hervat."
         }
       },
       "queue": {
@@ -412,67 +412,67 @@
         "description": "Configureer aanwezigheid, terugval, deuren, wachtrij en time-outs.",
         "data": {
           "queue_max": "Maximaal aantal berichten in wachtrij",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Wachttijd voor niet-beschikbare uitvoer",
+          "idle_timeout": "Wachten tot audio inactief is",
+          "start_timeout": "Time-out bij starten van afspelen",
+          "playback_timeout": "Maximale TTS-afspeeltijd",
+          "post_play_delay": "Pauze na afspelen",
+          "default_title": "Standaardtitel voor meldingen",
+          "critical_notify_data": "Gegevens voor kritieke meldingen",
           "occupancy_sensor": "Ruimte-aanwezigheidsentiteit",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "Waarde van bezette ruimtes",
           "fallback_room": "Terugvalruimte",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Open deur in bezette ruimte vereisen voor uitwijken",
+          "fallback_door_label": "Filter op deurlabel",
           "default_use_ai": "Aankondigingen herschrijven met AI",
           "default_ai_agent": "Standaard AI-provider (gesprek of AI-taak)",
           "fallback_ai_agent": "Reserve AI-provider (gesprek of AI-taak)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Terugvalkanaal voor meldingen"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
+          "output_availability_timeout": "Hoelang een niet-beschikbare uitvoer mag blijven wachten. Andere uitvoerbare aankondigingen kunnen deze passeren; na de ingestelde tijd wordt de niet-beschikbare uitvoer zonder melding overgeslagen.",
+          "idle_timeout": "Maximale tijd om te wachten totdat het geselecteerde audiopad inactief is voordat TTS start, zodat lopende media niet worden onderbroken.",
+          "start_timeout": "Maximale tijd waarbinnen een mediaspeler met TTS moet beginnen nadat het afspeelverzoek is verzonden.",
+          "playback_timeout": "Veiligheidslimiet voor hoelang Announcement Hub wacht totdat één gesproken aankondiging is afgelopen voordat de wachtrij wordt vrijgegeven.",
+          "post_play_delay": "Korte stille pauze na gesproken audio voordat de volgende uitvoer of taak mag beginnen, om afgekapt geluid bij opeenvolgende aankondigingen te voorkomen.",
+          "default_title": "Titel voor visuele meldingen als de verzendactie geen eigen titel bevat.",
+          "critical_notify_data": "Providerspecifieke gegevens die alleen aan visuele meldingen van niveau Kritiek worden toegevoegd, zoals urgentie- of prioriteitsopties die de meldingsintegratie ondersteunt.",
           "occupancy_sensor": "Entiteit waarvan de status of het gekozen attribuut de namen of ID's bevat van momenteel bezette Home Assistant-ruimtes. Wordt alleen gebruikt als een verzendactie routering naar bezette ruimtes inschakelt.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "occupancy_attribute": "Geef aan of bezette ruimtes worden uitgelezen uit de entiteitsstatus of een van de actuele attributen.",
           "fallback_room": "TTS-uitwijkruimte die alleen wordt gebruikt als er onder de huidige doelruimtes helemaal geen vaste ruimtekandidaten bestaan. Bestaande vaste kandidaten, ook als ze onbekend of onbeschikbaar zijn, verhinderen uitwijken en blijven onder de normale beschikbaarheidswachttijd vallen.",
           "fallback_check_door": "Als dit aanstaat, is uitwijken alleen toegestaan wanneer een geschikte deursensor in een van de huidige doelruimtes uitdrukkelijk 'open' meldt.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "fallback_door_label": "Optioneel Home Assistant-label. Als er een label is gekozen, mogen alleen binaire deursensoren met dat label het uitwijken toestaan. Laat dit veld leeg om alle deursensoren in de huidige doelruimtes mee te nemen.",
           "default_use_ai": "Wanneer ingeschakeld erven alle aankondigingen AI-herschrijving, tenzij de verzendactie expliciet use_ai: false opgeeft. Zonder use_ai geldt deze instelling. Als AI faalt, wordt de oorspronkelijke tekst afgeleverd. Controleer de ai-status in de response_variable van de verzendactie.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "default_ai_agent": "De standaardoptie van Home Assistant volgt de conversatieagent van je voorkeurs-Assist-pijplijn, niet de ingebouwde intent-agent conversation.process. De agent wordt bij het verzenden bepaald en in de keuzelijst getoond. Als de voorkeurs-pijplijn de ingebouwde agent gebruikt, kies dan expliciet een LLM-agent of stel een reserveagent in.",
+          "fallback_ai_agent": "Optionele reserve-AI-agent als de primaire agent faalt. Ook de Home Assistant-standaard volgt de voorkeurs-Assist-pijplijn; de optie 'Oorspronkelijke aankondiging' slaat een tweede AI-poging over. Als beide AI-agents falen, wordt altijd de oorspronkelijke tekst afgeleverd.",
           "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden."
         }
       },
       "init": {
-        "title": "Configure Announcement Hub",
+        "title": "Announcement Hub configureren",
         "description": "Kies een sectie; na opslaan keer je terug naar de integratie.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. Meldingsuitgangen en ruimtes",
+          "edit_tts": "2. TTS-engines en apparaten",
+          "edit_profiles": "3. Providerspecifieke uitvoerprofielen",
+          "edit_general": "4. Algemene instellingen, aanwezigheid en AI",
+          "edit_all": "Alle instellingen bewerken (volledige wizard)",
           "edit_people": "5. Personen en stemmen",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "Geavanceerde AI-prompts",
+          "edit_audio": "Audio, beltoon en volumeverlaging",
+          "edit_room_safety": "Aanwezigheidsverificatie per ruimte"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_outputs": "Kies meldingsapparaten, ruimtebindingen en minimale waarschuwingsniveaus zonder de TTS- of AI-instellingen te wijzigen.",
+          "edit_tts": "Wijzig de actieve spraakengine, stem, mediaspelers per ruimte, Snapcast-clients en spraakapparaten van de Companion App.",
+          "edit_profiles": "Stel meldingsduur, weergavestijlen en Snapcast-afspeelinstellingen in voor de gekozen providers.",
+          "edit_general": "Ga rechtstreeks naar AI-agents en reserveagents, aanwezigheid, uitwijkruimtes, wachtrijen en time-outs.",
+          "edit_all": "Doorloop alle configuratiepagina's in volgorde, zoals in de oorspronkelijke configuratiewizard.",
           "edit_people": "Configure people's room trackers and individual/group voice settings.",
-          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
-          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
-          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
+          "edit_advanced_ai": "Bewerk optionele AI-stijlen voor herschrijven, vertalen en beide samen. De vaste veiligheidsregels voor apparaten en tools blijven van kracht.",
+          "edit_audio": "Stel de beltoon alleen voor directe kamerspeakers en de optionele verlaging van muziekvolume in; nooit voor een gedeelde Snapcast-bron.",
+          "edit_room_safety": "Stel de optionele aanwezigheidssensor voor een ruimte in; niet-beschikbare sensoren mogen nooit uitwijken naar een andere ruimte veroorzaken."
         }
       },
       "people": {
@@ -483,8 +483,8 @@
           "person_group_language": "Groepstaal",
           "person_group_voice": "Groepsstem",
           "person_group_translate": "Groepsaankondigingen vertalen",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "AI-provider van de groep",
+          "person_group_tts_engine": "TTS-engine van de groep",
           "person_group_rewrite": "Groepsaankondigingen herschrijven",
           "person_group_addressee": "Groepsaanhef",
           "person_group_greeting": "Groep begroeten"
@@ -494,8 +494,8 @@
           "person_group_language": "Optionele taalcode voor aankondigingen aan meerdere geselecteerde personen in dezelfde kamer.",
           "person_group_voice": "Optionele TTS-stemcode voor aankondigingen aan meerdere geselecteerde personen in dezelfde kamer.",
           "person_group_translate": "Vertaal groepsaankondigingen automatisch naar de ingestelde groepstaal met de gekozen AI-agent of de reserveagent. Bij fouten wordt de oorspronkelijke tekst gebruikt.",
-          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
-          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_agent": "Optionele Conversation- of AI Task-agent voor groepsontvangers. Een agent die expliciet in de actie is opgegeven, heeft voorrang.",
+          "person_group_tts_engine": "Optionele TTS-engine voor personen die dezelfde ruimte delen. Dit kiest alleen de spraakinfrastructuur en voegt nooit andere uitvoerapparaten toe.",
           "person_group_rewrite": "Aankondigingen herschrijven met de AI-agent van de groep. Vertaling kan afzonderlijk worden ingesteld.",
           "person_group_addressee": "Optionele groepsaanspreking (bijvoorbeeld Familie). Alleen gebruikt als begroetingen zijn ingeschakeld of {{ name }} letterlijk aanwezig is.",
           "person_group_greeting": "Plaats de groepsaanspreking voor groepsaankondigingen. Standaard uitgeschakeld; voegt geen ontvangers toe."
@@ -515,7 +515,7 @@
           "destination_tablet": "Tabletuitgangen",
           "destination_other": "Overige persoonlijke uitgangen",
           "enabled": "Aankondigingen voor deze persoon toestaan",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "Sensor voor aanwezigheidsverificatie",
           "verify_presence": "Aanwezigheid verifiëren",
           "rewrite": "Aankondigingen herschrijven",
           "ai_agent": "Persoonlijke AI-agent",
@@ -533,85 +533,85 @@
           "destination_watch": "Selecteer bestaande meldings- of mediaspeleruitgangen van het horloge van deze persoon. Alleen toegewezen uitgangen worden gebruikt.",
           "destination_tablet": "Selecteer bestaande meldings- of mediaspeleruitgangen van de tablet van deze persoon. Alleen toegewezen uitgangen worden gebruikt.",
           "destination_other": "Andere bestaande Home Assistant-uitgangen die aan deze persoon zijn toegewezen en alleen bij de keuze 'Overig' worden gebruikt.",
-          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "enabled": "Schakel dit uit om nieuwe en al in de wachtrij staande aankondigingen voor deze persoon te blokkeren. Er wordt niet naar een andere persoon of ruimte omgeleid.",
           "presence_sensor": "Optionele binaire sensor om de aanwezigheid van deze persoon te bevestigen bij levering aan een kamer.",
-          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "verify_presence": "De gekozen aanwezigheidssensor moet bij aflevering aan staan. Ontbrekende of niet-beschikbare sensoren blokkeren aflevering aan de persoon in de ruimte.",
           "rewrite": "Herschrijven voor deze persoon inschakelen, onafhankelijk van diens vertaalvoorkeur.",
           "ai_agent": "Optionele AI Task- of Conversation-agent voor deze persoon. Overschrijft de algemene provider, tenzij de actie een andere kiest.",
           "tts_engine": "Optionele TTS-entiteit voor deze persoon; overschrijft de algemene spraakengine zonder de doelapparaten te wijzigen.",
-          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "greeting": "Plaats de voorkeursnaam vooraan in aankondigingen, tenzij de tekst de letterlijke placeholder {{ name }} al bevat.",
           "address": "Optionele aanspreekvorm voor deze persoon. Indien leeg wordt de weergavenaam uit Home Assistant gebruikt."
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "Geavanceerde AI-stijlpompts",
+        "description": "Optionele stijlinstructies voor herschrijven, vertalen of beide. De vaste veiligheidsregels en JSON-vereisten blijven leidend.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "Herschrijfstijl",
+          "translate": "Vertaalstijl",
+          "both": "Gecombineerde herschrijf- en vertaalstijl"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "Optionele voorkeur in gewone tekst; alleen {message} en {language} mogen als placeholders worden gebruikt.",
+          "translate": "Optionele vertaalvoorkeur voor de gekozen AI, zonder feiten te wijzigen of acties mogelijk te maken.",
+          "both": "Optionele stijlvoorkeur wanneer vertalen en herschrijven beide zijn ingeschakeld."
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "Audio-opties voor directe kamerspeakers",
+        "description": "Optionele beltoon en volumeverlaging uitsluitend voor geselecteerde directe kamerspeakers, nooit voor gedeelde Snapcast-weergave.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "Beltoon vóór aankondiging inschakelen",
+          "person_chime_url": "Lokaal pad naar beltoonaudio",
+          "person_chime_delay": "Wachttijd na de beltoon",
+          "person_output_ducking": "Volume van afgespeelde media verlagen",
+          "person_duck_factor": "Factor voor muziekvolume"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "Standaard uitgeschakeld. De beltoon wordt alleen afgespeeld op een expliciet geselecteerde directe speler in de ruimte.",
+          "person_chime_url": "Een lokaal audiobestand, bijvoorbeeld /local/chime.mp3; externe URL's worden niet geaccepteerd.",
+          "person_chime_delay": "Maximale tijd die de beltoon in de ruimte mag duren voordat TTS begint.",
+          "person_output_ducking": "Standaard uitgeschakeld. Sla het volume van een actieve directe kamerspeler op, verlaag dit tijdens de aankondiging en herstel het daarna.",
+          "person_duck_factor": "Deel van het oorspronkelijke muziekvolume tijdens de aankondiging; alleen directe kamerspelers worden beïnvloed."
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "Aanwezigheidsverificatie per ruimte",
+        "description": "Stel een optionele sensor in die de aanwezigheid in één geselecteerde Home Assistant-ruimte positief bevestigt.",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "Ruimte",
+          "verify_presence": "Aanwezigheidsbevestiging vereisen",
+          "presence_sensor": "Bezettingssensor van de ruimte"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "Kies de ruimte waarvoor de verificatie moet worden toegevoegd of verwijderd.",
+          "verify_presence": "Speel aankondigingen voor een persoon in diens ruimte alleen af wanneer de geselecteerde sensor aan staat; ontbrekende gegevens blokkeren de aflevering.",
+          "presence_sensor": "Kies een binary_sensor-entiteit voor aanwezigheid of bezetting die zich fysiek in deze ruimte bevindt."
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "Selecteer een TTS-mediaspeler wanneer TTS-engines zijn geselecteerd.",
+      "tts_engine_required": "Selecteer een TTS-engine wanneer een TTS-speler is geselecteerd.",
+      "snapcast_tts_path_required": "Snapcast-uitgangen vereisen minstens één TTS-engine en een TTS-mediaspeler.",
+      "output_required": "Selecteer minimaal één visuele, server-TTS- of Companion App TTS-uitgang.",
+      "display_time_order": "De maximale weergaveduur moet groter dan of gelijk aan de minimale weergaveduur zijn.",
+      "room_notify_area_required": "Een meldingsapparaat dat aan een ruimte is gebonden, moet een Home Assistant-ruimte hebben.",
+      "notify_level_overlap": "Een meldingsapparaat mag aan slechts één minimumniveau worden toegewezen.",
+      "room_tts_area_required": "Een directe TTS-mediaspeler die aan een ruimte is gebonden, moet een Home Assistant-ruimte hebben.",
+      "tts_player_role_overlap": "Dezelfde mediaspeler kan niet tegelijk een directe TTS-speler en de speler van de gedeelde Snapcast-bron zijn.",
       "invalid_person_output": "De geselecteerde persoonlijke uitgang bestaat niet of is uitgeschakeld.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "De aangepaste AI-stijl mag alleen {message} en {language} als placeholders gebruiken en mag maximaal 1200 tekens bevatten.",
+      "invalid_chime_url": "De beltoonaudio moet een bestand onder /local/ gebruiken.",
+      "invalid_person_area": "Selecteer een geldige Home Assistant-ruimte.",
+      "invalid_person_presence": "Selecteer een aanwezigheidssensor voordat verificatie wordt ingeschakeld."
     }
   },
   "selector": {
     "dispatch_order": {
       "options": {
-        "notify_then_tts": "Visual notifications first, then speech",
-        "tts_then_notify": "Speech first, then visual notifications"
+        "notify_then_tts": "Eerst visuele meldingen, daarna spraak",
+        "tts_then_notify": "Eerst spraak, daarna visuele meldingen"
       }
     },
     "tts_min_level": {
@@ -622,15 +622,15 @@
         "info": "Info",
         "success": "Geslaagd",
         "debug": "Debug",
-        "never": "Never"
+        "never": "Nooit"
       }
     },
     "companion_tts_media_stream": {
       "options": {
-        "default": "App default",
-        "music_stream": "Music stream",
-        "alarm_stream": "Alarm stream",
-        "alarm_stream_max": "Alarm stream at maximum volume"
+        "default": "Standaardinstelling van de app",
+        "music_stream": "Muziekstream",
+        "alarm_stream": "Alarmstream",
+        "alarm_stream_max": "Alarmstream op maximaal volume"
       }
     },
     "level": {
@@ -645,32 +645,32 @@
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left",
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "center": "Center"
+        "bottom-right": "Rechtsonder",
+        "bottom-left": "Linksonder",
+        "top-right": "Rechtsboven",
+        "top-left": "Linksboven",
+        "center": "Midden"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large",
-        "max": "Maximum"
+        "small": "Klein",
+        "medium": "Gemiddeld",
+        "large": "Groot",
+        "max": "Maximaal"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Grey",
-        "black": "Black",
+        "grey": "Grijs",
+        "black": "Zwart",
         "indigo": "Indigo",
-        "green": "Green",
-        "red": "Red",
-        "cyan": "Cyan",
-        "teal": "Teal",
-        "amber": "Amber",
-        "pink": "Pink"
+        "green": "Groen",
+        "red": "Rood",
+        "cyan": "Cyaan",
+        "teal": "Blauwgroen",
+        "amber": "Amberkleurig",
+        "pink": "Roze"
       }
     },
     "nfandroidtv_transparency": {
@@ -684,13 +684,13 @@
     },
     "occupancy_source": {
       "options": {
-        "state": "State"
+        "state": "Status"
       }
     },
     "notify_scope": {
       "options": {
-        "room": "Room-based",
-        "general": "General / movable"
+        "room": "Ruimtegebonden",
+        "general": "Algemeen / verplaatsbaar"
       }
     },
     "notify_level": {
@@ -704,9 +704,9 @@
     },
     "channel_fallback_mode": {
       "options": {
-        "visual_then_tts": "Visual first → TTS if unsuccessful",
-        "tts_then_visual": "TTS first → Visual if unsuccessful",
-        "both": "Both eligible channels"
+        "visual_then_tts": "Eerst visueel → TTS als aflevering mislukt",
+        "tts_then_visual": "Eerst TTS → visueel als aflevering mislukt",
+        "both": "Beide toegestane kanalen"
       }
     },
     "person_destination": {
@@ -722,14 +722,14 @@
   "entity": {
     "sensor": {
       "queue": {
-        "name": "Queue"
+        "name": "Wachtrij"
       }
     }
   },
   "services": {
     "send": {
       "name": "Aankondiging verzenden",
-      "description": "Backward-compatible alias for notify.announcement_hub. New automations should use notify.announcement_hub.",
+      "description": "Achterwaarts compatibele alias voor notify.announcement_hub. Gebruik notify.announcement_hub voor nieuwe automatiseringen.",
       "sections": {
         "content": {
           "name": "Het bericht"
@@ -755,7 +755,7 @@
         },
         "title": {
           "name": "Titel",
-          "description": "Optional title for visual notifications."
+          "description": "Optionele titel voor visuele meldingen."
         },
         "level": {
           "name": "Belangrijkheid",
@@ -766,20 +766,20 @@
           "description": "Kies notification (geschreven), tts (gesproken), snapcast of companion_tts (speciale spraak), of all. Filtert de geselecteerde apparaten en voegt nooit andere ontvangers toe."
         },
         "notify_data": {
-          "name": "Notification data",
-          "description": "Optional integration-specific data for this visual notification."
+          "name": "Meldingsgegevens",
+          "description": "Optionele integratiespecifieke gegevens voor deze visuele melding."
         },
         "language": {
-          "name": "TTS language",
-          "description": "Optional language override for this job."
+          "name": "TTS-taal",
+          "description": "Optionele taal die de standaardtaal voor deze taak overschrijft."
         },
         "tts_options": {
-          "name": "TTS options",
-          "description": "Optional voice or engine options for this job."
+          "name": "TTS-opties",
+          "description": "Optionele stem- of engineopties voor deze taak."
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
-          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
+          "name": "Spraak via de Companion App toestaan",
+          "description": "Verouderde optionele instelling om gesproken uitvoer via de Companion App toe te staan. Nieuwe acties kunnen met service tts of companion_tts aanvragen, beperkt tot de gekozen ontvangers."
         },
         "occupied_only": {
           "name": "Bezette ruimtes proberen bij terugval",
@@ -791,15 +791,15 @@
         },
         "ai_agent": {
           "name": "AI-provider",
-          "description": "Choose an available Conversation agent or AI Task entity for this announcement. Leave empty to inherit the integration's default AI provider."
+          "description": "Kies een beschikbare Conversation-agent of AI Task-entiteit voor deze aankondiging. Laat leeg om de standaard-AI-provider van de integratie te gebruiken."
         },
         "click_action": {
           "name": "Bestemming bij aantikken",
-          "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
+          "description": "Optionele URL, Home Assistant-dashboardpad, app://-deeplink of entityId:entity_id om te openen wanneer een visuele melding van de Companion App wordt aangetikt. Android krijgt clickAction; iOS/macOS krijgt url. Wordt genegeerd door overlays van Android TV/Fire TV, TTS en niet-ondersteunende providers. Overschrijft overeenkomende sleutels in notify_data."
         },
         "text": {
           "name": "Aankondiging",
-          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+          "description": "Gedeelde tekst voor zowel gesproken TTS als geschreven meldingen. Optioneel als text_tts of text_notify is opgegeven; een kanaalspecifiek veld overschrijft de bijbehorende versie van text."
         },
         "area": {
           "name": "Ruimtes",
@@ -826,7 +826,7 @@
           "description": "Verzend alleen naar de huidige kamers van de geselecteerde personen, zonder uitwijk naar andere kamers of Algemene uitgangen."
         },
         "manual_targets": {
-          "name": "Manual recipients",
+          "name": "Handmatig geselecteerde ontvangers",
           "description": "Zoek indien ingeschakeld expliciet gekozen ontvangers in Home Assistant, los van de standaarduitgangen van Announcement Hub. Vereist een geselecteerde area, integratie, apparaat of entiteit. Activeert nooit niet-geselecteerde uitgangen en breidt een ruimte niet uit naar alle telefoons."
         },
         "person_destination": {
@@ -838,36 +838,36 @@
           "description": "Overschrijf de automatische vertaalvoorkeur van deze persoon of groep voor deze aankondiging. De ingestelde taal wordt gebruikt; use_ai: false verhindert AI-vertaling."
         },
         "person_greeting": {
-          "name": "Personal greeting",
-          "description": "Override automatic salutation for a person/group; leave unset to use the configured preference."
+          "name": "Persoonlijke begroeting",
+          "description": "Overschrijf de automatische begroetingsinstelling voor een persoon of groep; laat leeg om de ingestelde voorkeur te gebruiken."
         },
         "pre_announce_sound": {
-          "name": "Pre-announcement chime",
-          "description": "Optional direct-room audio chime, never sent on the shared Snapcast source."
+          "name": "Beltoon vóór aankondiging",
+          "description": "Optionele beltoon uitsluitend via directe kamerspeakers, nooit via de gedeelde Snapcast-bron."
         },
         "tts_engine": {
-          "name": "TTS engine override",
-          "description": "Select one existing TTS engine for this announcement without selecting extra devices."
+          "name": "TTS-engine overschrijven",
+          "description": "Kies één bestaande TTS-engine voor deze aankondiging zonder extra uitvoerapparaten als ontvangers toe te voegen."
         }
       }
     },
     "clear_queue": {
       "name": "Wachtrij wissen",
-      "description": "Cancels all waiting jobs and can also stop the active announcement.",
+      "description": "Annuleert alle wachtende taken en kan ook de actieve aankondiging stoppen.",
       "fields": {
         "include_current": {
-          "name": "Include active announcement",
-          "description": "Also requests cancellation of the job currently running."
+          "name": "Actieve aankondiging meenemen",
+          "description": "Vraagt ook om annulering van de taak die op dit moment wordt uitgevoerd."
         }
       }
     },
     "cancel": {
       "name": "Annuleren",
-      "description": "Cancels one waiting or active job by its ID.",
+      "description": "Annuleert één wachtende of actieve taak aan de hand van de taak-ID.",
       "fields": {
         "job_id": {
-          "name": "Job ID",
-          "description": "The job ID returned by announcement_hub.send."
+          "name": "Taak-ID",
+          "description": "De taak-ID die announcement_hub.send heeft teruggegeven."
         }
       }
     }
