@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.10.0b13 - 2026-10-22
+
+**Beta — complete Ukrainian native integration localization.**
+
+- Translate all remaining Ukrainian native setup, reconfiguration, error,
+  selector, person/group, output, queue, AI style, TTS and Companion App,
+  Snapcast and service-action descriptions across **599** string entries.
+- Verify explanatory safety wording for exact person/device recipients,
+  occupied-room and door-controlled fallback, independent written
+  notifications and spoken text, safe original-message recovery after
+  AI errors, and shared Snapcast source isolation.
+- Preserve every interpolation placeholder and literal Home Assistant
+  service/API identifier. Only five numeric opacity percentages remain
+  English-identical; there are no untranslated descriptions.
+- Add strict Ukrainian regression tests for all 599 keys, action identifiers,
+  placeholders, options/setup parity, and routing-safety help text.
+- No changes to announcement routing or audio/queue runtime behavior.
+  Issue #50 remains open for the seven remaining native locale catalogs.
+
 ## 0.10.0b12 - 2026-10-22
 
 **Beta — complete Turkish native integration localization.**
