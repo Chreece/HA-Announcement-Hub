@@ -44,6 +44,11 @@ from .const import (
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
     CONF_PERSON_GROUP_TRANSLATE,
+    CONF_PERSON_GROUP_AGENT,
+    CONF_PERSON_GROUP_TTS_ENGINE,
+    CONF_PERSON_GROUP_REWRITE,
+    CONF_PERSON_GROUP_ADDRESSEE,
+    CONF_PERSON_GROUP_GREETING,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -306,6 +311,11 @@ class _AnnouncementFlowMixin:
             self._working[CONF_PERSON_GROUP_TRANSLATE] = bool(
                 user_input.get(CONF_PERSON_GROUP_TRANSLATE, False)
             )
+            for key in (CONF_PERSON_GROUP_AGENT, CONF_PERSON_GROUP_TTS_ENGINE,
+                        CONF_PERSON_GROUP_ADDRESSEE):
+                self._working[key] = str(user_input.get(key, "") or "").strip()
+            for key in (CONF_PERSON_GROUP_REWRITE, CONF_PERSON_GROUP_GREETING):
+                self._working[key] = bool(user_input.get(key, False))
             self._person_config_ids = selected
             self._person_index = 0
             return await self.async_step_person_profile()
@@ -330,6 +340,26 @@ class _AnnouncementFlowMixin:
             probatio.Required(
                 CONF_PERSON_GROUP_TRANSLATE,
                 default=bool(self._working.get(CONF_PERSON_GROUP_TRANSLATE, False)),
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                CONF_PERSON_GROUP_AGENT,
+                default=str(self._working.get(CONF_PERSON_GROUP_AGENT) or ""),
+            ): selector.TextSelector(),
+            probatio.Optional(
+                CONF_PERSON_GROUP_TTS_ENGINE,
+                default=str(self._working.get(CONF_PERSON_GROUP_TTS_ENGINE) or ""),
+            ): selector.TextSelector(),
+            probatio.Required(
+                CONF_PERSON_GROUP_REWRITE,
+                default=bool(self._working.get(CONF_PERSON_GROUP_REWRITE, False)),
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                CONF_PERSON_GROUP_ADDRESSEE,
+                default=str(self._working.get(CONF_PERSON_GROUP_ADDRESSEE) or ""),
+            ): selector.TextSelector(),
+            probatio.Required(
+                CONF_PERSON_GROUP_GREETING,
+                default=bool(self._working.get(CONF_PERSON_GROUP_GREETING, False)),
             ): selector.BooleanSelector(),
         })
         return self.async_show_form(step_id="people", data_schema=schema)
@@ -373,6 +403,14 @@ class _AnnouncementFlowMixin:
                 "language": str(user_input.get("language", "") or "").strip(),
                 "voice": str(user_input.get("voice", "") or "").strip(),
                 "translate": bool(user_input.get("translate", False)),
+                "rewrite": bool(user_input.get("rewrite", False)),
+                "ai_agent": str(user_input.get("ai_agent", "") or "").strip(),
+                "tts_engine": str(user_input.get("tts_engine", "") or "").strip(),
+                "greeting": bool(user_input.get("greeting", False)),
+                "address": str(user_input.get("address", "") or "").strip(),
+                "enabled": bool(user_input.get("enabled", True)),
+                "presence_sensor": str(user_input.get("presence_sensor", "") or "").strip(),
+                "verify_presence": bool(user_input.get("verify_presence", False)),
                 "ignore_home": bool(user_input.get("ignore_home", False)),
                 "destinations": destinations,
             }
@@ -420,6 +458,32 @@ class _AnnouncementFlowMixin:
             probatio.Required(
                 "ignore_home", default=bool(current.get("ignore_home", False))
             ): selector.BooleanSelector(),
+            probatio.Required(
+                "enabled", default=bool(current.get("enabled", True))
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                "presence_sensor", default=current.get("presence_sensor", "")
+            ): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="binary_sensor")
+            ),
+            probatio.Required(
+                "verify_presence", default=bool(current.get("verify_presence", False))
+            ): selector.BooleanSelector(),
+            probatio.Required(
+                "rewrite", default=bool(current.get("rewrite", False))
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                "ai_agent", default=current.get("ai_agent", "")
+            ): selector.TextSelector(),
+            probatio.Optional(
+                "tts_engine", default=current.get("tts_engine", "")
+            ): selector.TextSelector(),
+            probatio.Required(
+                "greeting", default=bool(current.get("greeting", False))
+            ): selector.BooleanSelector(),
+            probatio.Optional(
+                "address", default=current.get("address", "")
+            ): selector.TextSelector(),
         }
         for slot in ("mobile", "watch", "tablet", "other"):
             key = "destination_" + slot
