@@ -876,7 +876,7 @@ def test_action_accepts_generation_mode_and_persists_it_with_original_job():
     assert 'probatio.Optional(ATTR_AI_MODE, default="rewrite")' in init
     assert 'ai_mode=call.data[ATTR_AI_MODE]' in init
     assert 'ai_mode=ai_mode, translate_to=translate_to' in manager
-    assert '"requested_mode": ai_mode' in manager
+    assert '"requested_mode": actual_ai_mode' in manager
     assert 'mode=ai.get("requested_mode", "rewrite")' in manager
     assert "generate" in services["send"]["fields"]["ai"]["fields"]["ai_mode"]["selector"]["select"]["options"]
 
