@@ -44,6 +44,7 @@ from homeassistant.helpers.storage import Store
 
 from .ai_filter import async_filter_announcement
 from .ai_settings import resolve_ai_enabled
+from .person_delivery import person_is_enabled, presence_confirmed
 from .targeting import channel_selection, filter_selected_outputs, physical_keys, restrict_physical_keys
 from .notify_click_action import mobile_click_action_data
 from .const import (
@@ -1023,6 +1024,7 @@ class AnnouncementManager:
         use_ai: bool | None = None,
         ai_agent: str | None = None,
         ai_mode: str = "rewrite",
+        tts_engine: str | None = None,
         translate_to: str | None = None,
         text: str | None = None,
         areas: Sequence[str] | str | None = None,
@@ -1032,13 +1034,15 @@ class AnnouncementManager:
         channels: Sequence[str] | str | None = None,
         _fanout: bool = False,
         _person_targeted: bool = False,
+        _person_ids: Sequence[str] = (),
+        _presence_sensors: Sequence[str] = (),
         manual_targets: bool = False,
         _group_token: str | None = None,
         _excluded_physical: Sequence[str] = (),
     ) -> AnnouncementJob:
         if manual_targets and not any((areas, outputs, integrations, devices, entities)):
             raise ServiceValidationError("Manual targets require an explicit area, integration, device or entity")
-        if ai_mode not in {"rewrite", "generate"}:
+        if ai_mode not in {"rewrite", "generate", "translate"}:
             raise ServiceValidationError("ai_mode must be rewrite or generate")
         # Resolve the primary message into two independent inputs BEFORE
         # severity/room routing and the optional AI rewrite. Channel-specific
@@ -1152,7 +1156,8 @@ class AnnouncementManager:
                 click_action=click_action, language=language,
                 tts_options=tts_options, companion_tts=companion_tts,
                 occupied_only=occupied_only, use_ai=use_ai, ai_agent=ai_agent,
-                ai_mode=ai_mode, translate_to=translate_to,
+                ai_mode=ai_mode, tts_engine=tts_engine,
+                translate_to=translate_to,
                 channels=channel_tokens, _fanout=True,
                 manual_targets=manual_targets,
                 _group_token=group_token,
@@ -1204,6 +1209,11 @@ class AnnouncementManager:
             if manual_targets and not requested else
             self._manual_output_catalog() if manual_targets else self._configured_outputs()
         )
+        if tts_engine:
+            engine_id = str(tts_engine).strip()
+            if not engine_id.startswith("tts.") or self.hass.states.get(engine_id) is None:
+                raise ServiceValidationError("Unknown TTS engine selected for this announcement")
+            configured = ((engine_id,), *configured[1:])
         if _person_targeted and explicit_area_routing:
             # A person's Room is a fixed physical room target, never every
             # other person's Companion App push-speech device assigned here.
@@ -2057,6 +2067,8 @@ class AnnouncementManager:
             plan=plan,
             strict_targets=bool(requested) or _person_targeted or manual_targets,
             manual_targets=manual_targets,
+            person_ids=_person_ids,
+            presence_sensors=_presence_sensors,
             routing_mode=(
                 "person" if _person_targeted else
                 "room_fallback" if room_fallback_routing else "normal"
@@ -2431,6 +2443,21 @@ class AnnouncementManager:
             )
         )
 
+    def _person_authorized_now(self, job: AnnouncementJob) -> bool:
+        """Recheck queued person/room permissions before every delivery."""
+        if not job.person_ids and not job.presence_sensors:
+            return True
+        profiles = self.settings.get("person_profiles", {}) or {}
+        area_enabled = self.settings.get("person_area_enabled", {}) or {}
+        if any(not person_is_enabled(profiles.get(person_id, {}))
+               for person_id in job.person_ids):
+            return False
+        if any(area_enabled.get(room_id, True) is False
+               for room_id in job.preferred_areas):
+            return False
+        return all(presence_confirmed(self.hass.states, sensor)
+                   for sensor in job.presence_sensors)
+
     def _prepare_staged_route(self, job: AnnouncementJob) -> bool:
         """Choose a room's working visual/audio path before any other room.
 
@@ -2452,6 +2479,8 @@ class AnnouncementManager:
             self._manual_output_catalog() if job_manual else
             self._configured_outputs()
         )
+        if job.tts_engines:
+            configured = (tuple(job.tts_engines[:1]), *configured[1:])
         try:
             selected = restrict_physical_keys(
                 filter_selected_outputs(
@@ -2998,6 +3027,8 @@ class AnnouncementManager:
             reserved_rooms.update(rooms)
             if blocked_room or self._delivery_lane_keys(job) & active_resources:
                 continue
+            if not self._person_authorized_now(job):
+                continue
             if job.ai.get("pending_preprocessing"):
                 # AI is never awaited by the delivery worker. A later ready
                 # alert can proceed while an earlier model cold-starts.
@@ -3483,6 +3514,8 @@ class AnnouncementManager:
 
     async def _async_send_tts(self, job: AnnouncementJob) -> None:
         """Launch independent audible output classes together."""
+        if not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled or presence unverified")
         if not job.tts_text:
             return
 
@@ -3526,6 +3559,8 @@ class AnnouncementManager:
 
     async def _async_send_room_tts(self, job: AnnouncementJob) -> None:
         """Speak directly on area-bound media players using the TTS engine chain."""
+        if not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled or presence unverified")
         players = [
             player
             for player in job.room_tts_players
@@ -3644,6 +3679,8 @@ class AnnouncementManager:
             )
 
     async def _async_send_server_tts(self, job: AnnouncementJob) -> None:
+        if not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled or presence unverified")
         # Fail closed even for jobs restored from older queued snapshots:
         # playing the shared MPD/Piper source without a physical mute route
         # broadcasts to all Snapcast clients that are currently unmuted.
@@ -3946,6 +3983,8 @@ class AnnouncementManager:
         )
 
     async def _async_send_companion_tts(self, job: AnnouncementJob) -> None:
+        if not self._person_authorized_now(job):
+            raise HomeAssistantError("Person or room disabled or presence unverified")
         outputs = [
             output
             for output in resolve_companion_tts_outputs(
