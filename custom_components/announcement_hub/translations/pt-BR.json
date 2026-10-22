@@ -47,11 +47,11 @@
           "tts_cache": "Quando possível, gere e guarde em cache o áudio TTS antes de o reproduzir. Reduz o atraso inicial e permite reutilizar o mesmo áudio na saída selecionada.",
           "tts_language": "Idioma enviado ao motor TTS selecionado. As opções provêm diretamente dos idiomas que o motor declara suportar.",
           "tts_options": "Opções adicionais específicas do motor TTS. O idioma e a voz suportada são configurados separadamente acima; use este campo apenas para outras opções do provedor.",
-          "companion_tts_media_stream": "Fluxo de áudio Android utilizado pelo push-TTS da Companion App. Controla como o telefone gere o volume e o foco de áudio.",
-          "companion_tts_words_per_minute": "Usado apenas para estimar a duração do push-TTS da Companion App, pois a aplicativo não informa quando a reprodução termina. A fila espera esse período estimado para evitar sobreposições.",
+          "companion_tts_media_stream": "Fluxo de áudio do Android utilizado pelo push-TTS da Companion App. Controla como o telefone gerencia o volume e o foco de áudio.",
+          "companion_tts_words_per_minute": "Usado apenas para estimar a duração do push-TTS da Companion App, pois o aplicativo não informa quando a reprodução termina. A fila aguarda esse tempo estimado para evitar sobreposições.",
           "snapcast_outputs": "Reprodutores clientes Snapcast usados como saídas físicas sincronizadas dos cômodos. O Announcement Hub não envia TTS diretamente a eles; controla o silêncio e o roteamento enquanto o reprodutor compartilhado alimenta o Snapserver.",
           "companion_tts_outputs": "Dispositivos Android da Companion App autorizados a receber push-TTS. São diferentes das notificações visuais normais do telefone.",
-          "tts_area_players": "Reprodutores multimídia diretos que recebem TTS apenas quando a sua área Home Assistant corresponde à cômodo ocupada ou de alternativa. Todos os reprodutores selecionados aqui ficam automaticamente limitados à respectiva cômodo.",
+          "tts_area_players": "Reprodutores multimídia diretos que recebem TTS somente quando sua área no Home Assistant corresponde ao cômodo ocupado ou alternativo. Todos os reprodutores selecionados aqui ficam automaticamente limitados ao respectivo cômodo.",
           "tts_voice": "Voz oferecida pelo motor TTS ativo para o idioma selecionado. Inclui vozes regionais compatíveis (por exemplo, el com el_GR). Se o provedor suporta vozes mas não consegue listá-las, é possível inserir manualmente o ID da voz.",
           "direct_tts_announce": "Ative o modo announce do Home Assistant nos reprodutores multimídia diretos selecionados: pode emitir um sinal breve e retomar o conteúdo, quando suportado. Desative para evitar sons gerados pelo provedor; o TTS direto pode interromper outras reproduções. A fonte Snapcast compartilhada nunca usa o modo announce."
         }
@@ -81,7 +81,7 @@
           "snapcast_restore": "Restaurar estados de silêncio Snapcast"
         },
         "data_description": {
-          "max_length": "Número máximo de caracteres enviados numa parte de notificação visual. Os textos mais longos são divididos em pontos naturais; 0 desativa a cômodo.",
+          "max_length": "Número máximo de caracteres enviados em uma parte da notificação visual. Textos mais longos são divididos em pontos naturais; 0 desativa a divisão do texto.",
           "reading_words_per_minute": "Velocidade de leitura utilizada para estimar quanto tempo cada parte de notificação visual deve permanecer visível antes do envio da seguinte.",
           "minimum_display_seconds": "Limite mínimo da duração calculada de exibeção de cada parte, mesmo que o texto seja muito curto.",
           "maximum_display_seconds": "Limite máximo da duração calculada de exibeção de cada parte, para impedir que mensagens longas bloqueiem a fila indefinidamente.",
@@ -94,8 +94,8 @@
           "fontsize": "Tamanho do texto utilizado por Notifications for Android TV / Fire TV ao exiber a notificação sobreposta.",
           "color": "Cor de fundo utilizada por Notifications for Android TV / Fire TV na notificação sobreposta.",
           "transparency": "Transparência do fundo utilizada por Notifications for Android TV / Fire TV na notificação sobreposta.",
-          "interrupt": "Quando ativada, a notificação Android TV é interativa e pode interromper a aplicativo de TV em execução ou tirar seu o foco.",
-          "snapcast_source": "Nome da fonte ou fluxo Snapcast que transporta o áudio dos anúncios. Os clientes das cômodos selecionadas são encaminhados para esta fonte antes da voz.",
+          "interrupt": "Quando ativada, a notificação Android TV é interativa e pode interromper o aplicativo de TV em execução ou retirar seu foco.",
+          "snapcast_source": "Nome da fonte ou fluxo Snapcast que transporta o áudio dos anúncios. Os clientes dos cômodos selecionados são encaminhados para essa fonte antes do início da voz.",
           "snapcast_only_source": "Quando ativado, o Announcement Hub só altera o estado de silêncio dos clientes que já usam a fonte de anúncios configurada; os outros grupos e fontes Snapcast não são modificados.",
           "snapcast_settle_delay": "Breve atraso após alterar o roteamento ou o estado de silenciamento do Snapcast, antes de iniciar o TTS, para permitir que os clientes apliquem a alteração.",
           "snapcast_verify_timeout": "Tempo máximo de espera até os clientes Snapcast confirmarem o roteamento ou o estado de silenciamento solicitado, antes de continuar ou considerar a saída indisponível.",
@@ -115,9 +115,9 @@
           "default_title": "Título padrão da notificação",
           "critical_notify_data": "Dados das notificações Critical",
           "occupancy_sensor": "Entidade de presença do cômodo",
-          "occupancy_attribute": "Valor das cômodos ocupadas",
+          "occupancy_attribute": "Valor dos cômodos ocupados",
           "fallback_room": "Cômodo alternativo",
-          "fallback_check_door": "Exigir porta aberta na cômodo ocupada para alternativa",
+          "fallback_check_door": "Exigir porta aberta no cômodo ocupado para alternativa",
           "fallback_door_label": "Filtro de etiquetas dos sensores de porta",
           "default_use_ai": "Reescrever anúncios com IA",
           "default_ai_agent": "Provedor de IA padrão (conversa ou tarefa de IA)",
@@ -134,12 +134,12 @@
           "default_title": "Título utilizado nas notificações visuais quando a ação de envio não especifica um título.",
           "critical_notify_data": "Dados específicos do provedor acrescentados apenas às notificações visuais Critical, como as opções de urgência ou prioridade suportadas pela integração de notificação.",
           "occupancy_sensor": "Entidade cujo estado ou atributo selecionado contém os nomes ou IDs das áreas do Home Assistant ocupadas no momento. É usada apenas quando a ação de envio ativa o roteamento para áreas ocupadas.",
-          "occupancy_attribute": "Escolha se as cômodos ocupadas são lidas do estado da entidade ou de um dos seus atributos atuais.",
+          "occupancy_attribute": "Escolha se os cômodos ocupados são obtidos do estado da entidade ou de um de seus atributos atuais.",
           "fallback_room": "Área TTS alternativa usada somente quando não há nenhum candidato fixo de cômodo entre os cômodos de destino. Candidatos fixos existentes, mesmo indisponíveis ou desconhecidos, impedem a alternativa e seguem o tempo normal de espera por disponibilidade.",
           "fallback_check_door": "Quando ativado, o encaminhamento alternativo só é permitido se um sensor de porta elegível em um dos cômodos de destino informar explicitamente que a porta está aberta.",
-          "fallback_door_label": "Etiqueta opcional do Home Assistant. Se selecionada, apenas sensores binários de porta com essa etiqueta podem autorizar o alternativa; deixe em branco para considerar todos os sensores de porta das cômodos de destino.",
+          "fallback_door_label": "Etiqueta opcional do Home Assistant. Quando selecionada, somente sensores binários de porta com essa etiqueta podem autorizar o encaminhamento alternativo; deixe em branco para considerar todos os sensores de porta dos cômodos de destino.",
           "default_use_ai": "Quando ativado, todos os anúncios herdam a reescrita por IA, a menos que a ação de envio especifique use_ai: false. Se use_ai for omitido, vale esta configuração. Se a IA falhar, a mensagem original será entregue. Confira o status ai na response_variable da ação.",
-          "default_ai_agent": "O valor padrão do Home Assistant segue o agente de conversação do pipeline Assist preferido, e não o agente de intenções integrado conversation.process. O agente é escolhido no envio e exibedo na lista. Se o pipeline preferido utilizar o agente integrado, selecione explicitamente um agente baseado em LLM ou configure um de reserva.",
+          "default_ai_agent": "O valor padrão do Home Assistant segue o agente de conversação do pipeline Assist preferido, e não o agente de intenções integrado conversation.process. O agente é escolhido no envio e exibido na lista. Se o pipeline preferido utilizar o agente integrado, selecione explicitamente um agente baseado em LLM ou configure um de reserva.",
           "fallback_ai_agent": "Agente AI de reserva opcional caso o principal falhe. O valor padrão do Home Assistant também segue o pipeline Assist preferido; a opção de anúncio original ignora uma segunda tentativa de AI. Se nenhum agente AI funcionar, o texto original é sempre entregue.",
           "channel_fallback_mode": "Somente quando houver AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala se falhar; TTS → Visual fala primeiro e notifica se falhar; Ambos tenta os dois canais. Um único canal disponível funciona normalmente. Não cria texto ausente nem amplia destinatários; os níveis continuam valendo."
         }
@@ -156,18 +156,18 @@
           "edit_people": "5. Pessoas e vozes",
           "edit_advanced_ai": "Instruções AI avançadas",
           "edit_audio": "Áudio, aviso sonoro e redução de volume",
-          "edit_room_safety": "Verificação de presença na cômodo"
+          "edit_room_safety": "Verificação de presença no cômodo"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Escolha os dispositivos de notificação, a associação às cômodos e os níveis mínimos de alerta sem alterar as definições de TTS ou AI.",
-          "edit_tts": "Altere o motor de voz ativo, a voz, os reprodutores das cômodos, os clientes Snapcast e os dispositivos de fala da Companion App.",
+          "edit_outputs": "Escolha os dispositivos de notificação, a associação aos cômodos e os níveis mínimos de alerta sem alterar as definições de TTS ou AI.",
+          "edit_tts": "Altere o motor de voz ativo, a voz, os reprodutores dos cômodos, os clientes Snapcast e os dispositivos de fala da Companion App.",
           "edit_profiles": "Configure os tempos das notificações, os estilos de apresentação e as definições de reprodução Snapcast dos provedores selecionados.",
-          "edit_general": "Acesse diretamente às definições dos agentes AI principais e de reserva, da ocupação, do alternativa entre cômodos, da fila e dos tempos limite.",
+          "edit_general": "Acesse diretamente as configurações dos agentes AI principal e de reserva, ocupação, cômodo alternativo, fila e tempos limite.",
           "edit_all": "Visite todas as páginas de configuração pela ordem original do assistente.",
           "edit_people": "Configure people's room trackers and individual/group voice settings.",
           "edit_advanced_ai": "Edite os estilos AI opcionais para reescrita, tradução e operações combinadas. As regras essenciais de segurança de dispositivos e ferramentas permanecem fixas.",
-          "edit_audio": "Configure o aviso sonoro das cômodos com saída direta e a redução opcional do volume musical; nunca afeta a fonte Snapcast compartilhada.",
-          "edit_room_safety": "Configure o sensor opcional de presença de uma cômodo; sensores indisponíveis nunca causam recurso a outras cômodos."
+          "edit_audio": "Configure o aviso sonoro dos cômodos com saída direta e a redução opcional do volume musical; nunca afeta a fonte Snapcast compartilhada.",
+          "edit_room_safety": "Configure o sensor opcional de presença de um cômodo; sensores indisponíveis nunca provocam o encaminhamento para outros cômodos."
         }
       },
       "people": {
@@ -190,7 +190,7 @@
           "person_group_voice": "Identificador opcional de voz TTS para anúncios destinados a várias pessoas no mesmo cômodo.",
           "person_group_translate": "Traduz automaticamente os anúncios de grupo para o idioma configurado usando o agente de IA selecionado e o agente alternativo. Em caso de falha, mantém o texto original.",
           "person_group_agent": "Agente Conversation ou AI Task opcional para destinatários agrupados. O agente escolhido explicitamente na ação tem prioridade.",
-          "person_group_tts_engine": "Motor TTS opcional para pessoas na mesma cômodo: seleciona apenas a infraestrutura de voz e não adiciona outros dispositivos destinatários.",
+          "person_group_tts_engine": "Motor TTS opcional para pessoas na mesmo cômodo: seleciona apenas a infraestrutura de voz e não adiciona outros dispositivos destinatários.",
           "person_group_rewrite": "Reescrever os anúncios com o agente de IA do grupo. A tradução pode ser configurada separadamente.",
           "person_group_addressee": "Forma de tratamento opcional para o grupo (por exemplo, Família). Só é usada se as saudações estiverem ativadas ou se {{ name }} aparecer literalmente.",
           "person_group_greeting": "Adicionar a saudação do grupo ao início dos anúncios em grupo. Desativado por padrão; não adiciona destinatários."
@@ -230,7 +230,7 @@
           "destination_other": "Outras saídas do Home Assistant atribuídas à pessoa, usadas somente ao selecionar o destino «Outro».",
           "enabled": "Desative para bloquear novos anúncios e anúncios já na fila destinados a esta pessoa. Não os redireciona para outra pessoa ou cômodo.",
           "presence_sensor": "Sensor binário opcional para confirmar a presença desta pessoa ao enviar para um cômodo.",
-          "verify_presence": "Exija que o sensor de presença selecionado restaurarte on no momento da entrega. Um sensor ausente ou indisponível impede anúncios para esta pessoa na cômodo.",
+          "verify_presence": "Exija que o sensor de presença selecionado indique on no momento da entrega. Um sensor ausente ou indisponível bloqueia anúncios para essa pessoa no cômodo.",
           "rewrite": "Ativar a reescrita para esta pessoa independentemente de sua preferência de tradução.",
           "ai_agent": "Agente AI Task ou Conversation opcional para esta pessoa. Substitui o provedor global, a menos que a ação selecione outro.",
           "tts_engine": "Entidade TTS opcional para esta pessoa; substitui o mecanismo de voz global sem alterar os dispositivos destinatários.",
@@ -254,7 +254,7 @@
       },
       "edit_audio": {
         "title": "Opções de áudio direto por cômodo",
-        "description": "Sinal sonoro e redução de volume opcionais apenas nos alto-falantes diretos das cômodos selecionadas, nunca no fluxo Snapcast compartilhado.",
+        "description": "Sinal sonoro e redução de volume opcionais apenas nos alto-falantes diretos dos cômodos selecionados, nunca no fluxo Snapcast compartilhado.",
         "data": {
           "person_output_chime": "Ativar aviso sonoro antes do anúncio",
           "person_chime_url": "Caminho local do áudio do aviso sonoro",
@@ -265,22 +265,22 @@
         "data_description": {
           "person_output_chime": "Desativado por padrão. O aviso sonoro toca apenas num reprodutor direto de cômodo explicitamente escolhido.",
           "person_chime_url": "Arquivo de áudio local, como /local/chime.mp3; não são aceites URL remotos.",
-          "person_chime_delay": "Tempo máximo permitido para terminar o aviso sonoro da cômodo antes do TTS.",
-          "person_output_ducking": "Desativado por padrão. Guarda o volume do reprodutor direto ativo na cômodo, reduz durante a fala e repõe-no depois.",
-          "person_duck_factor": "Fração do volume original da música durante o anúncio; apenas são afetados os reprodutores diretos das cômodos."
+          "person_chime_delay": "Tempo máximo permitido para terminar o aviso sonoro do cômodo antes do TTS.",
+          "person_output_ducking": "Desativado por padrão. Guarda o volume do reprodutor direto ativo no cômodo, reduz durante a fala e repõe-no depois.",
+          "person_duck_factor": "Fração do volume original da música durante o anúncio; apenas são afetados os reprodutores diretos dos cômodos."
         }
       },
       "edit_room_safety": {
-        "title": "Verificação de presença na cômodo",
+        "title": "Verificação de presença no cômodo",
         "description": "Configure um sensor opcional que confirme explicitamente a presença numa área Home Assistant selecionada.",
         "data": {
           "area": "Área",
           "verify_presence": "Exigir confirmação de presença",
-          "presence_sensor": "Sensor de ocupação da cômodo"
+          "presence_sensor": "Sensor de ocupação do cômodo"
         },
         "data_description": {
           "area": "Escolha a área para adicionar ou remover a verificação.",
-          "verify_presence": "Reproduza anúncios dirigidos a uma pessoa na sua cômodo apenas se o sensor selecionado indicar on; a ausência de dados impede a entrega.",
+          "verify_presence": "Reproduza anúncios dirigidos a uma pessoa na suo cômodo apenas se o sensor selecionado indicar on; a ausência de dados impede a entrega.",
           "presence_sensor": "Escolha uma entidade binary_sensor de ocupação ou presença situada fisicamente nesta área."
         }
       }
@@ -291,14 +291,14 @@
       "snapcast_tts_path_required": "As saídas Snapcast requerem pelo menos um motor TTS e um reprodutor multimídia TTS.",
       "output_required": "Selecione pelo menos uma saída visual, TTS do servidor ou TTS da Companion App.",
       "display_time_order": "O tempo máximo de exibição deve ser maior ou igual ao tempo mínimo.",
-      "room_notify_area_required": "Um dispositivo de notificação associado a uma cômodo deve ter uma área Home Assistant.",
+      "room_notify_area_required": "Um dispositivo de notificação associado a um cômodo deve ter uma área Home Assistant.",
       "notify_level_overlap": "Um dispositivo de notificação só pode ter uma atribuição de nível mínimo.",
-      "room_tts_area_required": "Um reprodutor multimídia TTS direto associado a uma cômodo deve ter uma área Home Assistant.",
+      "room_tts_area_required": "Um reprodutor multimídia TTS direto associado a um cômodo deve ter uma área Home Assistant.",
       "tts_player_role_overlap": "O mesmo reprodutor não pode ser simultaneamente um reprodutor TTS direto e o reprodutor da fonte Snapcast compartilhada.",
       "invalid_person_output": "A saída pessoal selecionada não existe ou está desativada.",
       "invalid_prompt_template": "O estilo AI personalizado só pode usar os marcadores {message} e {language} e não pode ultrapassar 1200 caracteres.",
       "invalid_chime_url": "O áudio do aviso sonoro deve usar um arquivo /local/.",
-      "invalid_person_area": "Selecione uma cômodo válida do Home Assistant.",
+      "invalid_person_area": "Selecione um cômodo válido do Home Assistant.",
       "invalid_person_presence": "Selecione um sensor de presença antes de ativar a verificação."
     },
     "abort": {
@@ -352,11 +352,11 @@
           "tts_cache": "Quando possível, gere e guarde em cache o áudio TTS antes de o reproduzir. Reduz o atraso inicial e permite reutilizar o mesmo áudio na saída selecionada.",
           "tts_language": "Idioma enviado ao motor TTS selecionado. As opções provêm diretamente dos idiomas que o motor declara suportar.",
           "tts_options": "Opções adicionais específicas do motor TTS. O idioma e a voz suportada são configurados separadamente acima; use este campo apenas para outras opções do provedor.",
-          "companion_tts_media_stream": "Fluxo de áudio Android utilizado pelo push-TTS da Companion App. Controla como o telefone gere o volume e o foco de áudio.",
-          "companion_tts_words_per_minute": "Usado apenas para estimar a duração do push-TTS da Companion App, pois a aplicativo não informa quando a reprodução termina. A fila espera esse período estimado para evitar sobreposições.",
+          "companion_tts_media_stream": "Fluxo de áudio do Android utilizado pelo push-TTS da Companion App. Controla como o telefone gerencia o volume e o foco de áudio.",
+          "companion_tts_words_per_minute": "Usado apenas para estimar a duração do push-TTS da Companion App, pois o aplicativo não informa quando a reprodução termina. A fila aguarda esse tempo estimado para evitar sobreposições.",
           "snapcast_outputs": "Reprodutores clientes Snapcast usados como saídas físicas sincronizadas dos cômodos. O Announcement Hub não envia TTS diretamente a eles; controla o silêncio e o roteamento enquanto o reprodutor compartilhado alimenta o Snapserver.",
           "companion_tts_outputs": "Dispositivos Android da Companion App autorizados a receber push-TTS. São diferentes das notificações visuais normais do telefone.",
-          "tts_area_players": "Reprodutores multimídia diretos que recebem TTS apenas quando a sua área Home Assistant corresponde à cômodo ocupada ou de alternativa. Todos os reprodutores selecionados aqui ficam automaticamente limitados à respectiva cômodo.",
+          "tts_area_players": "Reprodutores multimídia diretos que recebem TTS somente quando sua área no Home Assistant corresponde ao cômodo ocupado ou alternativo. Todos os reprodutores selecionados aqui ficam automaticamente limitados ao respectivo cômodo.",
           "tts_voice": "Voz oferecida pelo motor TTS ativo para o idioma selecionado. Inclui vozes regionais compatíveis (por exemplo, el com el_GR). Se o provedor suporta vozes mas não consegue listá-las, é possível inserir manualmente o ID da voz.",
           "direct_tts_announce": "Ative o modo announce do Home Assistant nos reprodutores multimídia diretos selecionados: pode emitir um sinal breve e retomar o conteúdo, quando suportado. Desative para evitar sons gerados pelo provedor; o TTS direto pode interromper outras reproduções. A fonte Snapcast compartilhada nunca usa o modo announce."
         }
@@ -386,7 +386,7 @@
           "snapcast_restore": "Restaurar estados de silêncio Snapcast"
         },
         "data_description": {
-          "max_length": "Número máximo de caracteres enviados numa parte de notificação visual. Os textos mais longos são divididos em pontos naturais; 0 desativa a cômodo.",
+          "max_length": "Número máximo de caracteres enviados em uma parte da notificação visual. Textos mais longos são divididos em pontos naturais; 0 desativa a divisão do texto.",
           "reading_words_per_minute": "Velocidade de leitura utilizada para estimar quanto tempo cada parte de notificação visual deve permanecer visível antes do envio da seguinte.",
           "minimum_display_seconds": "Limite mínimo da duração calculada de exibeção de cada parte, mesmo que o texto seja muito curto.",
           "maximum_display_seconds": "Limite máximo da duração calculada de exibeção de cada parte, para impedir que mensagens longas bloqueiem a fila indefinidamente.",
@@ -399,8 +399,8 @@
           "fontsize": "Tamanho do texto utilizado por Notifications for Android TV / Fire TV ao exiber a notificação sobreposta.",
           "color": "Cor de fundo utilizada por Notifications for Android TV / Fire TV na notificação sobreposta.",
           "transparency": "Transparência do fundo utilizada por Notifications for Android TV / Fire TV na notificação sobreposta.",
-          "interrupt": "Quando ativada, a notificação Android TV é interativa e pode interromper a aplicativo de TV em execução ou tirar seu o foco.",
-          "snapcast_source": "Nome da fonte ou fluxo Snapcast que transporta o áudio dos anúncios. Os clientes das cômodos selecionadas são encaminhados para esta fonte antes da voz.",
+          "interrupt": "Quando ativada, a notificação Android TV é interativa e pode interromper o aplicativo de TV em execução ou retirar seu foco.",
+          "snapcast_source": "Nome da fonte ou fluxo Snapcast que transporta o áudio dos anúncios. Os clientes dos cômodos selecionados são encaminhados para essa fonte antes do início da voz.",
           "snapcast_only_source": "Quando ativado, o Announcement Hub só altera o estado de silêncio dos clientes que já usam a fonte de anúncios configurada; os outros grupos e fontes Snapcast não são modificados.",
           "snapcast_settle_delay": "Breve atraso após alterar o roteamento ou o estado de silenciamento do Snapcast, antes de iniciar o TTS, para permitir que os clientes apliquem a alteração.",
           "snapcast_verify_timeout": "Tempo máximo de espera até os clientes Snapcast confirmarem o roteamento ou o estado de silenciamento solicitado, antes de continuar ou considerar a saída indisponível.",
@@ -420,9 +420,9 @@
           "default_title": "Título padrão da notificação",
           "critical_notify_data": "Dados das notificações Critical",
           "occupancy_sensor": "Entidade de presença do cômodo",
-          "occupancy_attribute": "Valor das cômodos ocupadas",
+          "occupancy_attribute": "Valor dos cômodos ocupados",
           "fallback_room": "Cômodo alternativo",
-          "fallback_check_door": "Exigir porta aberta na cômodo ocupada para alternativa",
+          "fallback_check_door": "Exigir porta aberta no cômodo ocupado para alternativa",
           "fallback_door_label": "Filtro de etiquetas dos sensores de porta",
           "default_use_ai": "Reescrever anúncios com IA",
           "default_ai_agent": "Provedor de IA padrão (conversa ou tarefa de IA)",
@@ -439,12 +439,12 @@
           "default_title": "Título utilizado nas notificações visuais quando a ação de envio não especifica um título.",
           "critical_notify_data": "Dados específicos do provedor acrescentados apenas às notificações visuais Critical, como as opções de urgência ou prioridade suportadas pela integração de notificação.",
           "occupancy_sensor": "Entidade cujo estado ou atributo selecionado contém os nomes ou IDs das áreas do Home Assistant ocupadas no momento. É usada apenas quando a ação de envio ativa o roteamento para áreas ocupadas.",
-          "occupancy_attribute": "Escolha se as cômodos ocupadas são lidas do estado da entidade ou de um dos seus atributos atuais.",
+          "occupancy_attribute": "Escolha se os cômodos ocupados são obtidos do estado da entidade ou de um de seus atributos atuais.",
           "fallback_room": "Área TTS alternativa usada somente quando não há nenhum candidato fixo de cômodo entre os cômodos de destino. Candidatos fixos existentes, mesmo indisponíveis ou desconhecidos, impedem a alternativa e seguem o tempo normal de espera por disponibilidade.",
           "fallback_check_door": "Quando ativado, o encaminhamento alternativo só é permitido se um sensor de porta elegível em um dos cômodos de destino informar explicitamente que a porta está aberta.",
-          "fallback_door_label": "Etiqueta opcional do Home Assistant. Se selecionada, apenas sensores binários de porta com essa etiqueta podem autorizar o alternativa; deixe em branco para considerar todos os sensores de porta das cômodos de destino.",
+          "fallback_door_label": "Etiqueta opcional do Home Assistant. Quando selecionada, somente sensores binários de porta com essa etiqueta podem autorizar o encaminhamento alternativo; deixe em branco para considerar todos os sensores de porta dos cômodos de destino.",
           "default_use_ai": "Quando ativado, todos os anúncios herdam a reescrita por IA, a menos que a ação de envio especifique use_ai: false. Se use_ai for omitido, vale esta configuração. Se a IA falhar, a mensagem original será entregue. Confira o status ai na response_variable da ação.",
-          "default_ai_agent": "O valor padrão do Home Assistant segue o agente de conversação do pipeline Assist preferido, e não o agente de intenções integrado conversation.process. O agente é escolhido no envio e exibedo na lista. Se o pipeline preferido utilizar o agente integrado, selecione explicitamente um agente baseado em LLM ou configure um de reserva.",
+          "default_ai_agent": "O valor padrão do Home Assistant segue o agente de conversação do pipeline Assist preferido, e não o agente de intenções integrado conversation.process. O agente é escolhido no envio e exibido na lista. Se o pipeline preferido utilizar o agente integrado, selecione explicitamente um agente baseado em LLM ou configure um de reserva.",
           "fallback_ai_agent": "Agente AI de reserva opcional caso o principal falhe. O valor padrão do Home Assistant também segue o pipeline Assist preferido; a opção de anúncio original ignora uma segunda tentativa de AI. Se nenhum agente AI funcionar, o texto original é sempre entregue.",
           "channel_fallback_mode": "Somente quando houver AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala se falhar; TTS → Visual fala primeiro e notifica se falhar; Ambos tenta os dois canais. Um único canal disponível funciona normalmente. Não cria texto ausente nem amplia destinatários; os níveis continuam valendo."
         }
@@ -461,18 +461,18 @@
           "edit_people": "5. Pessoas e vozes",
           "edit_advanced_ai": "Instruções AI avançadas",
           "edit_audio": "Áudio, aviso sonoro e redução de volume",
-          "edit_room_safety": "Verificação de presença na cômodo"
+          "edit_room_safety": "Verificação de presença no cômodo"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Escolha os dispositivos de notificação, a associação às cômodos e os níveis mínimos de alerta sem alterar as definições de TTS ou AI.",
-          "edit_tts": "Altere o motor de voz ativo, a voz, os reprodutores das cômodos, os clientes Snapcast e os dispositivos de fala da Companion App.",
+          "edit_outputs": "Escolha os dispositivos de notificação, a associação aos cômodos e os níveis mínimos de alerta sem alterar as definições de TTS ou AI.",
+          "edit_tts": "Altere o motor de voz ativo, a voz, os reprodutores dos cômodos, os clientes Snapcast e os dispositivos de fala da Companion App.",
           "edit_profiles": "Configure os tempos das notificações, os estilos de apresentação e as definições de reprodução Snapcast dos provedores selecionados.",
-          "edit_general": "Acesse diretamente às definições dos agentes AI principais e de reserva, da ocupação, do alternativa entre cômodos, da fila e dos tempos limite.",
+          "edit_general": "Acesse diretamente às definições dos agentes AI principais e de reserva, da ocupação e do encaminhamento alternativo entre cômodos, da fila e dos tempos limite.",
           "edit_all": "Visite todas as páginas de configuração pela ordem original do assistente.",
           "edit_people": "Configure people's room trackers and individual/group voice settings.",
           "edit_advanced_ai": "Edite os estilos AI opcionais para reescrita, tradução e operações combinadas. As regras essenciais de segurança de dispositivos e ferramentas permanecem fixas.",
-          "edit_audio": "Configure o aviso sonoro das cômodos com saída direta e a redução opcional do volume musical; nunca afeta a fonte Snapcast compartilhada.",
-          "edit_room_safety": "Configure o sensor opcional de presença de uma cômodo; sensores indisponíveis nunca causam recurso a outras cômodos."
+          "edit_audio": "Configure o aviso sonoro dos cômodos com saída direta e a redução opcional do volume musical; nunca afeta a fonte Snapcast compartilhada.",
+          "edit_room_safety": "Configure o sensor opcional de presença de um cômodo; sensores indisponíveis nunca causam recurso a outras cômodos."
         }
       },
       "people": {
@@ -495,7 +495,7 @@
           "person_group_voice": "Identificador opcional de voz TTS para anúncios destinados a várias pessoas no mesmo cômodo.",
           "person_group_translate": "Traduz automaticamente os anúncios de grupo para o idioma configurado usando o agente de IA selecionado e o agente alternativo. Em caso de falha, mantém o texto original.",
           "person_group_agent": "Agente Conversation ou AI Task opcional para destinatários agrupados. O agente escolhido explicitamente na ação tem prioridade.",
-          "person_group_tts_engine": "Motor TTS opcional para pessoas na mesma cômodo: seleciona apenas a infraestrutura de voz e não adiciona outros dispositivos destinatários.",
+          "person_group_tts_engine": "Motor TTS opcional para pessoas na mesmo cômodo: seleciona apenas a infraestrutura de voz e não adiciona outros dispositivos destinatários.",
           "person_group_rewrite": "Reescrever os anúncios com o agente de IA do grupo. A tradução pode ser configurada separadamente.",
           "person_group_addressee": "Forma de tratamento opcional para o grupo (por exemplo, Família). Só é usada se as saudações estiverem ativadas ou se {{ name }} aparecer literalmente.",
           "person_group_greeting": "Adicionar a saudação do grupo ao início dos anúncios em grupo. Desativado por padrão; não adiciona destinatários."
@@ -535,7 +535,7 @@
           "destination_other": "Outras saídas do Home Assistant atribuídas à pessoa, usadas somente ao selecionar o destino «Outro».",
           "enabled": "Desative para bloquear novos anúncios e anúncios já na fila destinados a esta pessoa. Não os redireciona para outra pessoa ou cômodo.",
           "presence_sensor": "Sensor binário opcional para confirmar a presença desta pessoa ao enviar para um cômodo.",
-          "verify_presence": "Exija que o sensor de presença selecionado restaurarte on no momento da entrega. Um sensor ausente ou indisponível impede anúncios para esta pessoa na cômodo.",
+          "verify_presence": "Exija que o sensor de presença selecionado indique on no momento da entrega. Um sensor ausente ou indisponível bloqueia anúncios para essa pessoa no cômodo.",
           "rewrite": "Ativar a reescrita para esta pessoa independentemente de sua preferência de tradução.",
           "ai_agent": "Agente AI Task ou Conversation opcional para esta pessoa. Substitui o provedor global, a menos que a ação selecione outro.",
           "tts_engine": "Entidade TTS opcional para esta pessoa; substitui o mecanismo de voz global sem alterar os dispositivos destinatários.",
@@ -559,7 +559,7 @@
       },
       "edit_audio": {
         "title": "Opções de áudio direto por cômodo",
-        "description": "Sinal sonoro e redução de volume opcionais apenas nos alto-falantes diretos das cômodos selecionadas, nunca no fluxo Snapcast compartilhado.",
+        "description": "Sinal sonoro e redução de volume opcionais apenas nos alto-falantes diretos dos cômodos selecionados, nunca no fluxo Snapcast compartilhado.",
         "data": {
           "person_output_chime": "Ativar aviso sonoro antes do anúncio",
           "person_chime_url": "Caminho local do áudio do aviso sonoro",
@@ -570,22 +570,22 @@
         "data_description": {
           "person_output_chime": "Desativado por padrão. O aviso sonoro toca apenas num reprodutor direto de cômodo explicitamente escolhido.",
           "person_chime_url": "Arquivo de áudio local, como /local/chime.mp3; não são aceites URL remotos.",
-          "person_chime_delay": "Tempo máximo permitido para terminar o aviso sonoro da cômodo antes do TTS.",
-          "person_output_ducking": "Desativado por padrão. Guarda o volume do reprodutor direto ativo na cômodo, reduz durante a fala e repõe-no depois.",
-          "person_duck_factor": "Fração do volume original da música durante o anúncio; apenas são afetados os reprodutores diretos das cômodos."
+          "person_chime_delay": "Tempo máximo permitido para terminar o aviso sonoro do cômodo antes do TTS.",
+          "person_output_ducking": "Desativado por padrão. Guarda o volume do reprodutor direto ativo no cômodo, reduz durante a fala e repõe-no depois.",
+          "person_duck_factor": "Fração do volume original da música durante o anúncio; apenas são afetados os reprodutores diretos dos cômodos."
         }
       },
       "edit_room_safety": {
-        "title": "Verificação de presença na cômodo",
+        "title": "Verificação de presença no cômodo",
         "description": "Configure um sensor opcional que confirme explicitamente a presença numa área Home Assistant selecionada.",
         "data": {
           "area": "Área",
           "verify_presence": "Exigir confirmação de presença",
-          "presence_sensor": "Sensor de ocupação da cômodo"
+          "presence_sensor": "Sensor de ocupação do cômodo"
         },
         "data_description": {
           "area": "Escolha a área para adicionar ou remover a verificação.",
-          "verify_presence": "Reproduza anúncios dirigidos a uma pessoa na sua cômodo apenas se o sensor selecionado indicar on; a ausência de dados impede a entrega.",
+          "verify_presence": "Reproduza anúncios dirigidos a uma pessoa na suo cômodo apenas se o sensor selecionado indicar on; a ausência de dados impede a entrega.",
           "presence_sensor": "Escolha uma entidade binary_sensor de ocupação ou presença situada fisicamente nesta área."
         }
       }
@@ -596,14 +596,14 @@
       "snapcast_tts_path_required": "As saídas Snapcast requerem pelo menos um motor TTS e um reprodutor multimídia TTS.",
       "output_required": "Selecione pelo menos uma saída visual, TTS do servidor ou TTS da Companion App.",
       "display_time_order": "O tempo máximo de exibição deve ser maior ou igual ao tempo mínimo.",
-      "room_notify_area_required": "Um dispositivo de notificação associado a uma cômodo deve ter uma área Home Assistant.",
+      "room_notify_area_required": "Um dispositivo de notificação associado a um cômodo deve ter uma área Home Assistant.",
       "notify_level_overlap": "Um dispositivo de notificação só pode ter uma atribuição de nível mínimo.",
-      "room_tts_area_required": "Um reprodutor multimídia TTS direto associado a uma cômodo deve ter uma área Home Assistant.",
+      "room_tts_area_required": "Um reprodutor multimídia TTS direto associado a um cômodo deve ter uma área Home Assistant.",
       "tts_player_role_overlap": "O mesmo reprodutor não pode ser simultaneamente um reprodutor TTS direto e o reprodutor da fonte Snapcast compartilhada.",
       "invalid_person_output": "A saída pessoal selecionada não existe ou está desativada.",
       "invalid_prompt_template": "O estilo AI personalizado só pode usar os marcadores {message} e {language} e não pode ultrapassar 1200 caracteres.",
       "invalid_chime_url": "O áudio do aviso sonoro deve usar um arquivo /local/.",
-      "invalid_person_area": "Selecione uma cômodo válida do Home Assistant.",
+      "invalid_person_area": "Selecione um cômodo válido do Home Assistant.",
       "invalid_person_presence": "Selecione um sensor de presença antes de ativar a verificação."
     }
   },
@@ -843,7 +843,7 @@
         },
         "pre_announce_sound": {
           "name": "Aviso sonoro antes do anúncio",
-          "description": "Sinal sonoro opcional reservado aos reprodutores diretos das cômodos, nunca à fonte Snapcast compartilhada."
+          "description": "Sinal sonoro opcional reservado aos reprodutores diretos dos cômodos, nunca à fonte Snapcast compartilhada."
         },
         "tts_engine": {
           "name": "Substituir motor TTS",
