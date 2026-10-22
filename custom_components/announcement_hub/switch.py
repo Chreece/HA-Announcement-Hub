@@ -10,25 +10,40 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .const import DOMAIN
+from .const import DOMAIN, SIGNAL_UPDATE
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities
 ) -> None:
-    manager = entry.runtime_data
-    profiles = manager.settings.get("person_profiles", {}) or {}
-    areas = ar.async_get(hass).areas
-    switches = [
-        AnnouncementEnableSwitch(hass, entry, "person", person_id, person_id)
-        for person_id in profiles
-    ]
-    switches.extend(
-        AnnouncementEnableSwitch(hass, entry, "area", area_id, area.name)
-        for area_id, area in areas.items()
-    )
-    async_add_entities(switches)
+    """Expose people and room switches and discover later config additions."""
+    seen: set[tuple[str, str]] = set()
+
+    def refresh() -> None:
+        manager = entry.runtime_data
+        profiles = manager.settings.get("person_profiles", {}) or {}
+        areas = ar.async_get(hass).areas
+        candidates = [
+            ("person", person_id, person_id) for person_id in profiles
+        ] + [
+            ("area", area_id, area.name)
+            for area_id, area in areas.items()
+        ]
+        new = []
+        for kind, key, label in candidates:
+            if (kind, key) in seen:
+                continue
+            seen.add((kind, key))
+            new.append(AnnouncementEnableSwitch(hass, entry, kind, key, label))
+        if new:
+            async_add_entities(new)
+
+    refresh()
+    entry.async_on_unload(async_dispatcher_connect(
+        hass, SIGNAL_UPDATE, refresh,
+    ))
 
 
 class AnnouncementEnableSwitch(SwitchEntity):
