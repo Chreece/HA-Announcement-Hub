@@ -8,18 +8,18 @@
         "data": {
           "notify_outputs": "通知裝置",
           "notify_room_outputs": "依房間選擇通知裝置",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "最低級別：信息 / 成功",
+          "notify_warning_outputs": "最低級別：警告",
+          "notify_error_outputs": "最低級別：錯誤",
+          "notify_critical_outputs": "僅限嚴重"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_outputs": "Announcement Hub 可使用的已識別通知實體。所有受支持設備會被自動選中；請移除任何不希望 Announcement Hub 向其發送通知的設備。",
           "notify_room_outputs": "所選通知裝置的 Home Assistant 區域必須與有人使用的房間或備用房間相符。請勿將手機、手錶及筆記型電腦等可攜式裝置加入此清單。",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_info_outputs": "此列表中的設備接收 Info、Success 以及所有更高級別的公告。未分配到任何更高最低級別列表的設備使用 Debug 級別，因此會接收所有級別的公告。",
+          "notify_warning_outputs": "此列表中的設備接收 Warning、Error 和 Critical 公告，但不接收 Debug、Info 或 Success 公告。",
+          "notify_error_outputs": "此列表中的設備僅接收 Error 和 Critical 公告。",
+          "notify_critical_outputs": "此列表中的設備僅接收 Critical 公告。"
         }
       },
       "tts": {
@@ -29,77 +29,77 @@
           "tts_engines": "TTS 引擎",
           "tts_media_player": "Snapcast 共用媒體播放器",
           "snapcast_outputs": "各房間的 Snapcast 用戶端",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "從此級別起使用 TTS",
+          "tts_cache": "預先生成並快取語音",
+          "tts_language": "TTS 語言",
+          "tts_options": "TTS 引擎選項",
+          "companion_tts_media_stream": "Companion App 音訊流",
+          "companion_tts_words_per_minute": "Companion TTS 語音時長估計",
+          "tts_area_players": "每個房間的直接 TTS 播放器",
+          "companion_tts_outputs": "Companion App TTS 設備",
+          "tts_voice": "TTS 聲音",
+          "direct_tts_announce": "直接揚聲器公告模式（可能播放提示音）"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_engines": "唯一啟用的語音合成引擎。若 Home Assistant 預設 TTS 引擎可用，將自動預選。",
           "tts_media_player": "實際將產生的 TTS 音訊播放至共用 Snapserver 串流的一般媒體播放器，例如 MPD。它屬於全域基礎設施，不依房間篩選。",
           "tts_min_level": "允許語音播報的最低公告等級。低於此等級的公告保持靜音；緊急等級一律可聽見。",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "tts_cache": "條件允許時，在播放前生成並快取 TTS 音訊，以減少啟動延遲，並在選定的輸出路徑上重複使用相同音訊。",
+          "tts_language": "傳遞給所選 TTS 引擎的語言。選項直接來自該引擎聲明支持的語言列表。",
+          "tts_options": "此 TTS 引擎的其他專用選項。語言和支持的聲音已在上方單獨配置；此處僅填寫提供商的其他參數。",
+          "companion_tts_media_stream": "Companion App 推送式 TTS 使用的 Android 音訊流。它決定手機如何處理音量和音訊焦點。",
+          "companion_tts_words_per_minute": "僅用於估計 Companion App 推送式 TTS 的朗讀時長，因為應用不會報告播放結束。隊列會等待該估計時長，以防語音重疊。",
           "snapcast_outputs": "作為房間同步實體輸出的 Snapcast 用戶端媒體播放器。Announcement Hub 不直接向它們傳送 TTS，而是在共用播放器向 Snapserver 提供音訊時管理靜音與路由。",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "companion_tts_outputs": "允許接收推送式 TTS 的 Android Companion App 設備。此設置獨立於手機上的普通可視通知。",
+          "tts_area_players": "僅當直接媒體播放器的 Home Assistant 區域與有人佔用的房間或備用房間相符時，才向其發送生成的 TTS。此處選擇的每個播放器均自動限定到所屬房間。",
+          "tts_voice": "啟用中的 TTS 引擎為所選語言提供的聲音。包括兼容的區域聲音（例如 el 與 el_GR）。如果提供商支持聲音選擇但無法列出選項，仍可手動輸入聲音 ID。",
+          "direct_tts_announce": "為所選直接媒體播放器啟用 Home Assistant 的 announce 播放模式。在支持時可能先播放短提示音，再恢復原媒體。關閉可避免提供商生成提示音，但直接 TTS 可能中斷其他播放。共享 Snapcast 音源絕不使用 announce 模式。"
         }
       },
       "notification_profile": {
         "title": "整合選項：{integration}",
         "description": "設定此整合的通知及路由行為。",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "每段最多字符數",
+          "reading_words_per_minute": "閱讀速度",
+          "minimum_display_seconds": "最短顯示時間",
+          "maximum_display_seconds": "最長顯示時間",
+          "display_buffer_seconds": "額外閱讀時間",
+          "part_gap_seconds": "分段間隔",
+          "show_part_number": "在標題中顯示段號",
+          "integration_data": "附加集成資料",
+          "replace_parts": "替換上一段 Companion App 通知",
+          "position": "位置",
+          "fontsize": "字體大小",
+          "color": "背景顏色",
+          "transparency": "背景透明度",
+          "interrupt": "交互式通知",
+          "snapcast_source": "公告使用的 Snapcast 音源",
+          "snapcast_only_source": "僅管理已連接公告音源的用戶端",
+          "snapcast_settle_delay": "Snapcast 路由穩定延遲",
+          "snapcast_verify_timeout": "Snapcast 路由驗證超時",
+          "snapcast_restore": "恢復 Snapcast 靜音狀態"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "max_length": "每段可視通知允許發送的最大字符數。過長文本將在自然斷點處拆分；設為 0 可禁用拆分。",
+          "reading_words_per_minute": "根據閱讀速度估算每段可視通知在發送下一段之前應保持顯示的時間。",
+          "minimum_display_seconds": "每段可視通知計算顯示時間的下限，即使文本很短也適用。",
+          "maximum_display_seconds": "每段可視通知計算顯示時間的上限，避免長消息無限期阻塞隊列。",
+          "display_buffer_seconds": "為每段可視通知的預計閱讀時間額外增加的秒數。",
+          "part_gap_seconds": "分段可視通知之間的停頓，讓前一段消失後再發送下一段。",
+          "show_part_number": "啟用後，為分段通知的標題添加 1/3、2/3 等段號計數。",
+          "integration_data": "通過此集成發送的每條可視通知均可合並提供商專用的可選資料。單次調用的 notify_data 中同名鍵具有優先權。",
+          "replace_parts": "對於 Companion App 的分段消息，重複使用同一個通知標籤，使每個新段替換上一段，而非不斷疊加通知。",
+          "position": "Notifications for Android TV / Fire TV 在屏幕上顯示通知浮層的位置。",
+          "fontsize": "Notifications for Android TV / Fire TV 顯示通知浮層時使用的字體大小。",
+          "color": "Notifications for Android TV / Fire TV 通知浮層的背景顏色。",
+          "transparency": "Notifications for Android TV / Fire TV 通知浮層的背景透明度。",
+          "interrupt": "啟用後，Android TV 通知可以交互，可能中斷當前電視應用或奪取焦點。",
+          "snapcast_source": "承載公告音訊的 Snapcast 音源或流名稱。開始朗讀前，選定房間的用戶端會被路由至該音源。",
           "snapcast_only_source": "啟用後，Announcement Hub 只變更已連接到指定公告來源的用戶端靜音狀態；其他 Snapcast 群組與來源維持不變。",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "snapcast_settle_delay": "更改 Snapcast 路由或靜音狀態後、開始 TTS 前的短暫延遲，供用戶端應用變更。",
+          "snapcast_verify_timeout": "等待 Snapcast 用戶端確認所請求的路由或靜音狀態的最長時間，之後繼續執行或將該輸出視為不可用。",
+          "snapcast_restore": "公告結束後，恢復每個受管理 Snapcast 用戶端之前的靜音狀態，使正常收聽恢復到公告前的狀態。"
         }
       },
       "queue": {
@@ -107,40 +107,40 @@
         "description": "設定在場狀態、備用路由、門檢查、佇列及逾時。",
         "data": {
           "queue_max": "佇列公告上限",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "不可用輸出等待時間",
+          "idle_timeout": "等待音訊空閒",
+          "start_timeout": "播放啟動超時",
+          "playback_timeout": "TTS 最長播放時間",
+          "post_play_delay": "播放後間隔",
+          "default_title": "預設通知標題",
+          "critical_notify_data": "嚴重通知附加資料",
           "occupancy_sensor": "房間在場狀態實體",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "有人佔用的房間值",
           "fallback_room": "備用房間",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "備用路由要求目標房間門已打開",
+          "fallback_door_label": "門傳感器標籤過濾",
           "default_use_ai": "使用 AI 改寫公告",
           "default_ai_agent": "預設 AI 提供者（對話或 AI 任務）",
           "fallback_ai_agent": "備用 AI 提供者（對話或 AI 任務）",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "通知渠道備用方式"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "queue_max": "允許同時處於等待或活動狀態的公告任務最大數量。達到上限時將拒絕新的發送請求。",
+          "output_availability_timeout": "不可用輸出最多可保持等待的時間。其他可執行公告可以先行處理；超時後將靜默跳過該不可用輸出。",
+          "idle_timeout": "在啟動 TTS 之前，等待選定音訊路徑變為空閒狀態的最長時間，以免打斷正在播放的媒體。",
+          "start_timeout": "發送播放請求後，允許媒體播放器開始 TTS 播放的最長時間。",
+          "playback_timeout": "Announcement Hub 等待一次語音播放結束再釋放隊列的安全時間上限。",
+          "post_play_delay": "語音播放結束後，到下一次音訊輸出或任務開始前的短暫靜音間隔，以避免連續公告的聲音被截斷。",
+          "default_title": "發送操作未提供自定義標題時，用於可視通知的標題。",
+          "critical_notify_data": "僅向 Critical 級別可視通知合並的提供商專用資料，例如通知集成支持的緊急度或優先級選項。",
           "occupancy_sensor": "此實體的狀態或選取屬性包含目前有人使用的 Home Assistant 區域名稱或 ID。僅在傳送動作啟用「僅限有人房間」路由時使用。",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "occupancy_attribute": "選擇從實體狀態還是其當前某個屬性讀取有人佔用的房間。",
           "fallback_room": "備用 TTS 區域僅在目前目標房間完全沒有固定房間候選輸出時使用。即使現有固定候選輸出無法使用或狀態不明，也會阻止備用路由，並繼續遵守正常的可用性等待逾時。",
           "fallback_check_door": "啟用後，只有目前目標房間之一的合格門感測器明確回報門已開啟，才允許轉至備用房間。",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "fallback_door_label": "可選的 Home Assistant 標籤。選擇後，只有帶有該標籤的二元門傳感器才可允許備用路由；留空則考慮當前目標房間中的所有門傳感器。",
           "default_use_ai": "啟用後，所有公告預設沿用 AI 改寫，除非傳送動作明確指定 use_ai: false。未設定 use_ai 時採用本設定。AI 失敗時仍傳送原始訊息。可在動作的 response_variable 查看 ai 狀態。",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "default_ai_agent": "Home Assistant 預設選項使用首選 Assist 流程中的對話代理，而不是內置的 conversation.process 意圖代理。發送時才確定具體代理，並在下拉列表中顯示。如果首選流程使用內置代理，請明確選擇基於 LLM 的代理或配置備用代理。",
+          "fallback_ai_agent": "主 AI 代理失敗時使用的可選備用代理。Home Assistant 預設選項同樣遵循首選 Assist 流程；選擇原始公告則跳過第二次 AI 嘗試。若所有 AI 都失敗，仍始終發送原始文本。",
           "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。"
         }
       },
@@ -148,26 +148,26 @@
         "title": "重新設定 Announcement Hub",
         "description": "選擇要修改的部分，儲存後返回整合。",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. 通知輸出與房間",
+          "edit_tts": "2. TTS 引擎與設備",
+          "edit_profiles": "3. 提供商專用輸出配置",
+          "edit_general": "4. 常規設置、在家狀態與 AI",
+          "edit_all": "編輯所有設置（完整向導）",
           "edit_people": "5. 人員與語音",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "高級 AI 提示詞",
+          "edit_audio": "音訊、提示音及音量降低",
+          "edit_room_safety": "房間存在狀態驗證"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_outputs": "選擇通知設備、所屬房間及最低警報級別，不更改 TTS 或 AI 設置。",
+          "edit_tts": "更改啟用中的語音引擎、聲音、房間播放器、Snapcast 用戶端和 Companion App 語音設備。",
+          "edit_profiles": "配置所選提供商的通知顯示時長、顯示樣式和 Snapcast 播放設置。",
+          "edit_general": "直接進入主/備用 AI 代理、佔用狀態、備用房間、隊列和超時設置。",
+          "edit_all": "按初次配置向導的順序瀏覽全部設置頁面。",
           "edit_people": "Configure tracked people, room sensors, languages and voices.",
-          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
-          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
-          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
+          "edit_advanced_ai": "編輯用於改寫、翻譯及二者結合的可選 AI 風格。核心設備和工具安全規則保持不變。",
+          "edit_audio": "配置僅用於房間直接揚聲器的提示音和可選音樂音量降低，絕不應用於共享 Snapcast 音源。",
+          "edit_room_safety": "為單個房間配置可選的佔用狀態驗證傳感器；傳感器不可用時絕不觸發向其他房間的備用路由。"
         }
       },
       "people": {
@@ -178,8 +178,8 @@
           "person_group_language": "群組語言",
           "person_group_voice": "群組音色",
           "person_group_translate": "翻譯群組公告",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "群組 AI 提供商",
+          "person_group_tts_engine": "群組 TTS 引擎",
           "person_group_rewrite": "改寫群組公告",
           "person_group_addressee": "群組稱呼",
           "person_group_greeting": "自動稱呼群組"
@@ -189,8 +189,8 @@
           "person_group_language": "多個目標人員位於同一房間時，可選的群組公告語言代碼。",
           "person_group_voice": "多個目標人員位於同一房間時，可選的群組 TTS 音色識別碼。",
           "person_group_translate": "使用選定或備用 AI 服務，自動將群組公告翻譯成群組語言；失敗時保留原文。",
-          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
-          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_agent": "面向群組接收者的可選 Conversation 或 AI Task 代理。發送操作中明確指定的代理優先。",
+          "person_group_tts_engine": "供同一房間內多名人員使用的可選 TTS 引擎。僅選擇語音基礎設施，絕不增加其他接收設備。",
           "person_group_rewrite": "使用群組的 AI 代理改寫公告。翻譯設定可獨立配置。",
           "person_group_addressee": "選用的群組稱呼（例如「家人」）。僅在啟用問候語或文字中原樣包含 {{ name }} 時使用。",
           "person_group_greeting": "在群組公告前加上群組稱呼。預設關閉；不會增加收件者。"
@@ -210,7 +210,7 @@
           "destination_tablet": "平板輸出",
           "destination_other": "其他個人輸出",
           "enabled": "允許向此人發送公告",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "存在狀態驗證傳感器",
           "verify_presence": "驗證在場狀態",
           "rewrite": "改寫個人公告",
           "ai_agent": "個人 AI 代理",
@@ -228,81 +228,81 @@
           "destination_watch": "選擇此人手錶現有的通知或媒體播放器輸出。只使用已指派的輸出。",
           "destination_tablet": "選擇此人平板現有的通知或媒體播放器輸出。只使用已指派的輸出。",
           "destination_other": "指派給此人的其他 Home Assistant 輸出，只有選擇「其他」目的地時才會使用。",
-          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "enabled": "關閉後，將阻止面向此人的新公告以及隊列中已有的公告。不會轉發給其他人或其他房間。",
           "presence_sensor": "選用的二元感測器，用於向房間傳送訊息時確認此人是否在場。",
-          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "verify_presence": "要求選定的存在狀態傳感器在送達時為 on。傳感器缺失或不可用時，會阻止向此人所在房間送達公告。",
           "rewrite": "為此人啟用公告改寫，與其翻譯偏好互不影響。",
           "ai_agent": "此人的選用 AI Task 或 Conversation 代理；除非動作指定其他代理，否則覆蓋全域提供者。",
           "tts_engine": "此人的選用 TTS 實體；覆蓋全域語音引擎，但不變更接收裝置。",
-          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "greeting": "在公告開頭添加首選稱呼，除非文本已經包含字面佔位符 {{ name }}。",
           "address": "此人的選用稱呼。留空時使用 Home Assistant 中的顯示名稱。"
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "高級 AI 風格提示詞",
+        "description": "用於改寫、翻譯或兩者結合的可選風格指令。固定的安全規則和 JSON 格式要求始終優先。",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "改寫風格",
+          "translate": "翻譯風格",
+          "both": "改寫與翻譯組合風格"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "可選的純文本風格偏好；只能使用 {message} 和 {language} 佔位符。",
+          "translate": "供選定 AI 使用的可選翻譯偏好，不得更改事實或啟用任何操作。",
+          "both": "同時啟用翻譯和改寫時的可選風格偏好。"
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "房間直接音訊選項",
+        "description": "可選提示音和音量降低僅作用於選定房間的直接揚聲器，絕不作用於共享 Snapcast 播放。",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "啟用公告前提示音",
+          "person_chime_url": "本地提示音文件路徑",
+          "person_chime_delay": "提示音結束等待時間",
+          "person_output_ducking": "降低正在播放的音量",
+          "person_duck_factor": "音樂音量系數"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "預設關閉。僅在明確選擇的房間直接播放器上播放提示音。",
+          "person_chime_url": "本地音訊文件，例如 /local/chime.mp3；不接受遠程 URL。",
+          "person_chime_delay": "TTS 開始之前，等待房間提示音結束的最長時間。",
+          "person_output_ducking": "預設關閉。保存正在播放媒體的房間直接播放器音量，在語音播放期間降低音量，並在結束後恢復。",
+          "person_duck_factor": "公告播放時使用的原始音樂音量比例；僅影響房間直接播放器。"
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "房間存在狀態驗證",
+        "description": "為選定的一個 Home Assistant 區域配置可選傳感器，以明確確認有人存在。",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "區域",
+          "verify_presence": "要求存在狀態確認",
+          "presence_sensor": "房間佔用傳感器"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "選擇要添加或清除驗證設置的區域。",
+          "verify_presence": "僅當選定傳感器為 on 時，才在個人所在房間播放公告；缺失資料時禁止送達。",
+          "presence_sensor": "選擇實體實際位於該區域的 binary_sensor 佔用或存在狀態傳感器。"
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "選擇 TTS 引擎時，也必須選擇一個 TTS 媒體播放器。",
+      "tts_engine_required": "選擇 TTS 播放器時，也必須選擇一個 TTS 引擎。",
+      "snapcast_tts_path_required": "使用 Snapcast 輸出至少需要一個 TTS 引擎和一個 TTS 媒體播放器。",
+      "output_required": "請至少選擇一個可視、伺服器 TTS 或 Companion App TTS 輸出。",
+      "display_time_order": "最長顯示時間必須大於或等於最短顯示時間。",
+      "room_notify_area_required": "與房間綁定的通知設備必須分配 Home Assistant 區域。",
+      "notify_level_overlap": "一個通知設備只能分配一個最低通知級別。",
+      "room_tts_area_required": "與房間綁定的直接 TTS 媒體播放器必須分配 Home Assistant 區域。",
+      "tts_player_role_overlap": "同一媒體播放器不能同時用作直接 TTS 播放器和共享 Snapcast 音源播放器。",
       "invalid_person_output": "所選個人輸出不存在或已停用。",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "自定義 AI 風格只能使用 {message} 和 {language} 佔位符，且不得超過 1200 個字符。",
+      "invalid_chime_url": "提示音音訊必須使用 /local/ 下的文件。",
+      "invalid_person_area": "請選擇有效的 Home Assistant 房間。",
+      "invalid_person_presence": "啟用驗證前請先選擇存在狀態傳感器。"
     },
     "abort": {
-      "single_instance_allowed": "Announcement Hub is already configured."
+      "single_instance_allowed": "Announcement Hub 已配置。"
     }
   },
   "options": {
@@ -313,18 +313,18 @@
         "data": {
           "notify_outputs": "通知裝置",
           "notify_room_outputs": "依房間選擇通知裝置",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "最低級別：信息 / 成功",
+          "notify_warning_outputs": "最低級別：警告",
+          "notify_error_outputs": "最低級別：錯誤",
+          "notify_critical_outputs": "僅限嚴重"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_outputs": "Announcement Hub 可使用的已識別通知實體。所有受支持設備會被自動選中；請移除任何不希望 Announcement Hub 向其發送通知的設備。",
           "notify_room_outputs": "所選通知裝置的 Home Assistant 區域必須與有人使用的房間或備用房間相符。請勿將手機、手錶及筆記型電腦等可攜式裝置加入此清單。",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_info_outputs": "此列表中的設備接收 Info、Success 以及所有更高級別的公告。未分配到任何更高最低級別列表的設備使用 Debug 級別，因此會接收所有級別的公告。",
+          "notify_warning_outputs": "此列表中的設備接收 Warning、Error 和 Critical 公告，但不接收 Debug、Info 或 Success 公告。",
+          "notify_error_outputs": "此列表中的設備僅接收 Error 和 Critical 公告。",
+          "notify_critical_outputs": "此列表中的設備僅接收 Critical 公告。"
         }
       },
       "tts": {
@@ -334,77 +334,77 @@
           "tts_engines": "TTS 引擎",
           "tts_media_player": "Snapcast 共用媒體播放器",
           "snapcast_outputs": "各房間的 Snapcast 用戶端",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "從此級別起使用 TTS",
+          "tts_cache": "預先生成並快取語音",
+          "tts_language": "TTS 語言",
+          "tts_options": "TTS 引擎選項",
+          "companion_tts_media_stream": "Companion App 音訊流",
+          "companion_tts_words_per_minute": "Companion TTS 語音時長估計",
+          "tts_area_players": "每個房間的直接 TTS 播放器",
+          "companion_tts_outputs": "Companion App TTS 設備",
+          "tts_voice": "TTS 聲音",
+          "direct_tts_announce": "直接揚聲器公告模式（可能播放提示音）"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_engines": "唯一啟用的語音合成引擎。若 Home Assistant 預設 TTS 引擎可用，將自動預選。",
           "tts_media_player": "實際將產生的 TTS 音訊播放至共用 Snapserver 串流的一般媒體播放器，例如 MPD。它屬於全域基礎設施，不依房間篩選。",
           "tts_min_level": "允許語音播報的最低公告等級。低於此等級的公告保持靜音；緊急等級一律可聽見。",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "tts_cache": "條件允許時，在播放前生成並快取 TTS 音訊，以減少啟動延遲，並在選定的輸出路徑上重複使用相同音訊。",
+          "tts_language": "傳遞給所選 TTS 引擎的語言。選項直接來自該引擎聲明支持的語言列表。",
+          "tts_options": "此 TTS 引擎的其他專用選項。語言和支持的聲音已在上方單獨配置；此處僅填寫提供商的其他參數。",
+          "companion_tts_media_stream": "Companion App 推送式 TTS 使用的 Android 音訊流。它決定手機如何處理音量和音訊焦點。",
+          "companion_tts_words_per_minute": "僅用於估計 Companion App 推送式 TTS 的朗讀時長，因為應用不會報告播放結束。隊列會等待該估計時長，以防語音重疊。",
           "snapcast_outputs": "作為房間同步實體輸出的 Snapcast 用戶端媒體播放器。Announcement Hub 不直接向它們傳送 TTS，而是在共用播放器向 Snapserver 提供音訊時管理靜音與路由。",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "companion_tts_outputs": "允許接收推送式 TTS 的 Android Companion App 設備。此設置獨立於手機上的普通可視通知。",
+          "tts_area_players": "僅當直接媒體播放器的 Home Assistant 區域與有人佔用的房間或備用房間相符時，才向其發送生成的 TTS。此處選擇的每個播放器均自動限定到所屬房間。",
+          "tts_voice": "啟用中的 TTS 引擎為所選語言提供的聲音。包括兼容的區域聲音（例如 el 與 el_GR）。如果提供商支持聲音選擇但無法列出選項，仍可手動輸入聲音 ID。",
+          "direct_tts_announce": "為所選直接媒體播放器啟用 Home Assistant 的 announce 播放模式。在支持時可能先播放短提示音，再恢復原媒體。關閉可避免提供商生成提示音，但直接 TTS 可能中斷其他播放。共享 Snapcast 音源絕不使用 announce 模式。"
         }
       },
       "notification_profile": {
         "title": "整合選項：{integration}",
         "description": "設定此整合的通知及路由行為。",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "每段最多字符數",
+          "reading_words_per_minute": "閱讀速度",
+          "minimum_display_seconds": "最短顯示時間",
+          "maximum_display_seconds": "最長顯示時間",
+          "display_buffer_seconds": "額外閱讀時間",
+          "part_gap_seconds": "分段間隔",
+          "show_part_number": "在標題中顯示段號",
+          "integration_data": "附加集成資料",
+          "replace_parts": "替換上一段 Companion App 通知",
+          "position": "位置",
+          "fontsize": "字體大小",
+          "color": "背景顏色",
+          "transparency": "背景透明度",
+          "interrupt": "交互式通知",
+          "snapcast_source": "公告使用的 Snapcast 音源",
+          "snapcast_only_source": "僅管理已連接公告音源的用戶端",
+          "snapcast_settle_delay": "Snapcast 路由穩定延遲",
+          "snapcast_verify_timeout": "Snapcast 路由驗證超時",
+          "snapcast_restore": "恢復 Snapcast 靜音狀態"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "max_length": "每段可視通知允許發送的最大字符數。過長文本將在自然斷點處拆分；設為 0 可禁用拆分。",
+          "reading_words_per_minute": "根據閱讀速度估算每段可視通知在發送下一段之前應保持顯示的時間。",
+          "minimum_display_seconds": "每段可視通知計算顯示時間的下限，即使文本很短也適用。",
+          "maximum_display_seconds": "每段可視通知計算顯示時間的上限，避免長消息無限期阻塞隊列。",
+          "display_buffer_seconds": "為每段可視通知的預計閱讀時間額外增加的秒數。",
+          "part_gap_seconds": "分段可視通知之間的停頓，讓前一段消失後再發送下一段。",
+          "show_part_number": "啟用後，為分段通知的標題添加 1/3、2/3 等段號計數。",
+          "integration_data": "通過此集成發送的每條可視通知均可合並提供商專用的可選資料。單次調用的 notify_data 中同名鍵具有優先權。",
+          "replace_parts": "對於 Companion App 的分段消息，重複使用同一個通知標籤，使每個新段替換上一段，而非不斷疊加通知。",
+          "position": "Notifications for Android TV / Fire TV 在屏幕上顯示通知浮層的位置。",
+          "fontsize": "Notifications for Android TV / Fire TV 顯示通知浮層時使用的字體大小。",
+          "color": "Notifications for Android TV / Fire TV 通知浮層的背景顏色。",
+          "transparency": "Notifications for Android TV / Fire TV 通知浮層的背景透明度。",
+          "interrupt": "啟用後，Android TV 通知可以交互，可能中斷當前電視應用或奪取焦點。",
+          "snapcast_source": "承載公告音訊的 Snapcast 音源或流名稱。開始朗讀前，選定房間的用戶端會被路由至該音源。",
           "snapcast_only_source": "啟用後，Announcement Hub 只變更已連接到指定公告來源的用戶端靜音狀態；其他 Snapcast 群組與來源維持不變。",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "snapcast_settle_delay": "更改 Snapcast 路由或靜音狀態後、開始 TTS 前的短暫延遲，供用戶端應用變更。",
+          "snapcast_verify_timeout": "等待 Snapcast 用戶端確認所請求的路由或靜音狀態的最長時間，之後繼續執行或將該輸出視為不可用。",
+          "snapcast_restore": "公告結束後，恢復每個受管理 Snapcast 用戶端之前的靜音狀態，使正常收聽恢復到公告前的狀態。"
         }
       },
       "queue": {
@@ -412,67 +412,67 @@
         "description": "設定在場狀態、備用路由、門檢查、佇列及逾時。",
         "data": {
           "queue_max": "佇列公告上限",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "不可用輸出等待時間",
+          "idle_timeout": "等待音訊空閒",
+          "start_timeout": "播放啟動超時",
+          "playback_timeout": "TTS 最長播放時間",
+          "post_play_delay": "播放後間隔",
+          "default_title": "預設通知標題",
+          "critical_notify_data": "嚴重通知附加資料",
           "occupancy_sensor": "房間在場狀態實體",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "有人佔用的房間值",
           "fallback_room": "備用房間",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "備用路由要求目標房間門已打開",
+          "fallback_door_label": "門傳感器標籤過濾",
           "default_use_ai": "使用 AI 改寫公告",
           "default_ai_agent": "預設 AI 提供者（對話或 AI 任務）",
           "fallback_ai_agent": "備用 AI 提供者（對話或 AI 任務）",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "通知渠道備用方式"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "queue_max": "允許同時處於等待或活動狀態的公告任務最大數量。達到上限時將拒絕新的發送請求。",
+          "output_availability_timeout": "不可用輸出最多可保持等待的時間。其他可執行公告可以先行處理；超時後將靜默跳過該不可用輸出。",
+          "idle_timeout": "在啟動 TTS 之前，等待選定音訊路徑變為空閒狀態的最長時間，以免打斷正在播放的媒體。",
+          "start_timeout": "發送播放請求後，允許媒體播放器開始 TTS 播放的最長時間。",
+          "playback_timeout": "Announcement Hub 等待一次語音播放結束再釋放隊列的安全時間上限。",
+          "post_play_delay": "語音播放結束後，到下一次音訊輸出或任務開始前的短暫靜音間隔，以避免連續公告的聲音被截斷。",
+          "default_title": "發送操作未提供自定義標題時，用於可視通知的標題。",
+          "critical_notify_data": "僅向 Critical 級別可視通知合並的提供商專用資料，例如通知集成支持的緊急度或優先級選項。",
           "occupancy_sensor": "此實體的狀態或選取屬性包含目前有人使用的 Home Assistant 區域名稱或 ID。僅在傳送動作啟用「僅限有人房間」路由時使用。",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "occupancy_attribute": "選擇從實體狀態還是其當前某個屬性讀取有人佔用的房間。",
           "fallback_room": "備用 TTS 區域僅在目前目標房間完全沒有固定房間候選輸出時使用。即使現有固定候選輸出無法使用或狀態不明，也會阻止備用路由，並繼續遵守正常的可用性等待逾時。",
           "fallback_check_door": "啟用後，只有目前目標房間之一的合格門感測器明確回報門已開啟，才允許轉至備用房間。",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "fallback_door_label": "可選的 Home Assistant 標籤。選擇後，只有帶有該標籤的二元門傳感器才可允許備用路由；留空則考慮當前目標房間中的所有門傳感器。",
           "default_use_ai": "啟用後，所有公告預設沿用 AI 改寫，除非傳送動作明確指定 use_ai: false。未設定 use_ai 時採用本設定。AI 失敗時仍傳送原始訊息。可在動作的 response_variable 查看 ai 狀態。",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "default_ai_agent": "Home Assistant 預設選項使用首選 Assist 流程中的對話代理，而不是內置的 conversation.process 意圖代理。發送時才確定具體代理，並在下拉列表中顯示。如果首選流程使用內置代理，請明確選擇基於 LLM 的代理或配置備用代理。",
+          "fallback_ai_agent": "主 AI 代理失敗時使用的可選備用代理。Home Assistant 預設選項同樣遵循首選 Assist 流程；選擇原始公告則跳過第二次 AI 嘗試。若所有 AI 都失敗，仍始終發送原始文本。",
           "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。"
         }
       },
       "init": {
-        "title": "Configure Announcement Hub",
+        "title": "設定 Announcement Hub",
         "description": "選擇要修改的部分，儲存後返回整合。",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. 通知輸出與房間",
+          "edit_tts": "2. TTS 引擎與設備",
+          "edit_profiles": "3. 提供商專用輸出配置",
+          "edit_general": "4. 常規設置、在家狀態與 AI",
+          "edit_all": "編輯所有設置（完整向導）",
           "edit_people": "5. 人員與語音",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "高級 AI 提示詞",
+          "edit_audio": "音訊、提示音及音量降低",
+          "edit_room_safety": "房間存在狀態驗證"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_outputs": "選擇通知設備、所屬房間及最低警報級別，不更改 TTS 或 AI 設置。",
+          "edit_tts": "更改啟用中的語音引擎、聲音、房間播放器、Snapcast 用戶端和 Companion App 語音設備。",
+          "edit_profiles": "配置所選提供商的通知顯示時長、顯示樣式和 Snapcast 播放設置。",
+          "edit_general": "直接進入主/備用 AI 代理、佔用狀態、備用房間、隊列和超時設置。",
+          "edit_all": "按初次配置向導的順序瀏覽全部設置頁面。",
           "edit_people": "Configure tracked people, room sensors, languages and voices.",
-          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
-          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
-          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
+          "edit_advanced_ai": "編輯用於改寫、翻譯及二者結合的可選 AI 風格。核心設備和工具安全規則保持不變。",
+          "edit_audio": "配置僅用於房間直接揚聲器的提示音和可選音樂音量降低，絕不應用於共享 Snapcast 音源。",
+          "edit_room_safety": "為單個房間配置可選的佔用狀態驗證傳感器；傳感器不可用時絕不觸發向其他房間的備用路由。"
         }
       },
       "people": {
@@ -483,8 +483,8 @@
           "person_group_language": "群組語言",
           "person_group_voice": "群組音色",
           "person_group_translate": "翻譯群組公告",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "群組 AI 提供商",
+          "person_group_tts_engine": "群組 TTS 引擎",
           "person_group_rewrite": "改寫群組公告",
           "person_group_addressee": "群組稱呼",
           "person_group_greeting": "自動稱呼群組"
@@ -494,8 +494,8 @@
           "person_group_language": "多個目標人員位於同一房間時，可選的群組公告語言代碼。",
           "person_group_voice": "多個目標人員位於同一房間時，可選的群組 TTS 音色識別碼。",
           "person_group_translate": "使用選定或備用 AI 服務，自動將群組公告翻譯成群組語言；失敗時保留原文。",
-          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
-          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_agent": "面向群組接收者的可選 Conversation 或 AI Task 代理。發送操作中明確指定的代理優先。",
+          "person_group_tts_engine": "供同一房間內多名人員使用的可選 TTS 引擎。僅選擇語音基礎設施，絕不增加其他接收設備。",
           "person_group_rewrite": "使用群組的 AI 代理改寫公告。翻譯設定可獨立配置。",
           "person_group_addressee": "選用的群組稱呼（例如「家人」）。僅在啟用問候語或文字中原樣包含 {{ name }} 時使用。",
           "person_group_greeting": "在群組公告前加上群組稱呼。預設關閉；不會增加收件者。"
@@ -515,7 +515,7 @@
           "destination_tablet": "平板輸出",
           "destination_other": "其他個人輸出",
           "enabled": "允許向此人發送公告",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "存在狀態驗證傳感器",
           "verify_presence": "驗證在場狀態",
           "rewrite": "改寫個人公告",
           "ai_agent": "個人 AI 代理",
@@ -533,85 +533,85 @@
           "destination_watch": "選擇此人手錶現有的通知或媒體播放器輸出。只使用已指派的輸出。",
           "destination_tablet": "選擇此人平板現有的通知或媒體播放器輸出。只使用已指派的輸出。",
           "destination_other": "指派給此人的其他 Home Assistant 輸出，只有選擇「其他」目的地時才會使用。",
-          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "enabled": "關閉後，將阻止面向此人的新公告以及隊列中已有的公告。不會轉發給其他人或其他房間。",
           "presence_sensor": "選用的二元感測器，用於向房間傳送訊息時確認此人是否在場。",
-          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "verify_presence": "要求選定的存在狀態傳感器在送達時為 on。傳感器缺失或不可用時，會阻止向此人所在房間送達公告。",
           "rewrite": "為此人啟用公告改寫，與其翻譯偏好互不影響。",
           "ai_agent": "此人的選用 AI Task 或 Conversation 代理；除非動作指定其他代理，否則覆蓋全域提供者。",
           "tts_engine": "此人的選用 TTS 實體；覆蓋全域語音引擎，但不變更接收裝置。",
-          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "greeting": "在公告開頭添加首選稱呼，除非文本已經包含字面佔位符 {{ name }}。",
           "address": "此人的選用稱呼。留空時使用 Home Assistant 中的顯示名稱。"
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "高級 AI 風格提示詞",
+        "description": "用於改寫、翻譯或兩者結合的可選風格指令。固定的安全規則和 JSON 格式要求始終優先。",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "改寫風格",
+          "translate": "翻譯風格",
+          "both": "改寫與翻譯組合風格"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "可選的純文本風格偏好；只能使用 {message} 和 {language} 佔位符。",
+          "translate": "供選定 AI 使用的可選翻譯偏好，不得更改事實或啟用任何操作。",
+          "both": "同時啟用翻譯和改寫時的可選風格偏好。"
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "房間直接音訊選項",
+        "description": "可選提示音和音量降低僅作用於選定房間的直接揚聲器，絕不作用於共享 Snapcast 播放。",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "啟用公告前提示音",
+          "person_chime_url": "本地提示音文件路徑",
+          "person_chime_delay": "提示音結束等待時間",
+          "person_output_ducking": "降低正在播放的音量",
+          "person_duck_factor": "音樂音量系數"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "預設關閉。僅在明確選擇的房間直接播放器上播放提示音。",
+          "person_chime_url": "本地音訊文件，例如 /local/chime.mp3；不接受遠程 URL。",
+          "person_chime_delay": "TTS 開始之前，等待房間提示音結束的最長時間。",
+          "person_output_ducking": "預設關閉。保存正在播放媒體的房間直接播放器音量，在語音播放期間降低音量，並在結束後恢復。",
+          "person_duck_factor": "公告播放時使用的原始音樂音量比例；僅影響房間直接播放器。"
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "房間存在狀態驗證",
+        "description": "為選定的一個 Home Assistant 區域配置可選傳感器，以明確確認有人存在。",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "區域",
+          "verify_presence": "要求存在狀態確認",
+          "presence_sensor": "房間佔用傳感器"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "選擇要添加或清除驗證設置的區域。",
+          "verify_presence": "僅當選定傳感器為 on 時，才在個人所在房間播放公告；缺失資料時禁止送達。",
+          "presence_sensor": "選擇實體實際位於該區域的 binary_sensor 佔用或存在狀態傳感器。"
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "選擇 TTS 引擎時，也必須選擇一個 TTS 媒體播放器。",
+      "tts_engine_required": "選擇 TTS 播放器時，也必須選擇一個 TTS 引擎。",
+      "snapcast_tts_path_required": "使用 Snapcast 輸出至少需要一個 TTS 引擎和一個 TTS 媒體播放器。",
+      "output_required": "請至少選擇一個可視、伺服器 TTS 或 Companion App TTS 輸出。",
+      "display_time_order": "最長顯示時間必須大於或等於最短顯示時間。",
+      "room_notify_area_required": "與房間綁定的通知設備必須分配 Home Assistant 區域。",
+      "notify_level_overlap": "一個通知設備只能分配一個最低通知級別。",
+      "room_tts_area_required": "與房間綁定的直接 TTS 媒體播放器必須分配 Home Assistant 區域。",
+      "tts_player_role_overlap": "同一媒體播放器不能同時用作直接 TTS 播放器和共享 Snapcast 音源播放器。",
       "invalid_person_output": "所選個人輸出不存在或已停用。",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "自定義 AI 風格只能使用 {message} 和 {language} 佔位符，且不得超過 1200 個字符。",
+      "invalid_chime_url": "提示音音訊必須使用 /local/ 下的文件。",
+      "invalid_person_area": "請選擇有效的 Home Assistant 房間。",
+      "invalid_person_presence": "啟用驗證前請先選擇存在狀態傳感器。"
     }
   },
   "selector": {
     "dispatch_order": {
       "options": {
-        "notify_then_tts": "Visual notifications first, then speech",
-        "tts_then_notify": "Speech first, then visual notifications"
+        "notify_then_tts": "先顯示可視通知，再播放語音",
+        "tts_then_notify": "先播放語音，再顯示可視通知"
       }
     },
     "tts_min_level": {
@@ -622,15 +622,15 @@
         "info": "資訊",
         "success": "成功",
         "debug": "偵錯",
-        "never": "Never"
+        "never": "從不"
       }
     },
     "companion_tts_media_stream": {
       "options": {
-        "default": "App default",
-        "music_stream": "Music stream",
-        "alarm_stream": "Alarm stream",
-        "alarm_stream_max": "Alarm stream at maximum volume"
+        "default": "應用預設值",
+        "music_stream": "音樂音訊流",
+        "alarm_stream": "鬧鐘音訊流",
+        "alarm_stream_max": "以最大音量播放鬧鐘音訊流"
       }
     },
     "level": {
@@ -645,32 +645,32 @@
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left",
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "center": "Center"
+        "bottom-right": "右下角",
+        "bottom-left": "左下角",
+        "top-right": "右上角",
+        "top-left": "左上角",
+        "center": "居中"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large",
-        "max": "Maximum"
+        "small": "小",
+        "medium": "中",
+        "large": "大",
+        "max": "最大"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Grey",
-        "black": "Black",
-        "indigo": "Indigo",
-        "green": "Green",
-        "red": "Red",
-        "cyan": "Cyan",
-        "teal": "Teal",
-        "amber": "Amber",
-        "pink": "Pink"
+        "grey": "灰色",
+        "black": "黑色",
+        "indigo": "靛藍色",
+        "green": "綠色",
+        "red": "紅色",
+        "cyan": "青色",
+        "teal": "藍綠色",
+        "amber": "琥珀色",
+        "pink": "粉色"
       }
     },
     "nfandroidtv_transparency": {
@@ -684,13 +684,13 @@
     },
     "occupancy_source": {
       "options": {
-        "state": "State"
+        "state": "狀態"
       }
     },
     "notify_scope": {
       "options": {
-        "room": "Room-based",
-        "general": "General / movable"
+        "room": "按房間分配",
+        "general": "通用 / 可移動"
       }
     },
     "notify_level": {
@@ -704,9 +704,9 @@
     },
     "channel_fallback_mode": {
       "options": {
-        "visual_then_tts": "Visual first → TTS if unsuccessful",
-        "tts_then_visual": "TTS first → Visual if unsuccessful",
-        "both": "Both eligible channels"
+        "visual_then_tts": "可視優先 → 失敗後使用 TTS",
+        "tts_then_visual": "TTS 優先 → 失敗後使用可視通知",
+        "both": "兩個符合條件的渠道"
       }
     },
     "person_destination": {
@@ -722,14 +722,14 @@
   "entity": {
     "sensor": {
       "queue": {
-        "name": "Queue"
+        "name": "隊列"
       }
     }
   },
   "services": {
     "send": {
       "name": "傳送公告",
-      "description": "Backward-compatible alias for notify.announcement_hub. New automations should use notify.announcement_hub.",
+      "description": "notify.announcement_hub 的向後兼容別名。新自動化應使用 notify.announcement_hub。",
       "sections": {
         "content": {
           "name": "訊息"
@@ -755,7 +755,7 @@
         },
         "title": {
           "name": "標題",
-          "description": "Optional title for visual notifications."
+          "description": "可視通知的可選標題。"
         },
         "level": {
           "name": "重要程度",
@@ -766,20 +766,20 @@
           "description": "選擇 notification（文字）、tts（語音）、snapcast、companion_tts（專用語音）或 all。只篩選所選裝置，絕不新增無關接收者。"
         },
         "notify_data": {
-          "name": "Notification data",
-          "description": "Optional integration-specific data for this visual notification."
+          "name": "通知資料",
+          "description": "此可視通知的可選集成專用資料。"
         },
         "language": {
-          "name": "TTS language",
-          "description": "Optional language override for this job."
+          "name": "TTS 語言",
+          "description": "此任務的可選語言覆蓋設置。"
         },
         "tts_options": {
-          "name": "TTS options",
-          "description": "Optional voice or engine options for this job."
+          "name": "TTS 選項",
+          "description": "此任務的可選聲音或引擎選項。"
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
-          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
+          "name": "允許 Companion App 語音播報",
+          "description": "允許 Companion App 語音輸出的舊版可選設置。新操作可在 service 中請求 tts 或 companion_tts，但僅限選定的接收者。"
         },
         "occupied_only": {
           "name": "回退时尝试有人房间",
@@ -791,15 +791,15 @@
         },
         "ai_agent": {
           "name": "AI 提供者",
-          "description": "Choose an available Conversation agent or AI Task entity for this announcement. Leave empty to inherit the integration's default AI provider."
+          "description": "為此公告選擇可用的 Conversation 代理或 AI Task 實體。留空則繼承集成預設的 AI 提供商。"
         },
         "click_action": {
           "name": "点击通知后跳转",
-          "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
+          "description": "可選的 URL、Home Assistant 儀表盤路徑、app:// 深層連結或 entityId:entity_id，在點擊 Companion App 可視通知時打開。Android 使用 clickAction；iOS/macOS 使用 url。Android TV/Fire TV 浮層、TTS 及不支持的提供商會忽略此設置。覆蓋 notify_data 中的同名鍵。"
         },
         "text": {
           "name": "公告",
-          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+          "description": "語音 TTS 和文字通知共用的文本。若提供 text_tts 或 text_notify，則此字段可省略；每個渠道專用字段都會覆蓋 text 中對應渠道的內容。"
         },
         "area": {
           "name": "區域",
@@ -838,36 +838,36 @@
           "description": "覆寫此人或群組在本次公告的自動翻譯偏好。使用設定的目標語言；use_ai: false 禁止翻譯。"
         },
         "person_greeting": {
-          "name": "Personal greeting",
-          "description": "Override automatic salutation for a person/group; leave unset to use the configured preference."
+          "name": "個性化稱呼",
+          "description": "覆蓋個人或群組的自動稱呼設置；不填寫則使用已配置的偏好。"
         },
         "pre_announce_sound": {
-          "name": "Pre-announcement chime",
-          "description": "Optional direct-room audio chime, never sent on the shared Snapcast source."
+          "name": "公告前提示音",
+          "description": "僅在直接房間音訊上播放的可選提示音，絕不發送至共享 Snapcast 音源。"
         },
         "tts_engine": {
-          "name": "TTS engine override",
-          "description": "Select one existing TTS engine for this announcement without selecting extra devices."
+          "name": "覆蓋 TTS 引擎",
+          "description": "為此公告選擇一個現有 TTS 引擎，不會增加其他接收設備。"
         }
       }
     },
     "clear_queue": {
       "name": "清空公告佇列",
-      "description": "Cancels all waiting jobs and can also stop the active announcement.",
+      "description": "取消所有等待中的任務，也可以停止當前活動公告。",
       "fields": {
         "include_current": {
-          "name": "Include active announcement",
-          "description": "Also requests cancellation of the job currently running."
+          "name": "同時取消活動公告",
+          "description": "同時請求取消當前正在執行的任務。"
         }
       }
     },
     "cancel": {
       "name": "取消",
-      "description": "Cancels one waiting or active job by its ID.",
+      "description": "根據任務 ID 取消一個等待中或正在執行的任務。",
       "fields": {
         "job_id": {
-          "name": "Job ID",
-          "description": "The job ID returned by announcement_hub.send."
+          "name": "任務 ID",
+          "description": "由 announcement_hub.send 返回的任務 ID。"
         }
       }
     }
