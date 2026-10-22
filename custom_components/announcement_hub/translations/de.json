@@ -625,6 +625,10 @@
         "target_person": {
           "name": "Zielpersonen",
           "description": "Nur im Zimmer der gewählten Person sprechen, ohne Raum-Fallback."
+        },
+        "manual_targets": {
+          "name": "Manuelle Empfänger",
+          "description": "Explizit ausgewählte Empfänger direkt aus Home Assistant verwenden, unabhängig von den Standard-Ausgängen des Hubs. Erfordert einen Bereich, eine Integration, ein Gerät oder eine Entität. Keine zusätzlichen Räume oder pauschalen Handy-Benachrichtigungen."
         }
       }
     },
