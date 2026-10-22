@@ -171,7 +171,7 @@
           "tracked_people": "Osoby",
           "person_group_language": "Jazyk skupiny",
           "person_group_voice": "Hlas skupiny",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Překládat skupinová oznámení"
         },
         "data_description": {
           "tracked_people": "Vyberte osoby, u kterých chcete nastavit sledování místnosti a osobní hlasové preference.",
@@ -189,10 +189,10 @@
           "voice": "Hlas",
           "ignore_home": "Povolit mimo domov",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Výstupy mobilu",
+          "destination_watch": "Výstupy hodinek",
+          "destination_tablet": "Výstupy tabletu",
+          "destination_other": "Další osobní výstupy"
         },
         "data_description": {
           "tracker": "Vyberte senzor nebo sledovač zařízení, který hlásí aktuální místnost osoby ve stavu nebo atributu room/area.",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Vybraný osobní výstup neexistuje nebo je zakázán."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "Osoby",
           "person_group_language": "Jazyk skupiny",
           "person_group_voice": "Hlas skupiny",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Překládat skupinová oznámení"
         },
         "data_description": {
           "tracked_people": "Vyberte osoby, u kterých chcete nastavit sledování místnosti a osobní hlasové preference.",
@@ -412,10 +412,10 @@
           "voice": "Hlas",
           "ignore_home": "Povolit mimo domov",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Výstupy mobilu",
+          "destination_watch": "Výstupy hodinek",
+          "destination_tablet": "Výstupy tabletu",
+          "destination_other": "Další osobní výstupy"
         },
         "data_description": {
           "tracker": "Vyberte senzor nebo sledovač zařízení, který hlásí aktuální místnost osoby ve stavu nebo atributu room/area.",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Vybraný osobní výstup neexistuje nebo je zakázán."
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; no unselected outputs."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "Osobní cíle",
           "description": "Vyberte Místnost nebo přiřazený Mobil, Hodinky, Tablet a Jiné. Cíle lze kombinovat. Nepřiřazené cíle budou odmítnuty bez hromadného vysílání."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "Překládat pro vybrané osoby",
           "description": "Přepište pro toto oznámení automatické nastavení překladu osoby nebo skupiny. Použije se nastavený jazyk; use_ai: false překlad vypne."
         }
       }
