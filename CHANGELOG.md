@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b11 - 2026-10-22
+
+**Beta — complete Russian native integration localization.**
+
+- Translate the remaining native Russian setup and reconfiguration
+  descriptions, option labels, selectors, errors, queue controls, AI
+  style instructions, voice/Companion App settings, output profiles,
+  and service-action documentation for **all 599 catalog strings**.
+- Ensure localized descriptions preserve explicit recipient restrictions,
+  occupied and door-gated room fallback, person-specific routing, AI
+  original-message fallback, speech/visual channel separation, and
+  shared Snapcast source isolation.
+- Preserve every interpolation placeholder and literal technical
+  identifier. Only the five opacity percentages remain identical
+  to English; no English help descriptions remain.
+- Add Russian catalog regression tests enforcing key parity,
+  options/configuration agreement, interpolation, technical identifiers
+  and routing-safety wording.
+- Release remains beta/prerelease. No runtime routing or TTS logic changes.
+  Issue #50 remains open for the nine remaining localized catalogs.
+
 ## 0.10.0b10 - 2026-10-22
 
 **Beta — complete Polish native integration localization.**
