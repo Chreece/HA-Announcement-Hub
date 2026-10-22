@@ -154,3 +154,25 @@ def test_optional_chime_never_routes_to_shared_snapcast():
     assert len(service_calls) == 1
     assert service_calls[0][2]["entity_id"] == "media_player.kitchen"
     assert service_calls[0][2]["media_content_id"] == "/local/announcement.wav"
+
+
+def test_area_mute_applies_to_non_person_explicit_and_automatic_room_jobs():
+    methods = runtime_methods()
+    settings = {
+        "person_profiles": {},
+        "person_area_enabled": {"kitchen": False},
+        "person_room_presence": {},
+    }
+    fake = SimpleNamespace(
+        settings=settings,
+        hass=SimpleNamespace(states=SimpleNamespace(get=lambda _: None)),
+    )
+    job = SimpleNamespace(
+        person_ids=(), outputs=("kitchen",), preferred_areas=(),
+        presence_sensors=(),
+    )
+    assert not methods["_person_authorized_now"](fake, job)
+    job.outputs = ("bedroom",)
+    assert methods["_person_authorized_now"](fake, job)
+    job.outputs = ("bedroom", "kitchen")
+    assert not methods["_person_authorized_now"](fake, job)
