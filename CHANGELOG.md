@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.10.0b3 - 2026-10-22
+
+**Beta — room-tracker verification and international localization**
+
+- Verify compatibility with Bermuda room sensor states, ESPresense-style
+  device tracker room/area attributes, and area_id-based room reports.
+  Regression tests confirm that an unavailable configured tracker does
+  not reuse stale room data or broadcast to unrelated rooms.
+- Complete all People configuration field labels, help descriptions,
+  destination assignments, translation preferences, validation messages,
+  and person-target action descriptions across every shipped native
+  language catalog, including Greek and German.
+- Translate the newly added People dashboard mode, Room/Mobile/Watch/
+  Tablet/Other instructions, translation choices, selection errors and
+  manual-output help across all 19 localized dashboard languages.
+- Expand reviewed French and Spanish translations of output levels, TTS
+  configuration, media display profiles, queue settings, errors, and
+  reconfiguration navigation (138 string occurrences per language plus
+  the new People descriptions).
+- Add automated native/catalog and card regression checks for complete
+  People strings, locale parity and interpolation tokens, and document
+  how to connect Bermuda/ESPresense entities to persons. Ordinary
+  announcement routing, services, and stored configuration remain
+  backward compatible.
+- Older native configuration descriptions in several languages still
+  use English fallback where they have not been reviewed.
+
+
 ## 0.10.0b2 - 2026-10-22
 
 **Beta — person language translation and named personal destinations**
