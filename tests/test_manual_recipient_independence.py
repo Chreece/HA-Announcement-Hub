@@ -100,7 +100,7 @@ def test_manual_and_person_routing_cannot_become_global_without_targets():
     assert "Manual targets require an explicit area, integration, device or entity" in source
     assert "self._manual_output_catalog(job.preferred_areas)" in source
     assert "manual_targets=manual_targets" in source
-    assert "manual=job_manual" in source
+    assert "if job_manual else self._notify_policy(output)" in source
     assert "ATTR_MANUAL_TARGETS" in service
     assert 'payload.manual_targets = true' in card
     assert 'if (this._targetMode === "targeted") payload.manual_targets = true;' in card
