@@ -239,49 +239,49 @@
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "Erweiterte KI-Stilvorlagen",
+        "description": "Optionale Stilvorgaben für Umformulierung, Übersetzung und die Kombination beider Funktionen. Die festen Sicherheits- und JSON-Regeln bleiben verbindlich.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "Stil für Umformulierung",
+          "translate": "Stil für Übersetzung",
+          "both": "Stil für kombinierte Umformulierung und Übersetzung"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "Optionale Textvorgabe; nur {message} und {language} sind als Platzhalter erlaubt.",
+          "translate": "Optionale Stilvorgabe für die gewählte KI-Übersetzung, ohne Fakten zu verändern oder Aktionen auszuführen.",
+          "both": "Optionale Stilvorgabe, wenn Umformulierung und Übersetzung gemeinsam aktiv sind."
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "Raumbezogene Audiooptionen",
+        "description": "Optionaler Signalton und Lautstärkeabsenkung ausschließlich für ausgewählte direkte Raumlautsprecher, niemals für die gemeinsame Snapcast-Quelle.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "Signalton vor der Ansage",
+          "person_chime_url": "Lokaler Pfad zur Audiodatei",
+          "person_chime_delay": "Pause nach dem Signalton",
+          "person_output_ducking": "Laufende Audioausgabe absenken",
+          "person_duck_factor": "Lautstärkefaktor der Musik"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "Standardmäßig aus. Der Signalton wird nur auf ausdrücklich ausgewählten direkten Raumlautsprechern abgespielt.",
+          "person_chime_url": "Lokale Audiodatei wie /local/chime.mp3; externe URLs sind nicht erlaubt.",
+          "person_chime_delay": "Wartezeit nach dem Signalton, bevor die Sprachausgabe beginnt.",
+          "person_output_ducking": "Standardmäßig aus. Die aktuelle Lautstärke wird gespeichert, für die Ansage verringert und danach wiederhergestellt.",
+          "person_duck_factor": "Anteil der ursprünglichen Musiklautstärke während der Ansage; betrifft nur direkte Raumlautsprecher."
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "Anwesenheit im Raum prüfen",
+        "description": "Optionaler Anwesenheitssensor für einen ausgewählten Home-Assistant-Bereich.",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "Bereich",
+          "verify_presence": "Anwesenheitsbestätigung erforderlich",
+          "presence_sensor": "Raumbelegungssensor"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "Bereich wählen, in dem die Prüfung eingerichtet oder entfernt werden soll.",
+          "verify_presence": "Personenansagen in den Raum werden nur bei eingeschaltetem Sensor zugestellt. Fehlende Daten verhindern die Zustellung.",
+          "presence_sensor": "Einen binary_sensor für Anwesenheit oder Belegung auswählen, der diesem Bereich zugeordnet ist."
         }
       }
     },
@@ -296,10 +296,10 @@
       "room_tts_area_required": "Ein raumgebundener direkter TTS-Mediaplayer benötigt einen Home-Assistant-Bereich.",
       "tts_player_role_overlap": "Derselbe Media Player kann nicht gleichzeitig direkter TTS-Player und gemeinsamer Snapcast-Quellplayer sein.",
       "invalid_person_output": "Die gewählte Ausgabe ist nicht verfügbar oder deaktiviert.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "KI-Stilvorlagen dürfen nur {message} und {language} verwenden und höchstens 1.200 Zeichen lang sein.",
+      "invalid_chime_url": "Die Signaltongdatei muss unter /local/ liegen.",
+      "invalid_person_area": "Bitte einen gültigen Home-Assistant-Bereich auswählen.",
+      "invalid_person_presence": "Vor dem Aktivieren einen Anwesenheitssensor auswählen."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub ist bereits eingerichtet."
@@ -544,49 +544,49 @@
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "Erweiterte KI-Stilvorlagen",
+        "description": "Optionale Stilvorgaben für Umformulierung, Übersetzung und die Kombination beider Funktionen. Die festen Sicherheits- und JSON-Regeln bleiben verbindlich.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "Stil für Umformulierung",
+          "translate": "Stil für Übersetzung",
+          "both": "Stil für kombinierte Umformulierung und Übersetzung"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "Optionale Textvorgabe; nur {message} und {language} sind als Platzhalter erlaubt.",
+          "translate": "Optionale Stilvorgabe für die gewählte KI-Übersetzung, ohne Fakten zu verändern oder Aktionen auszuführen.",
+          "both": "Optionale Stilvorgabe, wenn Umformulierung und Übersetzung gemeinsam aktiv sind."
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "Raumbezogene Audiooptionen",
+        "description": "Optionaler Signalton und Lautstärkeabsenkung ausschließlich für ausgewählte direkte Raumlautsprecher, niemals für die gemeinsame Snapcast-Quelle.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "Signalton vor der Ansage",
+          "person_chime_url": "Lokaler Pfad zur Audiodatei",
+          "person_chime_delay": "Pause nach dem Signalton",
+          "person_output_ducking": "Laufende Audioausgabe absenken",
+          "person_duck_factor": "Lautstärkefaktor der Musik"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "Standardmäßig aus. Der Signalton wird nur auf ausdrücklich ausgewählten direkten Raumlautsprechern abgespielt.",
+          "person_chime_url": "Lokale Audiodatei wie /local/chime.mp3; externe URLs sind nicht erlaubt.",
+          "person_chime_delay": "Wartezeit nach dem Signalton, bevor die Sprachausgabe beginnt.",
+          "person_output_ducking": "Standardmäßig aus. Die aktuelle Lautstärke wird gespeichert, für die Ansage verringert und danach wiederhergestellt.",
+          "person_duck_factor": "Anteil der ursprünglichen Musiklautstärke während der Ansage; betrifft nur direkte Raumlautsprecher."
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "Anwesenheit im Raum prüfen",
+        "description": "Optionaler Anwesenheitssensor für einen ausgewählten Home-Assistant-Bereich.",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "Bereich",
+          "verify_presence": "Anwesenheitsbestätigung erforderlich",
+          "presence_sensor": "Raumbelegungssensor"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "Bereich wählen, in dem die Prüfung eingerichtet oder entfernt werden soll.",
+          "verify_presence": "Personenansagen in den Raum werden nur bei eingeschaltetem Sensor zugestellt. Fehlende Daten verhindern die Zustellung.",
+          "presence_sensor": "Einen binary_sensor für Anwesenheit oder Belegung auswählen, der diesem Bereich zugeordnet ist."
         }
       }
     },
@@ -601,10 +601,10 @@
       "room_tts_area_required": "Ein raumgebundener direkter TTS-Mediaplayer benötigt einen Home-Assistant-Bereich.",
       "tts_player_role_overlap": "Derselbe Media Player kann nicht gleichzeitig direkter TTS-Player und gemeinsamer Snapcast-Quellplayer sein.",
       "invalid_person_output": "Die gewählte Ausgabe ist nicht verfügbar oder deaktiviert.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "KI-Stilvorlagen dürfen nur {message} und {language} verwenden und höchstens 1.200 Zeichen lang sein.",
+      "invalid_chime_url": "Die Signaltongdatei muss unter /local/ liegen.",
+      "invalid_person_area": "Bitte einen gültigen Home-Assistant-Bereich auswählen.",
+      "invalid_person_presence": "Vor dem Aktivieren einen Anwesenheitssensor auswählen."
     }
   },
   "selector": {
@@ -838,16 +838,16 @@
           "description": "Die automatische Übersetzungseinstellung der Person beziehungsweise Gruppe für diese Ansage überschreiben. Dazu wird ihre eingestellte Sprache genutzt. use_ai: false verhindert eine KI-Übersetzung."
         },
         "person_greeting": {
-          "name": "Personal greeting",
-          "description": "Override automatic salutation for a person/group; leave unset to use the configured preference."
+          "name": "Persönliche Anrede",
+          "description": "Die automatische Anrede für diese Person oder Gruppe überschreiben. Ohne Angabe gilt die konfigurierte Einstellung."
         },
         "pre_announce_sound": {
-          "name": "Pre-announcement chime",
-          "description": "Optional direct-room audio chime, never sent on the shared Snapcast source."
+          "name": "Signalton vor der Ansage",
+          "description": "Optionaler Signalton ausschließlich auf direkten Raumlautsprechern, niemals über die gemeinsame Snapcast-Quelle."
         },
         "tts_engine": {
-          "name": "TTS engine override",
-          "description": "Select one existing TTS engine for this announcement without selecting extra devices."
+          "name": "TTS-Engine überschreiben",
+          "description": "Eine vorhandene TTS-Engine für diese Ansage wählen, ohne zusätzliche Ausgabegeräte auszuwählen."
         }
       }
     },
