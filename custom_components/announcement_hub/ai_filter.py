@@ -176,7 +176,7 @@ def _recovery_prompt(
         f"and text_notify.{title_rule} Never add other keys, code fences, "
         "preambles or explanations. For channels with null input return "
         "null, and for non-null channels return a nonempty string. "
-        (f"Translate into {target_language}. " if target_language else "Write in the language of the source. ")
+        + (f"Translate into {target_language}. " if target_language else "Write in the language of the source. ")
         + "text_tts must be natural plain speech with no emoji or markdown; "
         "text_notify must be a concise visual notification. "
         "Preserve every name, measurement, number, sign, unit, date, "
