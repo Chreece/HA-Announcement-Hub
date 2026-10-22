@@ -383,9 +383,10 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
         else:
             # A person is a location-based recipient, not an extra delivery
             # channel. Reject combinations that could widen the audience.
-            if any(call.data.get(key) is not None for key in (
-                ATTR_AREA, ATTR_OUTPUT, ATTR_INTEGRATION, ATTR_DEVICE, ATTR_ENTITY,
-                ATTR_MANUAL_TARGETS,
+            if (call.data.get(ATTR_MANUAL_TARGETS) or any(
+                call.data.get(key) is not None for key in (
+                    ATTR_AREA, ATTR_OUTPUT, ATTR_INTEGRATION, ATTR_DEVICE, ATTR_ENTITY,
+                )
             )):
                 raise ServiceValidationError(
                     "target_person cannot be combined with area, output, "
