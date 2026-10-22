@@ -191,9 +191,9 @@
           "person_group_translate": "選択したAIエージェントまたは代替エージェントで、グループ向け通知を設定言語に自動翻訳します。失敗時は元の文章を保持します。",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "グループの AI エージェントでお知らせを書き換えます。翻訳は個別に設定できます。",
+          "person_group_addressee": "グループへの任意の呼びかけ（例：家族）。挨拶が有効、または {{ name }} が文字どおり含まれる場合にのみ使用します。",
+          "person_group_greeting": "グループのお知らせの先頭に呼びかけを追加します。初期設定では無効で、送信先は追加されません。"
         }
       },
       "person_profile": {
@@ -229,13 +229,13 @@
           "destination_tablet": "この人物のタブレットに対応する既存の通知またはメディアプレーヤー出力を選択します。割り当てた出力のみを使用します。",
           "destination_other": "この人物に割り当てたその他のHome Assistant出力です。「その他」を選択した場合のみ使用します。",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "部屋への送信時に、この人の在室を確認する任意のバイナリーセンサーです。",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "この人のお知らせの書き換えを、翻訳設定とは別に有効にします。",
+          "ai_agent": "この人専用の AI Task または Conversation エージェントです。アクションで別のエージェントを選ばない限り、全体設定より優先されます。",
+          "tts_engine": "この人専用の TTS エンティティです。送信先デバイスを変えずに全体の音声エンジンより優先されます。",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "この人への任意の呼びかけ名です。空の場合は Home Assistant の表示名を使用します。"
         }
       },
       "edit_advanced_ai": {
@@ -496,9 +496,9 @@
           "person_group_translate": "選択したAIエージェントまたは代替エージェントで、グループ向け通知を設定言語に自動翻訳します。失敗時は元の文章を保持します。",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "グループの AI エージェントでお知らせを書き換えます。翻訳は個別に設定できます。",
+          "person_group_addressee": "グループへの任意の呼びかけ（例：家族）。挨拶が有効、または {{ name }} が文字どおり含まれる場合にのみ使用します。",
+          "person_group_greeting": "グループのお知らせの先頭に呼びかけを追加します。初期設定では無効で、送信先は追加されません。"
         }
       },
       "person_profile": {
@@ -534,13 +534,13 @@
           "destination_tablet": "この人物のタブレットに対応する既存の通知またはメディアプレーヤー出力を選択します。割り当てた出力のみを使用します。",
           "destination_other": "この人物に割り当てたその他のHome Assistant出力です。「その他」を選択した場合のみ使用します。",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "部屋への送信時に、この人の在室を確認する任意のバイナリーセンサーです。",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "この人のお知らせの書き換えを、翻訳設定とは別に有効にします。",
+          "ai_agent": "この人専用の AI Task または Conversation エージェントです。アクションで別のエージェントを選ばない限り、全体設定より優先されます。",
+          "tts_engine": "この人専用の TTS エンティティです。送信先デバイスを変えずに全体の音声エンジンより優先されます。",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "この人への任意の呼びかけ名です。空の場合は Home Assistant の表示名を使用します。"
         }
       },
       "edit_advanced_ai": {

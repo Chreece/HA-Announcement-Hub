@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.10.0b5 - 2026-10-22
+
+**Beta — person/group help localization regression repair.**
+
+- Translate all eight new person/group help descriptions in both initial
+  setup and reconfiguration menus across all 19 non-English native locales,
+  including Greek and German: **304 localized field occurrences**.
+- Clarify separate rewriting and translation, the exact `{{ name }}` greeting
+  placeholder, personal presence verification, AI/TTS provider precedence,
+  and that group greetings cannot add extra recipients.
+- Add regression coverage for all affected languages, fields and menu paths,
+  with intact interpolation placeholders and schema.
+- No runtime delivery behavior changed. Older native setup/help strings still
+  relying on English remain tracked in issue #50.
+
 ## 0.10.0b4 - 2026-10-22
 
 **Beta — Smart Announcements feature-parity additions (opt-in by default).**

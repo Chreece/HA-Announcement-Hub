@@ -191,9 +191,9 @@
           "person_group_translate": "Grup duyurularını seçili yapay zekâ sağlayıcısıyla grup diline otomatik çevirir. Hata durumunda yedek sağlayıcı veya özgün metin kullanılır.",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "Grup yapay zekâ aracısıyla duyuruları yeniden yazın. Çeviri ayrı olarak yapılandırılabilir.",
+          "person_group_addressee": "İsteğe bağlı grup hitabı (ör. Aile). Yalnızca selamlamalar açıkken veya {{ name }} ifadesi aynen yer aldığında kullanılır.",
+          "person_group_greeting": "Grup duyurularının başına grup hitabını ekleyin. Varsayılan olarak kapalıdır; alıcı eklemez."
         }
       },
       "person_profile": {
@@ -229,13 +229,13 @@
           "destination_tablet": "Kişinin tabletine ait mevcut bildirim veya medya oynatıcı çıkışlarını seçin. Yalnızca atanan çıkışlar kullanılır.",
           "destination_other": "Bu kişiye atanmış ve yalnızca Diğer seçildiğinde kullanılan diğer Home Assistant çıkışları.",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "Oda teslimatında bu kişinin varlığını doğrulamak için isteğe bağlı ikili sensör.",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "Bu kişi için yeniden yazmayı çeviri tercihinden bağımsız olarak etkinleştirin.",
+          "ai_agent": "Bu kişi için isteğe bağlı AI Task veya Conversation aracısı. Eylem başka birini seçmedikçe genel sağlayıcının yerini alır.",
+          "tts_engine": "Bu kişi için isteğe bağlı TTS varlığı; hedef cihazları değiştirmeden genel konuşma motorunun yerini alır.",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "Bu kişi için isteğe bağlı hitap. Boş bırakılırsa Home Assistant'taki görünen adı kullanılır."
         }
       },
       "edit_advanced_ai": {
@@ -496,9 +496,9 @@
           "person_group_translate": "Grup duyurularını seçili yapay zekâ sağlayıcısıyla grup diline otomatik çevirir. Hata durumunda yedek sağlayıcı veya özgün metin kullanılır.",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "Grup yapay zekâ aracısıyla duyuruları yeniden yazın. Çeviri ayrı olarak yapılandırılabilir.",
+          "person_group_addressee": "İsteğe bağlı grup hitabı (ör. Aile). Yalnızca selamlamalar açıkken veya {{ name }} ifadesi aynen yer aldığında kullanılır.",
+          "person_group_greeting": "Grup duyurularının başına grup hitabını ekleyin. Varsayılan olarak kapalıdır; alıcı eklemez."
         }
       },
       "person_profile": {
@@ -534,13 +534,13 @@
           "destination_tablet": "Kişinin tabletine ait mevcut bildirim veya medya oynatıcı çıkışlarını seçin. Yalnızca atanan çıkışlar kullanılır.",
           "destination_other": "Bu kişiye atanmış ve yalnızca Diğer seçildiğinde kullanılan diğer Home Assistant çıkışları.",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "Oda teslimatında bu kişinin varlığını doğrulamak için isteğe bağlı ikili sensör.",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "Bu kişi için yeniden yazmayı çeviri tercihinden bağımsız olarak etkinleştirin.",
+          "ai_agent": "Bu kişi için isteğe bağlı AI Task veya Conversation aracısı. Eylem başka birini seçmedikçe genel sağlayıcının yerini alır.",
+          "tts_engine": "Bu kişi için isteğe bağlı TTS varlığı; hedef cihazları değiştirmeden genel konuşma motorunun yerini alır.",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "Bu kişi için isteğe bağlı hitap. Boş bırakılırsa Home Assistant'taki görünen adı kullanılır."
         }
       },
       "edit_advanced_ai": {

@@ -191,9 +191,9 @@
           "person_group_translate": "Μεταφράζει αυτόματα τις ομαδικές ανακοινώσεις στη γλώσσα της ομάδας μέσω του επιλεγμένου παρόχου AI. Αν αποτύχει, χρησιμοποιείται ο εφεδρικός πάροχος ή το αρχικό κείμενο.",
           "person_group_agent": "Προαιρετικός Conversation ή AI Task πάροχος για ομάδες. Η ρητή επιλογή της ενέργειας υπερισχύει.",
           "person_group_tts_engine": "Προαιρετική μηχανή TTS ομάδας χωρίς αλλαγή των επιλεγμένων συσκευών.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "Επαναδιατύπωση ανακοινώσεων με τον πράκτορα AI της ομάδας. Η μετάφραση ρυθμίζεται ανεξάρτητα.",
+          "person_group_addressee": "Προαιρετική προσφώνηση ομάδας (π.χ. Οικογένεια). Χρησιμοποιείται μόνο όταν είναι ενεργοί οι χαιρετισμοί ή υπάρχει αυτούσιο το {{ name }}.",
+          "person_group_greeting": "Πρόσθεσε την προσφώνηση της ομάδας στην αρχή των ομαδικών ανακοινώσεων. Ανενεργό από προεπιλογή· δεν προσθέτει παραλήπτες."
         }
       },
       "person_profile": {
@@ -229,13 +229,13 @@
           "destination_tablet": "Επίλεξε υπάρχουσες εξόδους ειδοποιήσεων ή αναπαραγωγής του tablet αυτού του ατόμου. Χρησιμοποιούνται μόνο οι έξοδοι που του αναθέτεις.",
           "destination_other": "Άλλες υπάρχουσες έξοδοι Home Assistant που αναθέτεις στο άτομο και χρησιμοποιούνται μόνο αν επιλεγεί ο προορισμός «Άλλο».",
           "enabled": "Όταν απενεργοποιηθεί, μπλοκάρει και τις εκκρεμείς ανακοινώσεις του ατόμου χωρίς αποστολή σε άλλον παραλήπτη.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "Προαιρετικός δυαδικός αισθητήρας για επιβεβαίωση της παρουσίας αυτού του ατόμου κατά την αποστολή σε δωμάτιο.",
           "verify_presence": "Απαιτεί ο αισθητήρας παρουσίας να είναι ενεργός πριν από την αναπαραγωγή στο δωμάτιο. Άγνωστη κατάσταση εμποδίζει την αποστολή.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "Ενεργοποίησε την επαναδιατύπωση των ανακοινώσεων για αυτό το άτομο ανεξάρτητα από την προτίμηση μετάφρασής του.",
+          "ai_agent": "Προαιρετικός πράκτορας AI Task ή Conversation για αυτό το άτομο. Υπερισχύει του γενικού παρόχου, εκτός αν οριστεί άλλος στην ενέργεια.",
+          "tts_engine": "Προαιρετική οντότητα TTS για αυτό το άτομο. Υπερισχύει της γενικής μηχανής ομιλίας χωρίς να αλλάζει τις συσκευές παραλήπτες.",
           "greeting": "Προσθέτει προσφώνηση μόνο όταν δεν υπάρχει ήδη η μεταβλητή {{ name }}.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "Προαιρετική προσφώνηση για αυτό το άτομο. Αν είναι κενή, χρησιμοποιείται το φιλικό όνομα του ατόμου από το Home Assistant."
         }
       },
       "edit_advanced_ai": {
@@ -496,9 +496,9 @@
           "person_group_translate": "Μεταφράζει αυτόματα τις ομαδικές ανακοινώσεις στη γλώσσα της ομάδας μέσω του επιλεγμένου παρόχου AI. Αν αποτύχει, χρησιμοποιείται ο εφεδρικός πάροχος ή το αρχικό κείμενο.",
           "person_group_agent": "Προαιρετικός Conversation ή AI Task πάροχος για ομάδες. Η ρητή επιλογή της ενέργειας υπερισχύει.",
           "person_group_tts_engine": "Προαιρετική μηχανή TTS ομάδας χωρίς αλλαγή των επιλεγμένων συσκευών.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "Επαναδιατύπωση ανακοινώσεων με τον πράκτορα AI της ομάδας. Η μετάφραση ρυθμίζεται ανεξάρτητα.",
+          "person_group_addressee": "Προαιρετική προσφώνηση ομάδας (π.χ. Οικογένεια). Χρησιμοποιείται μόνο όταν είναι ενεργοί οι χαιρετισμοί ή υπάρχει αυτούσιο το {{ name }}.",
+          "person_group_greeting": "Πρόσθεσε την προσφώνηση της ομάδας στην αρχή των ομαδικών ανακοινώσεων. Ανενεργό από προεπιλογή· δεν προσθέτει παραλήπτες."
         }
       },
       "person_profile": {
@@ -534,13 +534,13 @@
           "destination_tablet": "Επίλεξε υπάρχουσες εξόδους ειδοποιήσεων ή αναπαραγωγής του tablet αυτού του ατόμου. Χρησιμοποιούνται μόνο οι έξοδοι που του αναθέτεις.",
           "destination_other": "Άλλες υπάρχουσες έξοδοι Home Assistant που αναθέτεις στο άτομο και χρησιμοποιούνται μόνο αν επιλεγεί ο προορισμός «Άλλο».",
           "enabled": "Όταν απενεργοποιηθεί, μπλοκάρει και τις εκκρεμείς ανακοινώσεις του ατόμου χωρίς αποστολή σε άλλον παραλήπτη.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "Προαιρετικός δυαδικός αισθητήρας για επιβεβαίωση της παρουσίας αυτού του ατόμου κατά την αποστολή σε δωμάτιο.",
           "verify_presence": "Απαιτεί ο αισθητήρας παρουσίας να είναι ενεργός πριν από την αναπαραγωγή στο δωμάτιο. Άγνωστη κατάσταση εμποδίζει την αποστολή.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "Ενεργοποίησε την επαναδιατύπωση των ανακοινώσεων για αυτό το άτομο ανεξάρτητα από την προτίμηση μετάφρασής του.",
+          "ai_agent": "Προαιρετικός πράκτορας AI Task ή Conversation για αυτό το άτομο. Υπερισχύει του γενικού παρόχου, εκτός αν οριστεί άλλος στην ενέργεια.",
+          "tts_engine": "Προαιρετική οντότητα TTS για αυτό το άτομο. Υπερισχύει της γενικής μηχανής ομιλίας χωρίς να αλλάζει τις συσκευές παραλήπτες.",
           "greeting": "Προσθέτει προσφώνηση μόνο όταν δεν υπάρχει ήδη η μεταβλητή {{ name }}.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "Προαιρετική προσφώνηση για αυτό το άτομο. Αν είναι κενή, χρησιμοποιείται το φιλικό όνομα του ατόμου από το Home Assistant."
         }
       },
       "edit_advanced_ai": {
