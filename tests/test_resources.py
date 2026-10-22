@@ -153,7 +153,7 @@ def test_manifest_and_hacs_identity() -> None:
 def test_platform_enum_is_used_for_forwarded_platforms() -> None:
     const_source = (COMPONENT / "const.py").read_text()
     assert "from homeassistant.const import Platform" in const_source
-    assert "PLATFORMS: Final = [Platform.SENSOR]" in const_source
+    assert "PLATFORMS: Final = [Platform.SENSOR, Platform.SWITCH]" in const_source
 
 
 def test_translations_cover_all_config_steps_and_service_fields() -> None:
