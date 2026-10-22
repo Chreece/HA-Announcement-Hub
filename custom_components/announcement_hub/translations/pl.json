@@ -625,6 +625,10 @@
         "target_person": {
           "name": "Osoby docelowe",
           "description": "Send to the selected people's current rooms only, without escalating to other rooms or general outputs."
+        },
+        "manual_targets": {
+          "name": "Odbiorcy ręczni",
+          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         }
       }
     },
