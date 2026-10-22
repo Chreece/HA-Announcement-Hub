@@ -171,7 +171,7 @@
           "tracked_people": "الأشخاص",
           "person_group_language": "لغة المجموعة",
           "person_group_voice": "صوت المجموعة",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "ترجمة إعلانات المجموعة"
         },
         "data_description": {
           "tracked_people": "اختر الأشخاص الذين تريد إعداد تتبع الغرفة وتفضيلات الصوت الخاصة بهم.",
@@ -189,10 +189,10 @@
           "voice": "الصوت",
           "ignore_home": "السماح خارج المنزل",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "مخرجات الهاتف",
+          "destination_watch": "مخرجات الساعة",
+          "destination_tablet": "مخرجات الجهاز اللوحي",
+          "destination_other": "مخرجات شخصية أخرى"
         },
         "data_description": {
           "tracker": "اختر المستشعر أو متتبع الجهاز الذي يذكر الغرفة الحالية للشخص في الحالة أو السمة room/area.",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "المخرج الشخصي المحدد غير موجود أو معطّل."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "الأشخاص",
           "person_group_language": "لغة المجموعة",
           "person_group_voice": "صوت المجموعة",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "ترجمة إعلانات المجموعة"
         },
         "data_description": {
           "tracked_people": "اختر الأشخاص الذين تريد إعداد تتبع الغرفة وتفضيلات الصوت الخاصة بهم.",
@@ -412,10 +412,10 @@
           "voice": "الصوت",
           "ignore_home": "السماح خارج المنزل",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "مخرجات الهاتف",
+          "destination_watch": "مخرجات الساعة",
+          "destination_tablet": "مخرجات الجهاز اللوحي",
+          "destination_other": "مخرجات شخصية أخرى"
         },
         "data_description": {
           "tracker": "اختر المستشعر أو متتبع الجهاز الذي يذكر الغرفة الحالية للشخص في الحالة أو السمة room/area.",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "المخرج الشخصي المحدد غير موجود أو معطّل."
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "وجهات الأشخاص",
           "description": "اختر الغرفة أو الهاتف أو الساعة أو الجهاز اللوحي أو الوجهات الأخرى المعيّنة للشخص. يمكن جمعها. تُرفض الوجهات غير المعيّنة دون بث عام."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "الترجمة للأشخاص المحددين",
           "description": "تجاوز تفضيل الترجمة التلقائية للشخص أو المجموعة لهذا الإعلان. تُستخدم اللغة المحددة، ويمنع use_ai: false الترجمة."
         }
       }
