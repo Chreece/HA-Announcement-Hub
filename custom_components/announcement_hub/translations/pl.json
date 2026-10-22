@@ -171,7 +171,7 @@
           "tracked_people": "Osoby",
           "person_group_language": "Język grupy",
           "person_group_voice": "Głos grupy",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Tłumacz ogłoszenia grupowe"
         },
         "data_description": {
           "tracked_people": "Wybierz osoby, dla których zostanie skonfigurowane wykrywanie pokoju oraz preferencje głosu.",
@@ -189,10 +189,10 @@
           "voice": "Głos",
           "ignore_home": "Zezwalaj poza domem",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Wyjścia telefonu",
+          "destination_watch": "Wyjścia zegarka",
+          "destination_tablet": "Wyjścia tabletu",
+          "destination_other": "Inne wyjścia osobiste"
         },
         "data_description": {
           "tracker": "Wybierz czujnik lub tracker urządzenia, który zgłasza aktualny pokój osoby w stanie albo atrybucie room/area.",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Wybrane wyjście osobiste nie istnieje lub jest wyłączone."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "Osoby",
           "person_group_language": "Język grupy",
           "person_group_voice": "Głos grupy",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Tłumacz ogłoszenia grupowe"
         },
         "data_description": {
           "tracked_people": "Wybierz osoby, dla których zostanie skonfigurowane wykrywanie pokoju oraz preferencje głosu.",
@@ -412,10 +412,10 @@
           "voice": "Głos",
           "ignore_home": "Zezwalaj poza domem",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Wyjścia telefonu",
+          "destination_watch": "Wyjścia zegarka",
+          "destination_tablet": "Wyjścia tabletu",
+          "destination_other": "Inne wyjścia osobiste"
         },
         "data_description": {
           "tracker": "Wybierz czujnik lub tracker urządzenia, który zgłasza aktualny pokój osoby w stanie albo atrybucie room/area.",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "Wybrane wyjście osobiste nie istnieje lub jest wyłączone."
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "Miejsca docelowe osób",
           "description": "Wybierz Pokój lub przypisany Telefon, Zegarek, Tablet i Inne. Można łączyć cele. Nieprzypisane cele są odrzucane bez wysyłania ogłoszenia wszystkim."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "Tłumacz dla wybranych osób",
           "description": "Zastąp preferencję automatycznego tłumaczenia osoby lub grupy dla tego ogłoszenia. Używany jest skonfigurowany język; use_ai: false wyłącza tłumaczenie."
         }
       }
