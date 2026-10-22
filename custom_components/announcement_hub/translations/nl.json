@@ -625,6 +625,10 @@
         "target_person": {
           "name": "Doelpersonen",
           "description": "Send to the selected people's current rooms only, without escalating to other rooms or general outputs."
+        },
+        "manual_targets": {
+          "name": "Manual recipients",
+          "description": "When enabled, discover explicitly chosen recipients from Home Assistant independently of Announcement Hub's configured default outputs. Requires a selected area, integration, device or entity. Never enables an unselected output or expands a selected room to every phone."
         }
       }
     },
