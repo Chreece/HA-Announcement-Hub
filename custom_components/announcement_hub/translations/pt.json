@@ -544,6 +544,15 @@
         "tts_then_visual": "TTS first → Visual if unsuccessful",
         "both": "Both eligible channels"
       }
+    },
+    "person_destination": {
+      "options": {
+        "room": "Divisão",
+        "mobile": "Telemóvel",
+        "watch": "Relógio",
+        "tablet": "Tablet",
+        "other": "Outro"
+      }
     }
   },
   "entity": {
