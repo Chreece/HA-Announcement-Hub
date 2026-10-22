@@ -78,11 +78,11 @@ def _planner(
         hass = SimpleNamespace()
 
         @staticmethod
-        def _notify_policy(output):
+        def _notify_policy(output, **kwargs):
             return ("room" if output.area_id else "general", "debug")
 
         @staticmethod
-        def _tts_player_scope(entity_id):
+        def _tts_player_scope(entity_id, **kwargs):
             return "room"
 
         @staticmethod
@@ -121,6 +121,7 @@ def _planner(
         "text_notify": text_notify,
         "explicit_area_routing": explicit_area_routing,
         "explicit_targeting": explicit_targeting,
+        "manual_targets": False,
         "minimum_tts_level": "debug",
         "LEVEL_CRITICAL": "critical",
         "LEVEL_INFO": "info",
