@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from uuid import uuid4
 from pathlib import Path
 from typing import Any
@@ -479,6 +480,14 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                     if not chosen_language:
                         raise ServiceValidationError(
                             "Person translation requires a person/group or global TTS language"
+                        )
+                    if not re.fullmatch(
+                        r"[A-Za-z]{2,24}(?:[-_][A-Za-z0-9]{2,12}){0,3}",
+                        str(chosen_language),
+                    ):
+                        raise ServiceValidationError(
+                            "Person translation language must be a language name "
+                            "or code such as el, de-DE, or Greek"
                         )
                     local["translate_to"] = str(chosen_language)
                 return local
