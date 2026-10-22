@@ -746,7 +746,7 @@
       },
       "fields": {
         "text_tts": {
-          "name": "语音文本 (TTS)",
+          "name": "語音文字 (TTS)",
           "description": "僅供語音播報的訊息，絕不轉送為文字通知。如提供 text，此欄位會覆寫其語音版本。"
         },
         "text_notify": {
@@ -782,7 +782,7 @@
           "description": "允許 Companion App 語音輸出的舊版可選設置。新操作可在 service 中請求 tts 或 companion_tts，但僅限選定的接收者。"
         },
         "occupied_only": {
-          "name": "回退时尝试有人房间",
+          "name": "備援時嘗試其他有人使用的房間",
           "description": "針對區域的傳送先嘗試所選房間，啟用後再嘗試其他有人使用的區域。明確指定的整合、裝置與實體目標保持不變。"
         },
         "use_ai": {
@@ -794,7 +794,7 @@
           "description": "為此公告選擇可用的 Conversation 代理或 AI Task 實體。留空則繼承集成預設的 AI 提供商。"
         },
         "click_action": {
-          "name": "点击通知后跳转",
+          "name": "點擊通知後開啟連結",
           "description": "可選的 URL、Home Assistant 儀表盤路徑、app:// 深層連結或 entityId:entity_id，在點擊 Companion App 可視通知時打開。Android 使用 clickAction；iOS/macOS 使用 url。Android TV/Fire TV 浮層、TTS 及不支持的提供商會忽略此設置。覆蓋 notify_data 中的同名鍵。"
         },
         "text": {
