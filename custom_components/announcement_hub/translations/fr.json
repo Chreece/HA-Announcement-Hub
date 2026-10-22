@@ -8,10 +8,10 @@
         "data": {
           "notify_outputs": "Appareils de notification",
           "notify_room_outputs": "Appareils de notification par pièce",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Minimum : information / succès",
+          "notify_warning_outputs": "Minimum : avertissement",
+          "notify_error_outputs": "Minimum : erreur",
+          "notify_critical_outputs": "Critique uniquement"
         },
         "data_description": {
           "notify_outputs": "Entités de notification reconnues que le Hub peut utiliser. Tous les appareils compatibles sont sélectionnés par défaut ; retirez ceux qui ne doivent jamais recevoir de notifications.",
@@ -29,16 +29,16 @@
           "tts_engines": "Moteur TTS",
           "tts_media_player": "Lecteur multimédia partagé pour Snapcast",
           "snapcast_outputs": "Clients Snapcast par pièce",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "Activer la synthèse vocale dès le niveau",
+          "tts_cache": "Prégénérer et mettre en cache la parole",
+          "tts_language": "Langue de synthèse vocale",
+          "tts_options": "Options du moteur vocal",
+          "companion_tts_media_stream": "Flux audio de l'application mobile",
+          "companion_tts_words_per_minute": "Durée estimée de la voix mobile",
+          "tts_area_players": "Lecteurs vocaux directs par pièce",
+          "companion_tts_outputs": "Appareils vocaux de l'application mobile",
+          "tts_voice": "Voix de synthèse vocale",
+          "direct_tts_announce": "Mode annonce du haut-parleur (peut jouer un carillon)"
         },
         "data_description": {
           "tts_engines": "Le moteur de synthèse vocale actif. Le moteur TTS par défaut de Home Assistant est présélectionné lorsqu'il est disponible.",
@@ -60,25 +60,25 @@
         "title": "Options de l’intégration : {integration}",
         "description": "Réglez le comportement des notifications et leur routage.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
+          "max_length": "Nombre maximal de caractères par partie",
+          "reading_words_per_minute": "Vitesse de lecture",
+          "minimum_display_seconds": "Durée d'affichage minimale",
+          "maximum_display_seconds": "Durée d'affichage maximale",
+          "display_buffer_seconds": "Marge de lecture",
+          "part_gap_seconds": "Pause entre les parties",
+          "show_part_number": "Numéroter les parties dans le titre",
+          "integration_data": "Données supplémentaires de l'intégration",
+          "replace_parts": "Remplacer la partie précédente dans l'application",
           "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "fontsize": "Taille de police",
+          "color": "Couleur d'arrière-plan",
+          "transparency": "Transparence de l'arrière-plan",
+          "interrupt": "Notification interactive",
+          "snapcast_source": "Source Snapcast des annonces",
+          "snapcast_only_source": "Gérer uniquement les clients déjà sur la source des annonces",
+          "snapcast_settle_delay": "Délai de stabilisation Snapcast",
+          "snapcast_verify_timeout": "Délai maximal de vérification Snapcast",
+          "snapcast_restore": "Restaurer les états de sourdine Snapcast"
         },
         "data_description": {
           "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
@@ -107,22 +107,22 @@
         "description": "Configurez la présence, le repli, les portes, la file et les délais.",
         "data": {
           "queue_max": "Nombre maximal d’annonces en file",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Attente d'une sortie indisponible",
+          "idle_timeout": "Attente de libération audio",
+          "start_timeout": "Délai maximal de démarrage",
+          "playback_timeout": "Durée maximale de lecture vocale",
+          "post_play_delay": "Pause après la lecture",
+          "default_title": "Titre de notification par défaut",
+          "critical_notify_data": "Données de notification critique",
           "occupancy_sensor": "Entité de présence par pièce",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "Valeur des pièces occupées",
           "fallback_room": "Pièce de secours",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Exiger une porte ouverte pour le repli entre pièces",
+          "fallback_door_label": "Filtre d'étiquette des capteurs de porte",
           "default_use_ai": "Réécrire les annonces avec l’IA",
           "default_ai_agent": "Fournisseur IA par défaut (conversation ou tâche IA)",
           "fallback_ai_agent": "Fournisseur IA de secours (conversation ou tâche IA)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Canal de secours des notifications"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -148,11 +148,11 @@
         "title": "Reconfigurer Announcement Hub",
         "description": "Choisissez une section ; l'enregistrement revient directement à l'intégration.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. Sorties de notification et pièces",
+          "edit_tts": "2. Moteurs vocaux et appareils",
+          "edit_profiles": "3. Profils de sortie par fournisseur",
+          "edit_general": "4. Paramètres généraux, présence et IA",
+          "edit_all": "Modifier tous les paramètres (assistant complet)",
           "edit_people": "5. Personnes et voix"
         },
         "menu_option_descriptions": {
@@ -171,7 +171,7 @@
           "tracked_people": "Personnes à configurer",
           "person_group_language": "Langue du groupe",
           "person_group_voice": "Voix du groupe",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Traduire les annonces de groupe"
         },
         "data_description": {
           "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
@@ -189,10 +189,10 @@
           "voice": "Voix",
           "ignore_home": "Autoriser en absence",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Sorties du téléphone",
+          "destination_watch": "Sorties de la montre",
+          "destination_tablet": "Sorties de la tablette",
+          "destination_other": "Autres sorties personnelles"
         },
         "data_description": {
           "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
@@ -208,19 +208,19 @@
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "tts_player_required": "Sélectionnez un lecteur multimédia vocal lorsqu'un moteur de synthèse vocale est choisi.",
+      "tts_engine_required": "Sélectionnez un moteur de synthèse vocale lorsqu'un lecteur vocal est choisi.",
+      "snapcast_tts_path_required": "Les sorties Snapcast nécessitent un moteur vocal et un lecteur multimédia TTS.",
+      "output_required": "Sélectionnez au moins une sortie visuelle, vocale serveur ou vocale de l'application mobile.",
+      "display_time_order": "La durée maximale d'affichage doit être supérieure ou égale à la durée minimale.",
+      "room_notify_area_required": "Un appareil de notification lié à une pièce doit appartenir à une zone Home Assistant.",
+      "notify_level_overlap": "Un appareil de notification ne peut avoir qu'un seul niveau minimal.",
+      "room_tts_area_required": "Un lecteur vocal lié à une pièce doit avoir une zone Home Assistant.",
+      "tts_player_role_overlap": "Un même lecteur ne peut pas être à la fois une sortie vocale directe et la source Snapcast partagée.",
+      "invalid_person_output": "La sortie personnelle sélectionnée n'existe pas ou est désactivée."
     },
     "abort": {
-      "single_instance_allowed": "Announcement Hub is already configured."
+      "single_instance_allowed": "Announcement Hub est déjà configuré."
     }
   },
   "options": {
@@ -231,10 +231,10 @@
         "data": {
           "notify_outputs": "Appareils de notification",
           "notify_room_outputs": "Appareils de notification par pièce",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Minimum : information / succès",
+          "notify_warning_outputs": "Minimum : avertissement",
+          "notify_error_outputs": "Minimum : erreur",
+          "notify_critical_outputs": "Critique uniquement"
         },
         "data_description": {
           "notify_outputs": "Entités de notification reconnues que le Hub peut utiliser. Tous les appareils compatibles sont sélectionnés par défaut ; retirez ceux qui ne doivent jamais recevoir de notifications.",
@@ -252,16 +252,16 @@
           "tts_engines": "Moteur TTS",
           "tts_media_player": "Lecteur multimédia partagé pour Snapcast",
           "snapcast_outputs": "Clients Snapcast par pièce",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "Activer la synthèse vocale dès le niveau",
+          "tts_cache": "Prégénérer et mettre en cache la parole",
+          "tts_language": "Langue de synthèse vocale",
+          "tts_options": "Options du moteur vocal",
+          "companion_tts_media_stream": "Flux audio de l'application mobile",
+          "companion_tts_words_per_minute": "Durée estimée de la voix mobile",
+          "tts_area_players": "Lecteurs vocaux directs par pièce",
+          "companion_tts_outputs": "Appareils vocaux de l'application mobile",
+          "tts_voice": "Voix de synthèse vocale",
+          "direct_tts_announce": "Mode annonce du haut-parleur (peut jouer un carillon)"
         },
         "data_description": {
           "tts_engines": "Le moteur de synthèse vocale actif. Le moteur TTS par défaut de Home Assistant est présélectionné lorsqu'il est disponible.",
@@ -283,25 +283,25 @@
         "title": "Options de l’intégration : {integration}",
         "description": "Réglez le comportement des notifications et leur routage.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
+          "max_length": "Nombre maximal de caractères par partie",
+          "reading_words_per_minute": "Vitesse de lecture",
+          "minimum_display_seconds": "Durée d'affichage minimale",
+          "maximum_display_seconds": "Durée d'affichage maximale",
+          "display_buffer_seconds": "Marge de lecture",
+          "part_gap_seconds": "Pause entre les parties",
+          "show_part_number": "Numéroter les parties dans le titre",
+          "integration_data": "Données supplémentaires de l'intégration",
+          "replace_parts": "Remplacer la partie précédente dans l'application",
           "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "fontsize": "Taille de police",
+          "color": "Couleur d'arrière-plan",
+          "transparency": "Transparence de l'arrière-plan",
+          "interrupt": "Notification interactive",
+          "snapcast_source": "Source Snapcast des annonces",
+          "snapcast_only_source": "Gérer uniquement les clients déjà sur la source des annonces",
+          "snapcast_settle_delay": "Délai de stabilisation Snapcast",
+          "snapcast_verify_timeout": "Délai maximal de vérification Snapcast",
+          "snapcast_restore": "Restaurer les états de sourdine Snapcast"
         },
         "data_description": {
           "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
@@ -330,22 +330,22 @@
         "description": "Configurez la présence, le repli, les portes, la file et les délais.",
         "data": {
           "queue_max": "Nombre maximal d’annonces en file",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Attente d'une sortie indisponible",
+          "idle_timeout": "Attente de libération audio",
+          "start_timeout": "Délai maximal de démarrage",
+          "playback_timeout": "Durée maximale de lecture vocale",
+          "post_play_delay": "Pause après la lecture",
+          "default_title": "Titre de notification par défaut",
+          "critical_notify_data": "Données de notification critique",
           "occupancy_sensor": "Entité de présence par pièce",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "Valeur des pièces occupées",
           "fallback_room": "Pièce de secours",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Exiger une porte ouverte pour le repli entre pièces",
+          "fallback_door_label": "Filtre d'étiquette des capteurs de porte",
           "default_use_ai": "Réécrire les annonces avec l’IA",
           "default_ai_agent": "Fournisseur IA par défaut (conversation ou tâche IA)",
           "fallback_ai_agent": "Fournisseur IA de secours (conversation ou tâche IA)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Canal de secours des notifications"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -368,14 +368,14 @@
         }
       },
       "init": {
-        "title": "Configure Announcement Hub",
+        "title": "Configurer Announcement Hub",
         "description": "Choisissez une section ; l'enregistrement revient directement à l'intégration.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. Sorties de notification et pièces",
+          "edit_tts": "2. Moteurs vocaux et appareils",
+          "edit_profiles": "3. Profils de sortie par fournisseur",
+          "edit_general": "4. Paramètres généraux, présence et IA",
+          "edit_all": "Modifier tous les paramètres (assistant complet)",
           "edit_people": "5. Personnes et voix"
         },
         "menu_option_descriptions": {
@@ -394,7 +394,7 @@
           "tracked_people": "Personnes à configurer",
           "person_group_language": "Langue du groupe",
           "person_group_voice": "Voix du groupe",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "Traduire les annonces de groupe"
         },
         "data_description": {
           "tracked_people": "Select people whose room trackers and speech preferences will be configured.",
@@ -412,10 +412,10 @@
           "voice": "Voix",
           "ignore_home": "Autoriser en absence",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "Sorties du téléphone",
+          "destination_watch": "Sorties de la montre",
+          "destination_tablet": "Sorties de la tablette",
+          "destination_other": "Autres sorties personnelles"
         },
         "data_description": {
           "tracker": "Select the sensor or device tracker that reports the person's current room, from its state or area/room attribute.",
@@ -431,16 +431,16 @@
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "tts_player_required": "Sélectionnez un lecteur multimédia vocal lorsqu'un moteur de synthèse vocale est choisi.",
+      "tts_engine_required": "Sélectionnez un moteur de synthèse vocale lorsqu'un lecteur vocal est choisi.",
+      "snapcast_tts_path_required": "Les sorties Snapcast nécessitent un moteur vocal et un lecteur multimédia TTS.",
+      "output_required": "Sélectionnez au moins une sortie visuelle, vocale serveur ou vocale de l'application mobile.",
+      "display_time_order": "La durée maximale d'affichage doit être supérieure ou égale à la durée minimale.",
+      "room_notify_area_required": "Un appareil de notification lié à une pièce doit appartenir à une zone Home Assistant.",
+      "notify_level_overlap": "Un appareil de notification ne peut avoir qu'un seul niveau minimal.",
+      "room_tts_area_required": "Un lecteur vocal lié à une pièce doit avoir une zone Home Assistant.",
+      "tts_player_role_overlap": "Un même lecteur ne peut pas être à la fois une sortie vocale directe et la source Snapcast partagée.",
+      "invalid_person_output": "La sortie personnelle sélectionnée n'existe pas ou est désactivée."
     }
   },
   "selector": {
@@ -602,19 +602,19 @@
           "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
         },
         "notify_data": {
-          "name": "Notification data",
+          "name": "Données de notification",
           "description": "Optional integration-specific data for this visual notification."
         },
         "language": {
-          "name": "TTS language",
+          "name": "Langue de synthèse vocale",
           "description": "Optional language override for this job."
         },
         "tts_options": {
-          "name": "TTS options",
+          "name": "Options de synthèse vocale",
           "description": "Optional voice or engine options for this job."
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
+          "name": "Autoriser la parole dans l'application mobile",
           "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
         },
         "occupied_only": {
@@ -666,11 +666,11 @@
           "description": "Utiliser uniquement les destinataires explicitement choisis dans Home Assistant, sans dépendre des sorties par défaut du Hub. Une pièce, intégration, appareil ou entité est requis."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "Destinations personnelles",
           "description": "Choose Room or assigned Mobile, Watch, Tablet and Other destinations, rather than device entity IDs. Unmapped choices are rejected."
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "Traduire pour les personnes sélectionnées",
           "description": "Override individual or group translation preferences for this announcement; requires a configured destination language."
         }
       }
@@ -680,7 +680,7 @@
       "description": "Cancels all waiting jobs and can also stop the active announcement.",
       "fields": {
         "include_current": {
-          "name": "Include active announcement",
+          "name": "Inclure l'annonce en cours",
           "description": "Also requests cancellation of the job currently running."
         }
       }
@@ -690,7 +690,7 @@
       "description": "Cancels one waiting or active job by its ID.",
       "fields": {
         "job_id": {
-          "name": "Job ID",
+          "name": "Identifiant de tâche",
           "description": "The job ID returned by announcement_hub.send."
         }
       }
