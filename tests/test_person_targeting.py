@@ -104,6 +104,6 @@ def test_person_routing_never_inherits_general_or_fallback_paths():
     assert "strict_targets=bool(requested) or _person_targeted" in manager
     assert "explicit_targeting = bool(requested) or bool(channel_tokens) or _person_targeted" in manager
     assert 'local["_person_targeted"] = True' in service
-    assert 'room_people.setdefault(area_id, []).append(person_id)' in service
+    assert 'rooms.setdefault(area_id, []).append(person_id)' in service
     assert 'for pending_job in created:' in service
     assert 'if (call.data.get(ATTR_MANUAL_TARGETS) or any(' in service
