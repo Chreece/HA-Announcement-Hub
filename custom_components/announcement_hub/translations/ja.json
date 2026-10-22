@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "{person_name} の音声",
-        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "description": "この人の現在の部屋を報告するセンサーを設定します。部屋が不明な場合、無関係なスピーカーにお知らせを送ることはありません。",
         "data": {
           "tracker": "部屋センサー",
           "language": "言語",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "{person_name} の音声",
-        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "description": "この人の現在の部屋を報告するセンサーを設定します。部屋が不明な場合、無関係なスピーカーにお知らせを送ることはありません。",
         "data": {
           "tracker": "部屋センサー",
           "language": "言語",
@@ -823,11 +823,11 @@
         },
         "target_person": {
           "name": "対象の人物",
-          "description": "Target only the selected person's current room, with no other room or general fallback."
+          "description": "選択した人の現在の部屋だけにお知らせを送ります。別の部屋や共通出力への代替送信はしません。"
         },
         "manual_targets": {
           "name": "手動選択した宛先",
-          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+          "description": "Home Assistant で明示選択した受信者のみを、Announcement Hub の既定出力とは独立して検索します。area、インテグレーション、機器、エンティティの選択が必要です。未選択の出力を有効にしたり、すべての電話に配信したりしません。"
         },
         "person_destination": {
           "name": "個人の通知先",

@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "Stem voor {person_name}",
-        "description": "Choose this person's current-room tracker. If the room is unknown, the announcement never falls back to another room.",
+        "description": "Selecteer de sensor die de huidige kamer van deze persoon bepaalt. Bij een onbekende kamer wordt nooit naar een andere kamer uitgeweken.",
         "data": {
           "tracker": "Kamersensor",
           "language": "Taal",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "Stem voor {person_name}",
-        "description": "Choose this person's current-room tracker. If the room is unknown, the announcement never falls back to another room.",
+        "description": "Selecteer de sensor die de huidige kamer van deze persoon bepaalt. Bij een onbekende kamer wordt nooit naar een andere kamer uitgeweken.",
         "data": {
           "tracker": "Kamersensor",
           "language": "Taal",
@@ -823,7 +823,7 @@
         },
         "target_person": {
           "name": "Doelpersonen",
-          "description": "Send to the selected people's current rooms only, without escalating to other rooms or general outputs."
+          "description": "Verzend alleen naar de huidige kamers van de geselecteerde personen, zonder uitwijk naar andere kamers of Algemene uitgangen."
         },
         "manual_targets": {
           "name": "Manual recipients",

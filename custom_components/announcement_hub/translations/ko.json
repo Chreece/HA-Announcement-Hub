@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "{person_name} 음성",
-        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "description": "이 사람의 현재 방을 보고하는 센서를 설정합니다. 방을 모르면 관련 없는 스피커로 안내를 보내지 않습니다.",
         "data": {
           "tracker": "방 센서",
           "language": "언어",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "{person_name} 음성",
-        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "description": "이 사람의 현재 방을 보고하는 센서를 설정합니다. 방을 모르면 관련 없는 스피커로 안내를 보내지 않습니다.",
         "data": {
           "tracker": "방 센서",
           "language": "언어",
@@ -823,11 +823,11 @@
         },
         "target_person": {
           "name": "대상 사람",
-          "description": "Target only the selected person's current room, with no other room or general fallback."
+          "description": "선택한 사람들의 현재 방에만 안내를 보내며 다른 방이나 일반 출력으로 대체 전송하지 않습니다."
         },
         "manual_targets": {
           "name": "수동 수신자",
-          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+          "description": "Announcement Hub의 기본 출력 목록과 독립적으로 Home Assistant에서 명시적으로 선택한 수신자만 찾습니다. area, 통합, 기기 또는 엔티티를 선택해야 합니다. 선택하지 않은 출력을 켜거나 모든 휴대전화에 전송하지 않습니다."
         },
         "person_destination": {
           "name": "개인별 수신 대상",

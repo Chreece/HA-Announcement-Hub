@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "{person_name} 的语音",
-        "description": "Configure a sensor reporting the person's current room. An unknown room never routes to an unrelated speaker.",
+        "description": "配置报告此人当前房间的传感器。房间未知时，公告绝不会转发到无关的扬声器。",
         "data": {
           "tracker": "房间传感器",
           "language": "语言",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "{person_name} 的语音",
-        "description": "Configure a sensor reporting the person's current room. An unknown room never routes to an unrelated speaker.",
+        "description": "配置报告此人当前房间的传感器。房间未知时，公告绝不会转发到无关的扬声器。",
         "data": {
           "tracker": "房间传感器",
           "language": "语言",
@@ -823,11 +823,11 @@
         },
         "target_person": {
           "name": "目标人员",
-          "description": "Announce in each selected person's current room only. Never fall back to another room."
+          "description": "仅向所选人员当前所在房间发送公告，不转向其他房间或通用输出。"
         },
         "manual_targets": {
           "name": "手动选择接收者",
-          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+          "description": "仅查找在 Home Assistant 中明确选择的接收者，不依赖 Announcement Hub 的默认输出列表。必须选择 area、集成、设备或实体。绝不启用未选择的输出，也不向所有手机广播。"
         },
         "person_destination": {
           "name": "个人接收目标",

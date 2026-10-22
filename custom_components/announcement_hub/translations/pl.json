@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "Głos dla {person_name}",
-        "description": "Choose this person's current-room tracker. If the room is unknown, the announcement never falls back to another room.",
+        "description": "Wybierz czujnik wykrywający aktualny pokój tej osoby. Nieznany pokój nigdy nie powoduje przekierowania do innego pokoju.",
         "data": {
           "tracker": "Czujnik pokoju",
           "language": "Język",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "Głos dla {person_name}",
-        "description": "Choose this person's current-room tracker. If the room is unknown, the announcement never falls back to another room.",
+        "description": "Wybierz czujnik wykrywający aktualny pokój tej osoby. Nieznany pokój nigdy nie powoduje przekierowania do innego pokoju.",
         "data": {
           "tracker": "Czujnik pokoju",
           "language": "Język",
@@ -823,11 +823,11 @@
         },
         "target_person": {
           "name": "Osoby docelowe",
-          "description": "Send to the selected people's current rooms only, without escalating to other rooms or general outputs."
+          "description": "Wyślij tylko do aktualnych pokoi wybranych osób, bez przekierowania do innych pokoi ani wyjść Ogólnych."
         },
         "manual_targets": {
           "name": "Odbiorcy ręczni",
-          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+          "description": "Wyszukuj tylko jawnie wybranych odbiorców Home Assistant, niezależnie od domyślnych wyjść Announcement Hub. Wymaga wskazania area, integracji, urządzenia lub encji. Nie rozszerza wysyłki na niewybrane wyjścia ani wszystkie telefony."
         },
         "person_destination": {
           "name": "Miejsca docelowe osób",

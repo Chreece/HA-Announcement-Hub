@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "Röst för {person_name}",
-        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "description": "Ställ in sensorn som rapporterar personens aktuella rum. Ett okänt rum leder aldrig till uppspelning på en orelaterad högtalare.",
         "data": {
           "tracker": "Rumssensor",
           "language": "Språk",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "Röst för {person_name}",
-        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "description": "Ställ in sensorn som rapporterar personens aktuella rum. Ett okänt rum leder aldrig till uppspelning på en orelaterad högtalare.",
         "data": {
           "tracker": "Rumssensor",
           "language": "Språk",
@@ -823,11 +823,11 @@
         },
         "target_person": {
           "name": "Målpersoner",
-          "description": "Target only the selected person's current room, with no other room or general fallback."
+          "description": "Skicka endast till de valda personernas aktuella rum, utan att falla tillbaka till andra rum eller Allmänna utgångar."
         },
         "manual_targets": {
           "name": "Manuella mottagare",
-          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+          "description": "Hitta endast uttryckligen valda Home Assistant-mottagare, oberoende av Announcement Hubs standardutgångar. Kräver area, integration, enhet eller entitet. Aktiverar aldrig ovalda utgångar eller utskick till alla telefoner."
         },
         "person_destination": {
           "name": "Personliga mottagare",

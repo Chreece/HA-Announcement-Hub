@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "Voz de {person_name}",
-        "description": "Choose this person's current-room tracker. If the room is unknown, the announcement never falls back to another room.",
+        "description": "Selecione o sensor do cômodo atual desta pessoa. Se ele for desconhecido, o anúncio não será enviado para outro cômodo.",
         "data": {
           "tracker": "Sensor do cômodo",
           "language": "Idioma",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "Voz de {person_name}",
-        "description": "Choose this person's current-room tracker. If the room is unknown, the announcement never falls back to another room.",
+        "description": "Selecione o sensor do cômodo atual desta pessoa. Se ele for desconhecido, o anúncio não será enviado para outro cômodo.",
         "data": {
           "tracker": "Sensor do cômodo",
           "language": "Idioma",
@@ -823,7 +823,7 @@
         },
         "target_person": {
           "name": "Pessoas destinatárias",
-          "description": "Send to the selected people's current rooms only, without escalating to other rooms or general outputs."
+          "description": "Envia somente aos cômodos atuais das pessoas selecionadas, sem alternativa em outros cômodos ou saídas Gerais."
         },
         "manual_targets": {
           "name": "Manual recipients",

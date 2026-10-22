@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "Голос для {person_name}",
-        "description": "Configure a sensor reporting the person's current room. An unknown room never routes to an unrelated speaker.",
+        "description": "Налаштуйте датчик, що повідомляє поточну кімнату цієї особи. Невідома кімната ніколи не спрямовує повідомлення до стороннього динаміка.",
         "data": {
           "tracker": "Датчик кімнати",
           "language": "Мова",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "Голос для {person_name}",
-        "description": "Configure a sensor reporting the person's current room. An unknown room never routes to an unrelated speaker.",
+        "description": "Налаштуйте датчик, що повідомляє поточну кімнату цієї особи. Невідома кімната ніколи не спрямовує повідомлення до стороннього динаміка.",
         "data": {
           "tracker": "Датчик кімнати",
           "language": "Мова",
@@ -823,11 +823,11 @@
         },
         "target_person": {
           "name": "Одержувачі",
-          "description": "Announce in each selected person's current room only. Never fall back to another room."
+          "description": "Оголошуйте лише в поточних кімнатах вибраних людей, без переходу до інших кімнат чи Загальних виходів."
         },
         "manual_targets": {
           "name": "Вибрані одержувачі",
-          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+          "description": "Знаходьте лише явно вибраних одержувачів Home Assistant незалежно від стандартних виходів Announcement Hub. Потрібно вибрати area, інтеграцію, пристрій або сутність. Не вмикайте невибрані виходи й не надсилайте всім телефонам."
         },
         "person_destination": {
           "name": "Особисті адресати",

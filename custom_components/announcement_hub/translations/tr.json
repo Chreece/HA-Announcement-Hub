@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "{person_name} için ses",
-        "description": "Configure a sensor reporting the person's current room. An unknown room never routes to an unrelated speaker.",
+        "description": "Bu kişinin bulunduğu odayı bildiren sensörü yapılandırın. Oda bilinmiyorsa duyuru başka bir hoparlöre yönlendirilmez.",
         "data": {
           "tracker": "Oda sensörü",
           "language": "Dil",
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "{person_name} için ses",
-        "description": "Configure a sensor reporting the person's current room. An unknown room never routes to an unrelated speaker.",
+        "description": "Bu kişinin bulunduğu odayı bildiren sensörü yapılandırın. Oda bilinmiyorsa duyuru başka bir hoparlöre yönlendirilmez.",
         "data": {
           "tracker": "Oda sensörü",
           "language": "Dil",
@@ -823,11 +823,11 @@
         },
         "target_person": {
           "name": "Hedef kişiler",
-          "description": "Announce in each selected person's current room only. Never fall back to another room."
+          "description": "Yalnızca seçili kişilerin mevcut odalarına duyuru gönderin; başka odalara veya Genel çıkışlara geçmeyin."
         },
         "manual_targets": {
           "name": "Elle seçilen alıcılar",
-          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+          "description": "Home Assistant'ta yalnızca açıkça seçilen alıcıları, Announcement Hub'ın varsayılan çıkışlarından bağımsız bulun. area, entegrasyon, cihaz veya varlık seçilmelidir. Seçilmemiş çıkışları ya da tüm telefonları hedeflemez."
         },
         "person_destination": {
           "name": "Kişisel hedefler",
