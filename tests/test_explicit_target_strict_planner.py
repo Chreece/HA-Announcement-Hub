@@ -249,7 +249,8 @@ def test_action_response_reports_authoritative_strict_target_mode() -> None:
     action = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
     assert '"strict_targets": job.strict_targets' in action
     assert "strict_targets=bool(requested)" in SOURCE
-    assert "routing_mode=\"room_fallback\" if room_fallback_routing else \"normal\"" in SOURCE
+    assert '"person" if _person_targeted else' in SOURCE
+    assert '"room_fallback" if room_fallback_routing else "normal"' in SOURCE
 
 
 def test_empty_selectors_fail_closed_before_broadcast() -> None:
