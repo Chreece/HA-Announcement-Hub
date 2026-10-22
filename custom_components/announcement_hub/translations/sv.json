@@ -15,7 +15,7 @@
         },
         "data_description": {
           "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
-          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
+          "notify_room_outputs": "Valda notifieringsenheter vars Home Assistant-område måste matcha det upptagna rummet eller reservrummet. Ta inte med flyttbara enheter som telefoner, klockor och bärbara datorer.",
           "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
           "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
           "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
@@ -42,14 +42,14 @@
         },
         "data_description": {
           "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
-          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
-          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
+          "tts_media_player": "Den allmänna mediaspelaren som faktiskt spelar upp genererad TTS i den delade Snapserver-strömmen, till exempel MPD. Det är global infrastruktur som aldrig filtreras efter rum.",
+          "tts_min_level": "Lägsta meddelandenivå som får läsas upp. Lägre nivåer är tysta; Kritisk hörs alltid.",
           "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
           "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
           "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
           "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
           "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
+          "snapcast_outputs": "Snapcast-klientmediaspelare som används som synkroniserade fysiska utgångar i rummen. Announcement Hub skickar inte TTS direkt till dem, utan styr ljudavstängning och routning medan den delade spelaren matar Snapserver.",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
           "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
           "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
@@ -96,7 +96,7 @@
           "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
           "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
           "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
-          "snapcast_only_source": "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
+          "snapcast_only_source": "När detta är aktiverat ändrar Announcement Hub endast ljudavstängning för klienter som redan är anslutna till den inställda meddelandekällan; andra Snapcast-grupper och källor påverkas inte.",
           "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
           "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
           "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
@@ -133,15 +133,15 @@
           "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
           "default_title": "Title used for visual notifications when the send action does not provide its own title.",
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
-          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
+          "occupancy_sensor": "Entitet vars tillstånd eller valda attribut innehåller namn eller ID för de Home Assistant-områden som för närvarande är upptagna. Används bara om sändåtgärden har aktiverat routning till upptagna rum.",
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
+          "fallback_room": "TTS-reservområde används endast om de aktuella målrummen saknar samtliga fasta rumskandidater. Befintliga fasta kandidater, även okända eller otillgängliga, hindrar reservroutning och omfattas av den vanliga väntetiden för tillgänglighet.",
+          "fallback_check_door": "När detta är aktiverat tillåts reservroutning bara om en lämplig dörrsensor i något av målrummen uttryckligen rapporterar att dörren är öppen.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
+          "default_use_ai": "När detta är aktiverat ärver alla meddelanden AI-omskrivning om inte sändåtgärden uttryckligen anger use_ai: false. Om use_ai utelämnas gäller denna inställning. Vid AI-fel skickas originaltexten. Kontrollera ai-status i åtgärdens response_variable.",
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande."
         }
       },
       "reconfigure": {
@@ -198,7 +198,7 @@
       },
       "person_profile": {
         "title": "Röst för {person_name}",
-        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "description": "Ställ in sensorn som rapporterar personens aktuella rum. Ett okänt rum leder aldrig till uppspelning på en orelaterad högtalare.",
         "data": {
           "tracker": "Rumssensor",
           "language": "Språk",
@@ -320,7 +320,7 @@
         },
         "data_description": {
           "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
-          "notify_room_outputs": "Selected notification devices whose Home Assistant area must match the occupied/fallback room. Leave movable devices such as phones, watches, and laptops out of this list.",
+          "notify_room_outputs": "Valda notifieringsenheter vars Home Assistant-område måste matcha det upptagna rummet eller reservrummet. Ta inte med flyttbara enheter som telefoner, klockor och bärbara datorer.",
           "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
           "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
           "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
@@ -347,14 +347,14 @@
         },
         "data_description": {
           "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
-          "tts_media_player": "The general media player that actually plays the generated TTS into the shared Snapserver stream, for example MPD. It is global infrastructure and is never filtered by room.",
-          "tts_min_level": "Minimum announcement level that is allowed to speak. Lower levels remain silent; Critical is always audible.",
+          "tts_media_player": "Den allmänna mediaspelaren som faktiskt spelar upp genererad TTS i den delade Snapserver-strömmen, till exempel MPD. Det är global infrastruktur som aldrig filtreras efter rum.",
+          "tts_min_level": "Lägsta meddelandenivå som får läsas upp. Lägre nivåer är tysta; Kritisk hörs alltid.",
           "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
           "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
           "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
           "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
           "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
-          "snapcast_outputs": "Snapcast client media players used as synchronized physical room outputs. Announcement Hub does not send TTS directly to them; it manages their mute/routing while the shared player feeds Snapserver.",
+          "snapcast_outputs": "Snapcast-klientmediaspelare som används som synkroniserade fysiska utgångar i rummen. Announcement Hub skickar inte TTS direkt till dem, utan styr ljudavstängning och routning medan den delade spelaren matar Snapserver.",
           "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
           "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
           "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
@@ -401,7 +401,7 @@
           "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
           "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
           "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
-          "snapcast_only_source": "When enabled, Announcement Hub changes mute state only for clients that are already on the configured announcement source; other Snapcast groups/sources are left untouched.",
+          "snapcast_only_source": "När detta är aktiverat ändrar Announcement Hub endast ljudavstängning för klienter som redan är anslutna till den inställda meddelandekällan; andra Snapcast-grupper och källor påverkas inte.",
           "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
           "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
           "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
@@ -438,15 +438,15 @@
           "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
           "default_title": "Title used for visual notifications when the send action does not provide its own title.",
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
-          "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
+          "occupancy_sensor": "Entitet vars tillstånd eller valda attribut innehåller namn eller ID för de Home Assistant-områden som för närvarande är upptagna. Används bara om sändåtgärden har aktiverat routning till upptagna rum.",
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
-          "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
+          "fallback_room": "TTS-reservområde används endast om de aktuella målrummen saknar samtliga fasta rumskandidater. Befintliga fasta kandidater, även okända eller otillgängliga, hindrar reservroutning och omfattas av den vanliga väntetiden för tillgänglighet.",
+          "fallback_check_door": "När detta är aktiverat tillåts reservroutning bara om en lämplig dörrsensor i något av målrummen uttryckligen rapporterar att dörren är öppen.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
-          "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
+          "default_use_ai": "När detta är aktiverat ärver alla meddelanden AI-omskrivning om inte sändåtgärden uttryckligen anger use_ai: false. Om use_ai utelämnas gäller denna inställning. Vid AI-fel skickas originaltexten. Kontrollera ai-status i åtgärdens response_variable.",
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande."
         }
       },
       "init": {
@@ -503,7 +503,7 @@
       },
       "person_profile": {
         "title": "Röst för {person_name}",
-        "description": "Configure a room sensor and optional voice. An unknown room never routes to unrelated speakers.",
+        "description": "Ställ in sensorn som rapporterar personens aktuella rum. Ett okänt rum leder aldrig till uppspelning på en orelaterad högtalare.",
         "data": {
           "tracker": "Rumssensor",
           "language": "Språk",
@@ -747,11 +747,11 @@
       "fields": {
         "text_tts": {
           "name": "Talad text (TTS)",
-          "description": "Speech-only message. Never forwarded as written notification text. Overrides the spoken version of text, if text is provided."
+          "description": "Enbart talat meddelande. Skickas aldrig som skriftlig notifiering. Ersätter talversionen av text om text anges."
         },
         "text_notify": {
           "name": "Skriftlig avisering",
-          "description": "Visual-only notification content. Never forwarded as spoken TTS. Overrides the notification version of text, if text is provided."
+          "description": "Endast innehåll för visuell notifiering. Läses aldrig upp av TTS. Ersätter den skriftliga versionen av text om text anges."
         },
         "title": {
           "name": "Titel",
@@ -759,11 +759,11 @@
         },
         "level": {
           "name": "Viktighet",
-          "description": "Announcement severity. Critical uses every configured matching output only when no explicit service or output target is supplied. Explicit selections remain authoritative even for Critical and never enable unrequested TTS."
+          "description": "Meddelandets allvarlighetsgrad. Kritisk använder alla matchande konfigurerade utgångar endast om ingen tjänst eller mottagare har valts uttryckligen. Uttryckliga val gäller även vid Kritisk och aktiverar aldrig oönskad TTS."
         },
         "service": {
           "name": "Leveranskanal",
-          "description": "Choose notification (written), tts (spoken), snapcast or companion_tts (specialized speech), or all. Filters the selected devices; it never selects unrelated recipients."
+          "description": "Välj notification (skriftligt), tts (tal), snapcast, companion_tts (specialiserat tal) eller all. Filtrerar valda enheter och lägger aldrig till orelaterade mottagare."
         },
         "notify_data": {
           "name": "Notification data",
@@ -783,11 +783,11 @@
         },
         "occupied_only": {
           "name": "Use occupied-room fallback",
-          "description": "Area-targeted calls try selected rooms first and then other occupied areas when enabled. Explicit integration, device and entity targets remain fixed."
+          "description": "Områdesriktade anrop försöker först valda rum och därefter andra upptagna områden om funktionen är på. Uttryckliga integrations-, enhets- och entitetsmål förblir oförändrade."
         },
         "use_ai": {
           "name": "AI-formulering",
-          "description": "Optional override for this announcement. Leave unset to inherit the integration setting; true enables AI and false bypasses it even if globally enabled."
+          "description": "Valfri åsidosättning för meddelandet. Lämna tomt för att ärva integrationsinställningen; true aktiverar AI och false hoppar över AI även om den är globalt aktiverad."
         },
         "ai_agent": {
           "name": "AI-leverantör",
@@ -803,31 +803,31 @@
         },
         "area": {
           "name": "Områden",
-          "description": "Room delivery with fallback. Try selected Home Assistant areas first, then other occupied areas, then the door-gated fallback area, and then General outputs. Combined explicit recipients are sent independently."
+          "description": "Rumsleverans med reserv: försök först valda Home Assistant-områden, sedan andra upptagna områden, därefter reservområdet efter dörrkontroll och sist Allmänna utgångar. Kombinerade uttryckliga mottagare hanteras separat."
         },
         "integration": {
           "name": "Integrationer",
-          "description": "Send to every configured physical output belonging to the given integration domains. Do not expand to unrelated devices or integrations. Can be combined with area and exact device/entity targets."
+          "description": "Skicka till alla konfigurerade fysiska utgångar för angivna integrationsdomäner. Utöka inte till orelaterade enheter eller integrationer. Kan kombineras med area och exakta enhets- eller entitetsmål."
         },
         "device": {
           "name": "Enheter",
-          "description": "Send only to outputs on these exact Home Assistant device IDs. Do not infer Snapcast or other speakers. Can be combined with area and integration."
+          "description": "Skicka endast till utgångar med exakt dessa Home Assistant-enhets-ID:n. Lägg inte automatiskt till Snapcast eller andra högtalare. Kan kombineras med area och integration."
         },
         "entity": {
           "name": "Entiteter",
-          "description": "Send only on these exact configured notify or media_player entities. No other recipients are added. Can be combined with area and integration."
+          "description": "Skicka endast till exakt dessa konfigurerade notify- eller media_player-entiteter. Inga andra mottagare läggs till. Kan kombineras med area och integration."
         },
         "ai_mode": {
           "name": "AI-formulering",
-          "description": "Rewrite edits a finished announcement; Generate creates the announcement from informational writing instructions. The original instructions are retained when AI fails."
+          "description": "Rewrite redigerar ett färdigt meddelande; Generate skapar ett meddelande från informativa skrivinstruktioner. Om AI misslyckas behålls originalinstruktionerna."
         },
         "target_person": {
           "name": "Målpersoner",
-          "description": "Target only the selected person's current room, with no other room or general fallback."
+          "description": "Skicka endast till de valda personernas aktuella rum, utan att falla tillbaka till andra rum eller Allmänna utgångar."
         },
         "manual_targets": {
           "name": "Manuella mottagare",
-          "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
+          "description": "Hitta endast uttryckligen valda Home Assistant-mottagare, oberoende av Announcement Hubs standardutgångar. Kräver area, integration, enhet eller entitet. Aktiverar aldrig ovalda utgångar eller utskick till alla telefoner."
         },
         "person_destination": {
           "name": "Personliga mottagare",
