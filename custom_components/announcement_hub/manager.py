@@ -2470,7 +2470,7 @@ class AnnouncementManager:
         # A room switch also applies to automatic and ordinary area jobs.
         # Refuse a mixed-room batch rather than leak to a disabled room.
         # A queued job may have moved to its current staged room already.
-        current_areas = tuple(job.outputs) or tuple(job.preferred_areas)
+        current_areas = tuple(getattr(job, "outputs", ())) or tuple(getattr(job, "preferred_areas", ()))
         if any(area_enabled.get(room_id, True) is False
                for room_id in current_areas):
             return False
