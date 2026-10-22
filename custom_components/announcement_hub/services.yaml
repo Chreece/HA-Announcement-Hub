@@ -43,6 +43,10 @@ send:
           selector:
             area:
               multiple: true
+        manual_targets:
+          default: false
+          selector:
+            boolean:
         target_person:
           selector:
             entity:
