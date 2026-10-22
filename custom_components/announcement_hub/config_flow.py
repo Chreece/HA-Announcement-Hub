@@ -40,6 +40,9 @@ from .const import (
     CONF_NOTIFY_PROFILES,
     CONF_OCCUPANCY_ATTRIBUTE,
     CONF_OCCUPANCY_SENSOR,
+    CONF_PERSON_PROFILES,
+    CONF_PERSON_GROUP_LANGUAGE,
+    CONF_PERSON_GROUP_VOICE,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -199,6 +202,7 @@ EDIT_MENU_OPTIONS = (
     "edit_tts",
     "edit_profiles",
     "edit_general",
+    "edit_people",
     "edit_all",
 )
 
@@ -213,6 +217,8 @@ class _AnnouncementFlowMixin:
     _notify_route_index: int
     _notify_profile_domains: list[str]
     _notify_profile_index: int
+    _person_config_ids: list[str]
+    _person_index: int
 
     @abstractmethod
     async def _async_finish(self) -> ConfigFlowResult:
@@ -261,6 +267,110 @@ class _AnnouncementFlowMixin:
         """Jump directly to general, occupancy, queue, and AI settings."""
         self._edit_section = "queue"
         return await self.async_step_queue()
+
+
+    async def async_step_edit_people(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Edit tracked people and their room tracking / voice settings."""
+        self._edit_section = "people"
+        return await self.async_step_people()
+
+    async def async_step_people(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose persons; person routing remains opt-in only."""
+        available = {
+            person.entity_id: person
+            for person in self.hass.states.async_all("person")
+        }
+        profiles = self._working.get(CONF_PERSON_PROFILES, {}) or {}
+        if not isinstance(profiles, dict):
+            profiles = {}
+        selected = [person_id for person_id in profiles if person_id in available]
+        if user_input is not None:
+            selected = [
+                person_id for person_id in user_input.get("tracked_people", [])
+                if person_id in available
+            ]
+            self._working[CONF_PERSON_PROFILES] = {
+                person_id: dict(profiles.get(person_id, {})) for person_id in selected
+            }
+            self._working[CONF_PERSON_GROUP_LANGUAGE] = (
+                str(user_input.get(CONF_PERSON_GROUP_LANGUAGE, "") or "").strip()
+            )
+            self._working[CONF_PERSON_GROUP_VOICE] = (
+                str(user_input.get(CONF_PERSON_GROUP_VOICE, "") or "").strip()
+            )
+            self._person_config_ids = selected
+            self._person_index = 0
+            return await self.async_step_person_profile()
+        options = [
+            selector.SelectOptionDict(
+                value=person_id,
+                label=str(state.attributes.get("friendly_name") or person_id),
+            )
+            for person_id, state in sorted(available.items())
+        ]
+        schema = probatio.Schema({
+            probatio.Optional("tracked_people", default=selected):
+                _known_multi_select(options),
+            probatio.Optional(
+                CONF_PERSON_GROUP_LANGUAGE,
+                default=str(self._working.get(CONF_PERSON_GROUP_LANGUAGE) or ""),
+            ): selector.TextSelector(),
+            probatio.Optional(
+                CONF_PERSON_GROUP_VOICE,
+                default=str(self._working.get(CONF_PERSON_GROUP_VOICE) or ""),
+            ): selector.TextSelector(),
+        })
+        return self.async_show_form(step_id="people", data_schema=schema)
+
+    async def async_step_person_profile(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Configure a room sensor and optional language/voice per person."""
+        if self._person_index >= len(self._person_config_ids):
+            return await self._async_finish()
+        person_id = self._person_config_ids[self._person_index]
+        person = self.hass.states.get(person_id)
+        profiles = self._working.get(CONF_PERSON_PROFILES, {}) or {}
+        current = dict(profiles.get(person_id, {}))
+        if user_input is not None:
+            profiles[person_id] = {
+                "tracker": str(user_input.get("tracker", "") or "").strip(),
+                "language": str(user_input.get("language", "") or "").strip(),
+                "voice": str(user_input.get("voice", "") or "").strip(),
+                "ignore_home": bool(user_input.get("ignore_home", False)),
+            }
+            self._working[CONF_PERSON_PROFILES] = profiles
+            self._person_index += 1
+            return await self.async_step_person_profile()
+        schema = probatio.Schema({
+            _optional_marker("tracker", current.get("tracker")):
+                selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain=["sensor", "device_tracker"])
+                ),
+            probatio.Optional(
+                "language", default=current.get("language", "")
+            ): selector.TextSelector(),
+            probatio.Optional(
+                "voice", default=current.get("voice", "")
+            ): selector.TextSelector(),
+            probatio.Required(
+                "ignore_home", default=bool(current.get("ignore_home", False))
+            ): selector.BooleanSelector(),
+        })
+        return self.async_show_form(
+            step_id="person_profile",
+            data_schema=schema,
+            description_placeholders={
+                "person_name": (
+                    str(person.attributes.get("friendly_name") or person_id)
+                    if person else person_id
+                )
+            },
+        )
 
     async def async_step_edit_all(
         self, user_input: dict[str, Any] | None = None
@@ -1525,6 +1635,8 @@ class AnnouncementHubConfigFlow(
         self._notify_route_index = 0
         self._notify_profile_domains = []
         self._notify_profile_index = 0
+        self._person_config_ids = []
+        self._person_index = 0
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -1577,6 +1689,8 @@ class AnnouncementHubOptionsFlow(_AnnouncementFlowMixin, OptionsFlow):
         self._notify_route_index = 0
         self._notify_profile_domains = []
         self._notify_profile_index = 0
+        self._person_config_ids = []
+        self._person_index = 0
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
