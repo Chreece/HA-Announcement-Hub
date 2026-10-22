@@ -37,6 +37,8 @@ def runtime_methods():
         "person_is_enabled": people.person_is_enabled,
         "presence_confirmed": people.presence_confirmed,
         "MEDIA_PLAYER_DOMAIN": "media_player",
+        "CONF_DIRECT_TTS_ANNOUNCE": "direct_tts_announce",
+        "DEFAULT_DIRECT_TTS_ANNOUNCE": True,
         "ATTR_ENTITY_ID": "entity_id",
         "ATTR_MEDIA_CONTENT_ID": "media_content_id",
         "ATTR_MEDIA_CONTENT_TYPE": "media_content_type",
