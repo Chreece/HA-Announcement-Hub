@@ -96,10 +96,15 @@ def selected_person_destinations(
         value = configured.get(name, [])
         if not isinstance(value, (list, tuple)):
             value = ()
-        entries = tuple(dict.fromkeys(
-            str(entity).strip() for entity in value
-            if isinstance(entity, str) and str(entity).startswith(("notify.", "media_player."))
-        ))
+        if any(
+            not isinstance(entity, str)
+            or not entity.startswith(("notify.", "media_player."))
+            for entity in value
+        ):
+            raise PersonTargetError(
+                f"Destination {name!r} has an invalid configured output"
+            )
+        entries = tuple(dict.fromkeys(str(entity).strip() for entity in value))
         if not entries:
             raise PersonTargetError(
                 f"Destination {name!r} is not configured for this person"
