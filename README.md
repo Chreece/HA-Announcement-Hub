@@ -336,44 +336,75 @@ can also interpret area IDs and supported string/mapping representations.
 Unknown or missing room values do not authorize a broadcast to unrelated
 room devices.
 
-## Person-targeted announcements (new)
+## Person-targeted announcements and personal destinations
 
-Announcement Hub also supports **explicit targeting by person** while retaining
-the existing strict area/device routing contract. Use **Configure → People and
-personal voices** to select Home Assistant people and configure an optional
-Bermuda, ESPresense or other sensor/device tracker reporting each person's
-current Home Assistant room.
+In **Configure → People and personal voices**, select Home Assistant people.
+For each person you can set a room-tracking sensor, language, TTS voice,
+**Translate announcements to this person's language**, and four named output
+assignments: **Mobile**, **Watch**, **Tablet**, and **Other**. Each assignment
+references your *existing* HA `notify` or supported `media_player` entities.
+It does **not** create a second mobile/watch messaging subsystem.
 
-You can leave the room sensor blank only when the person entity itself exposes
-a valid `room`/`area` attribute, or its `source` device tracker reports a
-room. If you enter a room sensor, it is **authoritative**: an unavailable sensor
-does not fall back to stale person/tracker data.
+### Send by person and destination name
 
 ```yaml
 action: notify.announcement_hub
 data:
-  text: "Your laundry is ready"
+  text: "Die Waschmaschine ist fertig."
   target_person:
-    - person.john
+    - person.alex
+  person_destination:
+    - mobile
+    - watch
+  person_translate: true
 ```
 
-Multiple people are supported. People sharing a room produce **one** room
-announcement using the configured group language/voice (or global defaults);
-people in separate rooms receive separate room jobs that can run concurrently
-while preserving each room's FIFO order. A person's configured language and
-voice apply when they are the only targeted person in a room. An explicit
-`language` or `tts_options.voice` in an action takes precedence.
+The action and Lovelace card display named choices (Room, Mobile, Watch,
+Tablet, Other), **not entity names**. The entity IDs are mapped in setup.
+The card offers only destinations assigned to all selected people and an
+optional per-send translation preference (Person setting, Translate,
+Original language). An unassigned or disabled output is rejected, not
+substituted with another person's device or an entire integration.
 
-**Safety and privacy:** person delivery never escalates to other occupied
-rooms, the door-gated fallback room, or General/movable outputs. If the person
-is away, has no current recognized room, or the configured room has no eligible
-output, the action is rejected rather than broadcasting. The per-person
-`Allow when away` option permits trusting that person's room tracker even
-when the person entity is not home; it does not permit unknown destinations.
-Person names must be unambiguous; `person.entity_id` is preferred. You cannot
-combine `target_person` with area, integration, device, entity or legacy
-output selectors. The existing severity, channel, TTS, AI, queue and delivery
-rules still apply.
+**Room** (default when `person_destination` is omitted) resolves the
+person's current room using Bermuda/ESPresense or another configured tracker,
+then sends only to suitable physical outputs in that room. Room delivery
+requires a current valid location and ordinarily requires the person home.
+An unavailable tracker cannot redirect to other occupied rooms or General
+outputs. **Mobile, Watch, Tablet and Other** use only the outputs assigned
+to that person and **do not require home status or room tracking**.
+
+You can select several destination names and several persons together.
+If selected people share a room, the Room leg sends **one** group announcement
+using the configured group language, voice and translation preference.
+Each person's Mobile/Watch/Tablet/Other leg uses their **own** language,
+voice and translation setting. Different rooms remain independently queued;
+the Hub deduplicates overlapping physical outputs within one combined send.
+
+### Language translation and speech
+
+If **Translate** is enabled for a person (or group), AI translates the
+requested spoken and written channels **independently** into that person's
+configured language. `text_tts` remains plain speech and `text_notify`
+remains a readable visual notification. Only supplied channels are permitted,
+and the selected TTS engine receives the translated speech, language and
+voice preferences. A per-action `language` or `tts_options.voice` overrides
+the profile; `person_translate` overrides automatic translation.
+
+Translation works even if global AI rewriting is off; selecting
+`use_ai: false` explicitly disables AI including translation for that call.
+The selected primary AI agent, optional backup agent, and original-text
+fallback continue to apply if translation fails. The original message is
+stored before AI processing and never silently dropped because an AI
+provider is offline. The translation must preserve numbers and facts; a
+provider might still make linguistic mistakes, so sensitive alerts should
+be tested on real hardware.
+
+**Safety:** `target_person` cannot be combined with the ordinary
+`area`, `integration`, `device`, or `entity` selectors. A requested
+person destination only uses its assigned outputs, never everyone else's
+Mobile App devices. For explicit device targeting without a person, use
+the existing manual recipient controls.
 
 ## How delivery works
 
