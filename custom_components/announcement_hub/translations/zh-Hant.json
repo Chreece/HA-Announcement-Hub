@@ -171,7 +171,7 @@
           "tracked_people": "人員",
           "person_group_language": "群組語言",
           "person_group_voice": "群組音色",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "翻譯群組公告"
         },
         "data_description": {
           "tracked_people": "選擇要設定房間追蹤及個人語音偏好的人員。",
@@ -189,10 +189,10 @@
           "voice": "音色",
           "ignore_home": "離家時允許",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "手機輸出",
+          "destination_watch": "手錶輸出",
+          "destination_tablet": "平板輸出",
+          "destination_other": "其他個人輸出"
         },
         "data_description": {
           "tracker": "選擇透過狀態或 room/area 屬性回報此人目前房間的感測器或裝置追蹤器。",
@@ -217,7 +217,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "所選個人輸出不存在或已停用。"
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -394,7 +394,7 @@
           "tracked_people": "人員",
           "person_group_language": "群組語言",
           "person_group_voice": "群組音色",
-          "person_group_translate": "Translate group announcements"
+          "person_group_translate": "翻譯群組公告"
         },
         "data_description": {
           "tracked_people": "選擇要設定房間追蹤及個人語音偏好的人員。",
@@ -412,10 +412,10 @@
           "voice": "音色",
           "ignore_home": "離家時允許",
           "translate": "Translate to person's language",
-          "destination_mobile": "Mobile outputs",
-          "destination_watch": "Watch outputs",
-          "destination_tablet": "Tablet outputs",
-          "destination_other": "Other personal outputs"
+          "destination_mobile": "手機輸出",
+          "destination_watch": "手錶輸出",
+          "destination_tablet": "平板輸出",
+          "destination_other": "其他個人輸出"
         },
         "data_description": {
           "tracker": "選擇透過狀態或 room/area 屬性回報此人目前房間的感測器或裝置追蹤器。",
@@ -440,7 +440,7 @@
       "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
       "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
       "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
-      "invalid_person_output": "The selected personal output does not exist or is disabled."
+      "invalid_person_output": "所選個人輸出不存在或已停用。"
     }
   },
   "selector": {
@@ -666,11 +666,11 @@
           "description": "Discover only explicitly selected Home Assistant recipients, independently of Announcement Hub's default output lists. Requires an area, integration, device or entity; never expands an unselected recipient or broadcasts to all phones."
         },
         "person_destination": {
-          "name": "Person destinations",
+          "name": "個人接收目標",
           "description": "選擇房間，或此人已指派的手機、手錶、平板及其他目的地。可合併選擇；未指派的目的地會被拒絕，不會廣播。"
         },
         "person_translate": {
-          "name": "Translate for selected people",
+          "name": "為所選人員翻譯",
           "description": "覆寫此人或群組在本次公告的自動翻譯偏好。使用設定的目標語言；use_ai: false 禁止翻譯。"
         }
       }
