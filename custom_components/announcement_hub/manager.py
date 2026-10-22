@@ -2456,6 +2456,12 @@ class AnnouncementManager:
         if any(area_enabled.get(room_id, True) is False
                for room_id in job.preferred_areas):
             return False
+        area_presence = self.settings.get("person_room_presence", {}) or {}
+        if job.person_ids and any(
+            not presence_confirmed(self.hass.states, area_presence[room_id])
+            for room_id in job.preferred_areas if room_id in area_presence
+        ):
+            return False
         return all(presence_confirmed(self.hass.states, sensor)
                    for sensor in job.presence_sensors)
 
