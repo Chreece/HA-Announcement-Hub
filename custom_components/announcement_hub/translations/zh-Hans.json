@@ -191,9 +191,9 @@
           "person_group_translate": "使用选定或备用 AI 服务将群组公告自动翻译成群组语言；失败时保留原始文本。",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "使用群组的 AI 代理改写公告。翻译设置可独立配置。",
+          "person_group_addressee": "可选的群组称呼（例如“家人”）。仅在启用问候语或文本中原样包含 {{ name }} 时使用。",
+          "person_group_greeting": "在群组公告前添加群组称呼。默认关闭；不会增加收件人。"
         }
       },
       "person_profile": {
@@ -229,13 +229,13 @@
           "destination_tablet": "选择此人平板现有的通知或媒体播放器输出。仅使用分配的输出。",
           "destination_other": "分配给此人的其他 Home Assistant 输出，仅在选择“其他”目的地时使用。",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "可选的二元传感器，用于向房间发送消息时确认此人是否在场。",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "为此人启用公告改写，与其翻译偏好相互独立。",
+          "ai_agent": "此人的可选 AI Task 或 Conversation 代理；除非操作指定其他代理，否则覆盖全局提供者。",
+          "tts_engine": "此人的可选 TTS 实体；覆盖全局语音引擎，但不更改接收设备。",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "此人的可选称呼。留空时使用 Home Assistant 中的友好名称。"
         }
       },
       "edit_advanced_ai": {
@@ -496,9 +496,9 @@
           "person_group_translate": "使用选定或备用 AI 服务将群组公告自动翻译成群组语言；失败时保留原始文本。",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "使用群组的 AI 代理改写公告。翻译设置可独立配置。",
+          "person_group_addressee": "可选的群组称呼（例如“家人”）。仅在启用问候语或文本中原样包含 {{ name }} 时使用。",
+          "person_group_greeting": "在群组公告前添加群组称呼。默认关闭；不会增加收件人。"
         }
       },
       "person_profile": {
@@ -534,13 +534,13 @@
           "destination_tablet": "选择此人平板现有的通知或媒体播放器输出。仅使用分配的输出。",
           "destination_other": "分配给此人的其他 Home Assistant 输出，仅在选择“其他”目的地时使用。",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "可选的二元传感器，用于向房间发送消息时确认此人是否在场。",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "为此人启用公告改写，与其翻译偏好相互独立。",
+          "ai_agent": "此人的可选 AI Task 或 Conversation 代理；除非操作指定其他代理，否则覆盖全局提供者。",
+          "tts_engine": "此人的可选 TTS 实体；覆盖全局语音引擎，但不更改接收设备。",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "此人的可选称呼。留空时使用 Home Assistant 中的友好名称。"
         }
       },
       "edit_advanced_ai": {

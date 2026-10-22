@@ -191,9 +191,9 @@
           "person_group_translate": "Automaticky překládat skupinová oznámení do jazyka skupiny pomocí vybrané AI nebo záložního agenta. Při chybě zachovat původní text.",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "Přeformulovat oznámení pomocí AI agenta skupiny. Překlad lze nastavit nezávisle.",
+          "person_group_addressee": "Volitelné oslovení skupiny (např. Rodina). Používá se jen při zapnutém pozdravu nebo pokud je doslova uvedeno {{ name }}.",
+          "person_group_greeting": "Přidat oslovení skupiny na začátek skupinových oznámení. Ve výchozím stavu vypnuto; nepřidává příjemce."
         }
       },
       "person_profile": {
@@ -229,13 +229,13 @@
           "destination_tablet": "Vyberte existující výstupy oznámení nebo přehrávače tabletu této osoby. Použijí se jen přiřazené výstupy.",
           "destination_other": "Další výstupy Home Assistant přiřazené této osobě, používané jen při volbě Jiné.",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "Volitelný binární senzor pro potvrzení přítomnosti této osoby při doručení do místnosti.",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "Povolit přeformulování pro tuto osobu nezávisle na jejím nastavení překladu.",
+          "ai_agent": "Volitelný agent AI Task nebo Conversation pro tuto osobu. Má přednost před globálním poskytovatelem, pokud akce neurčí jiného.",
+          "tts_engine": "Volitelná entita TTS pro tuto osobu; přepíše globální hlasový modul, aniž by měnila cílová zařízení.",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "Volitelné oslovení této osoby. Pokud je prázdné, použije se zobrazované jméno z Home Assistant."
         }
       },
       "edit_advanced_ai": {
@@ -496,9 +496,9 @@
           "person_group_translate": "Automaticky překládat skupinová oznámení do jazyka skupiny pomocí vybrané AI nebo záložního agenta. Při chybě zachovat původní text.",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "Přeformulovat oznámení pomocí AI agenta skupiny. Překlad lze nastavit nezávisle.",
+          "person_group_addressee": "Volitelné oslovení skupiny (např. Rodina). Používá se jen při zapnutém pozdravu nebo pokud je doslova uvedeno {{ name }}.",
+          "person_group_greeting": "Přidat oslovení skupiny na začátek skupinových oznámení. Ve výchozím stavu vypnuto; nepřidává příjemce."
         }
       },
       "person_profile": {
@@ -534,13 +534,13 @@
           "destination_tablet": "Vyberte existující výstupy oznámení nebo přehrávače tabletu této osoby. Použijí se jen přiřazené výstupy.",
           "destination_other": "Další výstupy Home Assistant přiřazené této osobě, používané jen při volbě Jiné.",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "Volitelný binární senzor pro potvrzení přítomnosti této osoby při doručení do místnosti.",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "Povolit přeformulování pro tuto osobu nezávisle na jejím nastavení překladu.",
+          "ai_agent": "Volitelný agent AI Task nebo Conversation pro tuto osobu. Má přednost před globálním poskytovatelem, pokud akce neurčí jiného.",
+          "tts_engine": "Volitelná entita TTS pro tuto osobu; přepíše globální hlasový modul, aniž by měnila cílová zařízení.",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "Volitelné oslovení této osoby. Pokud je prázdné, použije se zobrazované jméno z Home Assistant."
         }
       },
       "edit_advanced_ai": {

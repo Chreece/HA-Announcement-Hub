@@ -191,9 +191,9 @@
           "person_group_translate": "Traduz automaticamente anúncios de grupo para o idioma configurado, recorrendo ao agente de IA selecionado e à alternativa. Em caso de falha, mantém o texto original.",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "Reformular os anúncios com o agente de IA do grupo. A tradução é configurada separadamente.",
+          "person_group_addressee": "Forma de tratamento opcional para o grupo (por exemplo, Família). Só é usada se as saudações estiverem ativas ou se existir literalmente {{ name }}.",
+          "person_group_greeting": "Antepor a saudação do grupo aos anúncios coletivos. Desativado por predefinição; não acrescenta destinatários."
         }
       },
       "person_profile": {
@@ -229,13 +229,13 @@
           "destination_tablet": "Seleciona saídas de notificação ou leitores existentes do tablet da pessoa. Só serão usadas as saídas atribuídas.",
           "destination_other": "Outras saídas Home Assistant atribuídas a esta pessoa, utilizadas apenas com o destino «Outro».",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "Sensor binário opcional para confirmar a presença desta pessoa ao enviar para uma divisão.",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "Ativar a reformulação para esta pessoa independentemente da sua preferência de tradução.",
+          "ai_agent": "Agente AI Task ou Conversation opcional para esta pessoa. Substitui o fornecedor global, a menos que a ação selecione outro.",
+          "tts_engine": "Entidade TTS opcional para esta pessoa; substitui o motor de voz global sem alterar os dispositivos destinatários.",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "Saudação opcional para esta pessoa. Se ficar vazia, utiliza-se o nome apresentado no Home Assistant."
         }
       },
       "edit_advanced_ai": {
@@ -496,9 +496,9 @@
           "person_group_translate": "Traduz automaticamente anúncios de grupo para o idioma configurado, recorrendo ao agente de IA selecionado e à alternativa. Em caso de falha, mantém o texto original.",
           "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
           "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
-          "person_group_rewrite": "Rewrite announcements using the group AI agent. Translation remains independently configurable.",
-          "person_group_addressee": "Optional group salutation (for example Family). Used only when greetings are enabled or a literal {{ name }} placeholder is present.",
-          "person_group_greeting": "Prefix grouped announcements with the group salutation. Off by default; does not add recipients."
+          "person_group_rewrite": "Reformular os anúncios com o agente de IA do grupo. A tradução é configurada separadamente.",
+          "person_group_addressee": "Forma de tratamento opcional para o grupo (por exemplo, Família). Só é usada se as saudações estiverem ativas ou se existir literalmente {{ name }}.",
+          "person_group_greeting": "Antepor a saudação do grupo aos anúncios coletivos. Desativado por predefinição; não acrescenta destinatários."
         }
       },
       "person_profile": {
@@ -534,13 +534,13 @@
           "destination_tablet": "Seleciona saídas de notificação ou leitores existentes do tablet da pessoa. Só serão usadas as saídas atribuídas.",
           "destination_other": "Outras saídas Home Assistant atribuídas a esta pessoa, utilizadas apenas com o destino «Outro».",
           "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
-          "presence_sensor": "Optional binary sensor for confirming this person's presence when using Room delivery.",
+          "presence_sensor": "Sensor binário opcional para confirmar a presença desta pessoa ao enviar para uma divisão.",
           "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
-          "rewrite": "Enable rewriting for this person independently of their translation preference.",
-          "ai_agent": "Optional AI Task or Conversation agent for this person, overriding the global provider unless the action selects one.",
-          "tts_engine": "Optional TTS entity for this person; overrides the global speech engine without changing the target devices.",
+          "rewrite": "Ativar a reformulação para esta pessoa independentemente da sua preferência de tradução.",
+          "ai_agent": "Agente AI Task ou Conversation opcional para esta pessoa. Substitui o fornecedor global, a menos que a ação selecione outro.",
+          "tts_engine": "Entidade TTS opcional para esta pessoa; substitui o motor de voz global sem alterar os dispositivos destinatários.",
           "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
-          "address": "Optional salutation used for this person. If empty, Home Assistant's friendly person name is used."
+          "address": "Saudação opcional para esta pessoa. Se ficar vazia, utiliza-se o nome apresentado no Home Assistant."
         }
       },
       "edit_advanced_ai": {

@@ -94,3 +94,36 @@ def test_bermuda_and_espresense_examples_documented_without_new_dependency():
     assert "Bermuda" in readme and "ESPresense" in readme
     assert '"area_id", "room", "area", "room_name"' in source
     assert 'configured_tracker = str(profile.get("tracker")' in source
+
+
+# Beta localization regression guard: both initial setup and reconfigure menus.
+NEW_GROUP_DESCRIPTIONS = (
+    "person_group_rewrite", "person_group_addressee", "person_group_greeting",
+)
+NEW_PERSON_DESCRIPTIONS = (
+    "presence_sensor", "rewrite", "ai_agent", "tts_engine", "address",
+)
+
+
+def test_new_person_group_help_in_every_language_and_configuration_path():
+    folder = COMPONENT / "translations"
+    en = json.loads((folder / "en.json").read_text(encoding="utf-8"))
+    for lang in LANGUAGES:
+        localized = json.loads(
+            (folder / f"{lang}.json").read_text(encoding="utf-8")
+        )
+        for section in ("config", "options"):
+            for step, keys in (
+                ("people", NEW_GROUP_DESCRIPTIONS),
+                ("person_profile", NEW_PERSON_DESCRIPTIONS),
+            ):
+                reference = en[section]["step"][step]["data_description"]
+                actual = localized[section]["step"][step]["data_description"]
+                for key in keys:
+                    assert actual[key].strip() and actual[key] != reference[key], (
+                        lang, section, step, key
+                    )
+                    if key == "person_group_addressee":
+                        assert actual[key].count("{{ name }}") == 1, (
+                            lang, section, step, key
+                        )
