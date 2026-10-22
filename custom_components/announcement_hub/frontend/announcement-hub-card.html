@@ -34,8 +34,22 @@
         <div id="target-mode" class="segmented" role="group" aria-label="Recipient selection">
           <button type="button" data-mode="automatic">Automatic routing</button>
           <button type="button" data-mode="targeted">Choose recipients</button>
+          <button type="button" data-mode="person">People</button>
         </div>
         <p id="routing-explanation" class="hint">Announcement Hub chooses configured outputs using room and fallback rules.</p>
+        <div id="person-targets" hidden>
+          <div class="target-group">
+            <div class="target-label"><ha-icon icon="mdi:account-multiple"></ha-icon><div><strong>People</strong><small>Target named persons, not entity IDs</small></div></div>
+            <input id="person-search" class="search" placeholder="Search people..." aria-label="Search Home Assistant people" autocomplete="off">
+            <div id="person-options" class="options"></div>
+            <div id="person-chosen" class="picked" aria-live="polite"></div>
+          </div>
+          <div class="target-group">
+            <div class="target-label"><ha-icon icon="mdi:devices"></ha-icon><div><strong>Person destinations</strong><small>Assigned in integration setup</small></div></div>
+            <div id="person-destinations" class="choices spacious" role="group" aria-label="Person destinations"></div>
+            <p class="hint">Room uses location tracking. Mobile, Watch, Tablet and Other target only that person's assigned output devices.</p>
+          </div>
+        </div>
         <div id="targets" hidden>
           <div class="target-group">
             <div class="target-label"><ha-icon icon="mdi:floor-plan"></ha-icon><div><strong>Areas</strong><small>Explicit room outputs only</small></div></div>
