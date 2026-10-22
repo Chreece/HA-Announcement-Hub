@@ -52,6 +52,21 @@ send:
             entity:
               domain: person
               multiple: true
+        person_destination:
+          default:
+            - room
+          selector:
+            select:
+              multiple: true
+              options:
+                - room
+                - mobile
+                - watch
+                - tablet
+                - other
+        person_translate:
+          selector:
+            boolean:
         integration:
           example:
             - mobile_app
