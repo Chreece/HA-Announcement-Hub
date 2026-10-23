@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.10.0b21 - 2026-10-23
+
+**Beta — Greek setup and TTS/help language-quality follow-up.**
+
+- Translate 42 additional Greek setup, option, error and service-action
+  strings containing mixed English user-facing prose (such as "room-scoped",
+  "provider-specific payload", "audio path", "queue" and "routing").
+- Update the mirrored reconfiguration descriptions consistently, and fix
+  five more Greek error messages under options.error that still used the
+  old English technical wording. Localize the TTS pre-cache option label.
+- Retain byte-identical Home Assistant API keys, interpolation placeholders,
+  service names and product/provider names, including `notify_data`,
+  `el_GR`, `Snapcast`, `Companion App` and notification service URLs.
+- Add regression coverage rejecting previously missed mixed-English prose,
+  checking all 599 native keys and interpolation placeholders, and matching
+  initial setup/options labels and validation errors.
+- No change to runtime routing, recipient selection, queues, AI execution,
+  Snapcast playback or TTS delivery. Issue #50 remains closed; this is an
+  additional native-language quality correction.
+
 ## 0.10.0b20 - 2026-10-23
 
 **Beta — post-#50 stale-English native menu help and dashboard language consistency.**
