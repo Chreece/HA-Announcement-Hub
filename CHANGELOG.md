@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b18 - 2026-10-23
+
+**Beta — complete Korean and Czech native integration localization and issue #50.**
+
+- Translate the remaining Korean (`ko`) and Czech (`cs`) native UI fields
+  across all 599 catalog entries each, including configuration/options
+  help, notification profiles, selectors, TTS/Companion App, area and
+  person routing, Snapcast, audio, AI, queues and service-action text.
+- Complete the native-language catalog coverage for all 19 non-English
+  languages plus the English source, with no exact English fallback
+  descriptions. Numeric percentages and genuine shared technical
+  terms remain unchanged where appropriate.
+- Preserve Home Assistant field/service IDs and literal placeholders,
+  room-specific recipient isolation, door-gated fallback, original AI
+  failure recovery, and visual/spoken channel separation.
+- Add full catalog regression checks for all 20 catalogs and detailed
+  Korean/Czech verification of placeholders, mirrored menus, API keys,
+  and safety-critical descriptions.
+- No changes to announcement runtime routing, queuing, or sound delivery.
+  Native-speaker language QA and physical hardware tests remain separate.
+
 ## 0.10.0b17 - 2026-10-23
 
 **Beta — complete Swedish native integration localization.**
