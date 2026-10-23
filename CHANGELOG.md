@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.10.0b17 - 2026-10-23
+
+**Beta — complete Swedish native integration localization.**
+
+- Localize all **599** Swedish integration strings, including the formerly
+  English configuration descriptions, setup/reconfigure options,
+  recipient and person groups, AI settings, notification profiles, TTS
+  engines, Companion App devices, Snapcast, queue controls, and actions.
+- Preserve explicit recipient isolation, occupied-room/door-gated fallback,
+  AI original-message recovery, spoken-versus-written channel separation,
+  and direct versus shared Snapcast behavior.
+- Only eight entries remain English-identical by design: Information (2),
+  Indigo (1), and the five numeric transparency percentages.
+- Add regression coverage for 599-key parity, no untranslated native
+  help or errors, config/options equality, interpolation placeholders,
+  API field identifiers, and safety explanations.
+- No runtime routing, TTS, queue, or device behavior changed.
+  Issue #50 remains open for Korean and Czech translations.
+
 ## 0.10.0b16 - 2026-10-22
 
 **Beta — complete Japanese native integration localization.**
