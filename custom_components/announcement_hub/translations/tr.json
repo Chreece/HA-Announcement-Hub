@@ -164,7 +164,7 @@
           "edit_profiles": "Seçilen sağlayıcıların bildirim zamanlamasını, görüntüleme stillerini ve Snapcast oynatma ayarlarını yapılandırın.",
           "edit_general": "Doğrudan AI ve yedek aracılara, oda doluluğuna, yedek odalara, kuyruğa ve zaman aşımı ayarlarına gidin.",
           "edit_all": "İlk kurulum sihirbazında olduğu gibi tüm ayar sayfalarını sırayla ziyaret edin.",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "Takip edilen kişileri, oda sensörlerini, bireysel/grup dil ve ses tercihlerini yapılandırın.",
           "edit_advanced_ai": "Yeniden yazma, çeviri ve birleşik işlemler için isteğe bağlı AI stillerini düzenleyin. Temel cihaz ve araç güvenlik kuralları sabit kalır.",
           "edit_audio": "Yalnızca doğrudan oda hoparlörlerinin zilini ve isteğe bağlı müzik sesi azaltmayı yapılandırın; paylaşılan Snapcast kaynağına asla uygulanmaz.",
           "edit_room_safety": "Bir odanın isteğe bağlı varlık doğrulama sensörünü yapılandırın; kullanılamayan sensörler başka odaya yedek yönlendirme başlatmaz."
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "Kişiler ve grup sesi",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "Yalnızca açıkça hedeflenen oda duyurularını alabilecek kişileri yapılandırın.",
         "data": {
           "tracked_people": "Kişiler",
           "person_group_language": "Grup dili",
@@ -204,7 +204,7 @@
           "language": "Dil",
           "voice": "Ses",
           "ignore_home": "Evde değilken izin ver",
-          "translate": "Translate to person's language",
+          "translate": "Duyuruları bu kişinin diline çevir.",
           "destination_mobile": "Telefon çıkışları",
           "destination_watch": "Saat çıkışları",
           "destination_tablet": "Tablet çıkışları",
@@ -469,7 +469,7 @@
           "edit_profiles": "Seçilen sağlayıcıların bildirim zamanlamasını, görüntüleme stillerini ve Snapcast oynatma ayarlarını yapılandırın.",
           "edit_general": "Doğrudan AI ve yedek aracılara, oda doluluğuna, yedek odalara, kuyruğa ve zaman aşımı ayarlarına gidin.",
           "edit_all": "İlk kurulum sihirbazında olduğu gibi tüm ayar sayfalarını sırayla ziyaret edin.",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "Takip edilen kişileri, oda sensörlerini, bireysel/grup dil ve ses tercihlerini yapılandırın.",
           "edit_advanced_ai": "Yeniden yazma, çeviri ve birleşik işlemler için isteğe bağlı AI stillerini düzenleyin. Temel cihaz ve araç güvenlik kuralları sabit kalır.",
           "edit_audio": "Yalnızca doğrudan oda hoparlörlerinin zilini ve isteğe bağlı müzik sesi azaltmayı yapılandırın; paylaşılan Snapcast kaynağına asla uygulanmaz.",
           "edit_room_safety": "Bir odanın isteğe bağlı varlık doğrulama sensörünü yapılandırın; kullanılamayan sensörler başka odaya yedek yönlendirme başlatmaz."
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "Kişiler ve grup sesi",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "Yalnızca açıkça hedeflenen oda duyurularını alabilecek kişileri yapılandırın.",
         "data": {
           "tracked_people": "Kişiler",
           "person_group_language": "Grup dili",
@@ -509,7 +509,7 @@
           "language": "Dil",
           "voice": "Ses",
           "ignore_home": "Evde değilken izin ver",
-          "translate": "Translate to person's language",
+          "translate": "Duyuruları bu kişinin diline çevir.",
           "destination_mobile": "Telefon çıkışları",
           "destination_watch": "Saat çıkışları",
           "destination_tablet": "Tablet çıkışları",

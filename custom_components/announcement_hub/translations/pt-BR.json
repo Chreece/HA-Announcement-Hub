@@ -164,7 +164,7 @@
           "edit_profiles": "Configure os tempos das notificações, os estilos de apresentação e as definições de reprodução Snapcast dos provedores selecionados.",
           "edit_general": "Acesse diretamente as configurações dos agentes AI principal e de reserva, ocupação, cômodo alternativo, fila e tempos limite.",
           "edit_all": "Visite todas as páginas de configuração pela ordem original do assistente.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_people": "Configurar pessoas monitoradas, sensores dos cômodos e preferências de idioma e voz individuais ou do grupo.",
           "edit_advanced_ai": "Edite os estilos AI opcionais para reescrita, tradução e operações combinadas. As regras essenciais de segurança de dispositivos e ferramentas permanecem fixas.",
           "edit_audio": "Configure o aviso sonoro dos cômodos com saída direta e a redução opcional do volume musical; nunca afeta a fonte Snapcast compartilhada.",
           "edit_room_safety": "Configure o sensor opcional de presença de um cômodo; sensores indisponíveis nunca provocam o encaminhamento para outros cômodos."
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "Pessoas e voz de grupo",
-        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "description": "Configurar as pessoas que podem receber anúncios direcionados explicitamente ao cômodo em que estão.",
         "data": {
           "tracked_people": "Pessoas",
           "person_group_language": "Idioma do grupo",
@@ -204,7 +204,7 @@
           "language": "Idioma",
           "voice": "Voz",
           "ignore_home": "Permitir ausente",
-          "translate": "Translate to person's language",
+          "translate": "Traduzir os anúncios para o idioma desta pessoa.",
           "destination_mobile": "Saídas do celular",
           "destination_watch": "Saídas do relógio",
           "destination_tablet": "Saídas do tablet",
@@ -469,7 +469,7 @@
           "edit_profiles": "Configure os tempos das notificações, os estilos de apresentação e as definições de reprodução Snapcast dos provedores selecionados.",
           "edit_general": "Acesse diretamente às definições dos agentes AI principais e de reserva, da ocupação e do encaminhamento alternativo entre cômodos, da fila e dos tempos limite.",
           "edit_all": "Visite todas as páginas de configuração pela ordem original do assistente.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_people": "Configurar pessoas monitoradas, sensores dos cômodos e preferências de idioma e voz individuais ou do grupo.",
           "edit_advanced_ai": "Edite os estilos AI opcionais para reescrita, tradução e operações combinadas. As regras essenciais de segurança de dispositivos e ferramentas permanecem fixas.",
           "edit_audio": "Configure o aviso sonoro dos cômodos com saída direta e a redução opcional do volume musical; nunca afeta a fonte Snapcast compartilhada.",
           "edit_room_safety": "Configure o sensor opcional de presença de um cômodo; sensores indisponíveis nunca provocam o encaminhamento para outros cômodos."
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "Pessoas e voz de grupo",
-        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "description": "Configurar as pessoas que podem receber anúncios direcionados explicitamente ao cômodo em que estão.",
         "data": {
           "tracked_people": "Pessoas",
           "person_group_language": "Idioma do grupo",
@@ -509,7 +509,7 @@
           "language": "Idioma",
           "voice": "Voz",
           "ignore_home": "Permitir ausente",
-          "translate": "Translate to person's language",
+          "translate": "Traduzir os anúncios para o idioma desta pessoa.",
           "destination_mobile": "Saídas do celular",
           "destination_watch": "Saídas do relógio",
           "destination_tablet": "Saídas do tablet",

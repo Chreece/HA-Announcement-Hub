@@ -164,7 +164,7 @@
           "edit_profiles": "Skonfiguruj czas wyświetlania powiadomień, ich styl i ustawienia odtwarzania Snapcast dla wybranych dostawców.",
           "edit_general": "Przejdź bezpośrednio do agentów AI i zapasowych, obecności, zastępczych pokoi, kolejki i limitów czasu.",
           "edit_all": "Przejdź po kolei przez wszystkie strony konfiguracji, jak podczas pierwszego uruchomienia kreatora.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_people": "Skonfiguruj śledzone osoby, czujniki pokojów oraz indywidualne i grupowe preferencje języka i głosu.",
           "edit_advanced_ai": "Edytuj opcjonalne style AI dla przeredagowania, tłumaczenia i obu działań jednocześnie. Stałe reguły bezpieczeństwa urządzeń i narzędzi pozostają niezmienione.",
           "edit_audio": "Skonfiguruj dzwonek wyłącznie dla bezpośrednich głośników w pokoju i opcjonalne ściszanie muzyki, nigdy dla wspólnego źródła Snapcast.",
           "edit_room_safety": "Skonfiguruj opcjonalny czujnik weryfikacji obecności w pokoju; niedostępne czujniki nigdy nie uruchamiają przekierowania do innego pokoju."
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "Osoby i głos grupowy",
-        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "description": "Skonfiguruj osoby, które mogą odbierać ogłoszenia kierowane wyraźnie do ich pokojów.",
         "data": {
           "tracked_people": "Osoby",
           "person_group_language": "Język grupy",
@@ -204,7 +204,7 @@
           "language": "Język",
           "voice": "Głos",
           "ignore_home": "Zezwalaj poza domem",
-          "translate": "Translate to person's language",
+          "translate": "Tłumacz ogłoszenia na język tej osoby.",
           "destination_mobile": "Wyjścia telefonu",
           "destination_watch": "Wyjścia zegarka",
           "destination_tablet": "Wyjścia tabletu",
@@ -469,7 +469,7 @@
           "edit_profiles": "Skonfiguruj czas wyświetlania powiadomień, ich styl i ustawienia odtwarzania Snapcast dla wybranych dostawców.",
           "edit_general": "Przejdź bezpośrednio do agentów AI i zapasowych, obecności, zastępczych pokoi, kolejki i limitów czasu.",
           "edit_all": "Przejdź po kolei przez wszystkie strony konfiguracji, jak podczas pierwszego uruchomienia kreatora.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_people": "Skonfiguruj śledzone osoby, czujniki pokojów oraz indywidualne i grupowe preferencje języka i głosu.",
           "edit_advanced_ai": "Edytuj opcjonalne style AI dla przeredagowania, tłumaczenia i obu działań jednocześnie. Stałe reguły bezpieczeństwa urządzeń i narzędzi pozostają niezmienione.",
           "edit_audio": "Skonfiguruj dzwonek wyłącznie dla bezpośrednich głośników w pokoju i opcjonalne ściszanie muzyki, nigdy dla wspólnego źródła Snapcast.",
           "edit_room_safety": "Skonfiguruj opcjonalny czujnik weryfikacji obecności w pokoju; niedostępne czujniki nigdy nie uruchamiają przekierowania do innego pokoju."
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "Osoby i głos grupowy",
-        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "description": "Skonfiguruj osoby, które mogą odbierać ogłoszenia kierowane wyraźnie do ich pokojów.",
         "data": {
           "tracked_people": "Osoby",
           "person_group_language": "Język grupy",
@@ -509,7 +509,7 @@
           "language": "Język",
           "voice": "Głos",
           "ignore_home": "Zezwalaj poza domem",
-          "translate": "Translate to person's language",
+          "translate": "Tłumacz ogłoszenia na język tej osoby.",
           "destination_mobile": "Wyjścia telefonu",
           "destination_watch": "Wyjścia zegarka",
           "destination_tablet": "Wyjścia tabletu",

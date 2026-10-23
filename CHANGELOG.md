@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b20 - 2026-10-23
+
+**Beta — post-#50 stale-English native menu help and dashboard language consistency.**
+
+- Repair three source-diverged, still-English person configuration/help phrases
+  in 17 non-English catalogs. Both initial setup and reconfiguration views
+  now translate the personal language toggle, room-tracker/person preferences,
+  and explicitly targeted person delivery descriptions.
+- Improve Greek queue/door fallback explanations and German queue help
+  to remove leftover English prose not represented by the current English
+  source. Technical Home Assistant identifiers are unchanged.
+- Align dashboard room/mobile/watch/tablet/other help text with the actual
+  localized recipient-chip labels across 19 dashboard languages; no person
+  destination keys or sending payloads are changed.
+- Add regression tests that reject **stale historical English strings**
+  even when current en.json source text has changed, verify every person
+  menu's setup/options mirror, and check dashboard recipient wording.
+- This is presentation-only; no announcement delivery, routing, queue,
+  AI execution, Snapcast or TTS behavior changed. Native-speaker review
+  remains welcome for stylistic improvements after issue #50.
+
 ## 0.10.0b19 - 2026-10-23
 
 **Beta — dashboard person-destination localization follow-up.**

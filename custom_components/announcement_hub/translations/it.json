@@ -164,7 +164,7 @@
           "edit_profiles": "Configura la durata delle notifiche, gli stili di visualizzazione e le impostazioni di riproduzione Snapcast per i provider selezionati.",
           "edit_general": "Accedi direttamente alle impostazioni degli agenti AI principali e di riserva, dell'occupazione, del ripiego tra stanze, della coda e dei timeout.",
           "edit_all": "Visita tutte le pagine di configurazione in ordine, come nella procedura guidata iniziale.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_people": "Configura persone monitorate, sensori delle stanze e preferenze di lingua e voce individuali o di gruppo.",
           "edit_advanced_ai": "Modifica gli stili AI facoltativi per la riformulazione, la traduzione e le operazioni combinate. Le regole fondamentali di sicurezza di dispositivi e strumenti restano fisse.",
           "edit_audio": "Configura il campanello delle stanze con uscita diretta e la riduzione facoltativa del volume musicale; non si applica mai alla sorgente Snapcast condivisa.",
           "edit_room_safety": "Configura il sensore facoltativo di presenza per una stanza; sensori non disponibili non provocano mai un ripiego verso altre stanze."
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "Persone e voce di gruppo",
-        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "description": "Configura le persone che possono ricevere annunci diretti esplicitamente alla loro stanza.",
         "data": {
           "tracked_people": "Persone",
           "person_group_language": "Lingua del gruppo",
@@ -204,7 +204,7 @@
           "language": "Lingua",
           "voice": "Voce",
           "ignore_home": "Consenti se assente",
-          "translate": "Translate to person's language",
+          "translate": "Traduci gli annunci nella lingua di questa persona.",
           "destination_mobile": "Uscite cellulare",
           "destination_watch": "Uscite orologio",
           "destination_tablet": "Uscite tablet",
@@ -469,7 +469,7 @@
           "edit_profiles": "Configura la durata delle notifiche, gli stili di visualizzazione e le impostazioni di riproduzione Snapcast per i provider selezionati.",
           "edit_general": "Accedi direttamente alle impostazioni degli agenti AI principali e di riserva, dell'occupazione, del ripiego tra stanze, della coda e dei timeout.",
           "edit_all": "Visita tutte le pagine di configurazione in ordine, come nella procedura guidata iniziale.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_people": "Configura persone monitorate, sensori delle stanze e preferenze di lingua e voce individuali o di gruppo.",
           "edit_advanced_ai": "Modifica gli stili AI facoltativi per la riformulazione, la traduzione e le operazioni combinate. Le regole fondamentali di sicurezza di dispositivi e strumenti restano fisse.",
           "edit_audio": "Configura il campanello delle stanze con uscita diretta e la riduzione facoltativa del volume musicale; non si applica mai alla sorgente Snapcast condivisa.",
           "edit_room_safety": "Configura il sensore facoltativo di presenza per una stanza; sensori non disponibili non provocano mai un ripiego verso altre stanze."
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "Persone e voce di gruppo",
-        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "description": "Configura le persone che possono ricevere annunci diretti esplicitamente alla loro stanza.",
         "data": {
           "tracked_people": "Persone",
           "person_group_language": "Lingua del gruppo",
@@ -509,7 +509,7 @@
           "language": "Lingua",
           "voice": "Voce",
           "ignore_home": "Consenti se assente",
-          "translate": "Translate to person's language",
+          "translate": "Traduci gli annunci nella lingua di questa persona.",
           "destination_mobile": "Uscite cellulare",
           "destination_watch": "Uscite orologio",
           "destination_tablet": "Uscite tablet",

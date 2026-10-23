@@ -164,7 +164,7 @@
           "edit_profiles": "선택한 공급자의 알림 표시 시간과 스타일 및 Snapcast 재생 설정을 구성합니다.",
           "edit_general": "AI 에이전트와 예비 에이전트, 재실 정보, 대체 방, 대기열 및 제한 시간 설정으로 바로 이동합니다.",
           "edit_all": "초기 설정 마법사처럼 모든 설정 페이지를 차례대로 엽니다.",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "추적 대상 사람, 방 센서, 개인/그룹별 언어 및 음성 설정을 구성합니다.",
           "edit_advanced_ai": "다시 쓰기, 번역 및 두 작업을 함께 수행할 때의 선택적 AI 스타일을 편집합니다. 기기와 도구에 관한 기본 안전 규칙은 그대로 유지됩니다.",
           "edit_audio": "공유 Snapcast 소스가 아닌 직접 방 스피커에만 적용되는 알림음과 선택적 음악 음량 낮춤을 설정합니다.",
           "edit_room_safety": "방 하나의 선택적 재실 확인 센서를 설정합니다. 센서를 사용할 수 없어도 다른 방으로 대체 전송하지 않습니다."
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "사람과 그룹 음성",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "방 안내의 수신자로 명시적으로 지정할 수 있는 사람을 설정합니다.",
         "data": {
           "tracked_people": "사람",
           "person_group_language": "그룹 언어",
@@ -204,7 +204,7 @@
           "language": "언어",
           "voice": "음성",
           "ignore_home": "외출 중에도 허용",
-          "translate": "Translate to person's language",
+          "translate": "안내문을 이 사람의 언어로 번역",
           "destination_mobile": "휴대폰 출력",
           "destination_watch": "시계 출력",
           "destination_tablet": "태블릿 출력",
@@ -469,7 +469,7 @@
           "edit_profiles": "선택한 공급자의 알림 표시 시간과 스타일 및 Snapcast 재생 설정을 구성합니다.",
           "edit_general": "AI 에이전트와 예비 에이전트, 재실 정보, 대체 방, 대기열 및 제한 시간 설정으로 바로 이동합니다.",
           "edit_all": "초기 설정 마법사처럼 모든 설정 페이지를 차례대로 엽니다.",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "추적 대상 사람, 방 센서, 개인/그룹별 언어 및 음성 설정을 구성합니다.",
           "edit_advanced_ai": "다시 쓰기, 번역 및 두 작업을 함께 수행할 때의 선택적 AI 스타일을 편집합니다. 기기와 도구에 관한 기본 안전 규칙은 그대로 유지됩니다.",
           "edit_audio": "공유 Snapcast 소스가 아닌 직접 방 스피커에만 적용되는 알림음과 선택적 음악 음량 낮춤을 설정합니다.",
           "edit_room_safety": "방 하나의 선택적 재실 확인 센서를 설정합니다. 센서를 사용할 수 없어도 다른 방으로 대체 전송하지 않습니다."
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "사람과 그룹 음성",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "방 안내의 수신자로 명시적으로 지정할 수 있는 사람을 설정합니다.",
         "data": {
           "tracked_people": "사람",
           "person_group_language": "그룹 언어",
@@ -509,7 +509,7 @@
           "language": "언어",
           "voice": "음성",
           "ignore_home": "외출 중에도 허용",
-          "translate": "Translate to person's language",
+          "translate": "안내문을 이 사람의 언어로 번역",
           "destination_mobile": "휴대폰 출력",
           "destination_watch": "시계 출력",
           "destination_tablet": "태블릿 출력",

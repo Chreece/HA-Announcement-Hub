@@ -164,7 +164,7 @@
           "edit_profiles": "選択したプロバイダーの通知タイミング、表示スタイル、Snapcast の再生設定を構成します。",
           "edit_general": "主 AI エージェントと予備エージェント、在室状況、代替先の部屋、キュー、タイムアウトの設定に直接移動します。",
           "edit_all": "初回セットアップウィザードと同じ順序ですべての設定ページを確認します。",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "追跡対象の人物、部屋センサー、個人・グループ別の言語と音声設定を行います。",
           "edit_advanced_ai": "書き換え、翻訳、両方を組み合わせた処理に対する任意の AI スタイルを編集します。デバイスおよびツールに関する基本の安全ルールは変更されません。",
           "edit_audio": "直接の部屋のスピーカーに限ったチャイムと任意の音楽音量低下を設定します。共有 Snapcast 音源には適用しません。",
           "edit_room_safety": "部屋の任意の在室確認センサーを設定します。センサーが利用できなくても他の部屋への代替送信は発生しません。"
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "人物とグループ音声",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "部屋宛てのお知らせの送信先として明示的に指定できる人物を設定します。",
         "data": {
           "tracked_people": "人物",
           "person_group_language": "グループ言語",
@@ -204,7 +204,7 @@
           "language": "言語",
           "voice": "音声",
           "ignore_home": "外出中も許可",
-          "translate": "Translate to person's language",
+          "translate": "お知らせをこの人の言語に翻訳する",
           "destination_mobile": "携帯電話の出力",
           "destination_watch": "腕時計の出力",
           "destination_tablet": "タブレットの出力",
@@ -469,7 +469,7 @@
           "edit_profiles": "選択したプロバイダーの通知タイミング、表示スタイル、Snapcast の再生設定を構成します。",
           "edit_general": "主 AI エージェントと予備エージェント、在室状況、代替先の部屋、キュー、タイムアウトの設定に直接移動します。",
           "edit_all": "初回セットアップウィザードと同じ順序ですべての設定ページを確認します。",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "追跡対象の人物、部屋センサー、個人・グループ別の言語と音声設定を行います。",
           "edit_advanced_ai": "書き換え、翻訳、両方を組み合わせた処理に対する任意の AI スタイルを編集します。デバイスおよびツールに関する基本の安全ルールは変更されません。",
           "edit_audio": "直接の部屋のスピーカーに限ったチャイムと任意の音楽音量低下を設定します。共有 Snapcast 音源には適用しません。",
           "edit_room_safety": "部屋の任意の在室確認センサーを設定します。センサーが利用できなくても他の部屋への代替送信は発生しません。"
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "人物とグループ音声",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "部屋宛てのお知らせの送信先として明示的に指定できる人物を設定します。",
         "data": {
           "tracked_people": "人物",
           "person_group_language": "グループ言語",
@@ -509,7 +509,7 @@
           "language": "言語",
           "voice": "音声",
           "ignore_home": "外出中も許可",
-          "translate": "Translate to person's language",
+          "translate": "お知らせをこの人の言語に翻訳する",
           "destination_mobile": "携帯電話の出力",
           "destination_watch": "腕時計の出力",
           "destination_tablet": "タブレットの出力",
