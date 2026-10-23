@@ -8,18 +8,18 @@
         "data": {
           "notify_outputs": "알림 기기",
           "notify_room_outputs": "방별 알림 기기",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "최소 정보 / 성공",
+          "notify_warning_outputs": "최소 경고",
+          "notify_error_outputs": "최소 오류",
+          "notify_critical_outputs": "긴급만"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_outputs": "Announcement Hub에서 사용할 수 있는 인식된 알림 엔티티입니다. 지원되는 기기는 모두 자동 선택됩니다. 절대 알림을 보내지 않을 기기는 목록에서 제거하세요.",
           "notify_room_outputs": "Home Assistant 영역이 현재 재실 중이거나 대체 대상인 방과 일치해야 하는 알림 기기입니다. 휴대전화, 시계, 노트북처럼 이동할 수 있는 기기는 포함하지 마세요.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_info_outputs": "이 목록의 기기는 정보 및 성공 수준과 그보다 높은 수준의 안내를 받습니다. 높은 최소 수준 목록 어디에도 포함되지 않은 기기는 디버그 수준을 사용하므로 모든 수준을 받습니다.",
+          "notify_warning_outputs": "이 목록의 기기는 경고, 오류 및 긴급 안내를 받지만 디버그, 정보, 성공 안내는 받지 않습니다.",
+          "notify_error_outputs": "이 목록의 기기는 오류와 긴급 안내만 받습니다.",
+          "notify_critical_outputs": "이 목록의 기기는 긴급 안내만 받습니다."
         }
       },
       "tts": {
@@ -29,77 +29,77 @@
           "tts_engines": "TTS 엔진",
           "tts_media_player": "Snapcast용 공유 미디어 플레이어",
           "snapcast_outputs": "방별 Snapcast 클라이언트",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "다음 등급부터 TTS 사용",
+          "tts_cache": "음성 미리 생성 및 캐시",
+          "tts_language": "TTS 언어",
+          "tts_options": "TTS 엔진 옵션",
+          "companion_tts_media_stream": "Companion App 오디오 스트림",
+          "companion_tts_words_per_minute": "Companion TTS 재생 시간 추정",
+          "tts_area_players": "방별 직접 TTS 플레이어",
+          "companion_tts_outputs": "Companion App TTS 기기",
+          "tts_voice": "TTS 음성",
+          "direct_tts_announce": "직접 스피커 안내 모드(알림음이 날 수 있음)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_engines": "활성화할 유일한 음성 합성 엔진입니다. 가능한 경우 Home Assistant의 기본 TTS 엔진이 미리 선택됩니다.",
           "tts_media_player": "생성된 TTS를 공유 Snapserver 스트림으로 실제 재생하는 공용 미디어 플레이어입니다(예: MPD). 전체 시스템 인프라이므로 방별로 필터링하지 않습니다.",
           "tts_min_level": "음성으로 안내할 수 있는 최소 중요도입니다. 그보다 낮은 등급은 무음이며, 긴급 등급은 항상 음성으로 전달됩니다.",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "tts_cache": "가능하다면 재생 전에 TTS 오디오를 생성하고 캐시에 저장합니다. 재생 시작 지연을 줄이고 선택한 출력 경로에서 같은 오디오를 다시 사용할 수 있습니다.",
+          "tts_language": "선택한 TTS 엔진으로 전달할 언어입니다. 선택지는 엔진이 지원한다고 보고한 언어 목록에서 직접 가져옵니다.",
+          "tts_options": "해당 TTS 엔진에만 적용되는 추가 옵션입니다. 언어와 지원 음성은 위에서 별도로 설정하므로 여기에는 다른 공급자 옵션만 입력하세요.",
+          "companion_tts_media_stream": "Companion App의 푸시 TTS에 사용하는 Android 오디오 스트림입니다. 휴대전화가 음량과 오디오 포커스를 처리하는 방식을 결정합니다.",
+          "companion_tts_words_per_minute": "Companion App은 재생 완료를 보고하지 않으므로 푸시 TTS가 말하는 시간을 추정하는 데만 사용합니다. 겹침을 피하기 위해 대기열은 추정 시간 동안 기다립니다.",
           "snapcast_outputs": "방의 동기화된 물리적 출력으로 사용하는 Snapcast 클라이언트 미디어 플레이어입니다. Announcement Hub는 여기에 TTS를 직접 보내지 않고 공유 플레이어가 Snapserver에 소리를 전달하는 동안 음소거와 라우팅을 제어합니다.",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "companion_tts_outputs": "푸시 TTS를 수신할 수 있는 Android Companion App 기기입니다. 휴대전화의 일반 시각 알림과는 별개입니다.",
+          "tts_area_players": "Home Assistant 영역이 재실 중인 방이나 대체 대상 방과 일치할 때만 생성된 TTS를 받는 직접 미디어 플레이어입니다. 여기서 선택한 모든 플레이어는 자동으로 방에 종속됩니다.",
+          "tts_voice": "선택한 언어에 대해 활성 TTS 엔진이 제공하는 음성입니다. 호환되는 지역 음성도 포함합니다(예: el 및 el_GR). 공급자가 음성을 지원하지만 목록을 제공할 수 없다면 음성 ID를 직접 입력할 수 있습니다.",
+          "direct_tts_announce": "선택한 직접 미디어 플레이어에서 Home Assistant announce 재생 모드를 사용합니다. 지원하는 경우 짧은 알림음이 울리고 기존 미디어가 다시 재생될 수 있습니다. 공급자가 만드는 알림음을 피하려면 끄세요. 이 경우 직접 TTS가 다른 재생을 중단할 수 있습니다. 공유 Snapcast 소스에는 announce 모드를 사용하지 않습니다."
         }
       },
       "notification_profile": {
         "title": "통합 옵션: {integration}",
         "description": "이 통합의 알림과 경로 지정 동작을 설정하세요.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "부분당 최대 글자 수",
+          "reading_words_per_minute": "읽기 속도",
+          "minimum_display_seconds": "최소 표시 시간",
+          "maximum_display_seconds": "최대 표시 시간",
+          "display_buffer_seconds": "읽기 시간 여유",
+          "part_gap_seconds": "부분 사이 간격",
+          "show_part_number": "제목에 부분 번호 표시",
+          "integration_data": "추가 통합 데이터",
+          "replace_parts": "이전 Companion App 부분 교체",
+          "position": "위치",
+          "fontsize": "글꼴 크기",
+          "color": "배경색",
+          "transparency": "배경 투명도",
+          "interrupt": "대화형 알림",
+          "snapcast_source": "안내용 Snapcast 소스",
+          "snapcast_only_source": "이미 안내 소스에 연결된 클라이언트만 관리",
+          "snapcast_settle_delay": "Snapcast 경로 안정화 지연",
+          "snapcast_verify_timeout": "Snapcast 경로 확인 시간 초과",
+          "snapcast_restore": "Snapcast 음소거 상태 복원"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "max_length": "한 시각 알림 부분에 전송할 최대 글자 수입니다. 더 긴 내용은 자연스러운 경계에서 나뉘며 0은 분할을 해제합니다.",
+          "reading_words_per_minute": "다음 부분을 보내기 전 각 시각 알림 부분을 얼마나 오래 보여 줄지 추정하는 데 사용하는 읽기 속도입니다.",
+          "minimum_display_seconds": "내용이 매우 짧더라도 각 시각 알림 부분에 적용되는 계산된 표시 시간의 하한입니다.",
+          "maximum_display_seconds": "긴 메시지가 대기열을 무기한 차단하지 않도록 각 시각 알림 부분의 계산된 표시 시간에 적용하는 상한입니다.",
+          "display_buffer_seconds": "각 시각 알림 부분의 예상 읽기 시간에 더하는 초 단위 여유 시간입니다.",
+          "part_gap_seconds": "나뉜 시각 알림 부분 사이에 넣는 일시 정지입니다. 이전 부분이 사라진 뒤 다음 부분이 전달되도록 합니다.",
+          "show_part_number": "활성화하면 나뉜 알림 제목에 1/3 또는 2/3과 같은 부분 수를 추가합니다.",
+          "integration_data": "이 통합에서 보내는 각 시각 알림에 합쳐지는 선택적 공급자 데이터입니다. 개별 호출의 notify_data에 같은 키가 있으면 호출 값이 우선합니다.",
+          "replace_parts": "Companion App에서 나눠진 메시지는 동일한 알림 태그를 다시 사용하여 새 부분이 이전 부분을 대체하고 여러 알림이 쌓이지 않게 합니다.",
+          "position": "Notifications for Android TV / Fire TV가 화면에 알림 오버레이를 표시하는 위치입니다.",
+          "fontsize": "Notifications for Android TV / Fire TV 알림 오버레이의 텍스트 크기입니다.",
+          "color": "Notifications for Android TV / Fire TV 알림 오버레이의 배경색입니다.",
+          "transparency": "Notifications for Android TV / Fire TV 알림 오버레이의 배경 투명도입니다.",
+          "interrupt": "활성화하면 Android TV 알림이 대화형으로 바뀌며 현재 TV 앱을 방해하거나 포커스를 가져갈 수 있습니다.",
+          "snapcast_source": "안내 오디오가 흐르는 Snapcast 소스 또는 스트림의 이름입니다. 선택한 방의 클라이언트는 음성 안내 전에 해당 소스로 연결됩니다.",
           "snapcast_only_source": "활성화하면 Announcement Hub는 이미 설정한 안내 소스에 연결된 클라이언트만 음소거 상태를 변경합니다. 다른 Snapcast 그룹이나 소스는 변경하지 않습니다.",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "snapcast_settle_delay": "TTS 시작 전에 Snapcast 경로나 음소거 상태를 변경한 뒤 클라이언트가 변경 사항을 적용할 시간을 주는 짧은 지연입니다.",
+          "snapcast_verify_timeout": "진행하거나 경로를 사용할 수 없다고 판단하기 전에 Snapcast 클라이언트가 요청한 경로나 음소거 상태를 확인할 때까지 기다리는 최대 시간입니다.",
+          "snapcast_restore": "안내 후 관리한 각 Snapcast 클라이언트의 이전 음소거 상태를 복원하여 평소 재생을 원래대로 돌립니다."
         }
       },
       "queue": {
@@ -107,40 +107,40 @@
         "description": "재실 상태, 대체 경로, 문 확인, 대기열과 제한 시간을 설정하세요.",
         "data": {
           "queue_max": "대기열 최대 안내 수",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "사용 불가 출력 대기",
+          "idle_timeout": "오디오 유휴 대기",
+          "start_timeout": "재생 시작 제한 시간",
+          "playback_timeout": "최대 TTS 재생 시간",
+          "post_play_delay": "재생 후 간격",
+          "default_title": "기본 알림 제목",
+          "critical_notify_data": "긴급 알림 데이터",
           "occupancy_sensor": "방 재실 엔티티",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "재실 중인 방 값",
           "fallback_room": "대체 방",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "대체 전송 시 재실 방의 열린 문 필요",
+          "fallback_door_label": "문 센서 라벨 필터",
           "default_use_ai": "AI로 안내 다시 쓰기",
           "default_ai_agent": "기본 AI 제공자(대화 또는 AI 작업)",
           "fallback_ai_agent": "예비 AI 제공자(대화 또는 AI 작업)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "알림 채널 대체"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "queue_max": "허용되는 대기 또는 활성 안내 작업의 최대 개수입니다. 한도에 도달하면 새 전송을 거부합니다.",
+          "output_availability_timeout": "사용할 수 없는 출력이 대기할 수 있는 시간입니다. 다른 실행 가능한 안내는 먼저 처리될 수 있습니다. 제한 시간이 지나면 해당 출력은 별도 알림 없이 건너뜁니다.",
+          "idle_timeout": "TTS를 시작하기 전에 선택한 오디오 경로가 유휴 상태가 될 때까지 기다리는 최대 시간으로, 기존 재생을 방해하지 않도록 합니다.",
+          "start_timeout": "재생 요청을 보낸 뒤 미디어 플레이어가 TTS를 시작할 수 있는 최대 시간입니다.",
+          "playback_timeout": "Announcement Hub가 대기열을 해제하기 전 음성 재생 하나가 끝나기를 기다리는 안전 제한 시간입니다.",
+          "post_play_delay": "연속된 안내의 앞뒤가 잘리지 않도록 음성 재생 후 다음 오디오나 작업을 시작하기 전에 두는 짧은 무음 시간입니다.",
+          "default_title": "전송 작업에 제목이 없을 때 시각 알림에 사용하는 제목입니다.",
+          "critical_notify_data": "알림 통합이 지원하는 긴급도나 우선순위 옵션과 같이 긴급 시각 알림에만 추가되는 공급자별 데이터입니다.",
           "occupancy_sensor": "현재 사람이 있는 Home Assistant 영역 이름이나 ID를 상태 또는 선택한 속성에 담은 엔티티입니다. 전송 작업에서 재실 영역으로 라우팅할 때만 사용합니다.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "occupancy_attribute": "재실 중인 방 정보를 엔티티의 상태에서 읽을지 현재 속성 중 하나에서 읽을지 선택합니다.",
           "fallback_room": "대체 TTS 영역은 현재 대상 방에 고정된 방 출력 후보가 전혀 없을 때만 사용합니다. 기존 후보가 사용 불가이거나 상태가 알려지지 않았더라도 대체 경로를 차단하며 일반적인 가용성 대기 시간이 적용됩니다.",
           "fallback_check_door": "활성화하면 대상 방 중 하나의 적합한 문 센서가 문이 열려 있다고 명시적으로 보고할 때만 대체 경로를 허용합니다.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "fallback_door_label": "선택 사항인 Home Assistant 라벨입니다. 선택하면 그 라벨이 지정된 문 이진 센서만 대체 전송을 허용할 수 있습니다. 비워 두면 현재 목표 방의 모든 문 센서를 고려합니다.",
           "default_use_ai": "활성화하면 전송 작업에서 use_ai: false를 명시하지 않는 한 모든 안내가 AI 다시 쓰기를 상속합니다. use_ai를 생략하면 이 설정을 따릅니다. AI 실패 시 원문을 전달합니다. 작업의 response_variable에서 ai 상태를 확인하세요.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "default_ai_agent": "Home Assistant 기본값은 내장 conversation.process 인텐트 에이전트가 아닌 선호 Assist 파이프라인의 Conversation 에이전트를 따릅니다. 에이전트는 전송할 때 확인되어 목록에 표시됩니다. 파이프라인에서 내장 에이전트를 사용한다면 LLM 기반 에이전트를 명시적으로 선택하거나 예비 에이전트를 설정하세요.",
+          "fallback_ai_agent": "주 AI 에이전트가 실패할 때 사용할 예비 AI 에이전트입니다. Home Assistant 기본값도 선호 Assist 파이프라인을 따르며 원본 안내 선택 시 두 번째 AI 시도를 건너뜁니다. 어떤 AI도 작동하지 않으면 항상 원문을 전달합니다.",
           "channel_fallback_mode": "음성 text_tts와 문자 text_notify가 모두 있고 적합한 TTS 및 시각 기기도 있을 때만 적용합니다. 시각 → TTS는 먼저 알리고 실패하면 말하며, TTS → 시각은 먼저 말하고 실패하면 알리며, 둘 다는 양쪽을 시도합니다. 한 채널만 있으면 정상 작동합니다. 없는 문구를 만들거나 수신자를 추가하지 않으며 기존 등급 제한이 유지됩니다."
         }
       },
@@ -148,26 +148,26 @@
         "title": "Announcement Hub 재설정",
         "description": "변경할 항목을 선택하고 저장하면 통합 화면으로 돌아갑니다.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. 알림 출력 및 방",
+          "edit_tts": "2. TTS 엔진 및 기기",
+          "edit_profiles": "3. 공급자별 출력 프로필",
+          "edit_general": "4. 일반 설정, 재실 및 AI",
+          "edit_all": "모든 설정 편집(전체 마법사)",
           "edit_people": "5. 사람과 음성",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "고급 AI 프롬프트",
+          "edit_audio": "오디오, 알림음 및 볼륨 낮춤",
+          "edit_room_safety": "방 재실 확인"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_outputs": "TTS 또는 AI 설정을 바꾸지 않고 알림 기기, 방 범위 및 최소 경보 등급을 선택합니다.",
+          "edit_tts": "활성 음성 엔진과 음성, 방별 플레이어, Snapcast 클라이언트 및 Companion App 음성 기기를 변경합니다.",
+          "edit_profiles": "선택한 공급자의 알림 표시 시간과 스타일 및 Snapcast 재생 설정을 구성합니다.",
+          "edit_general": "AI 에이전트와 예비 에이전트, 재실 정보, 대체 방, 대기열 및 제한 시간 설정으로 바로 이동합니다.",
+          "edit_all": "초기 설정 마법사처럼 모든 설정 페이지를 차례대로 엽니다.",
           "edit_people": "Configure tracked people, room sensors, languages and voices.",
-          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
-          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
-          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
+          "edit_advanced_ai": "다시 쓰기, 번역 및 두 작업을 함께 수행할 때의 선택적 AI 스타일을 편집합니다. 기기와 도구에 관한 기본 안전 규칙은 그대로 유지됩니다.",
+          "edit_audio": "공유 Snapcast 소스가 아닌 직접 방 스피커에만 적용되는 알림음과 선택적 음악 음량 낮춤을 설정합니다.",
+          "edit_room_safety": "방 하나의 선택적 재실 확인 센서를 설정합니다. 센서를 사용할 수 없어도 다른 방으로 대체 전송하지 않습니다."
         }
       },
       "people": {
@@ -178,8 +178,8 @@
           "person_group_language": "그룹 언어",
           "person_group_voice": "그룹 음성",
           "person_group_translate": "그룹 알림 번역",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "그룹 AI 공급자",
+          "person_group_tts_engine": "그룹 TTS 엔진",
           "person_group_rewrite": "그룹 알림 다시 쓰기",
           "person_group_addressee": "그룹 호칭",
           "person_group_greeting": "그룹 호칭 자동 사용"
@@ -189,8 +189,8 @@
           "person_group_language": "여러 대상자가 같은 방에 있을 때 사용할 선택적 그룹 언어 코드입니다.",
           "person_group_voice": "여러 대상자가 같은 방에 있을 때 사용할 선택적 TTS 음성 ID입니다.",
           "person_group_translate": "선택한 AI 에이전트 또는 대체 에이전트로 그룹 알림을 설정한 언어로 자동 번역합니다. 실패하면 원본 문구를 유지합니다.",
-          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
-          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_agent": "그룹 수신자에게 사용할 선택적 Conversation 또는 AI Task 에이전트입니다. 작업에서 명시적으로 지정한 에이전트가 우선합니다.",
+          "person_group_tts_engine": "같은 방의 사람들에게 사용할 선택적 TTS 엔진입니다. 음성 기반 기능만 선택하며 다른 수신 기기를 추가하지 않습니다.",
           "person_group_rewrite": "그룹 AI 에이전트를 사용해 안내문을 다시 작성합니다. 번역은 별도로 설정할 수 있습니다.",
           "person_group_addressee": "선택적 그룹 호칭(예: 가족)입니다. 인사말이 활성화되었거나 {{ name }}이 문자 그대로 포함된 경우에만 사용합니다.",
           "person_group_greeting": "그룹 안내 앞에 그룹 호칭을 붙입니다. 기본적으로 꺼져 있으며 수신자를 추가하지 않습니다."
@@ -210,7 +210,7 @@
           "destination_tablet": "태블릿 출력",
           "destination_other": "기타 개인 출력",
           "enabled": "이 사람에게 알림 허용",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "재실 확인 센서",
           "verify_presence": "재실 상태 확인",
           "rewrite": "개인 알림 다시 쓰기",
           "ai_agent": "개인 AI 에이전트",
@@ -228,81 +228,81 @@
           "destination_watch": "이 사람의 시계에 속한 기존 알림 또는 미디어 플레이어 출력을 선택하세요. 지정된 출력만 사용합니다.",
           "destination_tablet": "이 사람의 태블릿에 속한 기존 알림 또는 미디어 플레이어 출력을 선택하세요. 지정된 출력만 사용합니다.",
           "destination_other": "이 사람에게 할당한 다른 Home Assistant 출력으로, 기타 대상이 선택된 경우에만 사용합니다.",
-          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "enabled": "이 사람에 대한 새 안내와 이미 대기 중인 안내를 모두 차단하려면 끄세요. 다른 사람이나 다른 방으로 전송하지 않습니다.",
           "presence_sensor": "방으로 전달할 때 이 사람의 재실 여부를 확인하는 선택적 이진 센서입니다.",
-          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "verify_presence": "전달 시 선택한 재실 센서가 켜져 있어야 합니다. 센서가 없거나 사용할 수 없다면 해당 사람의 방 전달을 차단합니다.",
           "rewrite": "번역 설정과 별개로 이 사람의 안내문 다시 쓰기를 활성화합니다.",
           "ai_agent": "이 사람을 위한 선택적 AI Task 또는 Conversation 에이전트입니다. 작업에서 다른 에이전트를 지정하지 않으면 전역 제공자보다 우선합니다.",
           "tts_engine": "이 사람을 위한 선택적 TTS 엔티티입니다. 대상 기기를 바꾸지 않고 전역 음성 엔진을 재정의합니다.",
-          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "greeting": "텍스트에 문자 그대로 {{ name }}이 이미 포함되어 있지 않으면 안내 앞에 원하는 이름을 붙입니다.",
           "address": "이 사람에게 사용할 선택적 호칭입니다. 비워 두면 Home Assistant에 표시되는 이름을 사용합니다."
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "고급 AI 스타일 프롬프트",
+        "description": "다시 쓰기, 번역 또는 두 작업 모두에 적용할 선택적 스타일 지침입니다. 고정된 안전 및 JSON 규칙이 항상 우선합니다.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "다시 쓰기 스타일",
+          "translate": "번역 스타일",
+          "both": "다시 쓰기와 번역 통합 스타일"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "일반 텍스트 선호 설정입니다. {message} 및 {language} 자리표시자만 사용할 수 있습니다.",
+          "translate": "선택한 AI에 대한 선택적 번역 선호 설정으로, 사실을 바꾸거나 행동을 허용하지 않습니다.",
+          "both": "번역과 다시 쓰기를 모두 사용할 때의 선택적 스타일 설정입니다."
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "방 직접 오디오 옵션",
+        "description": "선택한 방의 직접 스피커에서만 알림음과 음량 낮춤을 적용할 수 있습니다. 공유 Snapcast 재생에는 적용하지 않습니다.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "안내 전 알림음 사용",
+          "person_chime_url": "로컬 알림음 파일 경로",
+          "person_chime_delay": "알림음 완료 대기 시간",
+          "person_output_ducking": "재생 중인 오디오 음량 낮추기",
+          "person_duck_factor": "음악 음량 비율"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "기본적으로 꺼져 있습니다. 알림음은 명시적으로 선택한 방의 직접 플레이어에서만 재생됩니다.",
+          "person_chime_url": "/local/chime.mp3과 같은 로컬 오디오 파일을 사용하세요. 원격 URL은 허용하지 않습니다.",
+          "person_chime_delay": "TTS를 시작하기 전에 방 알림음이 완료되기를 기다리는 최대 시간입니다.",
+          "person_output_ducking": "기본적으로 꺼져 있습니다. 재생 중인 직접 방 플레이어의 음량을 저장하고 음성 안내 동안 낮춘 다음 원래대로 복원합니다.",
+          "person_duck_factor": "안내 중 원래 음악 음량에서 유지할 비율입니다. 직접 방 플레이어에만 적용됩니다."
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "방 재실 확인",
+        "description": "선택한 Home Assistant 영역 하나에서 재실을 명확히 확인하는 선택적 센서를 설정합니다.",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "영역",
+          "verify_presence": "재실 확인 필요",
+          "presence_sensor": "방 재실 센서"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "재실 확인을 추가하거나 해제할 영역을 선택합니다.",
+          "verify_presence": "선택한 센서가 켜져 있을 때만 해당 사람의 방 안내를 재생합니다. 데이터가 없으면 전달을 차단합니다.",
+          "presence_sensor": "실제로 이 영역에 위치한 binary_sensor 재실 또는 존재 감지 엔티티를 선택합니다."
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "TTS 엔진을 선택했으면 TTS 미디어 플레이어도 선택하세요.",
+      "tts_engine_required": "TTS 플레이어를 선택했으면 TTS 엔진도 선택하세요.",
+      "snapcast_tts_path_required": "Snapcast 출력에는 최소 하나의 TTS 엔진과 TTS 미디어 플레이어가 필요합니다.",
+      "output_required": "시각 출력, 서버 TTS 출력 또는 Companion App TTS 출력 중 하나 이상을 선택하세요.",
+      "display_time_order": "최대 표시 시간은 최소 표시 시간보다 크거나 같아야 합니다.",
+      "room_notify_area_required": "방 기반 알림 기기에는 Home Assistant 영역이 지정되어야 합니다.",
+      "notify_level_overlap": "알림 기기에는 최소 등급을 한 가지만 할당할 수 있습니다.",
+      "room_tts_area_required": "방 기반 직접 TTS 플레이어에는 Home Assistant 영역이 지정되어야 합니다.",
+      "tts_player_role_overlap": "하나의 미디어 플레이어를 직접 TTS 플레이어와 공유 Snapcast 소스 플레이어로 동시에 사용할 수 없습니다.",
       "invalid_person_output": "선택한 개인 출력이 없거나 비활성화되었습니다.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "사용자 지정 AI 스타일은 {message}와 {language} 자리표시자만 사용할 수 있고 1200자를 넘을 수 없습니다.",
+      "invalid_chime_url": "알림음 파일은 /local/ 경로를 사용해야 합니다.",
+      "invalid_person_area": "유효한 Home Assistant 방을 선택하세요.",
+      "invalid_person_presence": "재실 확인을 켜기 전에 재실 센서를 선택하세요."
     },
     "abort": {
-      "single_instance_allowed": "Announcement Hub is already configured."
+      "single_instance_allowed": "Announcement Hub가 이미 설정되어 있습니다."
     }
   },
   "options": {
@@ -313,18 +313,18 @@
         "data": {
           "notify_outputs": "알림 기기",
           "notify_room_outputs": "방별 알림 기기",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "최소 정보 / 성공",
+          "notify_warning_outputs": "최소 경고",
+          "notify_error_outputs": "최소 오류",
+          "notify_critical_outputs": "긴급만"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_outputs": "Announcement Hub에서 사용할 수 있는 인식된 알림 엔티티입니다. 지원되는 기기는 모두 자동 선택됩니다. 절대 알림을 보내지 않을 기기는 목록에서 제거하세요.",
           "notify_room_outputs": "Home Assistant 영역이 현재 재실 중이거나 대체 대상인 방과 일치해야 하는 알림 기기입니다. 휴대전화, 시계, 노트북처럼 이동할 수 있는 기기는 포함하지 마세요.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_info_outputs": "이 목록의 기기는 정보 및 성공 수준과 그보다 높은 수준의 안내를 받습니다. 높은 최소 수준 목록 어디에도 포함되지 않은 기기는 디버그 수준을 사용하므로 모든 수준을 받습니다.",
+          "notify_warning_outputs": "이 목록의 기기는 경고, 오류 및 긴급 안내를 받지만 디버그, 정보, 성공 안내는 받지 않습니다.",
+          "notify_error_outputs": "이 목록의 기기는 오류와 긴급 안내만 받습니다.",
+          "notify_critical_outputs": "이 목록의 기기는 긴급 안내만 받습니다."
         }
       },
       "tts": {
@@ -334,77 +334,77 @@
           "tts_engines": "TTS 엔진",
           "tts_media_player": "Snapcast용 공유 미디어 플레이어",
           "snapcast_outputs": "방별 Snapcast 클라이언트",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "다음 등급부터 TTS 사용",
+          "tts_cache": "음성 미리 생성 및 캐시",
+          "tts_language": "TTS 언어",
+          "tts_options": "TTS 엔진 옵션",
+          "companion_tts_media_stream": "Companion App 오디오 스트림",
+          "companion_tts_words_per_minute": "Companion TTS 재생 시간 추정",
+          "tts_area_players": "방별 직접 TTS 플레이어",
+          "companion_tts_outputs": "Companion App TTS 기기",
+          "tts_voice": "TTS 음성",
+          "direct_tts_announce": "직접 스피커 안내 모드(알림음이 날 수 있음)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_engines": "활성화할 유일한 음성 합성 엔진입니다. 가능한 경우 Home Assistant의 기본 TTS 엔진이 미리 선택됩니다.",
           "tts_media_player": "생성된 TTS를 공유 Snapserver 스트림으로 실제 재생하는 공용 미디어 플레이어입니다(예: MPD). 전체 시스템 인프라이므로 방별로 필터링하지 않습니다.",
           "tts_min_level": "음성으로 안내할 수 있는 최소 중요도입니다. 그보다 낮은 등급은 무음이며, 긴급 등급은 항상 음성으로 전달됩니다.",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "tts_cache": "가능하다면 재생 전에 TTS 오디오를 생성하고 캐시에 저장합니다. 재생 시작 지연을 줄이고 선택한 출력 경로에서 같은 오디오를 다시 사용할 수 있습니다.",
+          "tts_language": "선택한 TTS 엔진으로 전달할 언어입니다. 선택지는 엔진이 지원한다고 보고한 언어 목록에서 직접 가져옵니다.",
+          "tts_options": "해당 TTS 엔진에만 적용되는 추가 옵션입니다. 언어와 지원 음성은 위에서 별도로 설정하므로 여기에는 다른 공급자 옵션만 입력하세요.",
+          "companion_tts_media_stream": "Companion App의 푸시 TTS에 사용하는 Android 오디오 스트림입니다. 휴대전화가 음량과 오디오 포커스를 처리하는 방식을 결정합니다.",
+          "companion_tts_words_per_minute": "Companion App은 재생 완료를 보고하지 않으므로 푸시 TTS가 말하는 시간을 추정하는 데만 사용합니다. 겹침을 피하기 위해 대기열은 추정 시간 동안 기다립니다.",
           "snapcast_outputs": "방의 동기화된 물리적 출력으로 사용하는 Snapcast 클라이언트 미디어 플레이어입니다. Announcement Hub는 여기에 TTS를 직접 보내지 않고 공유 플레이어가 Snapserver에 소리를 전달하는 동안 음소거와 라우팅을 제어합니다.",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "companion_tts_outputs": "푸시 TTS를 수신할 수 있는 Android Companion App 기기입니다. 휴대전화의 일반 시각 알림과는 별개입니다.",
+          "tts_area_players": "Home Assistant 영역이 재실 중인 방이나 대체 대상 방과 일치할 때만 생성된 TTS를 받는 직접 미디어 플레이어입니다. 여기서 선택한 모든 플레이어는 자동으로 방에 종속됩니다.",
+          "tts_voice": "선택한 언어에 대해 활성 TTS 엔진이 제공하는 음성입니다. 호환되는 지역 음성도 포함합니다(예: el 및 el_GR). 공급자가 음성을 지원하지만 목록을 제공할 수 없다면 음성 ID를 직접 입력할 수 있습니다.",
+          "direct_tts_announce": "선택한 직접 미디어 플레이어에서 Home Assistant announce 재생 모드를 사용합니다. 지원하는 경우 짧은 알림음이 울리고 기존 미디어가 다시 재생될 수 있습니다. 공급자가 만드는 알림음을 피하려면 끄세요. 이 경우 직접 TTS가 다른 재생을 중단할 수 있습니다. 공유 Snapcast 소스에는 announce 모드를 사용하지 않습니다."
         }
       },
       "notification_profile": {
         "title": "통합 옵션: {integration}",
         "description": "이 통합의 알림과 경로 지정 동작을 설정하세요.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "부분당 최대 글자 수",
+          "reading_words_per_minute": "읽기 속도",
+          "minimum_display_seconds": "최소 표시 시간",
+          "maximum_display_seconds": "최대 표시 시간",
+          "display_buffer_seconds": "읽기 시간 여유",
+          "part_gap_seconds": "부분 사이 간격",
+          "show_part_number": "제목에 부분 번호 표시",
+          "integration_data": "추가 통합 데이터",
+          "replace_parts": "이전 Companion App 부분 교체",
+          "position": "위치",
+          "fontsize": "글꼴 크기",
+          "color": "배경색",
+          "transparency": "배경 투명도",
+          "interrupt": "대화형 알림",
+          "snapcast_source": "안내용 Snapcast 소스",
+          "snapcast_only_source": "이미 안내 소스에 연결된 클라이언트만 관리",
+          "snapcast_settle_delay": "Snapcast 경로 안정화 지연",
+          "snapcast_verify_timeout": "Snapcast 경로 확인 시간 초과",
+          "snapcast_restore": "Snapcast 음소거 상태 복원"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "max_length": "한 시각 알림 부분에 전송할 최대 글자 수입니다. 더 긴 내용은 자연스러운 경계에서 나뉘며 0은 분할을 해제합니다.",
+          "reading_words_per_minute": "다음 부분을 보내기 전 각 시각 알림 부분을 얼마나 오래 보여 줄지 추정하는 데 사용하는 읽기 속도입니다.",
+          "minimum_display_seconds": "내용이 매우 짧더라도 각 시각 알림 부분에 적용되는 계산된 표시 시간의 하한입니다.",
+          "maximum_display_seconds": "긴 메시지가 대기열을 무기한 차단하지 않도록 각 시각 알림 부분의 계산된 표시 시간에 적용하는 상한입니다.",
+          "display_buffer_seconds": "각 시각 알림 부분의 예상 읽기 시간에 더하는 초 단위 여유 시간입니다.",
+          "part_gap_seconds": "나뉜 시각 알림 부분 사이에 넣는 일시 정지입니다. 이전 부분이 사라진 뒤 다음 부분이 전달되도록 합니다.",
+          "show_part_number": "활성화하면 나뉜 알림 제목에 1/3 또는 2/3과 같은 부분 수를 추가합니다.",
+          "integration_data": "이 통합에서 보내는 각 시각 알림에 합쳐지는 선택적 공급자 데이터입니다. 개별 호출의 notify_data에 같은 키가 있으면 호출 값이 우선합니다.",
+          "replace_parts": "Companion App에서 나눠진 메시지는 동일한 알림 태그를 다시 사용하여 새 부분이 이전 부분을 대체하고 여러 알림이 쌓이지 않게 합니다.",
+          "position": "Notifications for Android TV / Fire TV가 화면에 알림 오버레이를 표시하는 위치입니다.",
+          "fontsize": "Notifications for Android TV / Fire TV 알림 오버레이의 텍스트 크기입니다.",
+          "color": "Notifications for Android TV / Fire TV 알림 오버레이의 배경색입니다.",
+          "transparency": "Notifications for Android TV / Fire TV 알림 오버레이의 배경 투명도입니다.",
+          "interrupt": "활성화하면 Android TV 알림이 대화형으로 바뀌며 현재 TV 앱을 방해하거나 포커스를 가져갈 수 있습니다.",
+          "snapcast_source": "안내 오디오가 흐르는 Snapcast 소스 또는 스트림의 이름입니다. 선택한 방의 클라이언트는 음성 안내 전에 해당 소스로 연결됩니다.",
           "snapcast_only_source": "활성화하면 Announcement Hub는 이미 설정한 안내 소스에 연결된 클라이언트만 음소거 상태를 변경합니다. 다른 Snapcast 그룹이나 소스는 변경하지 않습니다.",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "snapcast_settle_delay": "TTS 시작 전에 Snapcast 경로나 음소거 상태를 변경한 뒤 클라이언트가 변경 사항을 적용할 시간을 주는 짧은 지연입니다.",
+          "snapcast_verify_timeout": "진행하거나 경로를 사용할 수 없다고 판단하기 전에 Snapcast 클라이언트가 요청한 경로나 음소거 상태를 확인할 때까지 기다리는 최대 시간입니다.",
+          "snapcast_restore": "안내 후 관리한 각 Snapcast 클라이언트의 이전 음소거 상태를 복원하여 평소 재생을 원래대로 돌립니다."
         }
       },
       "queue": {
@@ -412,67 +412,67 @@
         "description": "재실 상태, 대체 경로, 문 확인, 대기열과 제한 시간을 설정하세요.",
         "data": {
           "queue_max": "대기열 최대 안내 수",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "사용 불가 출력 대기",
+          "idle_timeout": "오디오 유휴 대기",
+          "start_timeout": "재생 시작 제한 시간",
+          "playback_timeout": "최대 TTS 재생 시간",
+          "post_play_delay": "재생 후 간격",
+          "default_title": "기본 알림 제목",
+          "critical_notify_data": "긴급 알림 데이터",
           "occupancy_sensor": "방 재실 엔티티",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "재실 중인 방 값",
           "fallback_room": "대체 방",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "대체 전송 시 재실 방의 열린 문 필요",
+          "fallback_door_label": "문 센서 라벨 필터",
           "default_use_ai": "AI로 안내 다시 쓰기",
           "default_ai_agent": "기본 AI 제공자(대화 또는 AI 작업)",
           "fallback_ai_agent": "예비 AI 제공자(대화 또는 AI 작업)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "알림 채널 대체"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "queue_max": "허용되는 대기 또는 활성 안내 작업의 최대 개수입니다. 한도에 도달하면 새 전송을 거부합니다.",
+          "output_availability_timeout": "사용할 수 없는 출력이 대기할 수 있는 시간입니다. 다른 실행 가능한 안내는 먼저 처리될 수 있습니다. 제한 시간이 지나면 해당 출력은 별도 알림 없이 건너뜁니다.",
+          "idle_timeout": "TTS를 시작하기 전에 선택한 오디오 경로가 유휴 상태가 될 때까지 기다리는 최대 시간으로, 기존 재생을 방해하지 않도록 합니다.",
+          "start_timeout": "재생 요청을 보낸 뒤 미디어 플레이어가 TTS를 시작할 수 있는 최대 시간입니다.",
+          "playback_timeout": "Announcement Hub가 대기열을 해제하기 전 음성 재생 하나가 끝나기를 기다리는 안전 제한 시간입니다.",
+          "post_play_delay": "연속된 안내의 앞뒤가 잘리지 않도록 음성 재생 후 다음 오디오나 작업을 시작하기 전에 두는 짧은 무음 시간입니다.",
+          "default_title": "전송 작업에 제목이 없을 때 시각 알림에 사용하는 제목입니다.",
+          "critical_notify_data": "알림 통합이 지원하는 긴급도나 우선순위 옵션과 같이 긴급 시각 알림에만 추가되는 공급자별 데이터입니다.",
           "occupancy_sensor": "현재 사람이 있는 Home Assistant 영역 이름이나 ID를 상태 또는 선택한 속성에 담은 엔티티입니다. 전송 작업에서 재실 영역으로 라우팅할 때만 사용합니다.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "occupancy_attribute": "재실 중인 방 정보를 엔티티의 상태에서 읽을지 현재 속성 중 하나에서 읽을지 선택합니다.",
           "fallback_room": "대체 TTS 영역은 현재 대상 방에 고정된 방 출력 후보가 전혀 없을 때만 사용합니다. 기존 후보가 사용 불가이거나 상태가 알려지지 않았더라도 대체 경로를 차단하며 일반적인 가용성 대기 시간이 적용됩니다.",
           "fallback_check_door": "활성화하면 대상 방 중 하나의 적합한 문 센서가 문이 열려 있다고 명시적으로 보고할 때만 대체 경로를 허용합니다.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "fallback_door_label": "선택 사항인 Home Assistant 라벨입니다. 선택하면 그 라벨이 지정된 문 이진 센서만 대체 전송을 허용할 수 있습니다. 비워 두면 현재 목표 방의 모든 문 센서를 고려합니다.",
           "default_use_ai": "활성화하면 전송 작업에서 use_ai: false를 명시하지 않는 한 모든 안내가 AI 다시 쓰기를 상속합니다. use_ai를 생략하면 이 설정을 따릅니다. AI 실패 시 원문을 전달합니다. 작업의 response_variable에서 ai 상태를 확인하세요.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "default_ai_agent": "Home Assistant 기본값은 내장 conversation.process 인텐트 에이전트가 아닌 선호 Assist 파이프라인의 Conversation 에이전트를 따릅니다. 에이전트는 전송할 때 확인되어 목록에 표시됩니다. 파이프라인에서 내장 에이전트를 사용한다면 LLM 기반 에이전트를 명시적으로 선택하거나 예비 에이전트를 설정하세요.",
+          "fallback_ai_agent": "주 AI 에이전트가 실패할 때 사용할 예비 AI 에이전트입니다. Home Assistant 기본값도 선호 Assist 파이프라인을 따르며 원본 안내 선택 시 두 번째 AI 시도를 건너뜁니다. 어떤 AI도 작동하지 않으면 항상 원문을 전달합니다.",
           "channel_fallback_mode": "음성 text_tts와 문자 text_notify가 모두 있고 적합한 TTS 및 시각 기기도 있을 때만 적용합니다. 시각 → TTS는 먼저 알리고 실패하면 말하며, TTS → 시각은 먼저 말하고 실패하면 알리며, 둘 다는 양쪽을 시도합니다. 한 채널만 있으면 정상 작동합니다. 없는 문구를 만들거나 수신자를 추가하지 않으며 기존 등급 제한이 유지됩니다."
         }
       },
       "init": {
-        "title": "Configure Announcement Hub",
+        "title": "Announcement Hub 설정",
         "description": "변경할 항목을 선택하고 저장하면 통합 화면으로 돌아갑니다.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. 알림 출력 및 방",
+          "edit_tts": "2. TTS 엔진 및 기기",
+          "edit_profiles": "3. 공급자별 출력 프로필",
+          "edit_general": "4. 일반 설정, 재실 및 AI",
+          "edit_all": "모든 설정 편집(전체 마법사)",
           "edit_people": "5. 사람과 음성",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "고급 AI 프롬프트",
+          "edit_audio": "오디오, 알림음 및 볼륨 낮춤",
+          "edit_room_safety": "방 재실 확인"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_outputs": "TTS 또는 AI 설정을 바꾸지 않고 알림 기기, 방 범위 및 최소 경보 등급을 선택합니다.",
+          "edit_tts": "활성 음성 엔진과 음성, 방별 플레이어, Snapcast 클라이언트 및 Companion App 음성 기기를 변경합니다.",
+          "edit_profiles": "선택한 공급자의 알림 표시 시간과 스타일 및 Snapcast 재생 설정을 구성합니다.",
+          "edit_general": "AI 에이전트와 예비 에이전트, 재실 정보, 대체 방, 대기열 및 제한 시간 설정으로 바로 이동합니다.",
+          "edit_all": "초기 설정 마법사처럼 모든 설정 페이지를 차례대로 엽니다.",
           "edit_people": "Configure tracked people, room sensors, languages and voices.",
-          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
-          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
-          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
+          "edit_advanced_ai": "다시 쓰기, 번역 및 두 작업을 함께 수행할 때의 선택적 AI 스타일을 편집합니다. 기기와 도구에 관한 기본 안전 규칙은 그대로 유지됩니다.",
+          "edit_audio": "공유 Snapcast 소스가 아닌 직접 방 스피커에만 적용되는 알림음과 선택적 음악 음량 낮춤을 설정합니다.",
+          "edit_room_safety": "방 하나의 선택적 재실 확인 센서를 설정합니다. 센서를 사용할 수 없어도 다른 방으로 대체 전송하지 않습니다."
         }
       },
       "people": {
@@ -483,8 +483,8 @@
           "person_group_language": "그룹 언어",
           "person_group_voice": "그룹 음성",
           "person_group_translate": "그룹 알림 번역",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "그룹 AI 공급자",
+          "person_group_tts_engine": "그룹 TTS 엔진",
           "person_group_rewrite": "그룹 알림 다시 쓰기",
           "person_group_addressee": "그룹 호칭",
           "person_group_greeting": "그룹 호칭 자동 사용"
@@ -494,8 +494,8 @@
           "person_group_language": "여러 대상자가 같은 방에 있을 때 사용할 선택적 그룹 언어 코드입니다.",
           "person_group_voice": "여러 대상자가 같은 방에 있을 때 사용할 선택적 TTS 음성 ID입니다.",
           "person_group_translate": "선택한 AI 에이전트 또는 대체 에이전트로 그룹 알림을 설정한 언어로 자동 번역합니다. 실패하면 원본 문구를 유지합니다.",
-          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
-          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_agent": "그룹 수신자에게 사용할 선택적 Conversation 또는 AI Task 에이전트입니다. 작업에서 명시적으로 지정한 에이전트가 우선합니다.",
+          "person_group_tts_engine": "같은 방의 사람들에게 사용할 선택적 TTS 엔진입니다. 음성 기반 기능만 선택하며 다른 수신 기기를 추가하지 않습니다.",
           "person_group_rewrite": "그룹 AI 에이전트를 사용해 안내문을 다시 작성합니다. 번역은 별도로 설정할 수 있습니다.",
           "person_group_addressee": "선택적 그룹 호칭(예: 가족)입니다. 인사말이 활성화되었거나 {{ name }}이 문자 그대로 포함된 경우에만 사용합니다.",
           "person_group_greeting": "그룹 안내 앞에 그룹 호칭을 붙입니다. 기본적으로 꺼져 있으며 수신자를 추가하지 않습니다."
@@ -515,7 +515,7 @@
           "destination_tablet": "태블릿 출력",
           "destination_other": "기타 개인 출력",
           "enabled": "이 사람에게 알림 허용",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "재실 확인 센서",
           "verify_presence": "재실 상태 확인",
           "rewrite": "개인 알림 다시 쓰기",
           "ai_agent": "개인 AI 에이전트",
@@ -533,85 +533,85 @@
           "destination_watch": "이 사람의 시계에 속한 기존 알림 또는 미디어 플레이어 출력을 선택하세요. 지정된 출력만 사용합니다.",
           "destination_tablet": "이 사람의 태블릿에 속한 기존 알림 또는 미디어 플레이어 출력을 선택하세요. 지정된 출력만 사용합니다.",
           "destination_other": "이 사람에게 할당한 다른 Home Assistant 출력으로, 기타 대상이 선택된 경우에만 사용합니다.",
-          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "enabled": "이 사람에 대한 새 안내와 이미 대기 중인 안내를 모두 차단하려면 끄세요. 다른 사람이나 다른 방으로 전송하지 않습니다.",
           "presence_sensor": "방으로 전달할 때 이 사람의 재실 여부를 확인하는 선택적 이진 센서입니다.",
-          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "verify_presence": "전달 시 선택한 재실 센서가 켜져 있어야 합니다. 센서가 없거나 사용할 수 없다면 해당 사람의 방 전달을 차단합니다.",
           "rewrite": "번역 설정과 별개로 이 사람의 안내문 다시 쓰기를 활성화합니다.",
           "ai_agent": "이 사람을 위한 선택적 AI Task 또는 Conversation 에이전트입니다. 작업에서 다른 에이전트를 지정하지 않으면 전역 제공자보다 우선합니다.",
           "tts_engine": "이 사람을 위한 선택적 TTS 엔티티입니다. 대상 기기를 바꾸지 않고 전역 음성 엔진을 재정의합니다.",
-          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "greeting": "텍스트에 문자 그대로 {{ name }}이 이미 포함되어 있지 않으면 안내 앞에 원하는 이름을 붙입니다.",
           "address": "이 사람에게 사용할 선택적 호칭입니다. 비워 두면 Home Assistant에 표시되는 이름을 사용합니다."
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "고급 AI 스타일 프롬프트",
+        "description": "다시 쓰기, 번역 또는 두 작업 모두에 적용할 선택적 스타일 지침입니다. 고정된 안전 및 JSON 규칙이 항상 우선합니다.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "다시 쓰기 스타일",
+          "translate": "번역 스타일",
+          "both": "다시 쓰기와 번역 통합 스타일"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "일반 텍스트 선호 설정입니다. {message} 및 {language} 자리표시자만 사용할 수 있습니다.",
+          "translate": "선택한 AI에 대한 선택적 번역 선호 설정으로, 사실을 바꾸거나 행동을 허용하지 않습니다.",
+          "both": "번역과 다시 쓰기를 모두 사용할 때의 선택적 스타일 설정입니다."
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "방 직접 오디오 옵션",
+        "description": "선택한 방의 직접 스피커에서만 알림음과 음량 낮춤을 적용할 수 있습니다. 공유 Snapcast 재생에는 적용하지 않습니다.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "안내 전 알림음 사용",
+          "person_chime_url": "로컬 알림음 파일 경로",
+          "person_chime_delay": "알림음 완료 대기 시간",
+          "person_output_ducking": "재생 중인 오디오 음량 낮추기",
+          "person_duck_factor": "음악 음량 비율"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "기본적으로 꺼져 있습니다. 알림음은 명시적으로 선택한 방의 직접 플레이어에서만 재생됩니다.",
+          "person_chime_url": "/local/chime.mp3과 같은 로컬 오디오 파일을 사용하세요. 원격 URL은 허용하지 않습니다.",
+          "person_chime_delay": "TTS를 시작하기 전에 방 알림음이 완료되기를 기다리는 최대 시간입니다.",
+          "person_output_ducking": "기본적으로 꺼져 있습니다. 재생 중인 직접 방 플레이어의 음량을 저장하고 음성 안내 동안 낮춘 다음 원래대로 복원합니다.",
+          "person_duck_factor": "안내 중 원래 음악 음량에서 유지할 비율입니다. 직접 방 플레이어에만 적용됩니다."
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "방 재실 확인",
+        "description": "선택한 Home Assistant 영역 하나에서 재실을 명확히 확인하는 선택적 센서를 설정합니다.",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "영역",
+          "verify_presence": "재실 확인 필요",
+          "presence_sensor": "방 재실 센서"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "재실 확인을 추가하거나 해제할 영역을 선택합니다.",
+          "verify_presence": "선택한 센서가 켜져 있을 때만 해당 사람의 방 안내를 재생합니다. 데이터가 없으면 전달을 차단합니다.",
+          "presence_sensor": "실제로 이 영역에 위치한 binary_sensor 재실 또는 존재 감지 엔티티를 선택합니다."
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "TTS 엔진을 선택했으면 TTS 미디어 플레이어도 선택하세요.",
+      "tts_engine_required": "TTS 플레이어를 선택했으면 TTS 엔진도 선택하세요.",
+      "snapcast_tts_path_required": "Snapcast 출력에는 최소 하나의 TTS 엔진과 TTS 미디어 플레이어가 필요합니다.",
+      "output_required": "시각 출력, 서버 TTS 출력 또는 Companion App TTS 출력 중 하나 이상을 선택하세요.",
+      "display_time_order": "최대 표시 시간은 최소 표시 시간보다 크거나 같아야 합니다.",
+      "room_notify_area_required": "방 기반 알림 기기에는 Home Assistant 영역이 지정되어야 합니다.",
+      "notify_level_overlap": "알림 기기에는 최소 등급을 한 가지만 할당할 수 있습니다.",
+      "room_tts_area_required": "방 기반 직접 TTS 플레이어에는 Home Assistant 영역이 지정되어야 합니다.",
+      "tts_player_role_overlap": "하나의 미디어 플레이어를 직접 TTS 플레이어와 공유 Snapcast 소스 플레이어로 동시에 사용할 수 없습니다.",
       "invalid_person_output": "선택한 개인 출력이 없거나 비활성화되었습니다.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "사용자 지정 AI 스타일은 {message}와 {language} 자리표시자만 사용할 수 있고 1200자를 넘을 수 없습니다.",
+      "invalid_chime_url": "알림음 파일은 /local/ 경로를 사용해야 합니다.",
+      "invalid_person_area": "유효한 Home Assistant 방을 선택하세요.",
+      "invalid_person_presence": "재실 확인을 켜기 전에 재실 센서를 선택하세요."
     }
   },
   "selector": {
     "dispatch_order": {
       "options": {
-        "notify_then_tts": "Visual notifications first, then speech",
-        "tts_then_notify": "Speech first, then visual notifications"
+        "notify_then_tts": "시각 알림 먼저, 음성 나중",
+        "tts_then_notify": "음성 먼저, 시각 알림 나중"
       }
     },
     "tts_min_level": {
@@ -622,15 +622,15 @@
         "info": "정보",
         "success": "성공",
         "debug": "디버그",
-        "never": "Never"
+        "never": "사용 안 함"
       }
     },
     "companion_tts_media_stream": {
       "options": {
-        "default": "App default",
-        "music_stream": "Music stream",
-        "alarm_stream": "Alarm stream",
-        "alarm_stream_max": "Alarm stream at maximum volume"
+        "default": "앱 기본값",
+        "music_stream": "음악 스트림",
+        "alarm_stream": "알람 스트림",
+        "alarm_stream_max": "최대 음량 알람 스트림"
       }
     },
     "level": {
@@ -645,32 +645,32 @@
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left",
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "center": "Center"
+        "bottom-right": "오른쪽 아래",
+        "bottom-left": "왼쪽 아래",
+        "top-right": "오른쪽 위",
+        "top-left": "왼쪽 위",
+        "center": "가운데"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large",
-        "max": "Maximum"
+        "small": "작게",
+        "medium": "보통",
+        "large": "크게",
+        "max": "최대"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Grey",
-        "black": "Black",
-        "indigo": "Indigo",
-        "green": "Green",
-        "red": "Red",
-        "cyan": "Cyan",
-        "teal": "Teal",
-        "amber": "Amber",
-        "pink": "Pink"
+        "grey": "회색",
+        "black": "검정",
+        "indigo": "남색",
+        "green": "초록",
+        "red": "빨강",
+        "cyan": "청록색",
+        "teal": "청록",
+        "amber": "황갈색",
+        "pink": "분홍"
       }
     },
     "nfandroidtv_transparency": {
@@ -684,13 +684,13 @@
     },
     "occupancy_source": {
       "options": {
-        "state": "State"
+        "state": "상태"
       }
     },
     "notify_scope": {
       "options": {
-        "room": "Room-based",
-        "general": "General / movable"
+        "room": "방 기반",
+        "general": "일반 / 이동 가능"
       }
     },
     "notify_level": {
@@ -704,9 +704,9 @@
     },
     "channel_fallback_mode": {
       "options": {
-        "visual_then_tts": "Visual first → TTS if unsuccessful",
-        "tts_then_visual": "TTS first → Visual if unsuccessful",
-        "both": "Both eligible channels"
+        "visual_then_tts": "시각 우선 → 실패 시 TTS",
+        "tts_then_visual": "TTS 우선 → 실패 시 시각",
+        "both": "해당되는 두 채널 모두"
       }
     },
     "person_destination": {
@@ -722,14 +722,14 @@
   "entity": {
     "sensor": {
       "queue": {
-        "name": "Queue"
+        "name": "대기열"
       }
     }
   },
   "services": {
     "send": {
       "name": "안내 보내기",
-      "description": "Backward-compatible alias for notify.announcement_hub. New automations should use notify.announcement_hub.",
+      "description": "notify.announcement_hub의 이전 버전 호환 별칭입니다. 새 자동화에서는 notify.announcement_hub를 사용하세요.",
       "sections": {
         "content": {
           "name": "메시지"
@@ -755,7 +755,7 @@
         },
         "title": {
           "name": "제목",
-          "description": "Optional title for visual notifications."
+          "description": "시각 알림의 선택적 제목입니다."
         },
         "level": {
           "name": "중요도",
@@ -766,20 +766,20 @@
           "description": "notification(문자), tts(음성), snapcast, companion_tts(전용 음성), 또는 all을 선택합니다. 선택한 기기만 필터링하며 관련 없는 수신자는 추가하지 않습니다."
         },
         "notify_data": {
-          "name": "Notification data",
-          "description": "Optional integration-specific data for this visual notification."
+          "name": "알림 데이터",
+          "description": "이 시각 알림에 사용할 선택적 통합별 데이터입니다."
         },
         "language": {
-          "name": "TTS language",
-          "description": "Optional language override for this job."
+          "name": "TTS 언어",
+          "description": "이 작업에만 적용할 선택적 언어 설정입니다."
         },
         "tts_options": {
-          "name": "TTS options",
-          "description": "Optional voice or engine options for this job."
+          "name": "TTS 옵션",
+          "description": "이 작업에 사용할 선택적 음성 또는 엔진 옵션입니다."
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
-          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
+          "name": "Companion App 음성 허용",
+          "description": "Companion App 음성 출력을 허용하는 이전 선택적 설정입니다. 새 작업에서는 선택한 수신자에게 한정하여 service의 tts 또는 companion_tts를 요청할 수 있습니다."
         },
         "occupied_only": {
           "name": "대체 경로에서 사람이 있는 방 시도",
@@ -791,15 +791,15 @@
         },
         "ai_agent": {
           "name": "AI 제공자",
-          "description": "Choose an available Conversation agent or AI Task entity for this announcement. Leave empty to inherit the integration's default AI provider."
+          "description": "이 안내에 사용할 Conversation 에이전트 또는 AI Task 엔티티를 선택합니다. 비워 두면 통합의 기본 AI 공급자를 따릅니다."
         },
         "click_action": {
           "name": "알림 터치 대상",
-          "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
+          "description": "Companion App 시각 알림을 탭할 때 열 URL, Home Assistant 대시보드 경로, app:// 딥 링크 또는 entityId:entity_id를 지정합니다. Android는 clickAction, iOS/macOS는 url을 받습니다. Android TV/Fire TV 오버레이, TTS 및 미지원 공급자에서는 무시됩니다. notify_data의 같은 키를 덮어씁니다."
         },
         "text": {
           "name": "안내 방송",
-          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+          "description": "음성 TTS와 문자 알림에 공통으로 사용할 텍스트입니다. text_tts 또는 text_notify가 있으면 생략할 수 있으며 채널 전용 필드는 해당 text 버전을 덮어씁니다."
         },
         "area": {
           "name": "구역",
@@ -838,36 +838,36 @@
           "description": "이 알림에서 개인 또는 그룹의 자동 번역 설정을 덮어씁니다. 설정된 언어를 사용하며 use_ai: false는 번역을 막습니다."
         },
         "person_greeting": {
-          "name": "Personal greeting",
-          "description": "Override automatic salutation for a person/group; leave unset to use the configured preference."
+          "name": "개인 인사말",
+          "description": "개인 또는 그룹의 자동 호칭을 덮어씁니다. 비워 두면 설정된 선호값을 사용합니다."
         },
         "pre_announce_sound": {
-          "name": "Pre-announcement chime",
-          "description": "Optional direct-room audio chime, never sent on the shared Snapcast source."
+          "name": "안내 전 알림음",
+          "description": "직접 방 스피커에서만 선택적으로 재생하는 알림음입니다. 공유 Snapcast 소스로는 전송하지 않습니다."
         },
         "tts_engine": {
-          "name": "TTS engine override",
-          "description": "Select one existing TTS engine for this announcement without selecting extra devices."
+          "name": "TTS 엔진 재지정",
+          "description": "추가 수신 기기를 선택하지 않고 이 안내에 사용할 기존 TTS 엔진 하나를 선택합니다."
         }
       }
     },
     "clear_queue": {
       "name": "안내 대기열 비우기",
-      "description": "Cancels all waiting jobs and can also stop the active announcement.",
+      "description": "대기 중인 모든 작업을 취소하고 진행 중인 안내도 중단할 수 있습니다.",
       "fields": {
         "include_current": {
-          "name": "Include active announcement",
-          "description": "Also requests cancellation of the job currently running."
+          "name": "진행 중인 안내 포함",
+          "description": "현재 실행 중인 작업의 취소도 요청합니다."
         }
       }
     },
     "cancel": {
       "name": "취소",
-      "description": "Cancels one waiting or active job by its ID.",
+      "description": "작업 ID로 대기 또는 실행 중인 작업 하나를 취소합니다.",
       "fields": {
         "job_id": {
-          "name": "Job ID",
-          "description": "The job ID returned by announcement_hub.send."
+          "name": "작업 ID",
+          "description": "announcement_hub.send가 반환한 작업 ID입니다."
         }
       }
     }
