@@ -164,7 +164,7 @@
           "edit_profiles": "Stel meldingsduur, weergavestijlen en Snapcast-afspeelinstellingen in voor de gekozen providers.",
           "edit_general": "Ga rechtstreeks naar AI-agents en reserveagents, aanwezigheid, uitwijkruimtes, wachtrijen en time-outs.",
           "edit_all": "Doorloop alle configuratiepagina's in volgorde, zoals in de oorspronkelijke configuratiewizard.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_people": "Configureer gevolgde personen, kamersensoren en taal- en stemvoorkeuren per persoon of groep.",
           "edit_advanced_ai": "Bewerk optionele AI-stijlen voor herschrijven, vertalen en beide samen. De vaste veiligheidsregels voor apparaten en tools blijven van kracht.",
           "edit_audio": "Stel de beltoon alleen voor directe kamerspeakers en de optionele verlaging van muziekvolume in; nooit voor een gedeelde Snapcast-bron.",
           "edit_room_safety": "Stel de optionele aanwezigheidssensor voor een ruimte in; niet-beschikbare sensoren mogen nooit uitwijken naar een andere ruimte veroorzaken."
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "Personen en groepsstem",
-        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "description": "Configureer personen die expliciet aan hun kamer gerichte aankondigingen kunnen ontvangen.",
         "data": {
           "tracked_people": "Personen",
           "person_group_language": "Groepstaal",
@@ -204,7 +204,7 @@
           "language": "Taal",
           "voice": "Stem",
           "ignore_home": "Toestaan bij afwezigheid",
-          "translate": "Translate to person's language",
+          "translate": "Vertaal aankondigingen naar de taal van deze persoon.",
           "destination_mobile": "Mobiele uitgangen",
           "destination_watch": "Horloge-uitgangen",
           "destination_tablet": "Tabletuitgangen",
@@ -469,7 +469,7 @@
           "edit_profiles": "Stel meldingsduur, weergavestijlen en Snapcast-afspeelinstellingen in voor de gekozen providers.",
           "edit_general": "Ga rechtstreeks naar AI-agents en reserveagents, aanwezigheid, uitwijkruimtes, wachtrijen en time-outs.",
           "edit_all": "Doorloop alle configuratiepagina's in volgorde, zoals in de oorspronkelijke configuratiewizard.",
-          "edit_people": "Configure people's room trackers and individual/group voice settings.",
+          "edit_people": "Configureer gevolgde personen, kamersensoren en taal- en stemvoorkeuren per persoon of groep.",
           "edit_advanced_ai": "Bewerk optionele AI-stijlen voor herschrijven, vertalen en beide samen. De vaste veiligheidsregels voor apparaten en tools blijven van kracht.",
           "edit_audio": "Stel de beltoon alleen voor directe kamerspeakers en de optionele verlaging van muziekvolume in; nooit voor een gedeelde Snapcast-bron.",
           "edit_room_safety": "Stel de optionele aanwezigheidssensor voor een ruimte in; niet-beschikbare sensoren mogen nooit uitwijken naar een andere ruimte veroorzaken."
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "Personen en groepsstem",
-        "description": "Select people for person-targeted announcements; they are never automatically added to unrelated broadcasts.",
+        "description": "Configureer personen die expliciet aan hun kamer gerichte aankondigingen kunnen ontvangen.",
         "data": {
           "tracked_people": "Personen",
           "person_group_language": "Groepstaal",
@@ -509,7 +509,7 @@
           "language": "Taal",
           "voice": "Stem",
           "ignore_home": "Toestaan bij afwezigheid",
-          "translate": "Translate to person's language",
+          "translate": "Vertaal aankondigingen naar de taal van deze persoon.",
           "destination_mobile": "Mobiele uitgangen",
           "destination_watch": "Horloge-uitgangen",
           "destination_tablet": "Tabletuitgangen",

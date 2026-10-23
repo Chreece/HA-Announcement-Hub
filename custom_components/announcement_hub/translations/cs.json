@@ -164,7 +164,7 @@
           "edit_profiles": "Nastavte délku oznámení, styly zobrazení a parametry přehrávání Snapcast pro vybrané poskytovatele.",
           "edit_general": "Přejděte přímo k hlavnímu a záložnímu agentovi AI, obsazenosti, záložním místnostem, frontě a časovým limitům.",
           "edit_all": "Projít všechny stránky nastavení ve stejném pořadí jako při původním průvodci.",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "Nastavte sledované osoby, pokojové senzory a individuální či skupinové předvolby jazyka a hlas.",
           "edit_advanced_ai": "Upravte volitelné styly AI pro přeformulování, překlad a jejich kombinaci. Základní bezpečnostní pravidla zařízení a nástrojů zůstávají pevná.",
           "edit_audio": "Nastavte zvukový signál jen pro přímé reproduktory v místnosti a volitelné ztlumení hudby; nikdy ne pro sdílený zdroj Snapcast.",
           "edit_room_safety": "Nastavte volitelný senzor potvrzení přítomnosti pro místnost; nedostupný senzor nikdy nespustí záložní přesměrování do jiné místnosti."
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "Osoby a skupinový hlas",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "Nastavte osoby, jimž lze oznámení cíleně doručit do jejich místnosti.",
         "data": {
           "tracked_people": "Osoby",
           "person_group_language": "Jazyk skupiny",
@@ -204,7 +204,7 @@
           "language": "Jazyk",
           "voice": "Hlas",
           "ignore_home": "Povolit mimo domov",
-          "translate": "Translate to person's language",
+          "translate": "Překládat oznámení do jazyka této osoby.",
           "destination_mobile": "Výstupy mobilu",
           "destination_watch": "Výstupy hodinek",
           "destination_tablet": "Výstupy tabletu",
@@ -469,7 +469,7 @@
           "edit_profiles": "Nastavte délku oznámení, styly zobrazení a parametry přehrávání Snapcast pro vybrané poskytovatele.",
           "edit_general": "Přejděte přímo k hlavnímu a záložnímu agentovi AI, obsazenosti, záložním místnostem, frontě a časovým limitům.",
           "edit_all": "Projít všechny stránky nastavení ve stejném pořadí jako při původním průvodci.",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "Nastavte sledované osoby, pokojové senzory a individuální či skupinové předvolby jazyka a hlas.",
           "edit_advanced_ai": "Upravte volitelné styly AI pro přeformulování, překlad a jejich kombinaci. Základní bezpečnostní pravidla zařízení a nástrojů zůstávají pevná.",
           "edit_audio": "Nastavte zvukový signál jen pro přímé reproduktory v místnosti a volitelné ztlumení hudby; nikdy ne pro sdílený zdroj Snapcast.",
           "edit_room_safety": "Nastavte volitelný senzor potvrzení přítomnosti pro místnost; nedostupný senzor nikdy nespustí záložní přesměrování do jiné místnosti."
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "Osoby a skupinový hlas",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "Nastavte osoby, jimž lze oznámení cíleně doručit do jejich místnosti.",
         "data": {
           "tracked_people": "Osoby",
           "person_group_language": "Jazyk skupiny",
@@ -509,7 +509,7 @@
           "language": "Jazyk",
           "voice": "Hlas",
           "ignore_home": "Povolit mimo domov",
-          "translate": "Translate to person's language",
+          "translate": "Překládat oznámení do jazyka této osoby.",
           "destination_mobile": "Výstupy mobilu",
           "destination_watch": "Výstupy hodinek",
           "destination_tablet": "Výstupy tabletu",

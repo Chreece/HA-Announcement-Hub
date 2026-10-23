@@ -164,7 +164,7 @@
           "edit_profiles": "配置所选提供商的通知显示时长、显示样式和 Snapcast 播放设置。",
           "edit_general": "直接进入主/备用 AI 代理、占用状态、备用房间、队列和超时设置。",
           "edit_all": "按初次配置向导的顺序浏览全部设置页面。",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "配置被追踪的人员、房间传感器及个人或群组的语言和语音偏好。",
           "edit_advanced_ai": "编辑用于改写、翻译及二者结合的可选 AI 风格。核心设备和工具安全规则保持不变。",
           "edit_audio": "配置仅用于房间直接扬声器的提示音和可选音乐音量降低，绝不应用于共享 Snapcast 音源。",
           "edit_room_safety": "为单个房间配置可选的占用状态验证传感器；传感器不可用时绝不触发向其他房间的备用路由。"
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "人员与群组语音",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "配置可被明确指定为房间公告接收者的人员。",
         "data": {
           "tracked_people": "人员",
           "person_group_language": "群组语言",
@@ -204,7 +204,7 @@
           "language": "语言",
           "voice": "音色",
           "ignore_home": "离家时允许",
-          "translate": "Translate to person's language",
+          "translate": "将公告翻译成此人的语言。",
           "destination_mobile": "手机输出",
           "destination_watch": "手表输出",
           "destination_tablet": "平板输出",
@@ -469,7 +469,7 @@
           "edit_profiles": "配置所选提供商的通知显示时长、显示样式和 Snapcast 播放设置。",
           "edit_general": "直接进入主/备用 AI 代理、占用状态、备用房间、队列和超时设置。",
           "edit_all": "按初次配置向导的顺序浏览全部设置页面。",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "配置被追踪的人员、房间传感器及个人或群组的语言和语音偏好。",
           "edit_advanced_ai": "编辑用于改写、翻译及二者结合的可选 AI 风格。核心设备和工具安全规则保持不变。",
           "edit_audio": "配置仅用于房间直接扬声器的提示音和可选音乐音量降低，绝不应用于共享 Snapcast 音源。",
           "edit_room_safety": "为单个房间配置可选的占用状态验证传感器；传感器不可用时绝不触发向其他房间的备用路由。"
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "人员与群组语音",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "配置可被明确指定为房间公告接收者的人员。",
         "data": {
           "tracked_people": "人员",
           "person_group_language": "群组语言",
@@ -509,7 +509,7 @@
           "language": "语言",
           "voice": "音色",
           "ignore_home": "离家时允许",
-          "translate": "Translate to person's language",
+          "translate": "将公告翻译成此人的语言。",
           "destination_mobile": "手机输出",
           "destination_watch": "手表输出",
           "destination_tablet": "平板输出",

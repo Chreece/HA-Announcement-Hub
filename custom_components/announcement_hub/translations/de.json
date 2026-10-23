@@ -104,7 +104,7 @@
       },
       "queue": {
         "title": "4. Allgemeine Optionen",
-        "description": "Anwesenheitsrouting, Fallback, optionaler Tür-Label-Filter, Benachrichtigungsstandards und Queue/Timeouts.",
+        "description": "Anwesenheitsbasierte Zustellung, Ausweichräume, optionaler Türsensor-Label-Filter, Benachrichtigungsvorgaben sowie Warteschlange und Zeitlimits.",
         "data": {
           "queue_max": "Maximale Anzahl Ankündigungen",
           "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
@@ -135,7 +135,7 @@
           "critical_notify_data": "Provider-spezifische Daten, die nur bei kritischen visuellen Benachrichtigungen ergänzt werden, z. B. Prioritätsoptionen.",
           "occupancy_sensor": "Entität, deren Zustand oder ausgewähltes Attribut die aktuell belegten Home-Assistant-Bereiche enthält. Wird nur bei occupied-only Routing verwendet.",
           "occupancy_attribute": "Wähle, ob belegte Räume aus dem Entitätszustand oder einem aktuellen Attribut gelesen werden.",
-          "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen Raum-Kandidaten enthalten. Vorhandene feste Raum-Kandidaten, auch unavailable/unknown, blockieren den Fallback und unterliegen weiterhin dem normalen Verfügbarkeits-Timeout.",
+          "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen Raum-Kandidaten enthalten. Vorhandene feste Raum-Kandidaten, auch bei nicht verfügbarem oder unbekanntem Status, blockieren den Fallback und unterliegen weiterhin dem normalen Verfügbarkeits-Timeout.",
           "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor in einem der aktuellen Zielräume ausdrücklich offen meldet.",
           "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen.",
           "default_use_ai": "Wenn aktiviert, verwenden Ankündigungen standardmäßig die KI, solange die einzelne Aktion nicht ausdrücklich use_ai: false setzt. Ein nicht angegebenes use_ai übernimmt diese Integrationseinstellung. Bei KI-Fehlern bleibt die Originalmeldung erhalten. Der KI-Status steht in der Antwortvariable der Aktion.",
@@ -409,7 +409,7 @@
       },
       "queue": {
         "title": "4. Allgemeine Optionen",
-        "description": "Anwesenheitsrouting, Fallback, optionaler Tür-Label-Filter, Benachrichtigungsstandards und Queue/Timeouts.",
+        "description": "Anwesenheitsbasierte Zustellung, Ausweichräume, optionaler Türsensor-Label-Filter, Benachrichtigungsvorgaben sowie Warteschlange und Zeitlimits.",
         "data": {
           "queue_max": "Maximale Anzahl Ankündigungen",
           "output_availability_timeout": "Wartezeit für nicht verfügbare Ausgänge",
@@ -440,7 +440,7 @@
           "critical_notify_data": "Provider-spezifische Daten, die nur bei kritischen visuellen Benachrichtigungen ergänzt werden, z. B. Prioritätsoptionen.",
           "occupancy_sensor": "Entität, deren Zustand oder ausgewähltes Attribut die aktuell belegten Home-Assistant-Bereiche enthält. Wird nur bei occupied-only Routing verwendet.",
           "occupancy_attribute": "Wähle, ob belegte Räume aus dem Entitätszustand oder einem aktuellen Attribut gelesen werden.",
-          "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen Raum-Kandidaten enthalten. Vorhandene feste Raum-Kandidaten, auch unavailable/unknown, blockieren den Fallback und unterliegen weiterhin dem normalen Verfügbarkeits-Timeout.",
+          "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen Raum-Kandidaten enthalten. Vorhandene feste Raum-Kandidaten, auch bei nicht verfügbarem oder unbekanntem Status, blockieren den Fallback und unterliegen weiterhin dem normalen Verfügbarkeits-Timeout.",
           "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor in einem der aktuellen Zielräume ausdrücklich offen meldet.",
           "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen.",
           "default_use_ai": "Wenn aktiviert, verwenden Ankündigungen standardmäßig die KI, solange die einzelne Aktion nicht ausdrücklich use_ai: false setzt. Ein nicht angegebenes use_ai übernimmt diese Integrationseinstellung. Bei KI-Fehlern bleibt die Originalmeldung erhalten. Der KI-Status steht in der Antwortvariable der Aktion.",

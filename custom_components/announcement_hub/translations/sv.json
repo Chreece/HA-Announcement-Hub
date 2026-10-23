@@ -164,7 +164,7 @@
           "edit_profiles": "Konfigurera visningstider för aviseringar, visningsstilar och Snapcast-uppspelning för valda leverantörer.",
           "edit_general": "Gå direkt till primära och reserv-AI-agenter, beläggning, reservrum, kö och tidsgränser.",
           "edit_all": "Gå igenom alla inställningssidor i ordning, precis som i den ursprungliga konfigurationsguiden.",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "Konfigurera spårade personer, rumssensorer och individuella eller gruppvisa inställningar för språk och röst.",
           "edit_advanced_ai": "Redigera valfria AI-stilar för omskrivning, översättning och kombinationen av dem. Grundläggande säkerhetsregler för enheter och verktyg förblir fasta.",
           "edit_audio": "Konfigurera en signal som bara spelas i direktanslutna rumshögtalare och valfri sänkning av musikvolymen, aldrig i den delade Snapcast-källan.",
           "edit_room_safety": "Konfigurera en valfri närvarosensor för ett rum; otillgängliga sensorer utlöser aldrig reservväg till ett annat rum."
@@ -172,7 +172,7 @@
       },
       "people": {
         "title": "Personer och gruppröst",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "Konfigurera personer som uttryckligen kan väljas som mottagare av rumsmeddelanden.",
         "data": {
           "tracked_people": "Personer",
           "person_group_language": "Gruppspråk",
@@ -204,7 +204,7 @@
           "language": "Språk",
           "voice": "Röst",
           "ignore_home": "Tillåt utanför hemmet",
-          "translate": "Translate to person's language",
+          "translate": "Översätt meddelanden till den här personens språk.",
           "destination_mobile": "Mobilutgångar",
           "destination_watch": "Klockutgångar",
           "destination_tablet": "Surfplatteutgångar",
@@ -469,7 +469,7 @@
           "edit_profiles": "Konfigurera visningstider för aviseringar, visningsstilar och Snapcast-uppspelning för valda leverantörer.",
           "edit_general": "Gå direkt till primära och reserv-AI-agenter, beläggning, reservrum, kö och tidsgränser.",
           "edit_all": "Gå igenom alla inställningssidor i ordning, precis som i den ursprungliga konfigurationsguiden.",
-          "edit_people": "Configure tracked people, room sensors, languages and voices.",
+          "edit_people": "Konfigurera spårade personer, rumssensorer och individuella eller gruppvisa inställningar för språk och röst.",
           "edit_advanced_ai": "Redigera valfria AI-stilar för omskrivning, översättning och kombinationen av dem. Grundläggande säkerhetsregler för enheter och verktyg förblir fasta.",
           "edit_audio": "Konfigurera en signal som bara spelas i direktanslutna rumshögtalare och valfri sänkning av musikvolymen, aldrig i den delade Snapcast-källan.",
           "edit_room_safety": "Konfigurera en valfri närvarosensor för ett rum; otillgängliga sensorer utlöser aldrig reservväg till ett annat rum."
@@ -477,7 +477,7 @@
       },
       "people": {
         "title": "Personer och gruppröst",
-        "description": "Select people for explicitly targeted room announcements. No automatic broadcasts are enabled.",
+        "description": "Konfigurera personer som uttryckligen kan väljas som mottagare av rumsmeddelanden.",
         "data": {
           "tracked_people": "Personer",
           "person_group_language": "Gruppspråk",
@@ -509,7 +509,7 @@
           "language": "Språk",
           "voice": "Röst",
           "ignore_home": "Tillåt utanför hemmet",
-          "translate": "Translate to person's language",
+          "translate": "Översätt meddelanden till den här personens språk.",
           "destination_mobile": "Mobilutgångar",
           "destination_watch": "Klockutgångar",
           "destination_tablet": "Surfplatteutgångar",
