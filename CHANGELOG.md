@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.10.0b19 - 2026-10-23
+
+**Beta — dashboard person-destination localization follow-up.**
+
+- Translate the six dashboard card person/destination labels (People, Room,
+  Mobile, Watch, Tablet and Other) across all 19 non-English dashboard locales.
+  These formerly appeared in English for most users even after the native
+  integration translations were completed under issue #50.
+- Preserve the underlying person destination keys (`room`, `mobile`,
+  `watch`, `tablet`, `other`) and all device/service entity IDs.
+  This change affects presentation only, not routing, queuing, AI or TTS.
+- Add a dedicated card locale regression suite for all 19 languages,
+  recipient chips, unchanged technical examples and interpolation safety.
+  Include it and the existing full card-locale test in the translation
+  quality workflow.
+
 ## 0.10.0b18 - 2026-10-23
 
 **Beta — complete Korean and Czech native integration localization and issue #50.**
