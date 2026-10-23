@@ -8,18 +8,18 @@
         "data": {
           "notify_outputs": "Aviseringsenheter",
           "notify_room_outputs": "Aviseringsenheter per rum",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Minst Info / Lyckat",
+          "notify_warning_outputs": "Minst Varning",
+          "notify_error_outputs": "Minst Fel",
+          "notify_critical_outputs": "Endast Kritisk"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_outputs": "Igenkända notifieringsentiteter som Announcement Hub får använda. Alla stödda enheter väljs automatiskt; ta bort enheter som du aldrig vill att Announcement Hub ska skicka aviseringar till.",
           "notify_room_outputs": "Valda notifieringsenheter vars Home Assistant-område måste matcha det upptagna rummet eller reservrummet. Ta inte med flyttbara enheter som telefoner, klockor och bärbara datorer.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_info_outputs": "Enheter i denna lista får meddelanden på nivån Info och Lyckat samt alla högre nivåer. Enheter som inte har tilldelats någon lista med högre lägstanivå använder Debug och får därför alla nivåer.",
+          "notify_warning_outputs": "Enheter i listan får meddelanden på nivåerna Varning, Fel och Kritisk, men inte Debug, Info eller Lyckat.",
+          "notify_error_outputs": "Enheter i listan får endast meddelanden på nivåerna Fel och Kritisk.",
+          "notify_critical_outputs": "Enheter i listan får endast kritiska meddelanden."
         }
       },
       "tts": {
@@ -29,77 +29,77 @@
           "tts_engines": "TTS-motor",
           "tts_media_player": "Delad mediaspelare för Snapcast",
           "snapcast_outputs": "Snapcast-klienter per rum",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "Använd TTS från nivån",
+          "tts_cache": "Förgenerera och cachelagra tal",
+          "tts_language": "TTS-språk",
+          "tts_options": "Alternativ för TTS-motor",
+          "companion_tts_media_stream": "Ljudström för Companion App",
+          "companion_tts_words_per_minute": "Uppskattad talartid för Companion TTS",
+          "tts_area_players": "Direkta TTS-spelare per rum",
+          "companion_tts_outputs": "TTS-enheter i Companion App",
+          "tts_voice": "TTS-röst",
+          "direct_tts_announce": "Utropsläge för direkta högtalare (kan spela en signal)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_engines": "Den enda aktiva talsyntesmotorn. Home Assistants förvalda TTS-motor väljs automatiskt när den finns tillgänglig.",
           "tts_media_player": "Den allmänna mediaspelaren som faktiskt spelar upp genererad TTS i den delade Snapserver-strömmen, till exempel MPD. Det är global infrastruktur som aldrig filtreras efter rum.",
           "tts_min_level": "Lägsta meddelandenivå som får läsas upp. Lägre nivåer är tysta; Kritisk hörs alltid.",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "tts_cache": "Generera och cachelagra TTS-ljudet före uppspelning när det är möjligt. Det minskar fördröjningen innan uppspelningen börjar och låter samma ljud återanvändas via den valda ljudvägen.",
+          "tts_language": "Språket som skickas till den valda TTS-motorn. Alternativen hämtas direkt från de språk som motorn uppger sig stödja.",
+          "tts_options": "Ytterligare alternativ för den valda TTS-motorn. Språk och tillgänglig röst konfigureras separat ovan; använd bara detta för leverantörens andra alternativ.",
+          "companion_tts_media_stream": "Ljudströmmen i Android som används för TTS via Companion App-aviseringar. Den styr hur telefonen behandlar volym och ljudfokus.",
+          "companion_tts_words_per_minute": "Används bara för att uppskatta hur länge Companion App spelar upp TTS, eftersom appen inte rapporterar när uppspelningen är klar. Kön väntar den uppskattade tiden för att undvika överlapp.",
           "snapcast_outputs": "Snapcast-klientmediaspelare som används som synkroniserade fysiska utgångar i rummen. Announcement Hub skickar inte TTS direkt till dem, utan styr ljudavstängning och routning medan den delade spelaren matar Snapserver.",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "companion_tts_outputs": "Android-enheter med Companion App som får ta emot TTS-aviseringar. Detta är skilt från vanliga visuella aviseringar på telefonen.",
+          "tts_area_players": "Direkta mediaspelare som får genererat TTS-ljud endast när deras Home Assistant-område motsvarar det upptagna rummet eller reservrummet. Varje vald spelare kopplas automatiskt till sitt rum.",
+          "tts_voice": "Röst som den aktiva TTS-motorn erbjuder för valt språk. Kompatibla regionala röster tas med (exempelvis el och el_GR). Om leverantören stöder röstval men inte kan lista rösterna går det ändå att ange ett röst-ID manuellt.",
+          "direct_tts_announce": "Aktivera Home Assistants announce-uppspelning för valda direkta mediaspelare. Om det stöds kan en kort signal höras och medier därefter återupptas. Stäng av för att undvika signaler från leverantören; direkt TTS kan då avbryta annan uppspelning. Den delade Snapcast-källan använder aldrig announce-läget."
         }
       },
       "notification_profile": {
         "title": "Integrationsalternativ: {integration}",
         "description": "Konfigurera aviseringarnas beteende och dirigering.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "Högsta antal tecken per del",
+          "reading_words_per_minute": "Läshastighet",
+          "minimum_display_seconds": "Kortaste visningstid",
+          "maximum_display_seconds": "Längsta visningstid",
+          "display_buffer_seconds": "Extra lästid",
+          "part_gap_seconds": "Mellanrum mellan delar",
+          "show_part_number": "Visa delnummer i rubriken",
+          "integration_data": "Ytterligare integrationsdata",
+          "replace_parts": "Ersätt föregående del i Companion App",
+          "position": "Placering",
+          "fontsize": "Teckenstorlek",
+          "color": "Bakgrundsfärg",
+          "transparency": "Bakgrundens genomskinlighet",
+          "interrupt": "Interaktiv avisering",
+          "snapcast_source": "Snapcast-källa för meddelanden",
+          "snapcast_only_source": "Hantera endast klienter som redan använder meddelandekällan",
+          "snapcast_settle_delay": "Fördröjning vid Snapcast-omkoppling",
+          "snapcast_verify_timeout": "Tidsgräns för verifiering av Snapcast-omkoppling",
+          "snapcast_restore": "Återställ ljudavstängning för Snapcast"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "max_length": "Maximalt antal tecken i en del av en visuell avisering. Längre text delas vid naturliga gränser; 0 inaktiverar uppdelningen.",
+          "reading_words_per_minute": "Läshastigheten som används för att uppskatta hur länge varje del av en visuell avisering ska visas innan nästa del skickas.",
+          "minimum_display_seconds": "Undre gräns för beräknad visningstid för varje del av en visuell avisering, även om texten är mycket kort.",
+          "maximum_display_seconds": "Övre gräns för beräknad visningstid för varje del av en visuell avisering, så att långa meddelanden inte blockerar kön på obestämd tid.",
+          "display_buffer_seconds": "Extra sekunder som läggs till den uppskattade lästiden för varje del av en visuell avisering.",
+          "part_gap_seconds": "Paus mellan uppdelade delar av en visuell avisering så att föregående del kan försvinna innan nästa levereras.",
+          "show_part_number": "Om alternativet är aktiverat får delade meddelanden en räknare som 1/3 eller 2/3 i rubriken.",
+          "integration_data": "Valfria leverantörsspecifika data som läggs till varje visuell avisering från denna integration. Motsvarande nycklar i notify_data som anges vid anropet har företräde.",
+          "replace_parts": "Återanvänd samma aviseringstagg för delade meddelanden i Companion App så att varje ny del ersätter den föregående i stället för att skapa en hög av aviseringar.",
+          "position": "Skärmposition där Notifications for Android TV / Fire TV visar aviseringsöverlägget.",
+          "fontsize": "Textstorlek för aviseringsöverlägget i Notifications for Android TV / Fire TV.",
+          "color": "Bakgrundsfärg på aviseringsöverlägget i Notifications for Android TV / Fire TV.",
+          "transparency": "Bakgrundens genomskinlighet på aviseringsöverlägget i Notifications for Android TV / Fire TV.",
+          "interrupt": "Om det är aktiverat blir Android TV-aviseringen interaktiv och kan avbryta den pågående tv-appen eller ta fokus.",
+          "snapcast_source": "Namnet på den Snapcast-källa eller ström som bär meddelandeljudet. Klienterna i valda rum kopplas om till den källan före talet.",
           "snapcast_only_source": "När detta är aktiverat ändrar Announcement Hub endast ljudavstängning för klienter som redan är anslutna till den inställda meddelandekällan; andra Snapcast-grupper och källor påverkas inte.",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "snapcast_settle_delay": "Kort fördröjning efter att Snapcast-omkoppling eller ljudavstängning ändrats och innan TTS börjar, så att klienterna hinner tillämpa ändringen.",
+          "snapcast_verify_timeout": "Längsta tid att vänta på att Snapcast-klienter bekräftar begärd omkoppling eller ljudavstängning innan systemet går vidare eller betraktar utgången som otillgänglig.",
+          "snapcast_restore": "Återställ efter meddelandet den tidigare ljudavstängningen för varje hanterad Snapcast-klient så att vanlig uppspelning kan fortsätta som tidigare."
         }
       },
       "queue": {
@@ -107,40 +107,40 @@
         "description": "Ställ in närvaro, reservvägar, dörrar, kö och tidsgränser.",
         "data": {
           "queue_max": "Max antal meddelanden i kö",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Väntan på otillgänglig utgång",
+          "idle_timeout": "Vänta på inaktivt ljud",
+          "start_timeout": "Tidsgräns för uppspelningsstart",
+          "playback_timeout": "Maximal uppspelningstid för TTS",
+          "post_play_delay": "Paus efter uppspelning",
+          "default_title": "Standardrubrik för aviseringar",
+          "critical_notify_data": "Data för kritiska aviseringar",
           "occupancy_sensor": "Närvaroentitet för rum",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "Värde för upptagna rum",
           "fallback_room": "Reservrum",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Kräv öppen dörr i upptaget rum för reservväg",
+          "fallback_door_label": "Filter för dörrsensoretikett",
           "default_use_ai": "Skriv om meddelanden med AI",
           "default_ai_agent": "Standardleverantör av AI (konversation eller AI-uppgift)",
           "fallback_ai_agent": "Reservleverantör av AI (konversation eller AI-uppgift)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Reservkanal för aviseringar"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "queue_max": "Högsta antal väntande eller aktiva meddelandejobb som kan accepteras. Nya förfrågningar avvisas när gränsen är nådd.",
+          "output_availability_timeout": "Hur länge en otillgänglig utgång får vänta. Andra körbara meddelanden kan passera den; när tidsgränsen nås hoppas den otillgängliga utgången över utan avisering.",
+          "idle_timeout": "Längsta tid att vänta på att den valda ljudvägen blir inaktiv innan TTS börjar, så att pågående uppspelning inte avbryts.",
+          "start_timeout": "Längsta tid en mediaspelare får på sig att börja TTS-uppspelningen efter uppspelningsbegäran.",
+          "playback_timeout": "Säkerhetsgräns för hur länge Announcement Hub väntar på att ett talat meddelande avslutas innan kön frigörs.",
+          "post_play_delay": "Kort tyst intervall efter talad uppspelning innan nästa ljud eller jobb börjar, för att undvika att ljudet kapas mellan meddelanden.",
+          "default_title": "Rubrik som används för visuella aviseringar när sändåtgärden inte anger någon egen rubrik.",
+          "critical_notify_data": "Leverantörsspecifika data som bara läggs till kritiska visuella aviseringar, till exempel prioritets- och brådskandealternativ som notifieringsintegrationen stöder.",
           "occupancy_sensor": "Entitet vars tillstånd eller valda attribut innehåller namn eller ID för de Home Assistant-områden som för närvarande är upptagna. Används bara om sändåtgärden har aktiverat routning till upptagna rum.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "occupancy_attribute": "Välj om upptagna rum ska läsas ur entitetens tillstånd eller något av dess aktuella attribut.",
           "fallback_room": "TTS-reservområde används endast om de aktuella målrummen saknar samtliga fasta rumskandidater. Befintliga fasta kandidater, även okända eller otillgängliga, hindrar reservroutning och omfattas av den vanliga väntetiden för tillgänglighet.",
           "fallback_check_door": "När detta är aktiverat tillåts reservroutning bara om en lämplig dörrsensor i något av målrummen uttryckligen rapporterar att dörren är öppen.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "fallback_door_label": "Valfri etikett i Home Assistant. Om den väljs får bara binära dörrsensorer med denna etikett tillåta reservvägen. Lämna tomt för att överväga alla dörrsensorer i de aktuella målrummen.",
           "default_use_ai": "När detta är aktiverat ärver alla meddelanden AI-omskrivning om inte sändåtgärden uttryckligen anger use_ai: false. Om use_ai utelämnas gäller denna inställning. Vid AI-fel skickas originaltexten. Kontrollera ai-status i åtgärdens response_variable.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "default_ai_agent": "Home Assistant-standard följer konversationsagenten i din föredragna Assist-pipeline, inte den inbyggda intent-agenten conversation.process. Agenten bestäms vid sändning och visas i listan. Om standardpipelinen använder den inbyggda agenten, välj uttryckligen en LLM-agent eller konfigurera en reservagent.",
+          "fallback_ai_agent": "Valfri reserv-AI-agent när den primära agenten misslyckas. Home Assistant-standard följer också din föredragna Assist-pipeline; alternativet Ursprungligt meddelande hoppar över ett andra AI-försök. Om ingen AI fungerar levereras alltid originaltexten.",
           "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande."
         }
       },
@@ -148,26 +148,26 @@
         "title": "Konfigurera om Announcement Hub",
         "description": "Välj ett avsnitt, spara och återgå till integrationen.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. Notifieringsutgångar och rum",
+          "edit_tts": "2. TTS-motorer och enheter",
+          "edit_profiles": "3. Leverantörsspecifika utgångsprofiler",
+          "edit_general": "4. Allmänna inställningar, närvaro och AI",
+          "edit_all": "Redigera alla inställningar (fullständig guide)",
           "edit_people": "5. Personer och röster",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "Avancerade AI-instruktioner",
+          "edit_audio": "Ljud, signal och volymsänkning",
+          "edit_room_safety": "Närvarokontroll för rum"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_outputs": "Välj notifieringsenheter, rumstillhörighet och lägsta varningsnivåer utan att ändra TTS- eller AI-inställningar.",
+          "edit_tts": "Ändra aktiv talmotor, röst, rumsspelare, Snapcast-klienter och talanordningar i Companion App.",
+          "edit_profiles": "Konfigurera visningstider för aviseringar, visningsstilar och Snapcast-uppspelning för valda leverantörer.",
+          "edit_general": "Gå direkt till primära och reserv-AI-agenter, beläggning, reservrum, kö och tidsgränser.",
+          "edit_all": "Gå igenom alla inställningssidor i ordning, precis som i den ursprungliga konfigurationsguiden.",
           "edit_people": "Configure tracked people, room sensors, languages and voices.",
-          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
-          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
-          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
+          "edit_advanced_ai": "Redigera valfria AI-stilar för omskrivning, översättning och kombinationen av dem. Grundläggande säkerhetsregler för enheter och verktyg förblir fasta.",
+          "edit_audio": "Konfigurera en signal som bara spelas i direktanslutna rumshögtalare och valfri sänkning av musikvolymen, aldrig i den delade Snapcast-källan.",
+          "edit_room_safety": "Konfigurera en valfri närvarosensor för ett rum; otillgängliga sensorer utlöser aldrig reservväg till ett annat rum."
         }
       },
       "people": {
@@ -178,8 +178,8 @@
           "person_group_language": "Gruppspråk",
           "person_group_voice": "Gruppröst",
           "person_group_translate": "Översätt gruppmeddelanden",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "Gruppens AI-leverantör",
+          "person_group_tts_engine": "Gruppens TTS-motor",
           "person_group_rewrite": "Skriv om gruppmeddelanden",
           "person_group_addressee": "Gruppens tilltalsnamn",
           "person_group_greeting": "Tilltala grupper automatiskt"
@@ -189,8 +189,8 @@
           "person_group_language": "Valfri språkkod för meddelanden till flera valda personer i samma rum.",
           "person_group_voice": "Valfritt TTS-röst-ID för meddelanden till flera personer i samma rum.",
           "person_group_translate": "Översätt gruppmeddelanden automatiskt till gruppens språk med vald AI-agent eller reservagent. Vid fel används originaltexten.",
-          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
-          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_agent": "Valfri Conversation- eller AI Task-agent för grupperade mottagare. Agenten som uttryckligen anges i åtgärden har företräde.",
+          "person_group_tts_engine": "Valfri TTS-motor för personer i samma rum. Den väljer endast talinfrastruktur och lägger aldrig till ytterligare mottagarenheter.",
           "person_group_rewrite": "Skriv om meddelanden med gruppens AI-agent. Översättning kan konfigureras separat.",
           "person_group_addressee": "Valfri grupphälsning (t.ex. Familjen). Används endast om hälsningar är aktiverade eller om {{ name }} förekommer ordagrant.",
           "person_group_greeting": "Lägg grupphälsningen först i gruppmeddelanden. Avstängt som standard; lägger inte till mottagare."
@@ -210,7 +210,7 @@
           "destination_tablet": "Surfplatteutgångar",
           "destination_other": "Övriga personliga utgångar",
           "enabled": "Tillåt meddelanden till personen",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "Sensor för närvarobekräftelse",
           "verify_presence": "Verifiera närvaro",
           "rewrite": "Skriv om meddelanden",
           "ai_agent": "Personlig AI-agent",
@@ -228,81 +228,81 @@
           "destination_watch": "Välj befintliga notifierings- eller mediaspelarutgångar för personens klocka. Endast tilldelade utgångar används.",
           "destination_tablet": "Välj befintliga notifierings- eller mediaspelarutgångar för personens surfplatta. Endast tilldelade utgångar används.",
           "destination_other": "Andra befintliga Home Assistant-utgångar som tilldelats personen och används endast när Annat väljs.",
-          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "enabled": "Stäng av för att blockera både nya och redan köade meddelanden till denna person. De omdirigeras inte till en annan person eller ett annat rum.",
           "presence_sensor": "Valfri binärsensor för att bekräfta personens närvaro vid leverans till ett rum.",
-          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "verify_presence": "Kräv att den valda närvarosensorn är på vid leverans. Saknade eller otillgängliga sensorer blockerar leverans till personen i rummet.",
           "rewrite": "Aktivera omskrivning för den här personen oberoende av översättningsinställningen.",
           "ai_agent": "Valfri AI Task- eller Conversation-agent för den här personen. Åsidosätter den globala leverantören om åtgärden inte väljer en annan.",
           "tts_engine": "Valfri TTS-entitet för den här personen; åsidosätter den globala talmotorn utan att ändra mottagarenheter.",
-          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "greeting": "Lägg till tilltalsnamnet först i meddelanden, utom när texten redan innehåller den bokstavliga platshållaren {{ name }}.",
           "address": "Valfritt tilltalsnamn för den här personen. Om fältet lämnas tomt används visningsnamnet från Home Assistant."
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "Avancerade AI-stilinstruktioner",
+        "description": "Valfria stilinstruktioner för omskrivning, översättning eller båda. Fasta säkerhetsregler och JSON-krav gäller alltid.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "Omskrivningsstil",
+          "translate": "Översättningsstil",
+          "both": "Kombinerad omskrivnings- och översättningsstil"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "Valfri preferens i ren text; endast {message} och {language} får användas som platshållare.",
+          "translate": "Valfri översättningspreferens för vald AI utan att ändra fakta eller tillåta åtgärder.",
+          "both": "Valfri stilpreferens när både översättning och omskrivning är aktiverade."
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "Direkta ljudinställningar för rum",
+        "description": "Valfri signal och volymsänkning endast för valda direkta rumshögtalare, aldrig för delad Snapcast-uppspelning.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "Aktivera signal före meddelande",
+          "person_chime_url": "Lokal sökväg till signalljud",
+          "person_chime_delay": "Fördröjning efter signal",
+          "person_output_ducking": "Sänk volymen på pågående ljud",
+          "person_duck_factor": "Faktor för musikvolym"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "Avstängt som standard. Signalen spelas bara på en uttryckligen vald direkt spelare i ett rum.",
+          "person_chime_url": "En lokal ljudfil, till exempel /local/chime.mp3; fjärradresser stöds inte.",
+          "person_chime_delay": "Maximal tid för att avsluta signalen i rummet innan TTS börjar.",
+          "person_output_ducking": "Avstängt som standard. Spara volymen på en aktiv direkt rumsspelare, sänk den under tal och återställ den därefter.",
+          "person_duck_factor": "Andel av den ursprungliga musikvolymen medan meddelandet spelas; endast direkta rumsspelare påverkas."
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "Närvarokontroll för rum",
+        "description": "Konfigurera en valfri sensor som uttryckligen bekräftar närvaro i ett valt Home Assistant-område.",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "Område",
+          "verify_presence": "Kräv närvarobekräftelse",
+          "presence_sensor": "Närvarosensor för rum"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "Välj det område där närvarokontroll ska läggas till eller tas bort.",
+          "verify_presence": "Spela bara upp personliga rumsmeddelanden om den valda sensorn är på; saknade uppgifter blockerar leveransen.",
+          "presence_sensor": "Välj en binary_sensor-entitet för närvaro eller beläggning som fysiskt hör till området."
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "Välj en TTS-mediaspelare när TTS-motorer har valts.",
+      "tts_engine_required": "Välj en TTS-motor när en TTS-spelare har valts.",
+      "snapcast_tts_path_required": "Snapcast-utgångar kräver minst en TTS-motor och en TTS-mediaspelare.",
+      "output_required": "Välj minst en visuell utgång, server-TTS-utgång eller Companion App TTS-utgång.",
+      "display_time_order": "Den maximala visningstiden måste vara minst lika lång som den minimala.",
+      "room_notify_area_required": "En notifieringsenhet som är knuten till ett rum måste ha ett Home Assistant-område.",
+      "notify_level_overlap": "En notifieringsenhet får endast tilldelas en lägsta aviseringsnivå.",
+      "room_tts_area_required": "En direkt TTS-mediaspelare som är knuten till ett rum måste ha ett Home Assistant-område.",
+      "tts_player_role_overlap": "Samma mediaspelare kan inte vara både direkt TTS-spelare och spelare för den delade Snapcast-källan.",
       "invalid_person_output": "Den valda personliga utgången finns inte eller är inaktiverad.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "En egen AI-stil får bara använda platshållarna {message} och {language} och får inte överstiga 1200 tecken.",
+      "invalid_chime_url": "Signalljudet måste vara en fil under /local/.",
+      "invalid_person_area": "Välj ett giltigt rum i Home Assistant.",
+      "invalid_person_presence": "Välj en närvarosensor innan kontrollen aktiveras."
     },
     "abort": {
-      "single_instance_allowed": "Announcement Hub is already configured."
+      "single_instance_allowed": "Announcement Hub är redan konfigurerat."
     }
   },
   "options": {
@@ -313,18 +313,18 @@
         "data": {
           "notify_outputs": "Aviseringsenheter",
           "notify_room_outputs": "Aviseringsenheter per rum",
-          "notify_info_outputs": "Minimum Info / Success",
-          "notify_warning_outputs": "Minimum Warning",
-          "notify_error_outputs": "Minimum Error",
-          "notify_critical_outputs": "Critical only"
+          "notify_info_outputs": "Minst Info / Lyckat",
+          "notify_warning_outputs": "Minst Varning",
+          "notify_error_outputs": "Minst Fel",
+          "notify_critical_outputs": "Endast Kritisk"
         },
         "data_description": {
-          "notify_outputs": "Recognised notification entities that Announcement Hub may use. All supported devices are selected automatically; remove any device you never want Announcement Hub to notify.",
+          "notify_outputs": "Igenkända notifieringsentiteter som Announcement Hub får använda. Alla stödda enheter väljs automatiskt; ta bort enheter som du aldrig vill att Announcement Hub ska skicka aviseringar till.",
           "notify_room_outputs": "Valda notifieringsenheter vars Home Assistant-område måste matcha det upptagna rummet eller reservrummet. Ta inte med flyttbara enheter som telefoner, klockor och bärbara datorer.",
-          "notify_info_outputs": "Devices in this list receive Info and Success announcements and every higher level. Devices not assigned to any higher-level list use Debug and therefore receive every level.",
-          "notify_warning_outputs": "Devices in this list receive Warning, Error, and Critical announcements, but not Debug, Info, or Success.",
-          "notify_error_outputs": "Devices in this list receive only Error and Critical announcements.",
-          "notify_critical_outputs": "Devices in this list receive only Critical announcements."
+          "notify_info_outputs": "Enheter i denna lista får meddelanden på nivån Info och Lyckat samt alla högre nivåer. Enheter som inte har tilldelats någon lista med högre lägstanivå använder Debug och får därför alla nivåer.",
+          "notify_warning_outputs": "Enheter i listan får meddelanden på nivåerna Varning, Fel och Kritisk, men inte Debug, Info eller Lyckat.",
+          "notify_error_outputs": "Enheter i listan får endast meddelanden på nivåerna Fel och Kritisk.",
+          "notify_critical_outputs": "Enheter i listan får endast kritiska meddelanden."
         }
       },
       "tts": {
@@ -334,77 +334,77 @@
           "tts_engines": "TTS-motor",
           "tts_media_player": "Delad mediaspelare för Snapcast",
           "snapcast_outputs": "Snapcast-klienter per rum",
-          "tts_min_level": "Use TTS from level",
-          "tts_cache": "Pre-generate and cache speech",
-          "tts_language": "TTS language",
-          "tts_options": "TTS engine options",
-          "companion_tts_media_stream": "Companion App audio stream",
-          "companion_tts_words_per_minute": "Companion TTS speech estimate",
-          "tts_area_players": "Direct TTS players per room",
-          "companion_tts_outputs": "Companion App TTS devices",
-          "tts_voice": "TTS voice",
-          "direct_tts_announce": "Direct-speaker announcement mode (may chime)"
+          "tts_min_level": "Använd TTS från nivån",
+          "tts_cache": "Förgenerera och cachelagra tal",
+          "tts_language": "TTS-språk",
+          "tts_options": "Alternativ för TTS-motor",
+          "companion_tts_media_stream": "Ljudström för Companion App",
+          "companion_tts_words_per_minute": "Uppskattad talartid för Companion TTS",
+          "tts_area_players": "Direkta TTS-spelare per rum",
+          "companion_tts_outputs": "TTS-enheter i Companion App",
+          "tts_voice": "TTS-röst",
+          "direct_tts_announce": "Utropsläge för direkta högtalare (kan spela en signal)"
         },
         "data_description": {
-          "tts_engines": "The single active speech engine. Home Assistant's default TTS engine is preselected when available.",
+          "tts_engines": "Den enda aktiva talsyntesmotorn. Home Assistants förvalda TTS-motor väljs automatiskt när den finns tillgänglig.",
           "tts_media_player": "Den allmänna mediaspelaren som faktiskt spelar upp genererad TTS i den delade Snapserver-strömmen, till exempel MPD. Det är global infrastruktur som aldrig filtreras efter rum.",
           "tts_min_level": "Lägsta meddelandenivå som får läsas upp. Lägre nivåer är tysta; Kritisk hörs alltid.",
-          "tts_cache": "Generate/cache the TTS media before playback when possible. This reduces playback-start delay and lets the same generated media be reused by the selected output path.",
-          "tts_language": "Language passed to the selected TTS engine. Choices come directly from the engine's advertised supported languages.",
-          "tts_options": "Additional engine-specific TTS options. Language and supported voice are configured separately above; use this only for other provider options.",
-          "companion_tts_media_stream": "Android audio stream used for Companion App push-TTS, controlling how the phone treats volume/focus.",
-          "companion_tts_words_per_minute": "Used only to estimate how long Companion App push-TTS is speaking because the app does not report playback completion. The queue waits this estimate to prevent overlap.",
+          "tts_cache": "Generera och cachelagra TTS-ljudet före uppspelning när det är möjligt. Det minskar fördröjningen innan uppspelningen börjar och låter samma ljud återanvändas via den valda ljudvägen.",
+          "tts_language": "Språket som skickas till den valda TTS-motorn. Alternativen hämtas direkt från de språk som motorn uppger sig stödja.",
+          "tts_options": "Ytterligare alternativ för den valda TTS-motorn. Språk och tillgänglig röst konfigureras separat ovan; använd bara detta för leverantörens andra alternativ.",
+          "companion_tts_media_stream": "Ljudströmmen i Android som används för TTS via Companion App-aviseringar. Den styr hur telefonen behandlar volym och ljudfokus.",
+          "companion_tts_words_per_minute": "Används bara för att uppskatta hur länge Companion App spelar upp TTS, eftersom appen inte rapporterar när uppspelningen är klar. Kön väntar den uppskattade tiden för att undvika överlapp.",
           "snapcast_outputs": "Snapcast-klientmediaspelare som används som synkroniserade fysiska utgångar i rummen. Announcement Hub skickar inte TTS direkt till dem, utan styr ljudavstängning och routning medan den delade spelaren matar Snapserver.",
-          "companion_tts_outputs": "Android Companion App devices allowed to receive push-TTS. This is separate from normal visual phone notifications.",
-          "tts_area_players": "Direct media players that receive generated TTS only when their Home Assistant area matches the occupied/fallback room. Every player selected here is automatically room-scoped.",
-          "tts_voice": "Voice offered by the active TTS engine for the selected language. Locale-compatible voices are included (for example el with el_GR). If the provider supports voice but cannot enumerate choices, the field remains available for a manual voice ID.",
-          "direct_tts_announce": "Turn on to use Home Assistant's announce playback mode for selected direct media players, which may play a short bell and resume media when supported. Turn off to avoid provider-generated bells; direct TTS may interrupt other playback. The shared Snapcast source never uses announce mode."
+          "companion_tts_outputs": "Android-enheter med Companion App som får ta emot TTS-aviseringar. Detta är skilt från vanliga visuella aviseringar på telefonen.",
+          "tts_area_players": "Direkta mediaspelare som får genererat TTS-ljud endast när deras Home Assistant-område motsvarar det upptagna rummet eller reservrummet. Varje vald spelare kopplas automatiskt till sitt rum.",
+          "tts_voice": "Röst som den aktiva TTS-motorn erbjuder för valt språk. Kompatibla regionala röster tas med (exempelvis el och el_GR). Om leverantören stöder röstval men inte kan lista rösterna går det ändå att ange ett röst-ID manuellt.",
+          "direct_tts_announce": "Aktivera Home Assistants announce-uppspelning för valda direkta mediaspelare. Om det stöds kan en kort signal höras och medier därefter återupptas. Stäng av för att undvika signaler från leverantören; direkt TTS kan då avbryta annan uppspelning. Den delade Snapcast-källan använder aldrig announce-läget."
         }
       },
       "notification_profile": {
         "title": "Integrationsalternativ: {integration}",
         "description": "Konfigurera aviseringarnas beteende och dirigering.",
         "data": {
-          "max_length": "Maximum characters per part",
-          "reading_words_per_minute": "Reading speed",
-          "minimum_display_seconds": "Minimum display time",
-          "maximum_display_seconds": "Maximum display time",
-          "display_buffer_seconds": "Reading-time buffer",
-          "part_gap_seconds": "Gap between parts",
-          "show_part_number": "Show part number in the title",
-          "integration_data": "Additional integration data",
-          "replace_parts": "Replace the previous Companion App part",
-          "position": "Position",
-          "fontsize": "Font size",
-          "color": "Background color",
-          "transparency": "Background transparency",
-          "interrupt": "Interactive notification",
-          "snapcast_source": "Announcement Snapcast source",
-          "snapcast_only_source": "Manage only clients already on announcement source",
-          "snapcast_settle_delay": "Snapcast routing settle delay",
-          "snapcast_verify_timeout": "Snapcast routing verification timeout",
-          "snapcast_restore": "Restore Snapcast mute states"
+          "max_length": "Högsta antal tecken per del",
+          "reading_words_per_minute": "Läshastighet",
+          "minimum_display_seconds": "Kortaste visningstid",
+          "maximum_display_seconds": "Längsta visningstid",
+          "display_buffer_seconds": "Extra lästid",
+          "part_gap_seconds": "Mellanrum mellan delar",
+          "show_part_number": "Visa delnummer i rubriken",
+          "integration_data": "Ytterligare integrationsdata",
+          "replace_parts": "Ersätt föregående del i Companion App",
+          "position": "Placering",
+          "fontsize": "Teckenstorlek",
+          "color": "Bakgrundsfärg",
+          "transparency": "Bakgrundens genomskinlighet",
+          "interrupt": "Interaktiv avisering",
+          "snapcast_source": "Snapcast-källa för meddelanden",
+          "snapcast_only_source": "Hantera endast klienter som redan använder meddelandekällan",
+          "snapcast_settle_delay": "Fördröjning vid Snapcast-omkoppling",
+          "snapcast_verify_timeout": "Tidsgräns för verifiering av Snapcast-omkoppling",
+          "snapcast_restore": "Återställ ljudavstängning för Snapcast"
         },
         "data_description": {
-          "max_length": "Maximum number of characters sent in one visual notification part. Text longer than this is split at natural boundaries; 0 disables splitting.",
-          "reading_words_per_minute": "Reading speed used to estimate how long each visual notification part should remain visible before the next part is sent.",
-          "minimum_display_seconds": "Lower limit for the calculated display duration of each visual notification part, even when the text is very short.",
-          "maximum_display_seconds": "Upper limit for the calculated display duration of each visual notification part, preventing long messages from blocking the queue indefinitely.",
-          "display_buffer_seconds": "Additional seconds added to the reading-time estimate for every visual notification part.",
-          "part_gap_seconds": "Pause inserted between split visual notification parts so the previous part can clear before the next one is delivered.",
-          "show_part_number": "When enabled, split messages add counters such as 1/3 and 2/3 to the notification title.",
-          "integration_data": "Optional provider-specific payload merged into every visual notification sent through this integration. Per-call notify_data overrides matching keys.",
-          "replace_parts": "For Companion App split messages, reuse one notification tag so each new part replaces the previous part instead of creating a stack.",
-          "position": "Screen position where Notifications for Android TV / Fire TV displays the notification overlay.",
-          "fontsize": "Text size used by Notifications for Android TV / Fire TV when rendering the notification overlay.",
-          "color": "Background color used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "transparency": "Background transparency used by Notifications for Android TV / Fire TV for the notification overlay.",
-          "interrupt": "When enabled, the Android TV notification is interactive and may interrupt or take focus from the currently running TV application.",
-          "snapcast_source": "Name of the Snapcast source/stream that carries announcement audio. Selected room clients are routed to this source before speech.",
+          "max_length": "Maximalt antal tecken i en del av en visuell avisering. Längre text delas vid naturliga gränser; 0 inaktiverar uppdelningen.",
+          "reading_words_per_minute": "Läshastigheten som används för att uppskatta hur länge varje del av en visuell avisering ska visas innan nästa del skickas.",
+          "minimum_display_seconds": "Undre gräns för beräknad visningstid för varje del av en visuell avisering, även om texten är mycket kort.",
+          "maximum_display_seconds": "Övre gräns för beräknad visningstid för varje del av en visuell avisering, så att långa meddelanden inte blockerar kön på obestämd tid.",
+          "display_buffer_seconds": "Extra sekunder som läggs till den uppskattade lästiden för varje del av en visuell avisering.",
+          "part_gap_seconds": "Paus mellan uppdelade delar av en visuell avisering så att föregående del kan försvinna innan nästa levereras.",
+          "show_part_number": "Om alternativet är aktiverat får delade meddelanden en räknare som 1/3 eller 2/3 i rubriken.",
+          "integration_data": "Valfria leverantörsspecifika data som läggs till varje visuell avisering från denna integration. Motsvarande nycklar i notify_data som anges vid anropet har företräde.",
+          "replace_parts": "Återanvänd samma aviseringstagg för delade meddelanden i Companion App så att varje ny del ersätter den föregående i stället för att skapa en hög av aviseringar.",
+          "position": "Skärmposition där Notifications for Android TV / Fire TV visar aviseringsöverlägget.",
+          "fontsize": "Textstorlek för aviseringsöverlägget i Notifications for Android TV / Fire TV.",
+          "color": "Bakgrundsfärg på aviseringsöverlägget i Notifications for Android TV / Fire TV.",
+          "transparency": "Bakgrundens genomskinlighet på aviseringsöverlägget i Notifications for Android TV / Fire TV.",
+          "interrupt": "Om det är aktiverat blir Android TV-aviseringen interaktiv och kan avbryta den pågående tv-appen eller ta fokus.",
+          "snapcast_source": "Namnet på den Snapcast-källa eller ström som bär meddelandeljudet. Klienterna i valda rum kopplas om till den källan före talet.",
           "snapcast_only_source": "När detta är aktiverat ändrar Announcement Hub endast ljudavstängning för klienter som redan är anslutna till den inställda meddelandekällan; andra Snapcast-grupper och källor påverkas inte.",
-          "snapcast_settle_delay": "Short delay after changing Snapcast routing/mute state before TTS starts, allowing clients to apply the routing change.",
-          "snapcast_verify_timeout": "Maximum time to wait for Snapcast clients to report the requested routing/mute state before continuing or treating the route as unavailable.",
-          "snapcast_restore": "After the announcement, restore each managed Snapcast client's previous mute state so normal listening resumes exactly as before."
+          "snapcast_settle_delay": "Kort fördröjning efter att Snapcast-omkoppling eller ljudavstängning ändrats och innan TTS börjar, så att klienterna hinner tillämpa ändringen.",
+          "snapcast_verify_timeout": "Längsta tid att vänta på att Snapcast-klienter bekräftar begärd omkoppling eller ljudavstängning innan systemet går vidare eller betraktar utgången som otillgänglig.",
+          "snapcast_restore": "Återställ efter meddelandet den tidigare ljudavstängningen för varje hanterad Snapcast-klient så att vanlig uppspelning kan fortsätta som tidigare."
         }
       },
       "queue": {
@@ -412,67 +412,67 @@
         "description": "Ställ in närvaro, reservvägar, dörrar, kö och tidsgränser.",
         "data": {
           "queue_max": "Max antal meddelanden i kö",
-          "output_availability_timeout": "Unavailable-output wait",
-          "idle_timeout": "Audio idle wait",
-          "start_timeout": "Playback start timeout",
-          "playback_timeout": "Maximum TTS playback time",
-          "post_play_delay": "Post-playback gap",
-          "default_title": "Default notification title",
-          "critical_notify_data": "Critical notification data",
+          "output_availability_timeout": "Väntan på otillgänglig utgång",
+          "idle_timeout": "Vänta på inaktivt ljud",
+          "start_timeout": "Tidsgräns för uppspelningsstart",
+          "playback_timeout": "Maximal uppspelningstid för TTS",
+          "post_play_delay": "Paus efter uppspelning",
+          "default_title": "Standardrubrik för aviseringar",
+          "critical_notify_data": "Data för kritiska aviseringar",
           "occupancy_sensor": "Närvaroentitet för rum",
-          "occupancy_attribute": "Occupied rooms value",
+          "occupancy_attribute": "Värde för upptagna rum",
           "fallback_room": "Reservrum",
-          "fallback_check_door": "Require an open occupied-room door for fallback",
-          "fallback_door_label": "Door sensor label filter",
+          "fallback_check_door": "Kräv öppen dörr i upptaget rum för reservväg",
+          "fallback_door_label": "Filter för dörrsensoretikett",
           "default_use_ai": "Skriv om meddelanden med AI",
           "default_ai_agent": "Standardleverantör av AI (konversation eller AI-uppgift)",
           "fallback_ai_agent": "Reservleverantör av AI (konversation eller AI-uppgift)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Reservkanal för aviseringar"
         },
         "data_description": {
-          "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
-          "output_availability_timeout": "How long an unavailable output may remain pending. Other runnable announcements can pass it; after this timeout the unavailable output is skipped silently.",
-          "idle_timeout": "Maximum time to wait for the selected audio path to become idle before starting TTS, preventing an existing playback from being interrupted.",
-          "start_timeout": "Maximum time allowed for a media player to begin the TTS playback after the play request is sent.",
-          "playback_timeout": "Safety limit for how long Announcement Hub waits for one spoken playback to finish before releasing the queue.",
-          "post_play_delay": "Small quiet gap after audible playback before the next audible output/job may start, preventing back-to-back clipping.",
-          "default_title": "Title used for visual notifications when the send action does not provide its own title.",
-          "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
+          "queue_max": "Högsta antal väntande eller aktiva meddelandejobb som kan accepteras. Nya förfrågningar avvisas när gränsen är nådd.",
+          "output_availability_timeout": "Hur länge en otillgänglig utgång får vänta. Andra körbara meddelanden kan passera den; när tidsgränsen nås hoppas den otillgängliga utgången över utan avisering.",
+          "idle_timeout": "Längsta tid att vänta på att den valda ljudvägen blir inaktiv innan TTS börjar, så att pågående uppspelning inte avbryts.",
+          "start_timeout": "Längsta tid en mediaspelare får på sig att börja TTS-uppspelningen efter uppspelningsbegäran.",
+          "playback_timeout": "Säkerhetsgräns för hur länge Announcement Hub väntar på att ett talat meddelande avslutas innan kön frigörs.",
+          "post_play_delay": "Kort tyst intervall efter talad uppspelning innan nästa ljud eller jobb börjar, för att undvika att ljudet kapas mellan meddelanden.",
+          "default_title": "Rubrik som används för visuella aviseringar när sändåtgärden inte anger någon egen rubrik.",
+          "critical_notify_data": "Leverantörsspecifika data som bara läggs till kritiska visuella aviseringar, till exempel prioritets- och brådskandealternativ som notifieringsintegrationen stöder.",
           "occupancy_sensor": "Entitet vars tillstånd eller valda attribut innehåller namn eller ID för de Home Assistant-områden som för närvarande är upptagna. Används bara om sändåtgärden har aktiverat routning till upptagna rum.",
-          "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
+          "occupancy_attribute": "Välj om upptagna rum ska läsas ur entitetens tillstånd eller något av dess aktuella attribut.",
           "fallback_room": "TTS-reservområde används endast om de aktuella målrummen saknar samtliga fasta rumskandidater. Befintliga fasta kandidater, även okända eller otillgängliga, hindrar reservroutning och omfattas av den vanliga väntetiden för tillgänglighet.",
           "fallback_check_door": "När detta är aktiverat tillåts reservroutning bara om en lämplig dörrsensor i något av målrummen uttryckligen rapporterar att dörren är öppen.",
-          "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
+          "fallback_door_label": "Valfri etikett i Home Assistant. Om den väljs får bara binära dörrsensorer med denna etikett tillåta reservvägen. Lämna tomt för att överväga alla dörrsensorer i de aktuella målrummen.",
           "default_use_ai": "När detta är aktiverat ärver alla meddelanden AI-omskrivning om inte sändåtgärden uttryckligen anger use_ai: false. Om use_ai utelämnas gäller denna inställning. Vid AI-fel skickas originaltexten. Kontrollera ai-status i åtgärdens response_variable.",
-          "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
-          "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
+          "default_ai_agent": "Home Assistant-standard följer konversationsagenten i din föredragna Assist-pipeline, inte den inbyggda intent-agenten conversation.process. Agenten bestäms vid sändning och visas i listan. Om standardpipelinen använder den inbyggda agenten, välj uttryckligen en LLM-agent eller konfigurera en reservagent.",
+          "fallback_ai_agent": "Valfri reserv-AI-agent när den primära agenten misslyckas. Home Assistant-standard följer också din föredragna Assist-pipeline; alternativet Ursprungligt meddelande hoppar över ett andra AI-försök. Om ingen AI fungerar levereras alltid originaltexten.",
           "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande."
         }
       },
       "init": {
-        "title": "Configure Announcement Hub",
+        "title": "Konfigurera Announcement Hub",
         "description": "Välj ett avsnitt, spara och återgå till integrationen.",
         "menu_options": {
-          "edit_outputs": "1. Notification outputs & rooms",
-          "edit_tts": "2. TTS engines & devices",
-          "edit_profiles": "3. Provider-specific output profiles",
-          "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_outputs": "1. Notifieringsutgångar och rum",
+          "edit_tts": "2. TTS-motorer och enheter",
+          "edit_profiles": "3. Leverantörsspecifika utgångsprofiler",
+          "edit_general": "4. Allmänna inställningar, närvaro och AI",
+          "edit_all": "Redigera alla inställningar (fullständig guide)",
           "edit_people": "5. Personer och röster",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "Avancerade AI-instruktioner",
+          "edit_audio": "Ljud, signal och volymsänkning",
+          "edit_room_safety": "Närvarokontroll för rum"
         },
         "menu_option_descriptions": {
-          "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
-          "edit_tts": "Change the active speech engine, voice, room players, Snapcast clients and Companion App speech devices.",
-          "edit_profiles": "Configure notification timing, display styles and Snapcast playback settings for the selected providers.",
-          "edit_general": "Jump directly to AI and backup agents, occupancy, room fallback, queue and timeout settings.",
-          "edit_all": "Visit all setup pages in order, as in the original configuration wizard.",
+          "edit_outputs": "Välj notifieringsenheter, rumstillhörighet och lägsta varningsnivåer utan att ändra TTS- eller AI-inställningar.",
+          "edit_tts": "Ändra aktiv talmotor, röst, rumsspelare, Snapcast-klienter och talanordningar i Companion App.",
+          "edit_profiles": "Konfigurera visningstider för aviseringar, visningsstilar och Snapcast-uppspelning för valda leverantörer.",
+          "edit_general": "Gå direkt till primära och reserv-AI-agenter, beläggning, reservrum, kö och tidsgränser.",
+          "edit_all": "Gå igenom alla inställningssidor i ordning, precis som i den ursprungliga konfigurationsguiden.",
           "edit_people": "Configure tracked people, room sensors, languages and voices.",
-          "edit_advanced_ai": "Edit optional AI styles for rewrite, translation and combined operations. Core device/tool safety rules remain fixed.",
-          "edit_audio": "Configure direct-room-only chime and opt-in music volume ducking, never a shared Snapcast source.",
-          "edit_room_safety": "Configure one room's optional occupancy verification sensor; unavailable sensors never trigger another-room fallback."
+          "edit_advanced_ai": "Redigera valfria AI-stilar för omskrivning, översättning och kombinationen av dem. Grundläggande säkerhetsregler för enheter och verktyg förblir fasta.",
+          "edit_audio": "Konfigurera en signal som bara spelas i direktanslutna rumshögtalare och valfri sänkning av musikvolymen, aldrig i den delade Snapcast-källan.",
+          "edit_room_safety": "Konfigurera en valfri närvarosensor för ett rum; otillgängliga sensorer utlöser aldrig reservväg till ett annat rum."
         }
       },
       "people": {
@@ -483,8 +483,8 @@
           "person_group_language": "Gruppspråk",
           "person_group_voice": "Gruppröst",
           "person_group_translate": "Översätt gruppmeddelanden",
-          "person_group_agent": "Group AI provider",
-          "person_group_tts_engine": "Group TTS engine",
+          "person_group_agent": "Gruppens AI-leverantör",
+          "person_group_tts_engine": "Gruppens TTS-motor",
           "person_group_rewrite": "Skriv om gruppmeddelanden",
           "person_group_addressee": "Gruppens tilltalsnamn",
           "person_group_greeting": "Tilltala grupper automatiskt"
@@ -494,8 +494,8 @@
           "person_group_language": "Valfri språkkod för meddelanden till flera valda personer i samma rum.",
           "person_group_voice": "Valfritt TTS-röst-ID för meddelanden till flera personer i samma rum.",
           "person_group_translate": "Översätt gruppmeddelanden automatiskt till gruppens språk med vald AI-agent eller reservagent. Vid fel används originaltexten.",
-          "person_group_agent": "Optional Conversation or AI Task agent for grouped recipients. Explicit action agent takes priority.",
-          "person_group_tts_engine": "Optional TTS engine for people sharing a room; this selects speech infrastructure only and never adds other output devices.",
+          "person_group_agent": "Valfri Conversation- eller AI Task-agent för grupperade mottagare. Agenten som uttryckligen anges i åtgärden har företräde.",
+          "person_group_tts_engine": "Valfri TTS-motor för personer i samma rum. Den väljer endast talinfrastruktur och lägger aldrig till ytterligare mottagarenheter.",
           "person_group_rewrite": "Skriv om meddelanden med gruppens AI-agent. Översättning kan konfigureras separat.",
           "person_group_addressee": "Valfri grupphälsning (t.ex. Familjen). Används endast om hälsningar är aktiverade eller om {{ name }} förekommer ordagrant.",
           "person_group_greeting": "Lägg grupphälsningen först i gruppmeddelanden. Avstängt som standard; lägger inte till mottagare."
@@ -515,7 +515,7 @@
           "destination_tablet": "Surfplatteutgångar",
           "destination_other": "Övriga personliga utgångar",
           "enabled": "Tillåt meddelanden till personen",
-          "presence_sensor": "Presence verification sensor",
+          "presence_sensor": "Sensor för närvarobekräftelse",
           "verify_presence": "Verifiera närvaro",
           "rewrite": "Skriv om meddelanden",
           "ai_agent": "Personlig AI-agent",
@@ -533,85 +533,85 @@
           "destination_watch": "Välj befintliga notifierings- eller mediaspelarutgångar för personens klocka. Endast tilldelade utgångar används.",
           "destination_tablet": "Välj befintliga notifierings- eller mediaspelarutgångar för personens surfplatta. Endast tilldelade utgångar används.",
           "destination_other": "Andra befintliga Home Assistant-utgångar som tilldelats personen och används endast när Annat väljs.",
-          "enabled": "Turn off to block new and already queued announcements to this person. Does not redirect to another person or room.",
+          "enabled": "Stäng av för att blockera både nya och redan köade meddelanden till denna person. De omdirigeras inte till en annan person eller ett annat rum.",
           "presence_sensor": "Valfri binärsensor för att bekräfta personens närvaro vid leverans till ett rum.",
-          "verify_presence": "Require the selected presence sensor to be on at delivery time. Missing or unavailable sensors block person Room delivery.",
+          "verify_presence": "Kräv att den valda närvarosensorn är på vid leverans. Saknade eller otillgängliga sensorer blockerar leverans till personen i rummet.",
           "rewrite": "Aktivera omskrivning för den här personen oberoende av översättningsinställningen.",
           "ai_agent": "Valfri AI Task- eller Conversation-agent för den här personen. Åsidosätter den globala leverantören om åtgärden inte väljer en annan.",
           "tts_engine": "Valfri TTS-entitet för den här personen; åsidosätter den globala talmotorn utan att ändra mottagarenheter.",
-          "greeting": "Prefix announcements with the preferred name, except when a {{ name }} placeholder is already present.",
+          "greeting": "Lägg till tilltalsnamnet först i meddelanden, utom när texten redan innehåller den bokstavliga platshållaren {{ name }}.",
           "address": "Valfritt tilltalsnamn för den här personen. Om fältet lämnas tomt används visningsnamnet från Home Assistant."
         }
       },
       "edit_advanced_ai": {
-        "title": "Advanced AI style prompts",
-        "description": "Optional style instructions for rewriting, translation and both. Fixed safety/JSON rules remain authoritative.",
+        "title": "Avancerade AI-stilinstruktioner",
+        "description": "Valfria stilinstruktioner för omskrivning, översättning eller båda. Fasta säkerhetsregler och JSON-krav gäller alltid.",
         "data": {
-          "rewrite": "Rewrite style",
-          "translate": "Translation style",
-          "both": "Combined rewrite and translation style"
+          "rewrite": "Omskrivningsstil",
+          "translate": "Översättningsstil",
+          "both": "Kombinerad omskrivnings- och översättningsstil"
         },
         "data_description": {
-          "rewrite": "Optional plain-text preference; only {message} and {language} are allowed as placeholders.",
-          "translate": "Optional translation preference for the chosen AI, without modifying facts or enabling actions.",
-          "both": "Optional style preference when translation and rewriting are both active."
+          "rewrite": "Valfri preferens i ren text; endast {message} och {language} får användas som platshållare.",
+          "translate": "Valfri översättningspreferens för vald AI utan att ändra fakta eller tillåta åtgärder.",
+          "both": "Valfri stilpreferens när både översättning och omskrivning är aktiverade."
         }
       },
       "edit_audio": {
-        "title": "Direct room audio options",
-        "description": "Optional chime and ducking only for selected direct room speakers, never for shared Snapcast playback.",
+        "title": "Direkta ljudinställningar för rum",
+        "description": "Valfri signal och volymsänkning endast för valda direkta rumshögtalare, aldrig för delad Snapcast-uppspelning.",
         "data": {
-          "person_output_chime": "Enable pre-announcement chime",
-          "person_chime_url": "Local chime audio path",
-          "person_chime_delay": "Chime settle delay",
-          "person_output_ducking": "Duck playing audio",
-          "person_duck_factor": "Music volume factor"
+          "person_output_chime": "Aktivera signal före meddelande",
+          "person_chime_url": "Lokal sökväg till signalljud",
+          "person_chime_delay": "Fördröjning efter signal",
+          "person_output_ducking": "Sänk volymen på pågående ljud",
+          "person_duck_factor": "Faktor för musikvolym"
         },
         "data_description": {
-          "person_output_chime": "Off by default. Chime plays only on an explicitly selected direct room player.",
-          "person_chime_url": "A local audio file such as /local/chime.mp3; remote URLs are not accepted.",
-          "person_chime_delay": "Maximum time for the room chime to finish before TTS.",
-          "person_output_ducking": "Off by default. Save the volume of an active direct-room player, reduce it for speech and restore it afterwards.",
-          "person_duck_factor": "Fraction of original music volume while the announcement is playing; only direct room players are affected."
+          "person_output_chime": "Avstängt som standard. Signalen spelas bara på en uttryckligen vald direkt spelare i ett rum.",
+          "person_chime_url": "En lokal ljudfil, till exempel /local/chime.mp3; fjärradresser stöds inte.",
+          "person_chime_delay": "Maximal tid för att avsluta signalen i rummet innan TTS börjar.",
+          "person_output_ducking": "Avstängt som standard. Spara volymen på en aktiv direkt rumsspelare, sänk den under tal och återställ den därefter.",
+          "person_duck_factor": "Andel av den ursprungliga musikvolymen medan meddelandet spelas; endast direkta rumsspelare påverkas."
         }
       },
       "edit_room_safety": {
-        "title": "Room presence verification",
-        "description": "Configure an optional positive presence sensor for one selected Home Assistant area.",
+        "title": "Närvarokontroll för rum",
+        "description": "Konfigurera en valfri sensor som uttryckligen bekräftar närvaro i ett valt Home Assistant-område.",
         "data": {
-          "area": "Area",
-          "verify_presence": "Require presence confirmation",
-          "presence_sensor": "Room occupancy sensor"
+          "area": "Område",
+          "verify_presence": "Kräv närvarobekräftelse",
+          "presence_sensor": "Närvarosensor för rum"
         },
         "data_description": {
-          "area": "Choose the area to add or clear verification.",
-          "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
-          "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
+          "area": "Välj det område där närvarokontroll ska läggas till eller tas bort.",
+          "verify_presence": "Spela bara upp personliga rumsmeddelanden om den valda sensorn är på; saknade uppgifter blockerar leveransen.",
+          "presence_sensor": "Välj en binary_sensor-entitet för närvaro eller beläggning som fysiskt hör till området."
         }
       }
     },
     "error": {
-      "tts_player_required": "Select a TTS media player when TTS engines are selected.",
-      "tts_engine_required": "Select a TTS engine when a TTS player is selected.",
-      "snapcast_tts_path_required": "Snapcast outputs require at least one TTS engine and a TTS media player.",
-      "output_required": "Select at least one visual, server-TTS, or Companion App TTS output.",
-      "display_time_order": "Maximum display time must be greater than or equal to minimum display time.",
-      "room_notify_area_required": "A room-based notification device must have a Home Assistant area.",
-      "notify_level_overlap": "A notification device can have only one minimum-level assignment.",
-      "room_tts_area_required": "A room-based direct TTS media player must have a Home Assistant area.",
-      "tts_player_role_overlap": "The same media player cannot be both a Direct TTS player and the shared Snapcast source player.",
+      "tts_player_required": "Välj en TTS-mediaspelare när TTS-motorer har valts.",
+      "tts_engine_required": "Välj en TTS-motor när en TTS-spelare har valts.",
+      "snapcast_tts_path_required": "Snapcast-utgångar kräver minst en TTS-motor och en TTS-mediaspelare.",
+      "output_required": "Välj minst en visuell utgång, server-TTS-utgång eller Companion App TTS-utgång.",
+      "display_time_order": "Den maximala visningstiden måste vara minst lika lång som den minimala.",
+      "room_notify_area_required": "En notifieringsenhet som är knuten till ett rum måste ha ett Home Assistant-område.",
+      "notify_level_overlap": "En notifieringsenhet får endast tilldelas en lägsta aviseringsnivå.",
+      "room_tts_area_required": "En direkt TTS-mediaspelare som är knuten till ett rum måste ha ett Home Assistant-område.",
+      "tts_player_role_overlap": "Samma mediaspelare kan inte vara både direkt TTS-spelare och spelare för den delade Snapcast-källan.",
       "invalid_person_output": "Den valda personliga utgången finns inte eller är inaktiverad.",
-      "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
-      "invalid_chime_url": "Chime audio must use a /local/ file.",
-      "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_prompt_template": "En egen AI-stil får bara använda platshållarna {message} och {language} och får inte överstiga 1200 tecken.",
+      "invalid_chime_url": "Signalljudet måste vara en fil under /local/.",
+      "invalid_person_area": "Välj ett giltigt rum i Home Assistant.",
+      "invalid_person_presence": "Välj en närvarosensor innan kontrollen aktiveras."
     }
   },
   "selector": {
     "dispatch_order": {
       "options": {
-        "notify_then_tts": "Visual notifications first, then speech",
-        "tts_then_notify": "Speech first, then visual notifications"
+        "notify_then_tts": "Visuella aviseringar först, sedan tal",
+        "tts_then_notify": "Tal först, sedan visuella aviseringar"
       }
     },
     "tts_min_level": {
@@ -622,15 +622,15 @@
         "info": "Information",
         "success": "Lyckades",
         "debug": "Felsökning",
-        "never": "Never"
+        "never": "Aldrig"
       }
     },
     "companion_tts_media_stream": {
       "options": {
-        "default": "App default",
-        "music_stream": "Music stream",
-        "alarm_stream": "Alarm stream",
-        "alarm_stream_max": "Alarm stream at maximum volume"
+        "default": "Appens standardinställning",
+        "music_stream": "Musikström",
+        "alarm_stream": "Larmström",
+        "alarm_stream_max": "Larmström med maximal volym"
       }
     },
     "level": {
@@ -645,32 +645,32 @@
     },
     "nfandroidtv_position": {
       "options": {
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left",
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "center": "Center"
+        "bottom-right": "Nere till höger",
+        "bottom-left": "Nere till vänster",
+        "top-right": "Uppe till höger",
+        "top-left": "Uppe till vänster",
+        "center": "Mitten"
       }
     },
     "nfandroidtv_fontsize": {
       "options": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large",
-        "max": "Maximum"
+        "small": "Liten",
+        "medium": "Mellan",
+        "large": "Stor",
+        "max": "Största"
       }
     },
     "nfandroidtv_color": {
       "options": {
-        "grey": "Grey",
-        "black": "Black",
+        "grey": "Grå",
+        "black": "Svart",
         "indigo": "Indigo",
-        "green": "Green",
-        "red": "Red",
-        "cyan": "Cyan",
-        "teal": "Teal",
-        "amber": "Amber",
-        "pink": "Pink"
+        "green": "Grön",
+        "red": "Röd",
+        "cyan": "Cyanblå",
+        "teal": "Blågrön",
+        "amber": "Bärnstensgul",
+        "pink": "Rosa"
       }
     },
     "nfandroidtv_transparency": {
@@ -684,13 +684,13 @@
     },
     "occupancy_source": {
       "options": {
-        "state": "State"
+        "state": "Tillstånd"
       }
     },
     "notify_scope": {
       "options": {
-        "room": "Room-based",
-        "general": "General / movable"
+        "room": "Rumsbunden",
+        "general": "Allmän / flyttbar"
       }
     },
     "notify_level": {
@@ -704,9 +704,9 @@
     },
     "channel_fallback_mode": {
       "options": {
-        "visual_then_tts": "Visual first → TTS if unsuccessful",
-        "tts_then_visual": "TTS first → Visual if unsuccessful",
-        "both": "Both eligible channels"
+        "visual_then_tts": "Visuell först → TTS vid misslyckande",
+        "tts_then_visual": "TTS först → visuell vid misslyckande",
+        "both": "Båda tillåtna kanalerna"
       }
     },
     "person_destination": {
@@ -722,14 +722,14 @@
   "entity": {
     "sensor": {
       "queue": {
-        "name": "Queue"
+        "name": "Kö"
       }
     }
   },
   "services": {
     "send": {
       "name": "Skicka meddelande",
-      "description": "Backward-compatible alias for notify.announcement_hub. New automations should use notify.announcement_hub.",
+      "description": "Bakåtkompatibelt alias för notify.announcement_hub. Nya automatiseringar bör använda notify.announcement_hub.",
       "sections": {
         "content": {
           "name": "Meddelandet"
@@ -755,7 +755,7 @@
         },
         "title": {
           "name": "Titel",
-          "description": "Optional title for visual notifications."
+          "description": "Valfri rubrik för visuella aviseringar."
         },
         "level": {
           "name": "Viktighet",
@@ -766,23 +766,23 @@
           "description": "Välj notification (skriftligt), tts (tal), snapcast, companion_tts (specialiserat tal) eller all. Filtrerar valda enheter och lägger aldrig till orelaterade mottagare."
         },
         "notify_data": {
-          "name": "Notification data",
-          "description": "Optional integration-specific data for this visual notification."
+          "name": "Aviseringsdata",
+          "description": "Valfria integrationsspecifika data för denna visuella avisering."
         },
         "language": {
-          "name": "TTS language",
-          "description": "Optional language override for this job."
+          "name": "TTS-språk",
+          "description": "Valfritt språk som åsidosätter standarden för detta jobb."
         },
         "tts_options": {
-          "name": "TTS options",
-          "description": "Optional voice or engine options for this job."
+          "name": "TTS-alternativ",
+          "description": "Valfria röst- eller motoralternativ för detta jobb."
         },
         "companion_tts": {
-          "name": "Allow Companion App speech",
-          "description": "Legacy optional Companion App spoken-output opt-in. New actions can request tts or companion_tts in service, restricted to the selected recipients."
+          "name": "Tillåt tal via Companion App",
+          "description": "Äldre valfri inställning som tillåter tal via Companion App. Nya åtgärder kan begära tts eller companion_tts i service, begränsat till valda mottagare."
         },
         "occupied_only": {
-          "name": "Use occupied-room fallback",
+          "name": "Använd reservrum som är upptagna",
           "description": "Områdesriktade anrop försöker först valda rum och därefter andra upptagna områden om funktionen är på. Uttryckliga integrations-, enhets- och entitetsmål förblir oförändrade."
         },
         "use_ai": {
@@ -791,15 +791,15 @@
         },
         "ai_agent": {
           "name": "AI-leverantör",
-          "description": "Choose an available Conversation agent or AI Task entity for this announcement. Leave empty to inherit the integration's default AI provider."
+          "description": "Välj en tillgänglig Conversation-agent eller AI Task-entitet för detta meddelande. Lämna tomt för att ärva integrationens standardleverantör för AI."
         },
         "click_action": {
-          "name": "Click action (Companion App)",
-          "description": "Optional URL, Home Assistant dashboard path, app:// deep link, or entityId:entity_id to open when a Companion App visual notification is tapped. Android receives clickAction; iOS/macOS receives url. Ignored for Android TV/Fire TV overlays, TTS, and providers without support. Overrides matching keys in notify_data."
+          "name": "Klickåtgärd (Companion App)",
+          "description": "Valfri URL, sökväg till en Home Assistant-panel, app://-djuplänk eller entityId:entity_id som öppnas när man trycker på en visuell avisering från Companion App. Android får clickAction; iOS/macOS får url. Ignoreras av Android TV/Fire TV-överlägg, TTS och leverantörer utan stöd. Åsidosätter motsvarande nycklar i notify_data."
         },
         "text": {
           "name": "Meddelande",
-          "description": "Shared text for both spoken TTS and written notifications. Optional when text_tts or text_notify is supplied; the provided channel-specific field overrides the corresponding version of text."
+          "description": "Gemensam text för både talad TTS och skrivna aviseringar. Valfri om text_tts eller text_notify anges; det kanalspecifika fältet ersätter motsvarande version av text."
         },
         "area": {
           "name": "Områden",
@@ -838,36 +838,36 @@
           "description": "Åsidosätt personens eller gruppens automatiska översättning för detta meddelande. Inställt språk används; use_ai: false förhindrar översättning."
         },
         "person_greeting": {
-          "name": "Personal greeting",
-          "description": "Override automatic salutation for a person/group; leave unset to use the configured preference."
+          "name": "Personlig hälsning",
+          "description": "Åsidosätt den automatiska tilltalshälsningen för en person eller grupp. Lämna tomt för att använda den konfigurerade inställningen."
         },
         "pre_announce_sound": {
-          "name": "Pre-announcement chime",
-          "description": "Optional direct-room audio chime, never sent on the shared Snapcast source."
+          "name": "Signal före meddelandet",
+          "description": "Valfri ljudsignal endast via direkta rumshögtalare, aldrig via den delade Snapcast-källan."
         },
         "tts_engine": {
-          "name": "TTS engine override",
-          "description": "Select one existing TTS engine for this announcement without selecting extra devices."
+          "name": "Åsidosätt TTS-motor",
+          "description": "Välj en befintlig TTS-motor för detta meddelande utan att välja fler mottagarenheter."
         }
       }
     },
     "clear_queue": {
       "name": "Rensa meddelandekön",
-      "description": "Cancels all waiting jobs and can also stop the active announcement.",
+      "description": "Avbryter alla väntande jobb och kan även stoppa det aktiva meddelandet.",
       "fields": {
         "include_current": {
-          "name": "Include active announcement",
-          "description": "Also requests cancellation of the job currently running."
+          "name": "Inkludera aktivt meddelande",
+          "description": "Begär också att det jobb som körs just nu ska avbrytas."
         }
       }
     },
     "cancel": {
       "name": "Avbryt",
-      "description": "Cancels one waiting or active job by its ID.",
+      "description": "Avbryter ett väntande eller aktivt jobb med dess ID.",
       "fields": {
         "job_id": {
-          "name": "Job ID",
-          "description": "The job ID returned by announcement_hub.send."
+          "name": "Jobb-ID",
+          "description": "Jobb-ID som returnerades av announcement_hub.send."
         }
       }
     }
