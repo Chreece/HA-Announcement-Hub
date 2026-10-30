@@ -1820,7 +1820,16 @@ class _AnnouncementFlowMixin:
             str(option["value"]): str(option["label"])
             for option in notify_output_options(self.hass)
         }
-        options = sleep_notify_output_options(catalog, labels)
+        options = sleep_notify_output_options(
+            catalog, labels,
+            integration_label=lambda integration, count: provider_label(
+                self.hass, "sleep_all_devices",
+                name=integration_label(integration), count=str(count),
+            ),
+            device_label=lambda name: provider_label(
+                self.hass, "sleep_device", name=name,
+            ),
+        )
         known = {str(option["value"]) for option in options}
         saved = self._value(CONF_SLEEP_FALLBACK_OUTPUTS, None)
         if saved is None:
@@ -1834,7 +1843,10 @@ class _AnnouncementFlowMixin:
                 if token not in known:
                     options.append(
                         selector.SelectOptionDict(
-                            value=token, label=f"Unavailable · {token}"
+                            value=token,
+                            label=provider_label(
+                                self.hass, "sleep_unavailable", name=token
+                            )
                         )
                     )
                     known.add(token)
