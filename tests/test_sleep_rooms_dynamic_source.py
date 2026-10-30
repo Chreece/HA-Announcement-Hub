@@ -125,3 +125,34 @@ def test_sleep_source_values_are_not_fixed_permanent_rooms():
     assert "CONF_SLEEP_ROOMS, [])" not in FLOW
     assert "CONF_SLEEP_ROOMS, []" not in FLOW
     assert "multiple=True" in FLOW  # Other unrelated multi-select options remain.
+
+
+def test_sleep_attribute_options_track_entity_attributes_and_preserve_offline_choice():
+    tree = ast.parse(FLOW)
+    klass = next(node for node in tree.body
+                 if isinstance(node, ast.ClassDef)
+                 and node.name == "_AnnouncementFlowMixin")
+    method = next(node for node in klass.body
+                  if isinstance(node, ast.FunctionDef)
+                  and node.name == "_sleep_rooms_attribute_options")
+    namespace = {}
+    exec(compile(ast.fix_missing_locations(
+        ast.Module(body=[method], type_ignores=[])), "sleep attribute selector", "exec"
+    ), namespace)
+    source = namespace["_sleep_rooms_attribute_options"]
+
+    states = {
+        "sensor.sleep_rooms": SimpleNamespace(
+            state="active", attributes={"rooms": ["Schlafzimmer"], "count": 1}
+        ),
+    }
+    flow = SimpleNamespace(
+        _working={"sleep_rooms_entity": "sensor.sleep_rooms",
+                  "sleep_rooms_attribute": "rooms"},
+        hass=SimpleNamespace(states=SimpleNamespace(get=states.get)),
+    )
+    assert source(flow) == ["state", "count", "rooms"]
+    states.pop("sensor.sleep_rooms")
+    assert source(flow) == ["state", "rooms"]  # No silent reset on sensor outage.
+    flow._working["sleep_rooms_attribute"] = ""
+    assert source(flow) == ["state"]
