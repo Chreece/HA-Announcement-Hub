@@ -32,7 +32,7 @@ def _read(lang):
 
 def test_ukrainian_native_catalog_all_keys_and_translated_help():
     en, uk = _read("en"), _read("uk")
-    assert len(en) == 625
+    assert len(en) == 639
     assert set(en) == set(uk)
     unchanged = {key: s for key, s in en.items() if uk[key] == s}
     assert len(unchanged) == 5, unchanged

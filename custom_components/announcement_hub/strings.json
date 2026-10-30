@@ -124,7 +124,10 @@
           "fallback_ai_agent": "Backup AI provider (conversation or AI Task)",
           "channel_fallback_mode": "Notification channel fallback",
           "sleep_rooms_entity": "Sleeping-room entity",
-          "sleep_rooms_attribute": "Sleeping-room value"
+          "sleep_rooms_attribute": "Sleeping-room value",
+          "sleep_mute_tts": "Mute TTS while everyone is sleeping",
+          "sleep_fallback_written": "Written fallback while sleeping",
+          "sleep_fallback_outputs": "Sleep-time written notification recipients"
         },
         "data_description": {
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
           "channel_fallback_mode": "Only when the announcement includes BOTH spoken (text_tts) and written (text_notify) text AND both permitted output types exist: Visual → TTS attempts a written notification first and speaks only if it cannot be delivered; TTS → Visual speaks first and shows a notification only if speech fails; Both attempts both eligible channels. When only one channel or output type is present, it is delivered normally. Never creates another channel, adds devices or overrides the TTS Never/severity settings.",
           "sleep_rooms_entity": "Choose the Home Assistant entity whose state or an attribute lists the rooms where people are sleeping right now. This is a live list, not a permanent bedroom assignment.",
-          "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known."
+          "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known.",
+          "sleep_mute_tts": "When all reported occupied rooms are currently sleeping, prevent ALL spoken announcements and chimes, including Critical, Snapcast and Companion App TTS. If the sleep source is unavailable but occupancy is known, also mute as a precaution. Disable to keep normal speech behavior.",
+          "sleep_fallback_written": "When sleep TTS muting is active, deliver a written notification instead, using only the selected recipients below. For TTS-only messages, use the spoken text as written text. Disable to keep the announcement queued rather than automatically notify. Has no effect when sleep muting is off.",
+          "sleep_fallback_outputs": "Select one or more destinations: first choose an integration to reach all its configured notification devices, or choose individual devices listed below. Only outputs already enabled in Announcement Hub are eligible; unselected devices and integrations are never added. An empty selection delivers nothing. Existing installs default to all configured Companion App devices."
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "Chime audio must use a /local/ file.",
       "invalid_person_area": "Select a valid Home Assistant room.",
       "invalid_person_presence": "Select a presence sensor before enabling verification.",
-      "invalid_sleep_source": "Invalid sleeping-room source; select State or an available attribute."
+      "invalid_sleep_source": "Invalid sleeping-room source; select State or an available attribute.",
+      "invalid_sleep_fallback_target": "Select only configured sleep-time notification integrations or devices."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "Backup AI provider (conversation or AI Task)",
           "channel_fallback_mode": "Notification channel fallback",
           "sleep_rooms_entity": "Sleeping-room entity",
-          "sleep_rooms_attribute": "Sleeping-room value"
+          "sleep_rooms_attribute": "Sleeping-room value",
+          "sleep_mute_tts": "Mute TTS while everyone is sleeping",
+          "sleep_fallback_written": "Written fallback while sleeping",
+          "sleep_fallback_outputs": "Sleep-time written notification recipients"
         },
         "data_description": {
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
           "channel_fallback_mode": "Only when the announcement includes BOTH spoken (text_tts) and written (text_notify) text AND both permitted output types exist: Visual → TTS attempts a written notification first and speaks only if it cannot be delivered; TTS → Visual speaks first and shows a notification only if speech fails; Both attempts both eligible channels. When only one channel or output type is present, it is delivered normally. Never creates another channel, adds devices or overrides the TTS Never/severity settings.",
           "sleep_rooms_entity": "Choose the Home Assistant entity whose state or an attribute lists the rooms where people are sleeping right now. This is a live list, not a permanent bedroom assignment.",
-          "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known."
+          "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known.",
+          "sleep_mute_tts": "When all reported occupied rooms are currently sleeping, prevent ALL spoken announcements and chimes, including Critical, Snapcast and Companion App TTS. If the sleep source is unavailable but occupancy is known, also mute as a precaution. Disable to keep normal speech behavior.",
+          "sleep_fallback_written": "When sleep TTS muting is active, deliver a written notification instead, using only the selected recipients below. For TTS-only messages, use the spoken text as written text. Disable to keep the announcement queued rather than automatically notify. Has no effect when sleep muting is off.",
+          "sleep_fallback_outputs": "Select one or more destinations: first choose an integration to reach all its configured notification devices, or choose individual devices listed below. Only outputs already enabled in Announcement Hub are eligible; unselected devices and integrations are never added. An empty selection delivers nothing. Existing installs default to all configured Companion App devices."
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "Chime audio must use a /local/ file.",
       "invalid_person_area": "Select a valid Home Assistant room.",
       "invalid_person_presence": "Select a presence sensor before enabling verification.",
-      "invalid_sleep_source": "Invalid sleeping-room source; select State or an available attribute."
+      "invalid_sleep_source": "Invalid sleeping-room source; select State or an available attribute.",
+      "invalid_sleep_fallback_target": "Select only configured sleep-time notification integrations or devices."
     }
   },
   "selector": {

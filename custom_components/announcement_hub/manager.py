@@ -71,6 +71,9 @@ from .const import (
     CONF_SLEEP_ROOMS,
     CONF_SLEEP_ROOMS_ENTITY,
     CONF_SLEEP_ROOMS_ATTRIBUTE,
+    CONF_SLEEP_MUTE_TTS,
+    CONF_SLEEP_FALLBACK_WRITTEN,
+    CONF_SLEEP_FALLBACK_OUTPUTS,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -100,6 +103,8 @@ from .const import (
     DEFAULT_AI_AGENT,
     DEFAULT_FALLBACK_AI_AGENT,
     DEFAULT_FALLBACK_CHECK_DOOR,
+    DEFAULT_SLEEP_MUTE_TTS,
+    DEFAULT_SLEEP_FALLBACK_WRITTEN,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_NOTIFY_MIN_LEVEL,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
@@ -186,6 +191,7 @@ from .models import (
     tts_allowed_for_level,
     utcnow_iso,
 )
+from .sleep_delivery import sleep_notify_selected_refs
 from .routing_fallback import (
     STAGES,
     next_stage,
@@ -2451,6 +2457,12 @@ class AnnouncementManager:
             return True
         return set(occupied).issubset(self._sleep_area_ids())
 
+    def _sleep_tts_muted_now(self) -> bool:
+        """Apply the user's global sleep-mute option to the live sleep state."""
+        return bool(
+            self.settings.get(CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS)
+        ) and self._all_occupied_rooms_sleeping()
+
     def _staged_areas(
         self, job: AnnouncementJob, stage: str
     ) -> tuple[str, ...]:
@@ -2458,11 +2470,15 @@ class AnnouncementManager:
         enabled = self.settings.get("person_area_enabled", {}) or {}
         reading = self._occupied_area_ids()
         occupied_now = tuple(reading or ())
-        sleep_rooms = self._sleep_area_ids()
+        sleep_rooms = (
+            self._sleep_area_ids()
+            if self.settings.get(CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS)
+            else frozenset()
+        )
 
-        # When everyone is in a sleeping room, physical-room routing never
-        # wakes them. General delivery is restricted to mobile visuals.
-        if self._all_occupied_rooms_sleeping():
+        # Suppress physical-room delivery when the user enables sleep mute.
+        # Other occupied/awake rooms remain eligible in mixed households.
+        if self._sleep_tts_muted_now():
             return ()
 
         preferred = tuple(
@@ -2623,44 +2639,41 @@ class AnnouncementManager:
             # during the next polling cycle rather than broaden the selection.
             selected = ((), (), (), (), ())
 
-        sleeping_home = self._all_occupied_rooms_sleeping()
-        sleep_rooms = self._sleep_area_ids()
-        if (
-            sleeping_home and stage_kind == "general" and job_manual
-            and not job.requested_services and not job.channel_services
-        ):
-            # Area-only dashboard sends may still use explicitly configured
-            # mobile-app outputs, but never arbitrary discovered devices.
-            configured_mobile = tuple(
-                output.ref for output in resolve_notify_outputs(
+        sleeping_home = self._sleep_tts_muted_now()
+        sleep_rooms = (
+            self._sleep_area_ids()
+            if self.settings.get(CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS)
+            else frozenset()
+        )
+        sleep_written_fallback = bool(
+            sleeping_home
+            and stage_kind == "general"
+            and job.routing_mode == "room_fallback"
+            and not job.requested_services
+            and not job.channel_services
+            and self.settings.get(
+                CONF_SLEEP_FALLBACK_WRITTEN, DEFAULT_SLEEP_FALLBACK_WRITTEN
+            )
+        )
+
+        if sleeping_home:
+            # Never expand exact service/device recipient restrictions.
+            # An automatic sleeping-room fallback has its OWN explicit
+            # allowlist, independent of area/room scope and the usual
+            # notification order. No selected outputs means no broadcast.
+            allowed_refs: tuple[str, ...] = ()
+            if sleep_written_fallback:
+                configured_notifications = resolve_notify_outputs(
                     self.hass, self._configured_outputs()[1]
                 )
-                if output.integration == INTEGRATION_MOBILE_APP
-            )
-            selected = (
-                selected[0],
-                tuple(dict.fromkeys((*selected[1], *configured_mobile))),
-                selected[2], selected[3], selected[4],
-            )
+                allowed_refs = sleep_notify_selected_refs(
+                    configured_notifications,
+                    self.settings.get(CONF_SLEEP_FALLBACK_OUTPUTS),
+                )
+            selected = ((), allowed_refs, (), (), ())
 
         notifications = resolve_notify_outputs(self.hass, selected[1])
         companion = resolve_companion_tts_outputs(self.hass, selected[4])
-        if sleeping_home:
-            # All speech, including Critical, Snapcast and companion TTS,
-            # is suppressed. Only configured written mobile-app notifications
-            # remain eligible for automatic room-routing fallback.
-            mobile_refs = {
-                output.ref for output in notifications
-                if output.integration == INTEGRATION_MOBILE_APP
-            }
-            selected = (
-                (), tuple(ref for ref in selected[1] if ref in mobile_refs),
-                (), (), (),
-            )
-            notifications = tuple(
-                output for output in notifications if output.ref in mobile_refs
-            )
-            companion = ()
         minimum_tts_level = LEVEL_INFO if job_manual else str(
             self.settings.get(CONF_TTS_MIN_LEVEL, DEFAULT_TTS_MIN_LEVEL)
         )
@@ -2682,12 +2695,10 @@ class AnnouncementManager:
                 self._notify_policy(output, manual=True)
                 if job_manual else self._notify_policy(output)
             )
-            if (
-                sleeping_home and stage_kind == "general"
-                and output.integration == INTEGRATION_MOBILE_APP
-            ):
-                # A configured mobile app stays a written destination even
-                # when assigned an HA area/room scope in its normal profile.
+            if sleep_written_fallback:
+                # The user explicitly authorized this physical notification
+                # destination for sleeping-house delivery, even when its normal
+                # routing policy binds it to a physical room.
                 scope = NOTIFY_SCOPE_GENERAL
             notify_policy[output.ref] = (scope, minimum)
         targets = select_stage_targets(
@@ -2729,7 +2740,7 @@ class AnnouncementManager:
             speech_allowed=stage_speech_allowed,
         )
         written_text = job.text_notify or (
-            job.text_tts if sleeping_home and stage_kind == "general" else None
+            job.text_tts if sleep_written_fallback else None
         )
         # A declared channel has no recipients unless that channel's input
         # text was supplied. Never send text_tts to a written notification,
@@ -3137,7 +3148,7 @@ class AnnouncementManager:
 
     def _job_runnable_now(self, job: AnnouncementJob) -> bool:
         """Return whether at least one frozen delivery channel can run now."""
-        if self._all_occupied_rooms_sleeping():
+        if self._sleep_tts_muted_now():
             return self._job_has_ready_visual_output(job)
         return (
             self._job_has_ready_visual_output(job)
@@ -3687,8 +3698,8 @@ class AnnouncementManager:
 
     async def _async_send_tts(self, job: AnnouncementJob) -> None:
         """Launch independent audible output classes together."""
-        if self._all_occupied_rooms_sleeping():
-            _LOGGER.debug("Suppressed TTS: all occupied rooms are sleeping")
+        if self._sleep_tts_muted_now():
+            _LOGGER.debug("Suppressed TTS: sleep-mute policy is active")
             return
         if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled or presence unverified")
@@ -3819,8 +3830,8 @@ class AnnouncementManager:
         self, job: AnnouncementJob, player: str,
     ) -> None:
         """Only selected direct room speakers; never a shared Snapcast source."""
-        if self._all_occupied_rooms_sleeping():
-            return  # Even the pre-announcement bell must not wake sleepers.
+        if self._sleep_tts_muted_now():
+            return  # Sleep-mute also suppresses the chime.
         enabled = (
             job.pre_announce_sound
             if job.pre_announce_sound is not None
@@ -4331,7 +4342,7 @@ class AnnouncementManager:
     ) -> None:
         channel = f"companion_tts:{output.entry_id}"
         self._raise_if_cancelled(job)
-        if self._all_occupied_rooms_sleeping():
+        if self._sleep_tts_muted_now():
             return  # Recheck after availability waits, before phone TTS.
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person disabled during Companion TTS")
@@ -4387,10 +4398,9 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
-        if self._all_occupied_rooms_sleeping():
+        if self._sleep_tts_muted_now():
             raise HomeAssistantError(
-                "TTS suppressed because everybody is sleeping "
-                "or the live sleep-room source is unavailable"
+                "TTS suppressed by the enabled sleep-mute policy"
             )
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled before audio playback")

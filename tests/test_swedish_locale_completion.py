@@ -30,7 +30,7 @@ def read(lang):
 
 def test_swedish_native_catalog_is_complete():
     en, sv = read("en"), read("sv")
-    assert len(en) == 625
+    assert len(en) == 639
     assert set(en) == set(sv)
     same = {key: value for key, value in en.items() if sv[key] == value}
     assert len(same) == 8, same

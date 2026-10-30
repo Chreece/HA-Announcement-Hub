@@ -313,6 +313,9 @@ The **4. General options** page includes:
 | Occupied rooms value | Sensor state or attribute containing room names / area IDs |
 | Sleep rooms entity | A Home Assistant entity reporting rooms where people are **currently sleeping**; select it from a dropdown |
 | Sleep rooms value | Choose **State** or a live attribute that contains a list of sleeping room area IDs, names or aliases |
+| Mute TTS while everyone is sleeping | Toggle automatic speech/chime suppression when every occupied room is sleeping |
+| Written fallback while sleeping | Toggle written-only replacement for automatic room announcements while sleep mute is active |
+| Sleep-time written notification recipients | Multiselect: **Integration — all configured devices** first, followed by **individual devices**, limited to configured Announcement Hub notification outputs |
 | Fallback room | Alternate area only if the target room contains an awake person, local delivery failed and the door rule permits |
 | Require an open occupied-room door for fallback | Door rule that must pass before using the configured alternate room |
 | Door sensor label filter | Optional label to restrict which door sensors count |
@@ -363,10 +366,38 @@ for every queued announcement and immediately before TTS delivery: no HA
 restart is needed when a person starts or stops sleeping.
 
 An unavailable/missing sleeping-room source (or selected attribute) cannot
-prove a person is awake, so audio is suppressed while room occupancy is
-known; the mobile-app written fallback remains available. An existing
-pre-v0.10.0b23 fixed-area selection is honored **only until** a new live
-sleep-room entity is configured.
+prove a person is awake; if **Mute TTS while everyone is sleeping** is enabled,
+audio is suppressed while room occupancy is known.
+
+The three sleep-policy controls under **General options** are independent
+settings:
+
+- **Mute TTS while everyone is sleeping** (default **On**): prevents all
+  speech and pre-announcement chimes, including Critical and Companion App
+  audio. Turn Off to use ordinary speech routing even if everyone sleeps.
+- **Written fallback while sleeping** (default **On**): only when TTS sleep
+  mute is active, redirect automatic room announcements to the explicitly
+  selected written outputs. A TTS-only message uses its original text. Turn
+  Off to keep these automatic announcements queued until the rooms are awake;
+  it has no effect when sleep mute is Off.
+- **Sleep-time written notification recipients**: first choose
+  **Integration · [name] — all devices** or choose **Device · [name]** for
+  individual outputs. Multiple choices are allowed. Integration-wide choices
+  include **only notification outputs already enabled in Announcement Hub**,
+  not every device that happens to exist in Home Assistant. An empty selection
+  disables automatic sleep-time written delivery even with the fallback
+  toggle On. Existing installations default to all already-configured
+  **Companion App** notification devices.
+
+For example, selecting the **mobile_app integration** plus an individual
+**NFAndroidTV** display sends the sleep fallback to the configured mobile
+phones and only that chosen display. Selecting **NFAndroidTV — all devices**
+instead includes every configured NFAndroidTV notification device. Exact
+integration/device/entity recipient restrictions supplied by an action
+are never broadened by the sleep-time fallback.
+
+An existing pre-v0.10.0b23 fixed-area selection is honored **only until**
+a new live sleep-room entity is configured.
 
 ## Person-targeted announcements and personal destinations
 
@@ -555,12 +586,15 @@ General/non-room notification outputs
   If the configured source is unavailable, unconfirmed room presence is not
   assumed, and the alternate fallback room remains ineligible.
 - The **sleeping-room entity** lists rooms with sleeping people **right now**.
-  If the configured occupied-room list is contained in this live sleep list,
-  no TTS is started (even Critical, Snapcast and companion speech). Only
-  configured mobile-app written notifications are eligible; a TTS-only room
-  message uses its spoken text as written text. If the sleep source becomes
-  unavailable, audio is also suppressed while occupancy is known. If no
-  configured mobile-app output is available, the job stays queued.
+  With **Mute TTS while everyone is sleeping** enabled, if the configured
+  occupied-room list is contained in the sleep list, no TTS starts (including
+  Critical, Snapcast and companion speech). When **Written fallback while
+  sleeping** is also enabled, only the explicitly selected configured
+  integration/device notification outputs receive written text; TTS-only
+  messages use their spoken text as written text. If the sleep source is
+  unavailable and occupancy is known, the same enabled mute/fallback policy
+  applies. Without enabled/eligible recipients, the job remains queued.
+  Switching mute Off restores ordinary speech routing.
 - The **occupied-room stage** uses the configured occupancy sensor; it does
   not guess where people are.
 - The **alternate-room stage** is allowed only for a targeted, non-sleep room

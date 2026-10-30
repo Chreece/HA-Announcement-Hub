@@ -124,7 +124,10 @@
           "fallback_ai_agent": "Reserve AI-provider (gesprek of AI-taak)",
           "channel_fallback_mode": "Terugvalkanaal voor meldingen",
           "sleep_rooms_entity": "Entiteit met ruimten waar mensen slapen",
-          "sleep_rooms_attribute": "Waarde van ruimten met slapende personen"
+          "sleep_rooms_attribute": "Waarde van ruimten met slapende personen",
+          "sleep_mute_tts": "TTS dempen wanneer iedereen slaapt",
+          "sleep_fallback_written": "Schriftelijk terugvallen tijdens het slapen",
+          "sleep_fallback_outputs": "Ontvangers voor schriftelijke meldingen tijdens slaap"
         },
         "data_description": {
           "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "Optionele reserve-AI-agent als de primaire agent faalt. Ook de Home Assistant-standaard volgt de voorkeurs-Assist-pijplijn; de optie 'Oorspronkelijke aankondiging' slaat een tweede AI-poging over. Als beide AI-agents falen, wordt altijd de oorspronkelijke tekst afgeleverd.",
           "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden.",
           "sleep_rooms_entity": "Kies de Home Assistant-entiteit waarvan de status of een kenmerk aangeeft in welke ruimten momenteel mensen slapen. De lijst is dynamisch en wijst geen vaste slaapkamers aan.",
-          "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is."
+          "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is.",
+          "sleep_mute_tts": "Als alle bezette ruimten als slapend worden gemeld, worden alle spraakberichten en geluidssignalen gedempt, ook Kritiek, Snapcast en Companion App-TTS. Als de slaapbron uitvalt maar aanwezigheid bekend is, wordt spraak uit voorzorg ook gedempt. Schakel uit voor normale spraak.",
+          "sleep_fallback_written": "Als slaapdemping actief is, wordt in plaats daarvan alleen een schriftelijke melding naar de hieronder gekozen ontvangers gestuurd. Bij alleen TTS wordt de gesproken tekst als bericht gebruikt. Uitschakelen laat de automatische melding in de wachtrij. Zonder slaapdemping heeft deze instelling geen effect.",
+          "sleep_fallback_outputs": "Kies meerdere bestemmingen: eerst een integratie voor al haar ingestelde meldingsapparaten, daarna afzonderlijke apparaten. Alleen in Announcement Hub ingeschakelde uitgangen zijn toegestaan. Een lege selectie verstuurt niets. Bestaande installaties kiezen standaard alle ingestelde Companion App-apparaten."
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "De beltoonaudio moet een bestand onder /local/ gebruiken.",
       "invalid_person_area": "Selecteer een geldige Home Assistant-ruimte.",
       "invalid_person_presence": "Selecteer een aanwezigheidssensor voordat verificatie wordt ingeschakeld.",
-      "invalid_sleep_source": "Ongeldige bron voor slapende ruimten; kies Status of een beschikbaar kenmerk."
+      "invalid_sleep_source": "Ongeldige bron voor slapende ruimten; kies Status of een beschikbaar kenmerk.",
+      "invalid_sleep_fallback_target": "Kies alleen ingestelde integraties of apparaten voor schriftelijke meldingen tijdens de slaap."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is al geconfigureerd."
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "Reserve AI-provider (gesprek of AI-taak)",
           "channel_fallback_mode": "Terugvalkanaal voor meldingen",
           "sleep_rooms_entity": "Entiteit met ruimten waar mensen slapen",
-          "sleep_rooms_attribute": "Waarde van ruimten met slapende personen"
+          "sleep_rooms_attribute": "Waarde van ruimten met slapende personen",
+          "sleep_mute_tts": "TTS dempen wanneer iedereen slaapt",
+          "sleep_fallback_written": "Schriftelijk terugvallen tijdens het slapen",
+          "sleep_fallback_outputs": "Ontvangers voor schriftelijke meldingen tijdens slaap"
         },
         "data_description": {
           "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "Optionele reserve-AI-agent als de primaire agent faalt. Ook de Home Assistant-standaard volgt de voorkeurs-Assist-pijplijn; de optie 'Oorspronkelijke aankondiging' slaat een tweede AI-poging over. Als beide AI-agents falen, wordt altijd de oorspronkelijke tekst afgeleverd.",
           "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden.",
           "sleep_rooms_entity": "Kies de Home Assistant-entiteit waarvan de status of een kenmerk aangeeft in welke ruimten momenteel mensen slapen. De lijst is dynamisch en wijst geen vaste slaapkamers aan.",
-          "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is."
+          "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is.",
+          "sleep_mute_tts": "Als alle bezette ruimten als slapend worden gemeld, worden alle spraakberichten en geluidssignalen gedempt, ook Kritiek, Snapcast en Companion App-TTS. Als de slaapbron uitvalt maar aanwezigheid bekend is, wordt spraak uit voorzorg ook gedempt. Schakel uit voor normale spraak.",
+          "sleep_fallback_written": "Als slaapdemping actief is, wordt in plaats daarvan alleen een schriftelijke melding naar de hieronder gekozen ontvangers gestuurd. Bij alleen TTS wordt de gesproken tekst als bericht gebruikt. Uitschakelen laat de automatische melding in de wachtrij. Zonder slaapdemping heeft deze instelling geen effect.",
+          "sleep_fallback_outputs": "Kies meerdere bestemmingen: eerst een integratie voor al haar ingestelde meldingsapparaten, daarna afzonderlijke apparaten. Alleen in Announcement Hub ingeschakelde uitgangen zijn toegestaan. Een lege selectie verstuurt niets. Bestaande installaties kiezen standaard alle ingestelde Companion App-apparaten."
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "De beltoonaudio moet een bestand onder /local/ gebruiken.",
       "invalid_person_area": "Selecteer een geldige Home Assistant-ruimte.",
       "invalid_person_presence": "Selecteer een aanwezigheidssensor voordat verificatie wordt ingeschakeld.",
-      "invalid_sleep_source": "Ongeldige bron voor slapende ruimten; kies Status of een beschikbaar kenmerk."
+      "invalid_sleep_source": "Ongeldige bron voor slapende ruimten; kies Status of een beschikbaar kenmerk.",
+      "invalid_sleep_fallback_target": "Kies alleen ingestelde integraties of apparaten voor schriftelijke meldingen tijdens de slaap."
     }
   },
   "selector": {

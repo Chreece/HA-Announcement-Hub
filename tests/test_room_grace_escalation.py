@@ -34,6 +34,12 @@ targeting_spec = importlib.util.spec_from_file_location(
 assert targeting_spec is not None and targeting_spec.loader is not None
 targeting = importlib.util.module_from_spec(targeting_spec)
 targeting_spec.loader.exec_module(targeting)
+sleep_spec = importlib.util.spec_from_file_location(
+    "announcement_hub_sleep_delivery_test", C / "sleep_delivery.py"
+)
+assert sleep_spec is not None and sleep_spec.loader is not None
+sleep_delivery = importlib.util.module_from_spec(sleep_spec)
+sleep_spec.loader.exec_module(sleep_delivery)
 import sys
 sys.modules[spec.name] = routing
 spec.loader.exec_module(routing)
@@ -111,6 +117,8 @@ class FakeManager:
             "sleep_rooms": (),
             "sleep_rooms_entity": None,
             "sleep_rooms_attribute": "",
+            "sleep_mute_tts": True,
+            "sleep_fallback_written": True,
         }
         self._availability_timeout = timeout
         self.occupied = tuple(occupied)
@@ -231,6 +239,7 @@ METHODS = (
     "_sleep_area_ids",
     "_occupancy_values",
     "_all_occupied_rooms_sleeping",
+    "_sleep_tts_muted_now",
     "_staged_areas",
     "_prepare_staged_route",
     "_advance_staged_route",
@@ -263,6 +272,12 @@ namespace = {
     "CONF_SLEEP_ROOMS": "sleep_rooms",
     "CONF_SLEEP_ROOMS_ENTITY": "sleep_rooms_entity",
     "CONF_SLEEP_ROOMS_ATTRIBUTE": "sleep_rooms_attribute",
+    "CONF_SLEEP_MUTE_TTS": "sleep_mute_tts",
+    "CONF_SLEEP_FALLBACK_WRITTEN": "sleep_fallback_written",
+    "CONF_SLEEP_FALLBACK_OUTPUTS": "sleep_fallback_outputs",
+    "DEFAULT_SLEEP_MUTE_TTS": True,
+    "DEFAULT_SLEEP_FALLBACK_WRITTEN": True,
+    "sleep_notify_selected_refs": sleep_delivery.sleep_notify_selected_refs,
     "STATE_UNAVAILABLE": "unavailable",
     "STATE_UNKNOWN": "unknown",
     "json": json,
@@ -971,7 +986,7 @@ def test_sleeping_target_cannot_authorize_fallback_even_with_open_door(monkeypat
 
 
 def test_sleep_guard_applies_even_to_normal_jobs_and_before_chime():
-    assert "if self._all_occupied_rooms_sleeping():" in SRC[
+    assert "if self._sleep_tts_muted_now():" in SRC[
         SRC.index("    async def _async_send_tts("):
         SRC.index("    async def _async_restore_volume(")
     ]
@@ -1079,3 +1094,118 @@ def test_legacy_static_sleep_rooms_remain_until_live_source_selected(monkeypatch
         state="[]", attributes={},
     )
     assert not manager._all_occupied_rooms_sleeping()
+
+
+def test_sleep_muting_can_be_disabled_without_changing_source(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("kueche",), kitchen_snapcast=True,
+        available={"media_player.kitchen_snapcast": True},
+    )
+    manager.settings["sleep_rooms"] = ("kueche",)
+    manager.settings["sleep_mute_tts"] = False
+    configure_manager(monkeypatch, manager)
+    assert manager._all_occupied_rooms_sleeping()
+    assert not manager._sleep_tts_muted_now()
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.snapcast_clients == ("media_player.kitchen_snapcast",)
+    assert j.tts_text
+
+
+def test_sleep_written_fallback_can_be_disabled_separately(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",), available={"entity:notify.phone": True},
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    manager.settings["sleep_fallback_written"] = False
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert not manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ()
+    assert j.tts_text is None
+
+
+def test_sleep_written_fallback_can_target_entire_other_integration(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",),
+        available={"entity:notify.kitchen": True, "entity:notify.phone": True},
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    manager.settings["sleep_fallback_outputs"] = ("integration:nfandroidtv",)
+    configure_manager(monkeypatch, manager)
+    j = job(level="critical")
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == (
+        "entity:notify.kitchen", "entity:notify.living",
+        "entity:notify.entrance",
+    )
+    assert "entity:notify.phone" not in j.notify_outputs
+    assert j.tts_text is None
+
+
+def test_sleep_written_fallback_can_target_one_device_only(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",), available={"entity:notify.entrance": True},
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    manager.settings["sleep_fallback_outputs"] = ("entity:notify.entrance",)
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.notify_outputs == ("entity:notify.entrance",)
+    assert j.notify_text == j.text_notify
+    assert j.tts_text is None
+
+
+def test_sleep_written_empty_selection_never_broadcasts(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",), available={"entity:notify.phone": True},
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    manager.settings["sleep_fallback_outputs"] = ()
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert not manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ()
+
+
+def test_sleep_written_fallback_cannot_bypass_exact_service_filter(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",),
+        available={"entity:notify.phone": True, "entity:notify.entrance": True},
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    manager.settings["sleep_fallback_outputs"] = ("integration:nfandroidtv",)
+    configure_manager(monkeypatch, manager)
+    j = job(services=("mobile_app",))
+    assert not manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ()
+    assert j.tts_text is None
+
+
+def test_sleep_written_fallback_respects_configured_output_opt_out(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",),
+        available={"entity:notify.kitchen": True, "entity:notify.phone": True},
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    manager.settings["sleep_fallback_outputs"] = ("integration:nfandroidtv",)
+    manager.configured_notifies = (
+        "entity:notify.kitchen", "entity:notify.phone",
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.notify_outputs == ("entity:notify.kitchen",)

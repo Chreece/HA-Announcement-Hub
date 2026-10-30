@@ -42,7 +42,7 @@ def read(lang):
 @pytest.mark.parametrize("lang", NATIVE)
 def test_all_native_locale_help_strings_are_present_and_localized(lang):
     en, localized = read("en"), read(lang)
-    assert len(en) == 625
+    assert len(en) == 639
     assert set(localized) == set(en), lang
     for key, source in en.items():
         assert localized[key], (lang, key)

@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.10.0b23"
+VERSION: Final = "0.10.0b24"
 PLATFORMS: Final = [Platform.SENSOR, Platform.SWITCH]
 
 SERVICE_SEND: Final = "send"
@@ -124,6 +124,9 @@ CONF_OCCUPANCY_ATTRIBUTE: Final = "occupancy_attribute"
 CONF_SLEEP_ROOMS: Final = "sleep_rooms"  # Legacy fixed-area selection; read-only migration fallback.
 CONF_SLEEP_ROOMS_ENTITY: Final = "sleep_rooms_entity"
 CONF_SLEEP_ROOMS_ATTRIBUTE: Final = "sleep_rooms_attribute"
+CONF_SLEEP_MUTE_TTS: Final = "sleep_mute_tts"
+CONF_SLEEP_FALLBACK_WRITTEN: Final = "sleep_fallback_written"
+CONF_SLEEP_FALLBACK_OUTPUTS: Final = "sleep_fallback_outputs"
 CONF_FALLBACK_ROOM: Final = "fallback_room"
 CONF_PERSON_PROFILES: Final = "person_profiles"
 CONF_PERSON_GROUP_LANGUAGE: Final = "person_group_language"
@@ -243,6 +246,9 @@ DEFAULT_AI_AGENT: Final = "default"  # Uses HA current default conversation agen
 DEFAULT_FALLBACK_AI_AGENT: Final = "original"  # Never block a notification.
 DEFAULT_CRITICAL_NOTIFY_DATA: Final = {}
 DEFAULT_OCCUPIED_ONLY: Final = True
+# Existing v0.10.0b23 behavior remains active on upgrade.
+DEFAULT_SLEEP_MUTE_TTS: Final = True
+DEFAULT_SLEEP_FALLBACK_WRITTEN: Final = True
 DEFAULT_FALLBACK_CHECK_DOOR: Final = True
 DEFAULT_NOTIFY_MAX_LENGTH: Final = 0
 DEFAULT_NFANDROIDTV_MAX_LENGTH: Final = 193

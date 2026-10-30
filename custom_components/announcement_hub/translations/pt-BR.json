@@ -124,7 +124,10 @@
           "fallback_ai_agent": "Provedor de IA alternativo (conversa ou tarefa de IA)",
           "channel_fallback_mode": "Alternativa entre canais de notificação",
           "sleep_rooms_entity": "Entidade dos cômodos onde há pessoas dormindo",
-          "sleep_rooms_attribute": "Valor dos cômodos com pessoas dormindo"
+          "sleep_rooms_attribute": "Valor dos cômodos com pessoas dormindo",
+          "sleep_mute_tts": "Silenciar TTS quando todos estiverem dormindo",
+          "sleep_fallback_written": "Notificação escrita alternativa durante o sono",
+          "sleep_fallback_outputs": "Destinatários escritos durante o sono"
         },
         "data_description": {
           "queue_max": "Número máximo aceito de trabalhos de anúncio pendentes ou ativos. Os novos envios são rejeitados quando este limite é atingido.",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "Agente AI de reserva opcional caso o principal falhe. O valor padrão do Home Assistant também segue o pipeline Assist preferido; a opção de anúncio original ignora uma segunda tentativa de AI. Se nenhum agente AI funcionar, o texto original é sempre entregue.",
           "channel_fallback_mode": "Somente quando houver AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala se falhar; TTS → Visual fala primeiro e notifica se falhar; Ambos tenta os dois canais. Um único canal disponível funciona normalmente. Não cria texto ausente nem amplia destinatários; os níveis continuam valendo.",
           "sleep_rooms_entity": "Selecione a entidade do Home Assistant cujo estado ou atributo informa os cômodos em que há pessoas dormindo agora. A lista é dinâmica, não uma seleção permanente de quartos.",
-          "sleep_rooms_attribute": "Escolha Estado ou um atributo da entidade. Aceita IDs, nomes, apelidos, listas e textos separados por vírgulas. Cômodos desconhecidos são ignorados; se a fonte ficar indisponível, a fala será silenciada quando a ocupação for conhecida."
+          "sleep_rooms_attribute": "Escolha Estado ou um atributo da entidade. Aceita IDs, nomes, apelidos, listas e textos separados por vírgulas. Cômodos desconhecidos são ignorados; se a fonte ficar indisponível, a fala será silenciada quando a ocupação for conhecida.",
+          "sleep_mute_tts": "Quando todos os cômodos ocupados forem informados como locais de pessoas dormindo, toda fala e som de anúncio será silenciado, inclusive Crítico, Snapcast e TTS do Companion App. Se a fonte de sono ficar indisponível mas a ocupação for conhecida, o áudio será silenciado por segurança. Desative para manter a fala normal.",
+          "sleep_fallback_written": "Com o TTS silenciado durante o sono, envie uma notificação escrita apenas aos destinatários selecionados abaixo. Mensagens somente TTS usam o texto falado como texto escrito. Desativar mantém o anúncio automático na fila. Não se aplica sem o silêncio por sono.",
+          "sleep_fallback_outputs": "Selecione vários destinos: primeiro uma integração para todos os dispositivos de notificação já configurados ou dispositivos individuais abaixo. Somente saídas ativas no Announcement Hub são permitidas. Seleção vazia não envia nada. Instalações existentes usam por padrão todos os dispositivos Companion App configurados."
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "O áudio do aviso sonoro deve usar um arquivo /local/.",
       "invalid_person_area": "Selecione um cômodo válido do Home Assistant.",
       "invalid_person_presence": "Selecione um sensor de presença antes de ativar a verificação.",
-      "invalid_sleep_source": "Fonte inválida de cômodos com pessoas dormindo; escolha Estado ou um atributo disponível."
+      "invalid_sleep_source": "Fonte inválida de cômodos com pessoas dormindo; escolha Estado ou um atributo disponível.",
+      "invalid_sleep_fallback_target": "Selecione somente integrações ou dispositivos configurados para notificações escritas durante o sono."
     },
     "abort": {
       "single_instance_allowed": "O Announcement Hub já está configurado."
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "Provedor de IA alternativo (conversa ou tarefa de IA)",
           "channel_fallback_mode": "Alternativa entre canais de notificação",
           "sleep_rooms_entity": "Entidade dos cômodos onde há pessoas dormindo",
-          "sleep_rooms_attribute": "Valor dos cômodos com pessoas dormindo"
+          "sleep_rooms_attribute": "Valor dos cômodos com pessoas dormindo",
+          "sleep_mute_tts": "Silenciar TTS quando todos estiverem dormindo",
+          "sleep_fallback_written": "Notificação escrita alternativa durante o sono",
+          "sleep_fallback_outputs": "Destinatários escritos durante o sono"
         },
         "data_description": {
           "queue_max": "Número máximo aceito de trabalhos de anúncio pendentes ou ativos. Os novos envios são rejeitados quando este limite é atingido.",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "Agente AI de reserva opcional caso o principal falhe. O valor padrão do Home Assistant também segue o pipeline Assist preferido; a opção de anúncio original ignora uma segunda tentativa de AI. Se nenhum agente AI funcionar, o texto original é sempre entregue.",
           "channel_fallback_mode": "Somente quando houver AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala se falhar; TTS → Visual fala primeiro e notifica se falhar; Ambos tenta os dois canais. Um único canal disponível funciona normalmente. Não cria texto ausente nem amplia destinatários; os níveis continuam valendo.",
           "sleep_rooms_entity": "Selecione a entidade do Home Assistant cujo estado ou atributo informa os cômodos em que há pessoas dormindo agora. A lista é dinâmica, não uma seleção permanente de quartos.",
-          "sleep_rooms_attribute": "Escolha Estado ou um atributo da entidade. Aceita IDs, nomes, apelidos, listas e textos separados por vírgulas. Cômodos desconhecidos são ignorados; se a fonte ficar indisponível, a fala será silenciada quando a ocupação for conhecida."
+          "sleep_rooms_attribute": "Escolha Estado ou um atributo da entidade. Aceita IDs, nomes, apelidos, listas e textos separados por vírgulas. Cômodos desconhecidos são ignorados; se a fonte ficar indisponível, a fala será silenciada quando a ocupação for conhecida.",
+          "sleep_mute_tts": "Quando todos os cômodos ocupados forem informados como locais de pessoas dormindo, toda fala e som de anúncio será silenciado, inclusive Crítico, Snapcast e TTS do Companion App. Se a fonte de sono ficar indisponível mas a ocupação for conhecida, o áudio será silenciado por segurança. Desative para manter a fala normal.",
+          "sleep_fallback_written": "Com o TTS silenciado durante o sono, envie uma notificação escrita apenas aos destinatários selecionados abaixo. Mensagens somente TTS usam o texto falado como texto escrito. Desativar mantém o anúncio automático na fila. Não se aplica sem o silêncio por sono.",
+          "sleep_fallback_outputs": "Selecione vários destinos: primeiro uma integração para todos os dispositivos de notificação já configurados ou dispositivos individuais abaixo. Somente saídas ativas no Announcement Hub são permitidas. Seleção vazia não envia nada. Instalações existentes usam por padrão todos os dispositivos Companion App configurados."
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "O áudio do aviso sonoro deve usar um arquivo /local/.",
       "invalid_person_area": "Selecione um cômodo válido do Home Assistant.",
       "invalid_person_presence": "Selecione um sensor de presença antes de ativar a verificação.",
-      "invalid_sleep_source": "Fonte inválida de cômodos com pessoas dormindo; escolha Estado ou um atributo disponível."
+      "invalid_sleep_source": "Fonte inválida de cômodos com pessoas dormindo; escolha Estado ou um atributo disponível.",
+      "invalid_sleep_fallback_target": "Selecione somente integrações ou dispositivos configurados para notificações escritas durante o sono."
     }
   },
   "selector": {

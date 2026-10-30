@@ -108,6 +108,10 @@ class FakeManager:
         return False
 
     @staticmethod
+    def _sleep_tts_muted_now():
+        return False
+
+    @staticmethod
     def _is_player_busy(_player):
         return True
 

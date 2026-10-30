@@ -124,7 +124,10 @@
           "fallback_ai_agent": "Ersatz-KI-Konversationsagent",
           "channel_fallback_mode": "Kanal-Fallback für Mitteilungen",
           "sleep_rooms_entity": "Entität für aktuell schlafende Räume",
-          "sleep_rooms_attribute": "Wert der Schlafräume"
+          "sleep_rooms_attribute": "Wert der Schlafräume",
+          "sleep_mute_tts": "TTS stummschalten, wenn alle schlafen",
+          "sleep_fallback_written": "Im Schlaf schriftlich benachrichtigen",
+          "sleep_fallback_outputs": "Empfänger schriftlicher Schlaf-Benachrichtigungen"
         },
         "data_description": {
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt.",
           "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam.",
           "sleep_rooms_entity": "Wähle die Home-Assistant-Entität aus, deren Zustand oder Attribut die Räume meldet, in denen gerade Menschen schlafen. Die Liste ist dynamisch und bezeichnet keine dauerhaft festgelegten Schlafzimmer.",
-          "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm."
+          "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm.",
+          "sleep_mute_tts": "Wenn alle belegten Räume als schlafend gemeldet werden, bleiben sämtliche Sprachausgaben und Signaltöne aus, auch bei Kritisch, Snapcast und Companion-App-TTS. Ist die Schlafquelle nicht verfügbar, aber die Anwesenheit bekannt, wird vorsorglich ebenfalls stummgeschaltet. Deaktivieren, um normales Sprechen beizubehalten.",
+          "sleep_fallback_written": "Wenn die Schlaf-Stummschaltung aktiv ist, wird stattdessen nur an die unten ausgewählten Empfänger eine schriftliche Benachrichtigung gesendet. Bei reinen TTS-Nachrichten dient der gesprochene Text als Nachricht. Deaktivieren hält die automatische Ankündigung in der Warteschlange. Ohne Schlaf-Stummschaltung hat diese Option keine Wirkung.",
+          "sleep_fallback_outputs": "Mehrere Ziele auswählbar: zuerst eine Integration für alle bereits konfigurierten Meldegeräte oder darunter einzelne Geräte. Nur in Announcement Hub aktivierte Ausgaben sind erlaubt. Eine leere Auswahl sendet nichts. Bestehende Installationen verwenden standardmäßig alle konfigurierten Companion-App-Geräte."
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "Die Signaltongdatei muss unter /local/ liegen.",
       "invalid_person_area": "Bitte einen gültigen Home-Assistant-Bereich auswählen.",
       "invalid_person_presence": "Vor dem Aktivieren einen Anwesenheitssensor auswählen.",
-      "invalid_sleep_source": "Ungültige Schlafraumquelle; bitte Zustand oder ein vorhandenes Attribut wählen."
+      "invalid_sleep_source": "Ungültige Schlafraumquelle; bitte Zustand oder ein vorhandenes Attribut wählen.",
+      "invalid_sleep_fallback_target": "Nur konfigurierte Integrationen oder Geräte für die schriftliche Schlaf-Benachrichtigung auswählen."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub ist bereits eingerichtet."
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "Ersatz-KI-Konversationsagent",
           "channel_fallback_mode": "Kanal-Fallback für Mitteilungen",
           "sleep_rooms_entity": "Entität für aktuell schlafende Räume",
-          "sleep_rooms_attribute": "Wert der Schlafräume"
+          "sleep_rooms_attribute": "Wert der Schlafräume",
+          "sleep_mute_tts": "TTS stummschalten, wenn alle schlafen",
+          "sleep_fallback_written": "Im Schlaf schriftlich benachrichtigen",
+          "sleep_fallback_outputs": "Empfänger schriftlicher Schlaf-Benachrichtigungen"
         },
         "data_description": {
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt.",
           "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam.",
           "sleep_rooms_entity": "Wähle die Home-Assistant-Entität aus, deren Zustand oder Attribut die Räume meldet, in denen gerade Menschen schlafen. Die Liste ist dynamisch und bezeichnet keine dauerhaft festgelegten Schlafzimmer.",
-          "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm."
+          "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm.",
+          "sleep_mute_tts": "Wenn alle belegten Räume als schlafend gemeldet werden, bleiben sämtliche Sprachausgaben und Signaltöne aus, auch bei Kritisch, Snapcast und Companion-App-TTS. Ist die Schlafquelle nicht verfügbar, aber die Anwesenheit bekannt, wird vorsorglich ebenfalls stummgeschaltet. Deaktivieren, um normales Sprechen beizubehalten.",
+          "sleep_fallback_written": "Wenn die Schlaf-Stummschaltung aktiv ist, wird stattdessen nur an die unten ausgewählten Empfänger eine schriftliche Benachrichtigung gesendet. Bei reinen TTS-Nachrichten dient der gesprochene Text als Nachricht. Deaktivieren hält die automatische Ankündigung in der Warteschlange. Ohne Schlaf-Stummschaltung hat diese Option keine Wirkung.",
+          "sleep_fallback_outputs": "Mehrere Ziele auswählbar: zuerst eine Integration für alle bereits konfigurierten Meldegeräte oder darunter einzelne Geräte. Nur in Announcement Hub aktivierte Ausgaben sind erlaubt. Eine leere Auswahl sendet nichts. Bestehende Installationen verwenden standardmäßig alle konfigurierten Companion-App-Geräte."
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "Die Signaltongdatei muss unter /local/ liegen.",
       "invalid_person_area": "Bitte einen gültigen Home-Assistant-Bereich auswählen.",
       "invalid_person_presence": "Vor dem Aktivieren einen Anwesenheitssensor auswählen.",
-      "invalid_sleep_source": "Ungültige Schlafraumquelle; bitte Zustand oder ein vorhandenes Attribut wählen."
+      "invalid_sleep_source": "Ungültige Schlafraumquelle; bitte Zustand oder ein vorhandenes Attribut wählen.",
+      "invalid_sleep_fallback_target": "Nur konfigurierte Integrationen oder Geräte für die schriftliche Schlaf-Benachrichtigung auswählen."
     }
   },
   "selector": {

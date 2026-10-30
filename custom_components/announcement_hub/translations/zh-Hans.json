@@ -124,7 +124,10 @@
           "fallback_ai_agent": "备用 AI 提供者（对话或 AI 任务）",
           "channel_fallback_mode": "通知渠道备用方式",
           "sleep_rooms_entity": "当前睡眠房间实体",
-          "sleep_rooms_attribute": "当前睡眠房间取值"
+          "sleep_rooms_attribute": "当前睡眠房间取值",
+          "sleep_mute_tts": "所有人睡觉时静音 TTS",
+          "sleep_fallback_written": "睡眠期间改发文字通知",
+          "sleep_fallback_outputs": "睡眠期间文字通知接收方"
         },
         "data_description": {
           "queue_max": "允许同时处于等待或活动状态的公告任务最大数量。达到上限时将拒绝新的发送请求。",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "主 AI 代理失败时使用的可选备用代理。Home Assistant 默认选项同样遵循首选 Assist 流程；选择原始公告则跳过第二次 AI 尝试。若所有 AI 都失败，仍始终发送原始文本。",
           "channel_fallback_mode": "仅当同时提供语音 text_tts、文字 text_notify，且存在合格的 TTS 和可视设备时生效：可视 → TTS 先通知，失败后朗读；TTS → 可视 先朗读，失败后通知；两者同时尝试两个渠道。只有一个渠道时正常发送。不会生成缺失的文字或扩大接收范围，原有等级限制仍生效。",
           "sleep_rooms_entity": "选择其状态或属性列出当前有人正在睡觉的房间的 Home Assistant 实体。此列表会动态变化，而非固定指定卧室。",
-          "sleep_rooms_attribute": "选择实体状态或某个属性。支持区域 ID、名称、别名、列表或逗号分隔的文本。未知房间将被忽略；若来源不可用但已知有人在家，则禁止语音播报。"
+          "sleep_rooms_attribute": "选择实体状态或某个属性。支持区域 ID、名称、别名、列表或逗号分隔的文本。未知房间将被忽略；若来源不可用但已知有人在家，则禁止语音播报。",
+          "sleep_mute_tts": "当所有有人房间都被报告为当前睡眠房间时，禁止任何语音播报和提示音，包括严重级别、Snapcast 和 Companion App TTS。如果睡眠数据源不可用，但已知房间有人，也会谨慎静音。关闭此项可保留正常语音。",
+          "sleep_fallback_written": "睡眠静音 TTS 生效时，仅向下方所选接收方发送文字通知。仅有 TTS 文本的公告会将朗读文本作为文字发送。关闭后，自动公告会留在队列中等待。若关闭睡眠静音，本选项无效。",
+          "sleep_fallback_outputs": "可多选：先选择一个集成以包含其所有已配置通知设备，或者在下方选择单独设备。只允许已在 Announcement Hub 中启用的通知输出。空选项不会发送任何内容。现有安装默认选择所有已配置的 Companion App 设备。"
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "提示音音频必须使用 /local/ 下的文件。",
       "invalid_person_area": "请选择有效的 Home Assistant 房间。",
       "invalid_person_presence": "启用验证前请先选择存在状态传感器。",
-      "invalid_sleep_source": "睡眠房间来源无效；请选择状态或可用属性。"
+      "invalid_sleep_source": "睡眠房间来源无效；请选择状态或可用属性。",
+      "invalid_sleep_fallback_target": "只能选择已配置的集成或设备作为睡眠期间的文字通知接收方。"
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub 已配置。"
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "备用 AI 提供者（对话或 AI 任务）",
           "channel_fallback_mode": "通知渠道备用方式",
           "sleep_rooms_entity": "当前睡眠房间实体",
-          "sleep_rooms_attribute": "当前睡眠房间取值"
+          "sleep_rooms_attribute": "当前睡眠房间取值",
+          "sleep_mute_tts": "所有人睡觉时静音 TTS",
+          "sleep_fallback_written": "睡眠期间改发文字通知",
+          "sleep_fallback_outputs": "睡眠期间文字通知接收方"
         },
         "data_description": {
           "queue_max": "允许同时处于等待或活动状态的公告任务最大数量。达到上限时将拒绝新的发送请求。",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "主 AI 代理失败时使用的可选备用代理。Home Assistant 默认选项同样遵循首选 Assist 流程；选择原始公告则跳过第二次 AI 尝试。若所有 AI 都失败，仍始终发送原始文本。",
           "channel_fallback_mode": "仅当同时提供语音 text_tts、文字 text_notify，且存在合格的 TTS 和可视设备时生效：可视 → TTS 先通知，失败后朗读；TTS → 可视 先朗读，失败后通知；两者同时尝试两个渠道。只有一个渠道时正常发送。不会生成缺失的文字或扩大接收范围，原有等级限制仍生效。",
           "sleep_rooms_entity": "选择其状态或属性列出当前有人正在睡觉的房间的 Home Assistant 实体。此列表会动态变化，而非固定指定卧室。",
-          "sleep_rooms_attribute": "选择实体状态或某个属性。支持区域 ID、名称、别名、列表或逗号分隔的文本。未知房间将被忽略；若来源不可用但已知有人在家，则禁止语音播报。"
+          "sleep_rooms_attribute": "选择实体状态或某个属性。支持区域 ID、名称、别名、列表或逗号分隔的文本。未知房间将被忽略；若来源不可用但已知有人在家，则禁止语音播报。",
+          "sleep_mute_tts": "当所有有人房间都被报告为当前睡眠房间时，禁止任何语音播报和提示音，包括严重级别、Snapcast 和 Companion App TTS。如果睡眠数据源不可用，但已知房间有人，也会谨慎静音。关闭此项可保留正常语音。",
+          "sleep_fallback_written": "睡眠静音 TTS 生效时，仅向下方所选接收方发送文字通知。仅有 TTS 文本的公告会将朗读文本作为文字发送。关闭后，自动公告会留在队列中等待。若关闭睡眠静音，本选项无效。",
+          "sleep_fallback_outputs": "可多选：先选择一个集成以包含其所有已配置通知设备，或者在下方选择单独设备。只允许已在 Announcement Hub 中启用的通知输出。空选项不会发送任何内容。现有安装默认选择所有已配置的 Companion App 设备。"
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "提示音音频必须使用 /local/ 下的文件。",
       "invalid_person_area": "请选择有效的 Home Assistant 房间。",
       "invalid_person_presence": "启用验证前请先选择存在状态传感器。",
-      "invalid_sleep_source": "睡眠房间来源无效；请选择状态或可用属性。"
+      "invalid_sleep_source": "睡眠房间来源无效；请选择状态或可用属性。",
+      "invalid_sleep_fallback_target": "只能选择已配置的集成或设备作为睡眠期间的文字通知接收方。"
     }
   },
   "selector": {
