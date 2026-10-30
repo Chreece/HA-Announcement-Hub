@@ -282,7 +282,8 @@ def test_dual_channel_complete_provider_failure_is_not_reported_as_success(mode)
 
 def test_no_fallback_changes_text_payload_or_exact_recipient_list():
     assert 'job.text_tts if audible else None' in MANAGER
-    assert 'job.text_notify if job.notify_outputs else None' in MANAGER
+    assert 'job.notify_text = written_text if job.notify_outputs else None' in MANAGER
+    assert 'job.text_tts if sleeping_home and stage_kind == "general" else None' in MANAGER
     assert "self._select_requested_outputs(" in MANAGER
     assert "job.routing_channel_retry = desired_retry" in MANAGER
     assert "self._prepare_staged_route(job)" in MANAGER

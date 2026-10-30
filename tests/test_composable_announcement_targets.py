@@ -153,7 +153,8 @@ def test_severity_never_overrides_selected_text_channel():
     assert "notify_text = text_notify" in model
     routing = MANAGER[MANAGER.index("    def _prepare_staged_route("):]
     assert "job.tts_text = job.text_tts if audible else None" in routing
-    assert "job.notify_text = job.text_notify if job.notify_outputs else None" in routing
+    assert "job.notify_text = written_text if job.notify_outputs else None" in routing
+    assert 'job.text_tts if sleeping_home and stage_kind == "general" else None' in routing
 
 
 def test_configured_device_registry_identity_does_not_expand_other_hardware():
