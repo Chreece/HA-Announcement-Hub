@@ -122,7 +122,8 @@
           "default_use_ai": "使用 AI 改写公告",
           "default_ai_agent": "默认 AI 提供者（对话或 AI 任务）",
           "fallback_ai_agent": "备用 AI 提供者（对话或 AI 任务）",
-          "channel_fallback_mode": "通知渠道备用方式"
+          "channel_fallback_mode": "通知渠道备用方式",
+          "sleep_rooms": "睡眠房间"
         },
         "data_description": {
           "queue_max": "允许同时处于等待或活动状态的公告任务最大数量。达到上限时将拒绝新的发送请求。",
@@ -135,13 +136,14 @@
           "critical_notify_data": "仅向 Critical 级别可视通知合并的提供商专用数据，例如通知集成支持的紧急度或优先级选项。",
           "occupancy_sensor": "此实体的状态或所选属性包含当前有人占用的 Home Assistant 区域名称或 ID。仅在发送操作启用“仅占用房间”路由时使用。",
           "occupancy_attribute": "选择从实体状态还是其当前某个属性读取有人占用的房间。",
-          "fallback_room": "备用 TTS 区域仅在当前目标房间完全没有固定房间候选输出时使用。即使已有的固定候选输出不可用或状态未知，也会阻止备用路由，并继续遵守正常的可用性等待超时。",
+          "fallback_room": "仅当原目标房间有人且未睡眠、无法在该房间送达并满足开门条件时使用。目标房间无人或属于睡眠房间时绝不使用。",
           "fallback_check_door": "启用后，只有当前目标房间之一的合格门传感器明确报告门已打开，才允许转向备用房间。",
           "fallback_door_label": "可选的 Home Assistant 标签。选择后，只有带有该标签的二元门传感器才可允许备用路由；留空则考虑当前目标房间中的所有门传感器。",
           "default_use_ai": "启用后，所有公告默认继承 AI 改写，除非发送操作明确指定 use_ai: false。未设置 use_ai 时采用本设置。AI 失败时仍发送原始消息。可在操作的 response_variable 中查看 ai 状态。",
           "default_ai_agent": "Home Assistant 默认选项使用首选 Assist 流程中的对话代理，而不是内置的 conversation.process 意图代理。发送时才确定具体代理，并在下拉列表中显示。如果首选流程使用内置代理，请明确选择基于 LLM 的代理或配置备用代理。",
           "fallback_ai_agent": "主 AI 代理失败时使用的可选备用代理。Home Assistant 默认选项同样遵循首选 Assist 流程；选择原始公告则跳过第二次 AI 尝试。若所有 AI 都失败，仍始终发送原始文本。",
-          "channel_fallback_mode": "仅当同时提供语音 text_tts、文字 text_notify，且存在合格的 TTS 和可视设备时生效：可视 → TTS 先通知，失败后朗读；TTS → 可视 先朗读，失败后通知；两者同时尝试两个渠道。只有一个渠道时正常发送。不会生成缺失的文字或扩大接收范围，原有等级限制仍生效。"
+          "channel_fallback_mode": "仅当同时提供语音 text_tts、文字 text_notify，且存在合格的 TTS 和可视设备时生效：可视 → TTS 先通知，失败后朗读；TTS → 可视 先朗读，失败后通知；两者同时尝试两个渠道。只有一个渠道时正常发送。不会生成缺失的文字或扩大接收范围，原有等级限制仍生效。",
+          "sleep_rooms": "有人时视为睡眠中的房间。如果所有有人房间都属于此类，禁止所有语音播报，仅向已配置的手机应用发送文字通知。"
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "使用 AI 改写公告",
           "default_ai_agent": "默认 AI 提供者（对话或 AI 任务）",
           "fallback_ai_agent": "备用 AI 提供者（对话或 AI 任务）",
-          "channel_fallback_mode": "通知渠道备用方式"
+          "channel_fallback_mode": "通知渠道备用方式",
+          "sleep_rooms": "睡眠房间"
         },
         "data_description": {
           "queue_max": "允许同时处于等待或活动状态的公告任务最大数量。达到上限时将拒绝新的发送请求。",
@@ -440,13 +443,14 @@
           "critical_notify_data": "仅向 Critical 级别可视通知合并的提供商专用数据，例如通知集成支持的紧急度或优先级选项。",
           "occupancy_sensor": "此实体的状态或所选属性包含当前有人占用的 Home Assistant 区域名称或 ID。仅在发送操作启用“仅占用房间”路由时使用。",
           "occupancy_attribute": "选择从实体状态还是其当前某个属性读取有人占用的房间。",
-          "fallback_room": "备用 TTS 区域仅在当前目标房间完全没有固定房间候选输出时使用。即使已有的固定候选输出不可用或状态未知，也会阻止备用路由，并继续遵守正常的可用性等待超时。",
+          "fallback_room": "仅当原目标房间有人且未睡眠、无法在该房间送达并满足开门条件时使用。目标房间无人或属于睡眠房间时绝不使用。",
           "fallback_check_door": "启用后，只有当前目标房间之一的合格门传感器明确报告门已打开，才允许转向备用房间。",
           "fallback_door_label": "可选的 Home Assistant 标签。选择后，只有带有该标签的二元门传感器才可允许备用路由；留空则考虑当前目标房间中的所有门传感器。",
           "default_use_ai": "启用后，所有公告默认继承 AI 改写，除非发送操作明确指定 use_ai: false。未设置 use_ai 时采用本设置。AI 失败时仍发送原始消息。可在操作的 response_variable 中查看 ai 状态。",
           "default_ai_agent": "Home Assistant 默认选项使用首选 Assist 流程中的对话代理，而不是内置的 conversation.process 意图代理。发送时才确定具体代理，并在下拉列表中显示。如果首选流程使用内置代理，请明确选择基于 LLM 的代理或配置备用代理。",
           "fallback_ai_agent": "主 AI 代理失败时使用的可选备用代理。Home Assistant 默认选项同样遵循首选 Assist 流程；选择原始公告则跳过第二次 AI 尝试。若所有 AI 都失败，仍始终发送原始文本。",
-          "channel_fallback_mode": "仅当同时提供语音 text_tts、文字 text_notify，且存在合格的 TTS 和可视设备时生效：可视 → TTS 先通知，失败后朗读；TTS → 可视 先朗读，失败后通知；两者同时尝试两个渠道。只有一个渠道时正常发送。不会生成缺失的文字或扩大接收范围，原有等级限制仍生效。"
+          "channel_fallback_mode": "仅当同时提供语音 text_tts、文字 text_notify，且存在合格的 TTS 和可视设备时生效：可视 → TTS 先通知，失败后朗读；TTS → 可视 先朗读，失败后通知；两者同时尝试两个渠道。只有一个渠道时正常发送。不会生成缺失的文字或扩大接收范围，原有等级限制仍生效。",
+          "sleep_rooms": "有人时视为睡眠中的房间。如果所有有人房间都属于此类，禁止所有语音播报，仅向已配置的手机应用发送文字通知。"
         }
       },
       "init": {
