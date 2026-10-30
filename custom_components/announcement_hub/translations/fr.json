@@ -124,7 +124,10 @@
           "fallback_ai_agent": "Fournisseur IA de secours (conversation ou tâche IA)",
           "channel_fallback_mode": "Canal de secours des notifications",
           "sleep_rooms_entity": "Entité des pièces où l’on dort",
-          "sleep_rooms_attribute": "Valeur des pièces endormies"
+          "sleep_rooms_attribute": "Valeur des pièces endormies",
+          "sleep_mute_tts": "Couper le TTS lorsque tout le monde dort",
+          "sleep_fallback_written": "Notification écrite de secours pendant le sommeil",
+          "sleep_fallback_outputs": "Destinataires écrits pendant le sommeil"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "Agent de secours facultatif utilisé en cas d'échec de l'agent principal. La valeur Home Assistant par défaut suit aussi le pipeline Assist préféré ; « Annonce d'origine » évite un second appel à l'IA. Si aucun agent ne fonctionne, le texte d'origine est toujours transmis.",
           "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables.",
           "sleep_rooms_entity": "Sélectionnez l’entité Home Assistant dont l’état ou un attribut indique les pièces où des personnes dorment actuellement. Cette liste est dynamique et ne correspond pas à des chambres fixes.",
-          "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue."
+          "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue.",
+          "sleep_mute_tts": "Si toutes les pièces occupées sont signalées comme endormies, couper toutes les annonces vocales et sonneries, même Critique, Snapcast et TTS Companion App. Si la source de sommeil est indisponible mais que l'occupation est connue, garder le silence par précaution. Désactiver pour conserver la parole normale.",
+          "sleep_fallback_written": "Quand le TTS est coupé en raison du sommeil, envoyer plutôt une notification écrite uniquement aux destinataires choisis ci-dessous. Un message TTS seul utilise son texte oral comme texte écrit. La désactivation garde l'annonce automatique en attente. Cette option est sans effet si la coupure du TTS est désactivée.",
+          "sleep_fallback_outputs": "Sélectionnez plusieurs destinations : d'abord une intégration pour tous ses appareils de notification déjà configurés, ou des appareils individuels ci-dessous. Seules les sorties activées dans Announcement Hub sont autorisées. Une sélection vide n'envoie rien. Par défaut, les installations existantes utilisent tous les appareils Companion App configurés."
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "Le fichier audio du carillon doit être accessible sous /local/.",
       "invalid_person_area": "Sélectionnez une pièce Home Assistant valide.",
       "invalid_person_presence": "Sélectionnez un capteur de présence avant d’activer la vérification.",
-      "invalid_sleep_source": "Source des pièces endormies incorrecte ; choisissez État ou un attribut disponible."
+      "invalid_sleep_source": "Source des pièces endormies incorrecte ; choisissez État ou un attribut disponible.",
+      "invalid_sleep_fallback_target": "Sélectionnez uniquement les intégrations ou appareils configurés pour les notifications écrites de sommeil."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub est déjà configuré."
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "Fournisseur IA de secours (conversation ou tâche IA)",
           "channel_fallback_mode": "Canal de secours des notifications",
           "sleep_rooms_entity": "Entité des pièces où l’on dort",
-          "sleep_rooms_attribute": "Valeur des pièces endormies"
+          "sleep_rooms_attribute": "Valeur des pièces endormies",
+          "sleep_mute_tts": "Couper le TTS lorsque tout le monde dort",
+          "sleep_fallback_written": "Notification écrite de secours pendant le sommeil",
+          "sleep_fallback_outputs": "Destinataires écrits pendant le sommeil"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "Agent de secours facultatif utilisé en cas d'échec de l'agent principal. La valeur Home Assistant par défaut suit aussi le pipeline Assist préféré ; « Annonce d'origine » évite un second appel à l'IA. Si aucun agent ne fonctionne, le texte d'origine est toujours transmis.",
           "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables.",
           "sleep_rooms_entity": "Sélectionnez l’entité Home Assistant dont l’état ou un attribut indique les pièces où des personnes dorment actuellement. Cette liste est dynamique et ne correspond pas à des chambres fixes.",
-          "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue."
+          "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue.",
+          "sleep_mute_tts": "Si toutes les pièces occupées sont signalées comme endormies, couper toutes les annonces vocales et sonneries, même Critique, Snapcast et TTS Companion App. Si la source de sommeil est indisponible mais que l'occupation est connue, garder le silence par précaution. Désactiver pour conserver la parole normale.",
+          "sleep_fallback_written": "Quand le TTS est coupé en raison du sommeil, envoyer plutôt une notification écrite uniquement aux destinataires choisis ci-dessous. Un message TTS seul utilise son texte oral comme texte écrit. La désactivation garde l'annonce automatique en attente. Cette option est sans effet si la coupure du TTS est désactivée.",
+          "sleep_fallback_outputs": "Sélectionnez plusieurs destinations : d'abord une intégration pour tous ses appareils de notification déjà configurés, ou des appareils individuels ci-dessous. Seules les sorties activées dans Announcement Hub sont autorisées. Une sélection vide n'envoie rien. Par défaut, les installations existantes utilisent tous les appareils Companion App configurés."
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "Le fichier audio du carillon doit être accessible sous /local/.",
       "invalid_person_area": "Sélectionnez une pièce Home Assistant valide.",
       "invalid_person_presence": "Sélectionnez un capteur de présence avant d’activer la vérification.",
-      "invalid_sleep_source": "Source des pièces endormies incorrecte ; choisissez État ou un attribut disponible."
+      "invalid_sleep_source": "Source des pièces endormies incorrecte ; choisissez État ou un attribut disponible.",
+      "invalid_sleep_fallback_target": "Sélectionnez uniquement les intégrations ou appareils configurés pour les notifications écrites de sommeil."
     }
   },
   "selector": {
