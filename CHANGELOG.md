@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.10.0b23 - 2026-10-30
+
+**Beta — dynamically sourced sleeping rooms from a Home Assistant entity.**
+
+- Replace the static Sleep rooms area picker with a Home Assistant entity
+  dropdown and a second menu to select its State or one of its attributes.
+  Both initial setup and General settings/reconfiguration support the source.
+- Add dedicated descriptions and field-level help in all 20 supported
+  integration languages. Existing selected attributes remain available in
+  the menu while their source entity is temporarily offline.
+- Read the sleeping-room values live for each queued announcement and again
+  immediately before a chime, physical TTS playback, and companion-app TTS.
+  Resolve area IDs, names and aliases from state strings, lists and attributes;
+  ignore unknown room names rather than aborting routing.
+- Compare the dynamically sleeping rooms with the occupancy sensor's current
+  room list. If every occupied room is reported sleeping, suppress all
+  spoken announcements and use configured mobile-app written notifications.
+- If a configured sleeping-room source or chosen attribute becomes unavailable,
+  suppress speech while occupancy is known until reliable data returns.
+  Empty sleeping-room lists mean nobody is sleeping.
+- Preserve existing static sleep-room selections as a compatibility fallback
+  only until a new live entity source is selected.
+- Extend regression tests for changing sleep states, attribute selection,
+  offline inputs, aliases, channel safety, and setup/translation completeness.
+
 ## 0.10.0b22 - 2026-10-30
 
 **Beta — sleep-aware notifications and verified presence-based fallback.**
