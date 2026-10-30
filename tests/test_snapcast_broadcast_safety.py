@@ -31,6 +31,7 @@ class HomeAssistantError(Exception):
 NAMESPACE = {
     "asyncio": asyncio,
     "HomeAssistantError": HomeAssistantError,
+    "RoomRouteMoved": type("RoomRouteMoved", (HomeAssistantError,), {}),
     "STATE_UNAVAILABLE": "unavailable",
     "STATE_UNKNOWN": "unknown",
     "MEDIA_PLAYER_DOMAIN": "media_player",
