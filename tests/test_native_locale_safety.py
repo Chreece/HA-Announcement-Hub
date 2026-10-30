@@ -15,6 +15,8 @@ LOCALES = (
 )
 CONFIG_HELP = (
     "queue.data_description.occupancy_sensor",
+    "queue.data_description.sleep_rooms_entity",
+    "queue.data_description.sleep_rooms_attribute",
     "queue.data_description.fallback_room",
     "queue.data_description.fallback_check_door",
     "queue.data_description.default_use_ai",
