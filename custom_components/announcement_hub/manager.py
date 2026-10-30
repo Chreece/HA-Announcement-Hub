@@ -3819,6 +3819,8 @@ class AnnouncementManager:
         self, job: AnnouncementJob, player: str,
     ) -> None:
         """Only selected direct room speakers; never a shared Snapcast source."""
+        if self._all_occupied_rooms_sleeping():
+            return  # Even the pre-announcement bell must not wake sleepers.
         enabled = (
             job.pre_announce_sound
             if job.pre_announce_sound is not None
@@ -4329,6 +4331,8 @@ class AnnouncementManager:
     ) -> None:
         channel = f"companion_tts:{output.entry_id}"
         self._raise_if_cancelled(job)
+        if self._all_occupied_rooms_sleeping():
+            return  # Recheck after availability waits, before phone TTS.
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person disabled during Companion TTS")
         if self._group_already_delivered(job, channel):
@@ -4383,6 +4387,11 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
+        if self._all_occupied_rooms_sleeping():
+            raise HomeAssistantError(
+                "TTS suppressed because everybody is sleeping "
+                "or the live sleep-room source is unavailable"
+            )
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled before audio playback")
         shared_path = bool(
