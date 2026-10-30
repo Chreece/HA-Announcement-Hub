@@ -124,7 +124,10 @@
           "fallback_ai_agent": "Zapasowy dostawca AI (rozmowa lub zadanie AI)",
           "channel_fallback_mode": "Zastępczy kanał powiadamiania",
           "sleep_rooms_entity": "Encja pomieszczeń, w których ktoś śpi",
-          "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi"
+          "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi",
+          "sleep_mute_tts": "Wycisz TTS, gdy wszyscy śpią",
+          "sleep_fallback_written": "Pisemne powiadomienie zastępcze podczas snu",
+          "sleep_fallback_outputs": "Odbiorcy pisemnych powiadomień podczas snu"
         },
         "data_description": {
           "queue_max": "Maksymalna dopuszczalna liczba oczekujących lub aktywnych zadań ogłoszeń. Nowe wysyłki są odrzucane po osiągnięciu tego limitu.",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "Opcjonalny zapasowy agent AI na wypadek błędu agenta głównego. Wartość domyślna Home Assistant również podąża za preferowanym potokiem Assist; wybór oryginalnego ogłoszenia pomija drugą próbę AI. Jeśli oba agenty zawiodą, zawsze dostarczany jest oryginalny tekst.",
           "channel_fallback_mode": "Tylko gdy są ZARÓWNO text_tts i text_notify, JAK I odpowiednie urządzenia mowy i obrazu: Wizualnie → TTS najpierw powiadamia, potem mówi po błędzie; TTS → Wizualnie odwrotnie; Oba próbuje obu kanałów. Jeden kanał działa normalnie. Nie tworzy tekstu ani nie dodaje odbiorców; poziomy pozostają ważne.",
           "sleep_rooms_entity": "Wybierz encję Home Assistant, której stan lub atrybut zawiera pomieszczenia, w których obecnie śpią ludzie. To lista dynamiczna, a nie stały wybór sypialni.",
-          "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana."
+          "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana.",
+          "sleep_mute_tts": "Gdy wszystkie zajęte pokoje są oznaczone jako pokoje ze śpiącymi, wycisz wszystkie komunikaty głosowe i dźwięki, również Krytyczne, Snapcast i TTS Companion App. Jeśli źródło snu jest niedostępne, ale obecność jest znana, wycisz także zapobiegawczo. Wyłączenie przywraca zwykłą mowę.",
+          "sleep_fallback_written": "Gdy działa wyciszanie TTS podczas snu, wyślij zamiast niego pisemne powiadomienie tylko do odbiorców wybranych poniżej. Dla wiadomości wyłącznie TTS użyj tekstu mówionego. Wyłączenie pozostawia automatyczny komunikat w kolejce. Nie działa bez wyciszenia podczas snu.",
+          "sleep_fallback_outputs": "Wybierz wiele miejsc docelowych: najpierw integrację dla wszystkich skonfigurowanych w niej urządzeń powiadomień albo pojedyncze urządzenia poniżej. Dostępne są tylko wyjścia włączone w Announcement Hub. Pusty wybór nic nie wysyła. W dotychczasowych instalacjach domyślnie wybrane są urządzenia Companion App."
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "Dźwięk dzwonka musi pochodzić z pliku w /local/.",
       "invalid_person_area": "Wybierz prawidłowy pokój Home Assistant.",
       "invalid_person_presence": "Przed włączeniem weryfikacji wybierz czujnik obecności.",
-      "invalid_sleep_source": "Nieprawidłowe źródło pomieszczeń z osobami śpiącymi; wybierz Stan lub dostępny atrybut."
+      "invalid_sleep_source": "Nieprawidłowe źródło pomieszczeń z osobami śpiącymi; wybierz Stan lub dostępny atrybut.",
+      "invalid_sleep_fallback_target": "Wybierz wyłącznie skonfigurowane integracje lub urządzenia do pisemnych powiadomień podczas snu."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub jest już skonfigurowany."
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "Zapasowy dostawca AI (rozmowa lub zadanie AI)",
           "channel_fallback_mode": "Zastępczy kanał powiadamiania",
           "sleep_rooms_entity": "Encja pomieszczeń, w których ktoś śpi",
-          "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi"
+          "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi",
+          "sleep_mute_tts": "Wycisz TTS, gdy wszyscy śpią",
+          "sleep_fallback_written": "Pisemne powiadomienie zastępcze podczas snu",
+          "sleep_fallback_outputs": "Odbiorcy pisemnych powiadomień podczas snu"
         },
         "data_description": {
           "queue_max": "Maksymalna dopuszczalna liczba oczekujących lub aktywnych zadań ogłoszeń. Nowe wysyłki są odrzucane po osiągnięciu tego limitu.",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "Opcjonalny zapasowy agent AI na wypadek błędu agenta głównego. Wartość domyślna Home Assistant również podąża za preferowanym potokiem Assist; wybór oryginalnego ogłoszenia pomija drugą próbę AI. Jeśli oba agenty zawiodą, zawsze dostarczany jest oryginalny tekst.",
           "channel_fallback_mode": "Tylko gdy są ZARÓWNO text_tts i text_notify, JAK I odpowiednie urządzenia mowy i obrazu: Wizualnie → TTS najpierw powiadamia, potem mówi po błędzie; TTS → Wizualnie odwrotnie; Oba próbuje obu kanałów. Jeden kanał działa normalnie. Nie tworzy tekstu ani nie dodaje odbiorców; poziomy pozostają ważne.",
           "sleep_rooms_entity": "Wybierz encję Home Assistant, której stan lub atrybut zawiera pomieszczenia, w których obecnie śpią ludzie. To lista dynamiczna, a nie stały wybór sypialni.",
-          "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana."
+          "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana.",
+          "sleep_mute_tts": "Gdy wszystkie zajęte pokoje są oznaczone jako pokoje ze śpiącymi, wycisz wszystkie komunikaty głosowe i dźwięki, również Krytyczne, Snapcast i TTS Companion App. Jeśli źródło snu jest niedostępne, ale obecność jest znana, wycisz także zapobiegawczo. Wyłączenie przywraca zwykłą mowę.",
+          "sleep_fallback_written": "Gdy działa wyciszanie TTS podczas snu, wyślij zamiast niego pisemne powiadomienie tylko do odbiorców wybranych poniżej. Dla wiadomości wyłącznie TTS użyj tekstu mówionego. Wyłączenie pozostawia automatyczny komunikat w kolejce. Nie działa bez wyciszenia podczas snu.",
+          "sleep_fallback_outputs": "Wybierz wiele miejsc docelowych: najpierw integrację dla wszystkich skonfigurowanych w niej urządzeń powiadomień albo pojedyncze urządzenia poniżej. Dostępne są tylko wyjścia włączone w Announcement Hub. Pusty wybór nic nie wysyła. W dotychczasowych instalacjach domyślnie wybrane są urządzenia Companion App."
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "Dźwięk dzwonka musi pochodzić z pliku w /local/.",
       "invalid_person_area": "Wybierz prawidłowy pokój Home Assistant.",
       "invalid_person_presence": "Przed włączeniem weryfikacji wybierz czujnik obecności.",
-      "invalid_sleep_source": "Nieprawidłowe źródło pomieszczeń z osobami śpiącymi; wybierz Stan lub dostępny atrybut."
+      "invalid_sleep_source": "Nieprawidłowe źródło pomieszczeń z osobami śpiącymi; wybierz Stan lub dostępny atrybut.",
+      "invalid_sleep_fallback_target": "Wybierz wyłącznie skonfigurowane integracje lub urządzenia do pisemnych powiadomień podczas snu."
     }
   },
   "selector": {

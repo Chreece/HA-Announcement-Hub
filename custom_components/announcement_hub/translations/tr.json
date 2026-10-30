@@ -124,7 +124,10 @@
           "fallback_ai_agent": "Yedek YZ sağlayıcısı (sohbet veya YZ görevi)",
           "channel_fallback_mode": "Bildirim kanalı yedeklemesi",
           "sleep_rooms_entity": "Uyuyanların bulunduğu odalar varlığı",
-          "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri"
+          "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri",
+          "sleep_mute_tts": "Herkes uyurken TTS sesini kapat",
+          "sleep_fallback_written": "Uyku sırasında yazılı bildirim kullan",
+          "sleep_fallback_outputs": "Uyku sırasında yazılı bildirim alıcıları"
         },
         "data_description": {
           "queue_max": "İzin verilen en fazla bekleyen veya etkin duyuru işi sayısı. Sınıra ulaşıldığında yeni gönderimler reddedilir.",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "Birincil aracı başarısız olursa kullanılabilecek isteğe bağlı yedek AI aracısı. Home Assistant varsayılanı da tercih edilen Assist işlem hattını izler; Özgün duyuru seçeneği ikinci AI denemesini atlar. Hiçbir AI çalışmazsa özgün metin her zaman iletilir.",
           "channel_fallback_mode": "Yalnızca HEM konuşma text_tts hem yazılı text_notify HEM DE uygun TTS ve görsel cihazlar varsa: Görsel → TTS önce bildirir, başarısız olursa konuşur; TTS → Görsel önce konuşur, başarısız olursa bildirir; Her ikisi iki kanalı da dener. Tek kanal varsa normal çalışır. Eksik metin oluşturulmaz, alıcılar genişletilmez; seviye kuralları geçerlidir.",
           "sleep_rooms_entity": "Home Assistant içinde durumu veya niteliği şu anda insanların uyuduğu odaları listeleyen varlığı seçin. Bu dinamik bir listedir, kalıcı yatak odası seçimi değildir.",
-          "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur."
+          "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur.",
+          "sleep_mute_tts": "Dolu odaların tamamı uyuyanların bulunduğu odalar olarak bildiriliyorsa Kritik, Snapcast ve Companion App TTS dâhil tüm konuşmaları ve duyuru seslerini sustur. Uyku kaynağı kullanılamıyor ancak doluluk biliniyorsa önlem olarak yine sustur. Normal konuşma için kapat.",
+          "sleep_fallback_written": "Uyku nedeniyle TTS susturulmuşsa bunun yerine yalnızca aşağıda seçilen alıcılara yazılı bildirim gönder. Yalnızca TTS içeren mesajlarda konuşma metnini kullan. Kapatılırsa otomatik duyuru kuyrukta bekler. Uyku susturma kapalıysa etkisi yoktur.",
+          "sleep_fallback_outputs": "Birden fazla hedef seç: önce entegrasyondaki tüm yapılandırılmış bildirim cihazlarını veya aşağıdaki tek tek cihazları seç. Yalnızca Announcement Hub içinde etkinleştirilmiş çıkışlara izin verilir. Boş seçim gönderim yapmaz. Mevcut kurulumlarda tüm yapılandırılmış Companion App cihazları varsayılandır."
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "Zil sesi /local/ altında bir dosya kullanmalıdır.",
       "invalid_person_area": "Geçerli bir Home Assistant odası seçin.",
       "invalid_person_presence": "Doğrulamayı etkinleştirmeden önce varlık sensörü seçin.",
-      "invalid_sleep_source": "Uyuyan oda kaynağı geçersiz; Durum veya kullanılabilir bir nitelik seçin."
+      "invalid_sleep_source": "Uyuyan oda kaynağı geçersiz; Durum veya kullanılabilir bir nitelik seçin.",
+      "invalid_sleep_fallback_target": "Uyku sırasında yazılı bildirim için yalnızca yapılandırılmış entegrasyon ve cihazları seçin."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub zaten yapılandırılmış."
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "Yedek YZ sağlayıcısı (sohbet veya YZ görevi)",
           "channel_fallback_mode": "Bildirim kanalı yedeklemesi",
           "sleep_rooms_entity": "Uyuyanların bulunduğu odalar varlığı",
-          "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri"
+          "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri",
+          "sleep_mute_tts": "Herkes uyurken TTS sesini kapat",
+          "sleep_fallback_written": "Uyku sırasında yazılı bildirim kullan",
+          "sleep_fallback_outputs": "Uyku sırasında yazılı bildirim alıcıları"
         },
         "data_description": {
           "queue_max": "İzin verilen en fazla bekleyen veya etkin duyuru işi sayısı. Sınıra ulaşıldığında yeni gönderimler reddedilir.",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "Birincil aracı başarısız olursa kullanılabilecek isteğe bağlı yedek AI aracısı. Home Assistant varsayılanı da tercih edilen Assist işlem hattını izler; Özgün duyuru seçeneği ikinci AI denemesini atlar. Hiçbir AI çalışmazsa özgün metin her zaman iletilir.",
           "channel_fallback_mode": "Yalnızca HEM konuşma text_tts hem yazılı text_notify HEM DE uygun TTS ve görsel cihazlar varsa: Görsel → TTS önce bildirir, başarısız olursa konuşur; TTS → Görsel önce konuşur, başarısız olursa bildirir; Her ikisi iki kanalı da dener. Tek kanal varsa normal çalışır. Eksik metin oluşturulmaz, alıcılar genişletilmez; seviye kuralları geçerlidir.",
           "sleep_rooms_entity": "Home Assistant içinde durumu veya niteliği şu anda insanların uyuduğu odaları listeleyen varlığı seçin. Bu dinamik bir listedir, kalıcı yatak odası seçimi değildir.",
-          "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur."
+          "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur.",
+          "sleep_mute_tts": "Dolu odaların tamamı uyuyanların bulunduğu odalar olarak bildiriliyorsa Kritik, Snapcast ve Companion App TTS dâhil tüm konuşmaları ve duyuru seslerini sustur. Uyku kaynağı kullanılamıyor ancak doluluk biliniyorsa önlem olarak yine sustur. Normal konuşma için kapat.",
+          "sleep_fallback_written": "Uyku nedeniyle TTS susturulmuşsa bunun yerine yalnızca aşağıda seçilen alıcılara yazılı bildirim gönder. Yalnızca TTS içeren mesajlarda konuşma metnini kullan. Kapatılırsa otomatik duyuru kuyrukta bekler. Uyku susturma kapalıysa etkisi yoktur.",
+          "sleep_fallback_outputs": "Birden fazla hedef seç: önce entegrasyondaki tüm yapılandırılmış bildirim cihazlarını veya aşağıdaki tek tek cihazları seç. Yalnızca Announcement Hub içinde etkinleştirilmiş çıkışlara izin verilir. Boş seçim gönderim yapmaz. Mevcut kurulumlarda tüm yapılandırılmış Companion App cihazları varsayılandır."
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "Zil sesi /local/ altında bir dosya kullanmalıdır.",
       "invalid_person_area": "Geçerli bir Home Assistant odası seçin.",
       "invalid_person_presence": "Doğrulamayı etkinleştirmeden önce varlık sensörü seçin.",
-      "invalid_sleep_source": "Uyuyan oda kaynağı geçersiz; Durum veya kullanılabilir bir nitelik seçin."
+      "invalid_sleep_source": "Uyuyan oda kaynağı geçersiz; Durum veya kullanılabilir bir nitelik seçin.",
+      "invalid_sleep_fallback_target": "Uyku sırasında yazılı bildirim için yalnızca yapılandırılmış entegrasyon ve cihazları seçin."
     }
   },
   "selector": {

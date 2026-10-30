@@ -124,7 +124,10 @@
           "fallback_ai_agent": "Reservleverantör av AI (konversation eller AI-uppgift)",
           "channel_fallback_mode": "Reservkanal för aviseringar",
           "sleep_rooms_entity": "Entitet för rum där personer sover",
-          "sleep_rooms_attribute": "Värde för rum där någon sover"
+          "sleep_rooms_attribute": "Värde för rum där någon sover",
+          "sleep_mute_tts": "Tysta TTS när alla sover",
+          "sleep_fallback_written": "Skriftlig reservavisering under sömn",
+          "sleep_fallback_outputs": "Mottagare för skriftliga aviseringar under sömn"
         },
         "data_description": {
           "queue_max": "Högsta antal väntande eller aktiva meddelandejobb som kan accepteras. Nya förfrågningar avvisas när gränsen är nådd.",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "Valfri reserv-AI-agent när den primära agenten misslyckas. Home Assistant-standard följer också din föredragna Assist-pipeline; alternativet Ursprungligt meddelande hoppar över ett andra AI-försök. Om ingen AI fungerar levereras alltid originaltexten.",
           "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande.",
           "sleep_rooms_entity": "Välj den Home Assistant-entitet vars tillstånd eller attribut listar rum där personer sover just nu. Listan är dynamisk och innebär inte att vissa sovrum alltid är valda.",
-          "sleep_rooms_attribute": "Välj Tillstånd eller ett attribut hos entiteten. Områdes-ID:n, namn, alias, listor och kommaseparerad text stöds. Okända rum ignoreras; om källan är otillgänglig tystas tal när närvaron är känd."
+          "sleep_rooms_attribute": "Välj Tillstånd eller ett attribut hos entiteten. Områdes-ID:n, namn, alias, listor och kommaseparerad text stöds. Okända rum ignoreras; om källan är otillgänglig tystas tal när närvaron är känd.",
+          "sleep_mute_tts": "När alla upptagna rum rapporteras som sovande stängs alla röstmeddelanden och ljudsignaler av, även Kritiska, Snapcast och Companion App-TTS. Om sovkällan är otillgänglig men närvaron är känd tystas ljudet som försiktighetsåtgärd. Inaktivera för normal talfunktion.",
+          "sleep_fallback_written": "När TTS tystas under sömn skickas i stället en skriftlig avisering endast till mottagarna som valts nedan. Meddelanden med enbart TTS använder taltexten som skriven text. Avstängning låter det automatiska meddelandet stanna i kön. Ingen effekt om sömntystning är av.",
+          "sleep_fallback_outputs": "Välj flera mål: först en integration för alla dess konfigurerade aviseringsenheter eller enskilda enheter längre ned. Bara utgångar som redan är aktiverade i Announcement Hub tillåts. Tomt val skickar inget. Befintliga installationer väljer som standard konfigurerade Companion App-enheter."
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "Signalljudet måste vara en fil under /local/.",
       "invalid_person_area": "Välj ett giltigt rum i Home Assistant.",
       "invalid_person_presence": "Välj en närvarosensor innan kontrollen aktiveras.",
-      "invalid_sleep_source": "Ogiltig källa för sovande rum; välj Tillstånd eller ett tillgängligt attribut."
+      "invalid_sleep_source": "Ogiltig källa för sovande rum; välj Tillstånd eller ett tillgängligt attribut.",
+      "invalid_sleep_fallback_target": "Välj bara konfigurerade integrationer eller enheter för skriftliga aviseringar vid sömn."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub är redan konfigurerat."
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "Reservleverantör av AI (konversation eller AI-uppgift)",
           "channel_fallback_mode": "Reservkanal för aviseringar",
           "sleep_rooms_entity": "Entitet för rum där personer sover",
-          "sleep_rooms_attribute": "Värde för rum där någon sover"
+          "sleep_rooms_attribute": "Värde för rum där någon sover",
+          "sleep_mute_tts": "Tysta TTS när alla sover",
+          "sleep_fallback_written": "Skriftlig reservavisering under sömn",
+          "sleep_fallback_outputs": "Mottagare för skriftliga aviseringar under sömn"
         },
         "data_description": {
           "queue_max": "Högsta antal väntande eller aktiva meddelandejobb som kan accepteras. Nya förfrågningar avvisas när gränsen är nådd.",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "Valfri reserv-AI-agent när den primära agenten misslyckas. Home Assistant-standard följer också din föredragna Assist-pipeline; alternativet Ursprungligt meddelande hoppar över ett andra AI-försök. Om ingen AI fungerar levereras alltid originaltexten.",
           "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande.",
           "sleep_rooms_entity": "Välj den Home Assistant-entitet vars tillstånd eller attribut listar rum där personer sover just nu. Listan är dynamisk och innebär inte att vissa sovrum alltid är valda.",
-          "sleep_rooms_attribute": "Välj Tillstånd eller ett attribut hos entiteten. Områdes-ID:n, namn, alias, listor och kommaseparerad text stöds. Okända rum ignoreras; om källan är otillgänglig tystas tal när närvaron är känd."
+          "sleep_rooms_attribute": "Välj Tillstånd eller ett attribut hos entiteten. Områdes-ID:n, namn, alias, listor och kommaseparerad text stöds. Okända rum ignoreras; om källan är otillgänglig tystas tal när närvaron är känd.",
+          "sleep_mute_tts": "När alla upptagna rum rapporteras som sovande stängs alla röstmeddelanden och ljudsignaler av, även Kritiska, Snapcast och Companion App-TTS. Om sovkällan är otillgänglig men närvaron är känd tystas ljudet som försiktighetsåtgärd. Inaktivera för normal talfunktion.",
+          "sleep_fallback_written": "När TTS tystas under sömn skickas i stället en skriftlig avisering endast till mottagarna som valts nedan. Meddelanden med enbart TTS använder taltexten som skriven text. Avstängning låter det automatiska meddelandet stanna i kön. Ingen effekt om sömntystning är av.",
+          "sleep_fallback_outputs": "Välj flera mål: först en integration för alla dess konfigurerade aviseringsenheter eller enskilda enheter längre ned. Bara utgångar som redan är aktiverade i Announcement Hub tillåts. Tomt val skickar inget. Befintliga installationer väljer som standard konfigurerade Companion App-enheter."
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "Signalljudet måste vara en fil under /local/.",
       "invalid_person_area": "Välj ett giltigt rum i Home Assistant.",
       "invalid_person_presence": "Välj en närvarosensor innan kontrollen aktiveras.",
-      "invalid_sleep_source": "Ogiltig källa för sovande rum; välj Tillstånd eller ett tillgängligt attribut."
+      "invalid_sleep_source": "Ogiltig källa för sovande rum; välj Tillstånd eller ett tillgängligt attribut.",
+      "invalid_sleep_fallback_target": "Välj bara konfigurerade integrationer eller enheter för skriftliga aviseringar vid sömn."
     }
   },
   "selector": {
