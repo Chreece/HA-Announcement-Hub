@@ -122,7 +122,8 @@
           "default_use_ai": "Přeformulovat oznámení pomocí AI",
           "default_ai_agent": "Výchozí poskytovatel AI (konverzace nebo úloha)",
           "fallback_ai_agent": "Záložní poskytovatel AI (konverzace nebo úloha)",
-          "channel_fallback_mode": "Záložní kanál oznámení"
+          "channel_fallback_mode": "Záložní kanál oznámení",
+          "sleep_rooms": "Místnosti pro spánek"
         },
         "data_description": {
           "queue_max": "Nejvyšší povolený počet čekajících nebo aktivních úloh oznámení. Po dosažení limitu se nové požadavky na odeslání odmítají.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Data poskytovatele přidávaná pouze ke kritickým vizuálním oznámením, například podporované možnosti naléhavosti nebo priority.",
           "occupancy_sensor": "Entita, jejíž stav nebo vybraný atribut obsahuje názvy či ID aktuálně obsazených oblastí Home Assistant. Používá se pouze tehdy, když akce odeslání povolí směrování do obsazených místností.",
           "occupancy_attribute": "Zvolte, zda se obsazené místnosti načítají ze stavu entity nebo z některého jejího aktuálního atributu.",
-          "fallback_room": "Záložní oblast TTS se použije pouze tehdy, když mezi cílovými místnostmi není vůbec žádný pevný kandidát přiřazený k místnosti. Stávající pevní kandidáti, i nedostupní nebo s neznámým stavem, zabrání záložnímu směrování a podléhají běžné lhůtě pro dostupnost.",
+          "fallback_room": "Pouze když je v původní cílové místnosti bdělá osoba, doručení v místnosti se nezdařilo a je splněna podmínka dveří. Nikdy pro prázdnou nebo spací místnost.",
           "fallback_check_door": "Je-li povoleno, záložní směrování je možné pouze tehdy, pokud vhodný dveřní senzor v některé cílové místnosti výslovně hlásí otevřené dveře.",
           "fallback_door_label": "Volitelný štítek Home Assistant. Po jeho výběru mohou záložní směrování povolit jen binární dveřní senzory s tímto štítkem. Prázdná hodnota umožní zohlednit všechny dveřní senzory v cílových místnostech.",
           "default_use_ai": "Je-li povoleno, všechna oznámení přebírají přepsání AI, pokud akce odeslání výslovně neuvádí use_ai: false. Při vynechání use_ai platí toto nastavení. Pokud AI selže, doručí se původní zpráva. Stav ai zkontrolujte v response_variable akce.",
           "default_ai_agent": "Výchozí nastavení Home Assistant používá konverzačního agenta preferovaného řetězce Assist, nikoli vestavěného agenta záměrů conversation.process. Agent se určí při odeslání a zobrazí v nabídce. Pokud preferovaný řetězec používá vestavěného agenta, výslovně vyberte agenta založeného na LLM nebo nastavte záložního.",
           "fallback_ai_agent": "Volitelný záložní agent AI při selhání primárního. Také výchozí agent Home Assistant následuje preferovaný řetězec Assist; možnost Původní oznámení přeskočí druhý pokus AI. Pokud žádný agent AI nefunguje, doručí se vždy původní text.",
-          "channel_fallback_mode": "Pouze pokud existují OBA texty, mluvený text_tts i psaný text_notify, A ZÁROVEŇ vhodná TTS a vizuální zařízení: Vizuálně → TTS nejprve upozorní a při selhání mluví; TTS → Vizuálně nejprve mluví a při selhání upozorní; Obojí zkusí oba kanály. Jediný dostupný kanál funguje normálně. Nevytváří chybějící text ani nerozšiřuje příjemce; nastavené úrovně platí dál."
+          "channel_fallback_mode": "Pouze pokud existují OBA texty, mluvený text_tts i psaný text_notify, A ZÁROVEŇ vhodná TTS a vizuální zařízení: Vizuálně → TTS nejprve upozorní a při selhání mluví; TTS → Vizuálně nejprve mluví a při selhání upozorní; Obojí zkusí oba kanály. Jediný dostupný kanál funguje normálně. Nevytváří chybějící text ani nerozšiřuje příjemce; nastavené úrovně platí dál.",
+          "sleep_rooms": "Místnosti považované za spací, pokud jsou obsazené. Když jsou všechny obsazené místnosti spací, hlasová oznámení se vypnou a odešlou se jen písemná upozornění do nastavených mobilních aplikací."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Přeformulovat oznámení pomocí AI",
           "default_ai_agent": "Výchozí poskytovatel AI (konverzace nebo úloha)",
           "fallback_ai_agent": "Záložní poskytovatel AI (konverzace nebo úloha)",
-          "channel_fallback_mode": "Záložní kanál oznámení"
+          "channel_fallback_mode": "Záložní kanál oznámení",
+          "sleep_rooms": "Místnosti pro spánek"
         },
         "data_description": {
           "queue_max": "Nejvyšší povolený počet čekajících nebo aktivních úloh oznámení. Po dosažení limitu se nové požadavky na odeslání odmítají.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Data poskytovatele přidávaná pouze ke kritickým vizuálním oznámením, například podporované možnosti naléhavosti nebo priority.",
           "occupancy_sensor": "Entita, jejíž stav nebo vybraný atribut obsahuje názvy či ID aktuálně obsazených oblastí Home Assistant. Používá se pouze tehdy, když akce odeslání povolí směrování do obsazených místností.",
           "occupancy_attribute": "Zvolte, zda se obsazené místnosti načítají ze stavu entity nebo z některého jejího aktuálního atributu.",
-          "fallback_room": "Záložní oblast TTS se použije pouze tehdy, když mezi cílovými místnostmi není vůbec žádný pevný kandidát přiřazený k místnosti. Stávající pevní kandidáti, i nedostupní nebo s neznámým stavem, zabrání záložnímu směrování a podléhají běžné lhůtě pro dostupnost.",
+          "fallback_room": "Pouze když je v původní cílové místnosti bdělá osoba, doručení v místnosti se nezdařilo a je splněna podmínka dveří. Nikdy pro prázdnou nebo spací místnost.",
           "fallback_check_door": "Je-li povoleno, záložní směrování je možné pouze tehdy, pokud vhodný dveřní senzor v některé cílové místnosti výslovně hlásí otevřené dveře.",
           "fallback_door_label": "Volitelný štítek Home Assistant. Po jeho výběru mohou záložní směrování povolit jen binární dveřní senzory s tímto štítkem. Prázdná hodnota umožní zohlednit všechny dveřní senzory v cílových místnostech.",
           "default_use_ai": "Je-li povoleno, všechna oznámení přebírají přepsání AI, pokud akce odeslání výslovně neuvádí use_ai: false. Při vynechání use_ai platí toto nastavení. Pokud AI selže, doručí se původní zpráva. Stav ai zkontrolujte v response_variable akce.",
           "default_ai_agent": "Výchozí nastavení Home Assistant používá konverzačního agenta preferovaného řetězce Assist, nikoli vestavěného agenta záměrů conversation.process. Agent se určí při odeslání a zobrazí v nabídce. Pokud preferovaný řetězec používá vestavěného agenta, výslovně vyberte agenta založeného na LLM nebo nastavte záložního.",
           "fallback_ai_agent": "Volitelný záložní agent AI při selhání primárního. Také výchozí agent Home Assistant následuje preferovaný řetězec Assist; možnost Původní oznámení přeskočí druhý pokus AI. Pokud žádný agent AI nefunguje, doručí se vždy původní text.",
-          "channel_fallback_mode": "Pouze pokud existují OBA texty, mluvený text_tts i psaný text_notify, A ZÁROVEŇ vhodná TTS a vizuální zařízení: Vizuálně → TTS nejprve upozorní a při selhání mluví; TTS → Vizuálně nejprve mluví a při selhání upozorní; Obojí zkusí oba kanály. Jediný dostupný kanál funguje normálně. Nevytváří chybějící text ani nerozšiřuje příjemce; nastavené úrovně platí dál."
+          "channel_fallback_mode": "Pouze pokud existují OBA texty, mluvený text_tts i psaný text_notify, A ZÁROVEŇ vhodná TTS a vizuální zařízení: Vizuálně → TTS nejprve upozorní a při selhání mluví; TTS → Vizuálně nejprve mluví a při selhání upozorní; Obojí zkusí oba kanály. Jediný dostupný kanál funguje normálně. Nevytváří chybějící text ani nerozšiřuje příjemce; nastavené úrovně platí dál.",
+          "sleep_rooms": "Místnosti považované za spací, pokud jsou obsazené. Když jsou všechny obsazené místnosti spací, hlasová oznámení se vypnou a odešlou se jen písemná upozornění do nastavených mobilních aplikací."
         }
       },
       "init": {

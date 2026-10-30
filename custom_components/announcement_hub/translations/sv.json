@@ -122,7 +122,8 @@
           "default_use_ai": "Skriv om meddelanden med AI",
           "default_ai_agent": "Standardleverantör av AI (konversation eller AI-uppgift)",
           "fallback_ai_agent": "Reservleverantör av AI (konversation eller AI-uppgift)",
-          "channel_fallback_mode": "Reservkanal för aviseringar"
+          "channel_fallback_mode": "Reservkanal för aviseringar",
+          "sleep_rooms": "Sovrum"
         },
         "data_description": {
           "queue_max": "Högsta antal väntande eller aktiva meddelandejobb som kan accepteras. Nya förfrågningar avvisas när gränsen är nådd.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Leverantörsspecifika data som bara läggs till kritiska visuella aviseringar, till exempel prioritets- och brådskandealternativ som notifieringsintegrationen stöder.",
           "occupancy_sensor": "Entitet vars tillstånd eller valda attribut innehåller namn eller ID för de Home Assistant-områden som för närvarande är upptagna. Används bara om sändåtgärden har aktiverat routning till upptagna rum.",
           "occupancy_attribute": "Välj om upptagna rum ska läsas ur entitetens tillstånd eller något av dess aktuella attribut.",
-          "fallback_room": "TTS-reservområde används endast om de aktuella målrummen saknar samtliga fasta rumskandidater. Befintliga fasta kandidater, även okända eller otillgängliga, hindrar reservroutning och omfattas av den vanliga väntetiden för tillgänglighet.",
+          "fallback_room": "Endast när någon är vaken och närvarande i det ursprungliga målrummet, ingen tillåten enhet där kunde leverera meddelandet och dörrvillkoret är uppfyllt. Aldrig för ett tomt eller sovande rum.",
           "fallback_check_door": "När detta är aktiverat tillåts reservroutning bara om en lämplig dörrsensor i något av målrummen uttryckligen rapporterar att dörren är öppen.",
           "fallback_door_label": "Valfri etikett i Home Assistant. Om den väljs får bara binära dörrsensorer med denna etikett tillåta reservvägen. Lämna tomt för att överväga alla dörrsensorer i de aktuella målrummen.",
           "default_use_ai": "När detta är aktiverat ärver alla meddelanden AI-omskrivning om inte sändåtgärden uttryckligen anger use_ai: false. Om use_ai utelämnas gäller denna inställning. Vid AI-fel skickas originaltexten. Kontrollera ai-status i åtgärdens response_variable.",
           "default_ai_agent": "Home Assistant-standard följer konversationsagenten i din föredragna Assist-pipeline, inte den inbyggda intent-agenten conversation.process. Agenten bestäms vid sändning och visas i listan. Om standardpipelinen använder den inbyggda agenten, välj uttryckligen en LLM-agent eller konfigurera en reservagent.",
           "fallback_ai_agent": "Valfri reserv-AI-agent när den primära agenten misslyckas. Home Assistant-standard följer också din föredragna Assist-pipeline; alternativet Ursprungligt meddelande hoppar över ett andra AI-försök. Om ingen AI fungerar levereras alltid originaltexten.",
-          "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande."
+          "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande.",
+          "sleep_rooms": "Rum som räknas som sovrum när de är upptagna. Om alla upptagna rum är sovrum tystas alla röstmeddelanden och endast skriftliga aviseringar skickas till konfigurerade mobilappar."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Skriv om meddelanden med AI",
           "default_ai_agent": "Standardleverantör av AI (konversation eller AI-uppgift)",
           "fallback_ai_agent": "Reservleverantör av AI (konversation eller AI-uppgift)",
-          "channel_fallback_mode": "Reservkanal för aviseringar"
+          "channel_fallback_mode": "Reservkanal för aviseringar",
+          "sleep_rooms": "Sovrum"
         },
         "data_description": {
           "queue_max": "Högsta antal väntande eller aktiva meddelandejobb som kan accepteras. Nya förfrågningar avvisas när gränsen är nådd.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Leverantörsspecifika data som bara läggs till kritiska visuella aviseringar, till exempel prioritets- och brådskandealternativ som notifieringsintegrationen stöder.",
           "occupancy_sensor": "Entitet vars tillstånd eller valda attribut innehåller namn eller ID för de Home Assistant-områden som för närvarande är upptagna. Används bara om sändåtgärden har aktiverat routning till upptagna rum.",
           "occupancy_attribute": "Välj om upptagna rum ska läsas ur entitetens tillstånd eller något av dess aktuella attribut.",
-          "fallback_room": "TTS-reservområde används endast om de aktuella målrummen saknar samtliga fasta rumskandidater. Befintliga fasta kandidater, även okända eller otillgängliga, hindrar reservroutning och omfattas av den vanliga väntetiden för tillgänglighet.",
+          "fallback_room": "Endast när någon är vaken och närvarande i det ursprungliga målrummet, ingen tillåten enhet där kunde leverera meddelandet och dörrvillkoret är uppfyllt. Aldrig för ett tomt eller sovande rum.",
           "fallback_check_door": "När detta är aktiverat tillåts reservroutning bara om en lämplig dörrsensor i något av målrummen uttryckligen rapporterar att dörren är öppen.",
           "fallback_door_label": "Valfri etikett i Home Assistant. Om den väljs får bara binära dörrsensorer med denna etikett tillåta reservvägen. Lämna tomt för att överväga alla dörrsensorer i de aktuella målrummen.",
           "default_use_ai": "När detta är aktiverat ärver alla meddelanden AI-omskrivning om inte sändåtgärden uttryckligen anger use_ai: false. Om use_ai utelämnas gäller denna inställning. Vid AI-fel skickas originaltexten. Kontrollera ai-status i åtgärdens response_variable.",
           "default_ai_agent": "Home Assistant-standard följer konversationsagenten i din föredragna Assist-pipeline, inte den inbyggda intent-agenten conversation.process. Agenten bestäms vid sändning och visas i listan. Om standardpipelinen använder den inbyggda agenten, välj uttryckligen en LLM-agent eller konfigurera en reservagent.",
           "fallback_ai_agent": "Valfri reserv-AI-agent när den primära agenten misslyckas. Home Assistant-standard följer också din föredragna Assist-pipeline; alternativet Ursprungligt meddelande hoppar över ett andra AI-försök. Om ingen AI fungerar levereras alltid originaltexten.",
-          "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande."
+          "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande.",
+          "sleep_rooms": "Rum som räknas som sovrum när de är upptagna. Om alla upptagna rum är sovrum tystas alla röstmeddelanden och endast skriftliga aviseringar skickas till konfigurerade mobilappar."
         }
       },
       "init": {

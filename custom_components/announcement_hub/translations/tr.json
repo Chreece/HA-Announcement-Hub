@@ -122,7 +122,8 @@
           "default_use_ai": "Duyuruları YZ ile yeniden yaz",
           "default_ai_agent": "Varsayılan YZ sağlayıcısı (sohbet veya YZ görevi)",
           "fallback_ai_agent": "Yedek YZ sağlayıcısı (sohbet veya YZ görevi)",
-          "channel_fallback_mode": "Bildirim kanalı yedeklemesi"
+          "channel_fallback_mode": "Bildirim kanalı yedeklemesi",
+          "sleep_rooms": "Uyku odaları"
         },
         "data_description": {
           "queue_max": "İzin verilen en fazla bekleyen veya etkin duyuru işi sayısı. Sınıra ulaşıldığında yeni gönderimler reddedilir.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Yalnızca Critical görsel bildirimlere eklenen, örneğin bildirim entegrasyonunun desteklediği aciliyet veya öncelik seçenekleri gibi sağlayıcıya özgü veriler.",
           "occupancy_sensor": "Durumu veya seçilen özniteliği, şu anda dolu olan Home Assistant alanlarının adlarını ya da kimliklerini içeren varlık. Yalnızca gönderim eyleminde dolu odalara yönlendirme açıkken kullanılır.",
           "occupancy_attribute": "Dolu odaların varlığın durumundan mı yoksa mevcut özniteliklerinden birinden mi okunacağını seçin.",
-          "fallback_room": "Yedek TTS alanı, mevcut hedef odalarda hiçbir sabit oda adayı yoksa kullanılır. Bilinmeyen veya kullanılamayan sabit adaylar da yedek yönlendirmeyi engeller ve normal kullanılabilirlik bekleme süresine tabidir.",
+          "fallback_room": "Yalnızca ilk hedef odada uyanık biri varsa, odadaki izinli çıkışlar bildirimi iletemediyse ve kapı koşulu sağlanıyorsa kullanılır. Boş veya uyku odaları için kullanılmaz.",
           "fallback_check_door": "Etkinse yedek yönlendirmeye yalnızca hedef odalardan birindeki uygun kapı sensörü açık durumunu açıkça bildirirse izin verilir.",
           "fallback_door_label": "İsteğe bağlı Home Assistant etiketi. Etiket seçilirse yalnızca bu etiketi taşıyan ikili kapı sensörleri yedek yönlendirmeye izin verebilir; boş bırakılırsa mevcut hedef odalardaki tüm kapı sensörleri değerlendirilir.",
           "default_use_ai": "Etkinse, gönderim eylemi açıkça use_ai: false belirtmediği sürece tüm duyurular yapay zekâ ile yeniden yazmayı devralır. use_ai belirtilmezse bu ayar geçerlidir. Yapay zekâ başarısız olursa özgün mesaj gönderilir. Eylemin response_variable içindeki ai durumuna bakın.",
           "default_ai_agent": "Home Assistant varsayılanı, yerleşik conversation.process niyet aracısı yerine tercih edilen Assist işlem hattındaki konuşma aracısını izler. Aracı gönderim anında belirlenir ve açılır listede gösterilir. Tercih edilen işlem hattı yerleşik aracı kullanıyorsa LLM tabanlı bir aracıyı açıkça seçin veya yedek yapılandırın.",
           "fallback_ai_agent": "Birincil aracı başarısız olursa kullanılabilecek isteğe bağlı yedek AI aracısı. Home Assistant varsayılanı da tercih edilen Assist işlem hattını izler; Özgün duyuru seçeneği ikinci AI denemesini atlar. Hiçbir AI çalışmazsa özgün metin her zaman iletilir.",
-          "channel_fallback_mode": "Yalnızca HEM konuşma text_tts hem yazılı text_notify HEM DE uygun TTS ve görsel cihazlar varsa: Görsel → TTS önce bildirir, başarısız olursa konuşur; TTS → Görsel önce konuşur, başarısız olursa bildirir; Her ikisi iki kanalı da dener. Tek kanal varsa normal çalışır. Eksik metin oluşturulmaz, alıcılar genişletilmez; seviye kuralları geçerlidir."
+          "channel_fallback_mode": "Yalnızca HEM konuşma text_tts hem yazılı text_notify HEM DE uygun TTS ve görsel cihazlar varsa: Görsel → TTS önce bildirir, başarısız olursa konuşur; TTS → Görsel önce konuşur, başarısız olursa bildirir; Her ikisi iki kanalı da dener. Tek kanal varsa normal çalışır. Eksik metin oluşturulmaz, alıcılar genişletilmez; seviye kuralları geçerlidir.",
+          "sleep_rooms": "Doluyken uyku odası sayılan alanlar. Tüm dolu odalar uyku odasıysa sesli duyurular tamamen susturulur; yalnızca yapılandırılmış mobil uygulamalara yazılı bildirim gönderilir."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Duyuruları YZ ile yeniden yaz",
           "default_ai_agent": "Varsayılan YZ sağlayıcısı (sohbet veya YZ görevi)",
           "fallback_ai_agent": "Yedek YZ sağlayıcısı (sohbet veya YZ görevi)",
-          "channel_fallback_mode": "Bildirim kanalı yedeklemesi"
+          "channel_fallback_mode": "Bildirim kanalı yedeklemesi",
+          "sleep_rooms": "Uyku odaları"
         },
         "data_description": {
           "queue_max": "İzin verilen en fazla bekleyen veya etkin duyuru işi sayısı. Sınıra ulaşıldığında yeni gönderimler reddedilir.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Yalnızca Critical görsel bildirimlere eklenen, örneğin bildirim entegrasyonunun desteklediği aciliyet veya öncelik seçenekleri gibi sağlayıcıya özgü veriler.",
           "occupancy_sensor": "Durumu veya seçilen özniteliği, şu anda dolu olan Home Assistant alanlarının adlarını ya da kimliklerini içeren varlık. Yalnızca gönderim eyleminde dolu odalara yönlendirme açıkken kullanılır.",
           "occupancy_attribute": "Dolu odaların varlığın durumundan mı yoksa mevcut özniteliklerinden birinden mi okunacağını seçin.",
-          "fallback_room": "Yedek TTS alanı, mevcut hedef odalarda hiçbir sabit oda adayı yoksa kullanılır. Bilinmeyen veya kullanılamayan sabit adaylar da yedek yönlendirmeyi engeller ve normal kullanılabilirlik bekleme süresine tabidir.",
+          "fallback_room": "Yalnızca ilk hedef odada uyanık biri varsa, odadaki izinli çıkışlar bildirimi iletemediyse ve kapı koşulu sağlanıyorsa kullanılır. Boş veya uyku odaları için kullanılmaz.",
           "fallback_check_door": "Etkinse yedek yönlendirmeye yalnızca hedef odalardan birindeki uygun kapı sensörü açık durumunu açıkça bildirirse izin verilir.",
           "fallback_door_label": "İsteğe bağlı Home Assistant etiketi. Etiket seçilirse yalnızca bu etiketi taşıyan ikili kapı sensörleri yedek yönlendirmeye izin verebilir; boş bırakılırsa mevcut hedef odalardaki tüm kapı sensörleri değerlendirilir.",
           "default_use_ai": "Etkinse, gönderim eylemi açıkça use_ai: false belirtmediği sürece tüm duyurular yapay zekâ ile yeniden yazmayı devralır. use_ai belirtilmezse bu ayar geçerlidir. Yapay zekâ başarısız olursa özgün mesaj gönderilir. Eylemin response_variable içindeki ai durumuna bakın.",
           "default_ai_agent": "Home Assistant varsayılanı, yerleşik conversation.process niyet aracısı yerine tercih edilen Assist işlem hattındaki konuşma aracısını izler. Aracı gönderim anında belirlenir ve açılır listede gösterilir. Tercih edilen işlem hattı yerleşik aracı kullanıyorsa LLM tabanlı bir aracıyı açıkça seçin veya yedek yapılandırın.",
           "fallback_ai_agent": "Birincil aracı başarısız olursa kullanılabilecek isteğe bağlı yedek AI aracısı. Home Assistant varsayılanı da tercih edilen Assist işlem hattını izler; Özgün duyuru seçeneği ikinci AI denemesini atlar. Hiçbir AI çalışmazsa özgün metin her zaman iletilir.",
-          "channel_fallback_mode": "Yalnızca HEM konuşma text_tts hem yazılı text_notify HEM DE uygun TTS ve görsel cihazlar varsa: Görsel → TTS önce bildirir, başarısız olursa konuşur; TTS → Görsel önce konuşur, başarısız olursa bildirir; Her ikisi iki kanalı da dener. Tek kanal varsa normal çalışır. Eksik metin oluşturulmaz, alıcılar genişletilmez; seviye kuralları geçerlidir."
+          "channel_fallback_mode": "Yalnızca HEM konuşma text_tts hem yazılı text_notify HEM DE uygun TTS ve görsel cihazlar varsa: Görsel → TTS önce bildirir, başarısız olursa konuşur; TTS → Görsel önce konuşur, başarısız olursa bildirir; Her ikisi iki kanalı da dener. Tek kanal varsa normal çalışır. Eksik metin oluşturulmaz, alıcılar genişletilmez; seviye kuralları geçerlidir.",
+          "sleep_rooms": "Doluyken uyku odası sayılan alanlar. Tüm dolu odalar uyku odasıysa sesli duyurular tamamen susturulur; yalnızca yapılandırılmış mobil uygulamalara yazılı bildirim gönderilir."
         }
       },
       "init": {
