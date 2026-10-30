@@ -246,6 +246,10 @@ class JobCancelled(HomeAssistantError):
     """Raised internally when a queued or active job is cancelled."""
 
 
+class RoomRouteMoved(HomeAssistantError):
+    """The intended physical room became unoccupied before delivery began."""
+
+
 class AnnouncementManager:
     """Own the persistent FIFO queue and all output coordination."""
 
@@ -2320,6 +2324,16 @@ class AnnouncementManager:
                 self._schedule_save()
                 self._wake.set()
                 return
+        try:
+            self._assert_live_room_route(job)
+        except RoomRouteMoved:
+            self._requeue_after_room_move(job, "before delivery worker started")
+            self._active_jobs.pop(job.job_id, None)
+            self._current = next(iter(self._active_jobs.values()), None)
+            self._schedule_save()
+            self._notify_update()
+            return
+
         job.status = "processing"
         job.started_at = utcnow_iso()
         job.error = None
@@ -2337,6 +2351,16 @@ class AnnouncementManager:
         except JobCancelled:
             job.status = "cancelled"
             terminal_event = EVENT_CANCELLED
+        except RoomRouteMoved:
+            if not job.successful_channels:
+                self._requeue_after_room_move(
+                    job, "person left the selected room before output"
+                )
+                requeued = True
+            else:
+                # Never replay a message whose authorized output succeeded.
+                job.status = "completed"
+                terminal_event = EVENT_FINISHED
         except asyncio.CancelledError:
             if not self._running:
                 job.status = "pending"
@@ -2462,6 +2486,70 @@ class AnnouncementManager:
         return bool(
             self.settings.get(CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS)
         ) and self._all_occupied_rooms_sleeping()
+
+    def _room_route_moved(
+        self, job: AnnouncementJob, physical_areas: Sequence[str] = ()
+    ) -> bool:
+        """Check fresh occupancy only for movable automatic room routing.
+
+        Never change a strict person, integration, entity or device recipient.
+        A deliberate fallback room may be empty, provided its ORIGINAL target
+        still has an occupant. Missing occupancy configuration is not proof
+        that a room is empty. No prior output receipt is fabricated.
+        """
+        if (
+            job.routing_mode != "room_fallback"
+            or not job.occupancy_requested
+            or job.routing_stage not in {"primary", "occupied", "fallback"}
+        ):
+            return False
+        occupied = self._occupied_area_ids()
+        if occupied is None:
+            return False
+        current = set(occupied)
+        if job.routing_stage == "fallback":
+            return bool(job.preferred_areas) and current.isdisjoint(
+                job.preferred_areas
+            )
+        required = set(str(area) for area in physical_areas if area)
+        if required:
+            # Never broadcast to one stale room when several were selected
+            # from an older occupancy snapshot.
+            return not required.issubset(current)
+        return bool(job.outputs) and current.isdisjoint(job.outputs)
+
+    def _assert_live_room_route(
+        self, job: AnnouncementJob, physical_areas: Sequence[str] = ()
+    ) -> None:
+        """Refuse a stale output before any chime/notification/audio action."""
+        if self._room_route_moved(job, physical_areas):
+            raise RoomRouteMoved(
+                "Occupied rooms changed before the planned room delivery"
+            )
+
+    def _requeue_after_room_move(
+        self, job: AnnouncementJob, reason: str
+    ) -> None:
+        """Retarget, without discarding the job or repeating an AI request."""
+        job.routing_stage = "primary"
+        job.routing_stage_started_at = utcnow_iso()
+        job.routing_seen_occupied = self._occupied_area_ids()
+        job.routing_audio_retry = False
+        job.routing_channel_retry = None
+        job.routing_retry_after = None
+        job.status = "pending"
+        job.started_at = None
+        job.finished_at = None
+        job.error = None
+        job.channel_errors.clear()
+        job.routing_history.append(f"room move: {reason}; route refreshed")
+        job.routing_history = job.routing_history[-24:]
+        self._queue.append(job)
+        self._queue = type(self._queue)(sorted(
+            self._queue,
+            key=lambda item: (getattr(item, "created_at", ""), item.job_id),
+        ))
+        self._wake.set()
 
     def _staged_areas(
         self, job: AnnouncementJob, stage: str
@@ -2871,6 +2959,31 @@ class AnnouncementManager:
             except (TypeError, ValueError):
                 pass
             job.routing_retry_after = None
+        # A queued announcement can sit in the final/general stage while
+        # people move to another room. Revisit immediately on a real change,
+        # instead of holding for another availability grace period.
+        observed = self._occupied_area_ids() if job.occupancy_requested else None
+        if observed is not None:
+            previous = getattr(job, "routing_seen_occupied", None)
+            if (
+                previous is not None
+                and set(previous) != set(observed)
+                and job.routing_stage in {"occupied", "fallback", "general"}
+            ):
+                old = job.routing_stage
+                job.routing_stage = "primary"
+                job.routing_stage_started_at = utcnow_iso()
+                job.routing_audio_retry = False
+                job.routing_channel_retry = None
+                job.routing_retry_after = None
+                job.routing_history.append(
+                    f"{old}: occupancy changed; retry current rooms"
+                )
+                job.routing_history = job.routing_history[-24:]
+                self._schedule_save()
+                self._notify_update()
+            job.routing_seen_occupied = tuple(observed)
+
         timeout = self._availability_timeout
         for _ in range(len(STAGES) + 1):
             has_configured_output = self._prepare_staged_route(job)
@@ -3279,6 +3392,11 @@ class AnnouncementManager:
             for sender in (preferred, fallback):
                 try:
                     await sender(job)
+                except RoomRouteMoved:
+                    # A person moving rooms is not a failed provider or an
+                    # invitation to speak on an old second-channel target.
+                    # Re-plan against live occupancy before either channel.
+                    raise
                 except asyncio.CancelledError:
                     raise
                 except Exception as err:  # noqa: BLE001
@@ -3418,6 +3536,13 @@ class AnnouncementManager:
                     index < len(parts)
                     or not job.tts_text
                 )
+                # Companion App push notifications remain in the phone's
+                # notification tray. Do NOT reserve an occupied room for up
+                # to 30 seconds merely to simulate a TV overlay read time.
+                # TV overlays and other expiring visual providers keep their
+                # existing dwell/part ordering.
+                if output.integration == INTEGRATION_MOBILE_APP:
+                    hold_after_part = False
                 if hold_after_part:
                     await self._async_reading_hold(job, hold_seconds)
                 if index < len(parts):
@@ -3444,6 +3569,10 @@ class AnnouncementManager:
         part_index: int,
         part_count: int,
     ) -> None:
+        if getattr(job, "routing_mode", "normal") == "room_fallback":
+            area = job.notify_output_areas.get(output.ref, output.area_id)
+            if area is not None:
+                self._assert_live_room_route(job, (area,))
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled during delivery")
         integration_data = profile.get(PROFILE_INTEGRATION_DATA, {})
@@ -3642,6 +3771,8 @@ class AnnouncementManager:
                 await deliver(item)
             except JobCancelled:
                 raise
+            except RoomRouteMoved:
+                raise
             except asyncio.CancelledError:
                 raise
             except Exception as err:  # noqa: BLE001
@@ -3713,6 +3844,8 @@ class AnnouncementManager:
             try:
                 await deliver()
             except JobCancelled:
+                raise
+            except RoomRouteMoved:
                 raise
             except asyncio.CancelledError:
                 raise
@@ -3839,6 +3972,13 @@ class AnnouncementManager:
         )
         if not enabled:
             return
+        if getattr(job, "routing_mode", "normal") == "room_fallback":
+            self._assert_live_room_route(
+                job, (
+                    getattr(job, "room_tts_player_areas", {}).get(player)
+                    or entity_area_id(self.hass, player),
+                )
+            )
         if player == job.tts_media_player:
             # Never publish pre-roll to a shared TTS source, even if it
             # currently appears routed or muted to one room.
@@ -3897,6 +4037,13 @@ class AnnouncementManager:
             }
 
         async def deliver(player: str) -> None:
+            if getattr(job, "routing_mode", "normal") == "room_fallback":
+                self._assert_live_room_route(
+                    job, (
+                        getattr(job, "room_tts_player_areas", {}).get(player)
+                        or entity_area_id(self.hass, player),
+                    )
+                )
             physical = f"room_tts:{player}"
             if self._group_already_delivered(job, physical):
                 engine = job.tts_engines[0]
@@ -3915,6 +4062,13 @@ class AnnouncementManager:
                 ducked = await self._async_duck_direct_player(job, player)
                 if not ducked:
                     await self._wait_audio_path_idle(player, idle_timeout, job)
+                if getattr(job, "routing_mode", "normal") == "room_fallback":
+                    self._assert_live_room_route(
+                        job, (
+                            getattr(job, "room_tts_player_areas", {}).get(player)
+                            or entity_area_id(self.hass, player),
+                        )
+                    )
                 await self._async_optional_direct_chime(job, player)
                 engines = await self._async_available_tts_engines(job)
                 if not engines:
@@ -3932,6 +4086,8 @@ class AnnouncementManager:
                             job, player, media_source_id, ()
                         )
                     except JobCancelled:
+                        raise
+                    except RoomRouteMoved:
                         raise
                     except asyncio.CancelledError:
                         raise
@@ -3974,7 +4130,9 @@ class AnnouncementManager:
                     return_exceptions=True,
                 )
                 for player, result in zip(ready, results, strict=True):
-                    if isinstance(result, (JobCancelled, asyncio.CancelledError)):
+                    if isinstance(
+                        result, (JobCancelled, RoomRouteMoved, asyncio.CancelledError)
+                    ):
                         raise result
                     if isinstance(result, BaseException):
                         _LOGGER.debug(
@@ -4144,6 +4302,13 @@ class AnnouncementManager:
         await self._wait_audio_path_idle(
             player, idle_timeout, job, selected_clients
         )
+        if getattr(job, "routing_mode", "normal") == "room_fallback":
+            self._assert_live_room_route(job, tuple(
+                job.snapcast_client_areas.get(client) or entity_area_id(
+                    self.hass, client
+                )
+                for client in target_clients
+            ))
 
         route_snapshot: dict[str, bool] | None = None
         route_targets: tuple[str, ...] = ()
@@ -4175,6 +4340,8 @@ class AnnouncementManager:
                         job, player, media_source_id, route_targets
                     )
                 except JobCancelled:
+                    raise
+                except RoomRouteMoved:
                     raise
                 except asyncio.CancelledError:
                     raise
@@ -4398,6 +4565,19 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
+        if getattr(job, "routing_mode", "normal") == "room_fallback":
+            self._assert_live_room_route(job, (
+                tuple(
+                    job.snapcast_client_areas.get(client) or entity_area_id(
+                        self.hass, client
+                    )
+                    for client in route_targets
+                )
+                if route_targets else (
+                    getattr(job, "room_tts_player_areas", {}).get(player)
+                    or entity_area_id(self.hass, player),
+                )
+            ))
         if self._sleep_tts_muted_now():
             raise HomeAssistantError(
                 "TTS suppressed by the enabled sleep-mute policy"

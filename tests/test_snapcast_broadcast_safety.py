@@ -31,6 +31,7 @@ class HomeAssistantError(Exception):
 NAMESPACE = {
     "asyncio": asyncio,
     "HomeAssistantError": HomeAssistantError,
+    "RoomRouteMoved": type("RoomRouteMoved", (HomeAssistantError,), {}),
     "STATE_UNAVAILABLE": "unavailable",
     "STATE_UNKNOWN": "unknown",
     "MEDIA_PLAYER_DOMAIN": "media_player",
@@ -110,6 +111,10 @@ class FakeManager:
     @staticmethod
     def _sleep_tts_muted_now():
         return False
+
+    @staticmethod
+    def _assert_live_room_route(job, physical_areas=()):
+        return None
 
     @staticmethod
     def _is_player_busy(_player):

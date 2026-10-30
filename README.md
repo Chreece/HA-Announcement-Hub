@@ -399,6 +399,28 @@ are never broadened by the sleep-time fallback.
 An existing pre-v0.10.0b23 fixed-area selection is honored **only until**
 a new live sleep-room entity is configured.
 
+### Bursts when arriving home or moving between rooms
+
+For a door/welcome automation, always give `wait_template` a finite
+`timeout` when using `continue_on_timeout`: without one, waiting for
+both a closed entrance door and a non-zero entrance people-counter can block
+forever when the person has already walked to another room. Use a door-closed
+wait with a reasonable timeout instead.
+
+A routine that calls `notify.announcement_hub` several times with
+`use_ai: true` and `ai_mode: generate` creates **one AI provider request per
+announcement**. Announcement Hub serializes calls to the same model to protect
+the provider, and does not cancel a cold-starting model on a fixed Hub timeout;
+a large routine therefore cannot finish speaking instantly. Prefer concise
+combined prompts for non-critical morning summaries, and a plain, already
+formatted TTS text for a welcome requiring minimal latency. Room movement
+rerouting fixes stale destinations, not slow external AI generation.
+
+Scripts using Home Assistant's `mode: single` do not queue a second invocation
+while the first is still running. For genuinely independent invocations that
+must all run, consider `mode: queued` with an explicit `max`, after checking
+that repeated routine announcements are desirable.
+
 ## Person-targeted announcements and personal destinations
 
 In **Configure → People and personal voices**, select Home Assistant people.
@@ -596,7 +618,20 @@ General/non-room notification outputs
   applies. Without enabled/eligible recipients, the job remains queued.
   Switching mute Off restores ordinary speech routing.
 - The **occupied-room stage** uses the configured occupancy sensor; it does
-  not guess where people are.
+  not guess where people are. A queued automatic/area announcement remembers
+  the previous occupancy only to detect moves. When people move, the worker
+  immediately revisits current rooms (including a job already waiting at the
+  final General tier) and rechecks room occupancy before using a room-bound
+  screen, direct speaker or Snapcast output. If the selected room becomes
+  empty before the physical service call, the undelivered announcement is
+  requeued against live occupied rooms, without re-running its AI generation
+  or marking the old speaker as successful. An announcement already playing
+  is not interrupted mid-sentence; the guard applies **before playback**.
+- **Persistent Companion App text notifications** do not artificially hold
+  an occupied-room lane for the screen reading duration after the push
+  service acknowledges. NFAndroidTV and other short-lived visual overlays
+  continue to respect their reading-time settings, so a succeeding overlay
+  does not overwrite text too early.
 - The **alternate-room stage** is allowed only for a targeted, non-sleep room
   with a confirmed occupant, after the original room and other occupied-room
   delivery paths did not succeed. It is never used when the targeted room
