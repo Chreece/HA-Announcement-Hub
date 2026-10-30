@@ -27,7 +27,7 @@ def _load(lang):
 
 def test_japanese_599_native_entries_and_no_english_help():
     en, ja = _load("en"), _load("ja")
-    assert len(en) == 603
+    assert len(en) == 625
     assert set(ja) == set(en)
     identical = {key: source for key, source in en.items() if ja[key] == source}
     assert len(identical) == 5, identical
