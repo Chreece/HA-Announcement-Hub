@@ -142,6 +142,7 @@ def test_optional_chime_never_routes_to_shared_snapcast():
         },
         hass=SimpleNamespace(services=Services()),
         _raise_if_cancelled=lambda job: None,
+        _all_occupied_rooms_sleeping=lambda: False,
         _is_player_busy=lambda player: False,
         _wait_for=wait_for,
     )

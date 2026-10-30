@@ -9,7 +9,7 @@ C = ROOT / "custom_components" / "announcement_hub"
 
 def test_original_four_setup_steps_remain_and_editing_gains_a_menu() -> None:
     strings = json.loads((C / "strings.json").read_text())
-    expected = {"outputs", "tts", "notification_profile", "queue", "people", "person_profile", "edit_advanced_ai", "edit_audio", "edit_room_safety"}
+    expected = {"outputs", "tts", "notification_profile", "queue", "people", "person_profile", "edit_advanced_ai", "edit_audio", "edit_room_safety", "sleep_rooms", "sleep_rooms_source"}
     assert set(strings["config"]["step"]) == expected | {"reconfigure"}
     assert set(strings["options"]["step"]) == expected | {"init"}
 

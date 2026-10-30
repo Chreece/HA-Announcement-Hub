@@ -40,7 +40,8 @@ from .const import (
     CONF_NOTIFY_PROFILES,
     CONF_OCCUPANCY_ATTRIBUTE,
     CONF_OCCUPANCY_SENSOR,
-    CONF_SLEEP_ROOMS,
+    CONF_SLEEP_ROOMS_ENTITY,
+    CONF_SLEEP_ROOMS_ATTRIBUTE,
     CONF_PERSON_PROFILES,
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
@@ -1530,6 +1531,16 @@ class _AnnouncementFlowMixin:
         )
         return self.async_show_form(step_id="snapcast", data_schema=schema)
 
+    def _sleep_rooms_attribute_options(self) -> list[str]:
+        """State plus live attributes; retain an existing offline selection."""
+        entity = str(self._working.get(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
+        state = self.hass.states.get(entity) if entity else None
+        attributes = sorted(str(key) for key in (state.attributes if state else {}))
+        current = str(self._working.get(CONF_SLEEP_ROOMS_ATTRIBUTE, "") or "")
+        if current and current not in attributes:
+            attributes.append(current)
+        return ["state", *attributes]
+
     def _occupancy_attribute_options(self) -> list[str]:
         """Return State plus live attributes for the selected occupancy entity."""
         sensor = str(self._working.get(CONF_OCCUPANCY_SENSOR, "") or "").strip()
@@ -1546,7 +1557,7 @@ class _AnnouncementFlowMixin:
                 user_input,
                 {
                     CONF_OCCUPANCY_SENSOR: None,
-                    CONF_SLEEP_ROOMS: [],
+                    CONF_SLEEP_ROOMS_ENTITY: None,
                     CONF_FALLBACK_ROOM: None,
                     CONF_FALLBACK_CHECK_DOOR: DEFAULT_FALLBACK_CHECK_DOOR,
                 },
@@ -1554,7 +1565,7 @@ class _AnnouncementFlowMixin:
             if self._working.get(CONF_OCCUPANCY_SENSOR):
                 return await self.async_step_occupancy_source()
             self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
-            return await self.async_step_queue()
+            return await self.async_step_sleep_rooms()
 
         schema = probatio.Schema(
             {
@@ -1564,10 +1575,6 @@ class _AnnouncementFlowMixin:
                 ): selector.EntitySelector(
                     selector.EntitySelectorConfig(domain="sensor")
                 ),
-                probatio.Optional(
-                    CONF_SLEEP_ROOMS,
-                    default=list(self._value(CONF_SLEEP_ROOMS, []) or []),
-                ): selector.AreaSelector(selector.AreaSelectorConfig(multiple=True)),
                 _optional_marker(
                     CONF_FALLBACK_ROOM,
                     self._value(CONF_FALLBACK_ROOM, None),
@@ -1590,7 +1597,7 @@ class _AnnouncementFlowMixin:
         sensor = str(self._working.get(CONF_OCCUPANCY_SENSOR, "") or "").strip()
         if not sensor:
             self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
-            return await self.async_step_queue()
+            return await self.async_step_sleep_rooms()
 
         options = self._occupancy_attribute_options()
         if user_input is not None:
@@ -1598,7 +1605,7 @@ class _AnnouncementFlowMixin:
             self._working[CONF_OCCUPANCY_ATTRIBUTE] = (
                 "" if source == "state" else source
             )
-            return await self.async_step_queue()
+            return await self.async_step_sleep_rooms()
 
         current = str(self._working.get(CONF_OCCUPANCY_ATTRIBUTE, "") or "")
         default = current if current in options else "state"
@@ -1620,6 +1627,79 @@ class _AnnouncementFlowMixin:
             step_id="occupancy_source",
             data_schema=schema,
             description_placeholders={"entity": sensor},
+        )
+
+    async def async_step_sleep_rooms(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose the entity that reports WHERE people are sleeping right now."""
+        if user_input is not None:
+            entity = str(user_input.get(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
+            self._working[CONF_SLEEP_ROOMS_ENTITY] = entity or None
+            self._working[CONF_SLEEP_ROOMS_ATTRIBUTE] = ""
+            self._sleep_source_from_queue = False
+            if entity:
+                return await self.async_step_sleep_rooms_source()
+            return await self.async_step_queue()
+        return self.async_show_form(
+            step_id="sleep_rooms",
+            data_schema=probatio.Schema({
+                _optional_marker(
+                    CONF_SLEEP_ROOMS_ENTITY,
+                    self._value(CONF_SLEEP_ROOMS_ENTITY, None),
+                ): selector.EntitySelector(),
+            }),
+        )
+
+    async def async_step_sleep_rooms_source(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Select state or a live list-bearing attribute from the sleep entity."""
+        entity = str(self._working.get(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
+        if not entity:
+            self._working[CONF_SLEEP_ROOMS_ATTRIBUTE] = ""
+            if self._sleep_source_from_queue:
+                self._sleep_source_from_queue = False
+                return await self._async_finish()
+            return await self.async_step_queue()
+        options = self._sleep_rooms_attribute_options()
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            source = str(user_input.get(CONF_SLEEP_ROOMS_ATTRIBUTE, "state"))
+            if source in options:
+                self._working[CONF_SLEEP_ROOMS_ATTRIBUTE] = (
+                    "" if source == "state" else source
+                )
+                if self._sleep_source_from_queue:
+                    self._sleep_source_from_queue = False
+                    return await self._async_finish()
+                return await self.async_step_queue()
+            errors["base"] = "invalid_sleep_source"
+        current = str(self._working.get(CONF_SLEEP_ROOMS_ATTRIBUTE, "") or "")
+        default = current if current in options else "state"
+        schema = probatio.Schema({
+            probatio.Required(
+                CONF_SLEEP_ROOMS_ATTRIBUTE, default=default,
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=[
+                        selector.SelectOptionDict(
+                            value="state", label=provider_label(self.hass, "state")
+                        ),
+                        *[
+                            selector.SelectOptionDict(value=key, label=key)
+                            for key in options if key != "state"
+                        ],
+                    ],
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+        })
+        return self.async_show_form(
+            step_id="sleep_rooms_source",
+            data_schema=schema,
+            description_placeholders={"entity": entity},
+            errors=errors,
         )
 
     def _ai_agent_options(self) -> list[selector.SelectOptionDict]:
@@ -1722,6 +1802,12 @@ class _AnnouncementFlowMixin:
         if user_input is not None:
             incoming_sensor = user_input.get(CONF_OCCUPANCY_SENSOR)
             had_source_field = CONF_OCCUPANCY_ATTRIBUTE in user_input
+            previous_sleep_entity = str(
+                self._working.get(CONF_SLEEP_ROOMS_ENTITY, "") or ""
+            ).strip()
+            incoming_sleep_entity = str(
+                user_input.get(CONF_SLEEP_ROOMS_ENTITY, "") or ""
+            ).strip()
             for key, default in (
                 (CONF_DEFAULT_TITLE, DEFAULT_TITLE),
                 (CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
@@ -1729,7 +1815,7 @@ class _AnnouncementFlowMixin:
                 (CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT),
                 (CONF_CRITICAL_NOTIFY_DATA, {}),
                 (CONF_OCCUPANCY_SENSOR, None),
-                (CONF_SLEEP_ROOMS, []),
+                (CONF_SLEEP_ROOMS_ENTITY, None),
                 (CONF_FALLBACK_ROOM, None),
                 (CONF_FALLBACK_CHECK_DOOR, DEFAULT_FALLBACK_CHECK_DOOR),
                 (CONF_FALLBACK_DOOR_LABEL, None),
@@ -1753,6 +1839,14 @@ class _AnnouncementFlowMixin:
             else:
                 self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
 
+            if not incoming_sleep_entity or incoming_sleep_entity != previous_sleep_entity:
+                self._working[CONF_SLEEP_ROOMS_ATTRIBUTE] = ""
+            elif CONF_SLEEP_ROOMS_ATTRIBUTE in user_input:
+                sleep_source = str(user_input[CONF_SLEEP_ROOMS_ATTRIBUTE])
+                self._working[CONF_SLEEP_ROOMS_ATTRIBUTE] = (
+                    "" if sleep_source == "state" else sleep_source
+                )
+
             has_tts = bool(
                 self._working.get(CONF_TTS_ENGINES)
                 and (
@@ -1770,9 +1864,13 @@ class _AnnouncementFlowMixin:
             ):
                 errors["base"] = "output_required"
             else:
+                if incoming_sleep_entity and incoming_sleep_entity != previous_sleep_entity:
+                    self._sleep_source_from_queue = True
+                    return await self.async_step_sleep_rooms_source()
                 return await self._async_finish()
 
         sensor = str(self._value(CONF_OCCUPANCY_SENSOR, "") or "").strip()
+        sleep_entity = str(self._value(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
         fields: dict[probatio.Marker, Any] = {
             probatio.Required(
                 CONF_DEFAULT_TITLE,
@@ -1810,6 +1908,10 @@ class _AnnouncementFlowMixin:
                 CONF_OCCUPANCY_SENSOR,
                 self._value(CONF_OCCUPANCY_SENSOR, None),
             ): selector.EntitySelector(),
+            _optional_marker(
+                CONF_SLEEP_ROOMS_ENTITY,
+                self._value(CONF_SLEEP_ROOMS_ENTITY, None),
+            ): selector.EntitySelector(),
         }
 
         if sensor:
@@ -1836,12 +1938,36 @@ class _AnnouncementFlowMixin:
                 )
             )
 
+        if sleep_entity:
+            sleep_options = self._sleep_rooms_attribute_options()
+            current_sleep_source = str(
+                self._value(CONF_SLEEP_ROOMS_ATTRIBUTE, "") or ""
+            )
+            fields[
+                probatio.Required(
+                    CONF_SLEEP_ROOMS_ATTRIBUTE,
+                    default=(
+                        current_sleep_source
+                        if current_sleep_source in sleep_options else "state"
+                    ),
+                )
+            ] = selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=[
+                        selector.SelectOptionDict(
+                            value="state", label=provider_label(self.hass, "state")
+                        ),
+                        *[
+                            selector.SelectOptionDict(value=key, label=key)
+                            for key in sleep_options if key != "state"
+                        ],
+                    ],
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            )
+
         fields.update(
             {
-                probatio.Optional(
-                    CONF_SLEEP_ROOMS,
-                    default=list(self._value(CONF_SLEEP_ROOMS, []) or []),
-                ): selector.AreaSelector(selector.AreaSelectorConfig(multiple=True)),
                 _optional_marker(
                     CONF_FALLBACK_ROOM,
                     self._value(CONF_FALLBACK_ROOM, None),
@@ -1933,6 +2059,7 @@ class AnnouncementHubConfigFlow(
         self._notify_profile_index = 0
         self._person_config_ids = []
         self._person_index = 0
+        self._sleep_source_from_queue = False
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -1987,6 +2114,7 @@ class AnnouncementHubOptionsFlow(_AnnouncementFlowMixin, OptionsFlow):
         self._notify_profile_index = 0
         self._person_config_ids = []
         self._person_index = 0
+        self._sleep_source_from_queue = False
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None

@@ -311,7 +311,8 @@ The **4. General options** page includes:
 | Backup AI conversation agent | Alternate agent, or original message without a second AI attempt |
 | Room-presence entity | A sensor reporting currently occupied Home Assistant rooms |
 | Occupied rooms value | Sensor state or attribute containing room names / area IDs |
-| Sleep rooms | Areas treated as sleeping when occupied; all-asleep homes use configured written mobile-app notifications instead of speech |
+| Sleep rooms entity | A Home Assistant entity reporting rooms where people are **currently sleeping**; select it from a dropdown |
+| Sleep rooms value | Choose **State** or a live attribute that contains a list of sleeping room area IDs, names or aliases |
 | Fallback room | Alternate area only if the target room contains an awake person, local delivery failed and the door rule permits |
 | Require an open occupied-room door for fallback | Door rule that must pass before using the configured alternate room |
 | Door sensor label filter | Optional label to restrict which door sensors count |
@@ -338,6 +339,34 @@ Select the sensor and set **Occupied rooms value** to `rooms`. The integration
 can also interpret area IDs and supported string/mapping representations.
 Unknown or missing room values do not authorize a broadcast to unrelated
 room devices.
+
+**Sleeping rooms are not permanently designated bedrooms.** Configure a
+separate **Sleep rooms entity** whose current state or an attribute contains
+the areas with people currently asleep. For example:
+
+```yaml
+entity_id: sensor.sleeping_rooms
+state: "2"
+attributes:
+  rooms:
+    - Schlafzimmer
+    - Kinderzimmer
+```
+
+Select `sensor.sleeping_rooms`, then choose the `rooms` attribute from the
+**Sleep rooms value** dropdown on the next page. If your entity's state itself
+contains the room names (e.g. `Schlafzimmer, Kinderzimmer` or
+`["Schlafzimmer", "Kinderzimmer"]`), select **State** instead. Empty
+lists mean nobody is currently sleeping. Home Assistant area IDs, names and
+aliases are accepted; unrecognized names are ignored. The value is read again
+for every queued announcement and immediately before TTS delivery: no HA
+restart is needed when a person starts or stops sleeping.
+
+An unavailable/missing sleeping-room source (or selected attribute) cannot
+prove a person is awake, so audio is suppressed while room occupancy is
+known; the mobile-app written fallback remains available. An existing
+pre-v0.10.0b23 fixed-area selection is honored **only until** a new live
+sleep-room entity is configured.
 
 ## Person-targeted announcements and personal destinations
 
@@ -525,11 +554,13 @@ General/non-room notification outputs
   the alternate fallback room still requires confirmed target-room presence.
   If the configured source is unavailable, unconfirmed room presence is not
   assumed, and the alternate fallback room remains ineligible.
-- **Sleep rooms** are configured under General options. If all currently
-  occupied rooms belong to them, no TTS is started (even Critical, Snapcast
-  and companion speech). Only configured mobile-app written notifications
-  are eligible; a TTS-only room message uses its spoken text as written text.
-  If no configured mobile-app output is available, the job stays queued.
+- The **sleeping-room entity** lists rooms with sleeping people **right now**.
+  If the configured occupied-room list is contained in this live sleep list,
+  no TTS is started (even Critical, Snapcast and companion speech). Only
+  configured mobile-app written notifications are eligible; a TTS-only room
+  message uses its spoken text as written text. If the sleep source becomes
+  unavailable, audio is also suppressed while occupancy is known. If no
+  configured mobile-app output is available, the job stays queued.
 - The **occupied-room stage** uses the configured occupancy sensor; it does
   not guess where people are.
 - The **alternate-room stage** is allowed only for a targeted, non-sleep room

@@ -123,7 +123,8 @@
           "default_ai_agent": "Varsayılan YZ sağlayıcısı (sohbet veya YZ görevi)",
           "fallback_ai_agent": "Yedek YZ sağlayıcısı (sohbet veya YZ görevi)",
           "channel_fallback_mode": "Bildirim kanalı yedeklemesi",
-          "sleep_rooms": "Uyku odaları"
+          "sleep_rooms_entity": "Uyuyanların bulunduğu odalar varlığı",
+          "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri"
         },
         "data_description": {
           "queue_max": "İzin verilen en fazla bekleyen veya etkin duyuru işi sayısı. Sınıra ulaşıldığında yeni gönderimler reddedilir.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "Home Assistant varsayılanı, yerleşik conversation.process niyet aracısı yerine tercih edilen Assist işlem hattındaki konuşma aracısını izler. Aracı gönderim anında belirlenir ve açılır listede gösterilir. Tercih edilen işlem hattı yerleşik aracı kullanıyorsa LLM tabanlı bir aracıyı açıkça seçin veya yedek yapılandırın.",
           "fallback_ai_agent": "Birincil aracı başarısız olursa kullanılabilecek isteğe bağlı yedek AI aracısı. Home Assistant varsayılanı da tercih edilen Assist işlem hattını izler; Özgün duyuru seçeneği ikinci AI denemesini atlar. Hiçbir AI çalışmazsa özgün metin her zaman iletilir.",
           "channel_fallback_mode": "Yalnızca HEM konuşma text_tts hem yazılı text_notify HEM DE uygun TTS ve görsel cihazlar varsa: Görsel → TTS önce bildirir, başarısız olursa konuşur; TTS → Görsel önce konuşur, başarısız olursa bildirir; Her ikisi iki kanalı da dener. Tek kanal varsa normal çalışır. Eksik metin oluşturulmaz, alıcılar genişletilmez; seviye kuralları geçerlidir.",
-          "sleep_rooms": "Doluyken uyku odası sayılan alanlar. Tüm dolu odalar uyku odasıysa sesli duyurular tamamen susturulur; yalnızca yapılandırılmış mobil uygulamalara yazılı bildirim gönderilir."
+          "sleep_rooms_entity": "Home Assistant içinde durumu veya niteliği şu anda insanların uyuduğu odaları listeleyen varlığı seçin. Bu dinamik bir listedir, kalıcı yatak odası seçimi değildir.",
+          "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Kişiye yönelik Oda duyurularını yalnızca seçilen sensör açık (on) olduğunda oynatın; eksik veri teslimatı engeller.",
           "presence_sensor": "Fiziksel olarak bu alanda bulunan bir binary_sensor doluluk veya varlık varlığı seçin."
         }
+      },
+      "sleep_rooms": {
+        "title": "Uyuyanların bulunduğu odalar — varlık",
+        "description": "Şu anda hangi odalarda uyuyan kişiler olduğunu bildiren varlığı seçin. Uygun sensör yoksa boş bırakın.",
+        "data": {
+          "sleep_rooms_entity": "Uyuyanların bulunduğu odalar varlığı"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Home Assistant içinde durumu veya niteliği şu anda insanların uyuduğu odaları listeleyen varlığı seçin. Bu dinamik bir listedir, kalıcı yatak odası seçimi değildir."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Uyuyanların bulunduğu odalar — durum veya nitelik",
+        "description": "Güncel oda listesini içeren durumu veya niteliği seçin. Boş liste kimsenin uyumadığını gösterir.",
+        "data": {
+          "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "Özel AI stili yalnızca {message} ve {language} yer tutucularını kullanabilir ve 1200 karakteri aşamaz.",
       "invalid_chime_url": "Zil sesi /local/ altında bir dosya kullanmalıdır.",
       "invalid_person_area": "Geçerli bir Home Assistant odası seçin.",
-      "invalid_person_presence": "Doğrulamayı etkinleştirmeden önce varlık sensörü seçin."
+      "invalid_person_presence": "Doğrulamayı etkinleştirmeden önce varlık sensörü seçin.",
+      "invalid_sleep_source": "Uyuyan oda kaynağı geçersiz; Durum veya kullanılabilir bir nitelik seçin."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub zaten yapılandırılmış."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Varsayılan YZ sağlayıcısı (sohbet veya YZ görevi)",
           "fallback_ai_agent": "Yedek YZ sağlayıcısı (sohbet veya YZ görevi)",
           "channel_fallback_mode": "Bildirim kanalı yedeklemesi",
-          "sleep_rooms": "Uyku odaları"
+          "sleep_rooms_entity": "Uyuyanların bulunduğu odalar varlığı",
+          "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri"
         },
         "data_description": {
           "queue_max": "İzin verilen en fazla bekleyen veya etkin duyuru işi sayısı. Sınıra ulaşıldığında yeni gönderimler reddedilir.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "Home Assistant varsayılanı, yerleşik conversation.process niyet aracısı yerine tercih edilen Assist işlem hattındaki konuşma aracısını izler. Aracı gönderim anında belirlenir ve açılır listede gösterilir. Tercih edilen işlem hattı yerleşik aracı kullanıyorsa LLM tabanlı bir aracıyı açıkça seçin veya yedek yapılandırın.",
           "fallback_ai_agent": "Birincil aracı başarısız olursa kullanılabilecek isteğe bağlı yedek AI aracısı. Home Assistant varsayılanı da tercih edilen Assist işlem hattını izler; Özgün duyuru seçeneği ikinci AI denemesini atlar. Hiçbir AI çalışmazsa özgün metin her zaman iletilir.",
           "channel_fallback_mode": "Yalnızca HEM konuşma text_tts hem yazılı text_notify HEM DE uygun TTS ve görsel cihazlar varsa: Görsel → TTS önce bildirir, başarısız olursa konuşur; TTS → Görsel önce konuşur, başarısız olursa bildirir; Her ikisi iki kanalı da dener. Tek kanal varsa normal çalışır. Eksik metin oluşturulmaz, alıcılar genişletilmez; seviye kuralları geçerlidir.",
-          "sleep_rooms": "Doluyken uyku odası sayılan alanlar. Tüm dolu odalar uyku odasıysa sesli duyurular tamamen susturulur; yalnızca yapılandırılmış mobil uygulamalara yazılı bildirim gönderilir."
+          "sleep_rooms_entity": "Home Assistant içinde durumu veya niteliği şu anda insanların uyuduğu odaları listeleyen varlığı seçin. Bu dinamik bir listedir, kalıcı yatak odası seçimi değildir.",
+          "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Kişiye yönelik Oda duyurularını yalnızca seçilen sensör açık (on) olduğunda oynatın; eksik veri teslimatı engeller.",
           "presence_sensor": "Fiziksel olarak bu alanda bulunan bir binary_sensor doluluk veya varlık varlığı seçin."
         }
+      },
+      "sleep_rooms": {
+        "title": "Uyuyanların bulunduğu odalar — varlık",
+        "description": "Şu anda hangi odalarda uyuyan kişiler olduğunu bildiren varlığı seçin. Uygun sensör yoksa boş bırakın.",
+        "data": {
+          "sleep_rooms_entity": "Uyuyanların bulunduğu odalar varlığı"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Home Assistant içinde durumu veya niteliği şu anda insanların uyuduğu odaları listeleyen varlığı seçin. Bu dinamik bir listedir, kalıcı yatak odası seçimi değildir."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Uyuyanların bulunduğu odalar — durum veya nitelik",
+        "description": "Güncel oda listesini içeren durumu veya niteliği seçin. Boş liste kimsenin uyumadığını gösterir.",
+        "data": {
+          "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "Özel AI stili yalnızca {message} ve {language} yer tutucularını kullanabilir ve 1200 karakteri aşamaz.",
       "invalid_chime_url": "Zil sesi /local/ altında bir dosya kullanmalıdır.",
       "invalid_person_area": "Geçerli bir Home Assistant odası seçin.",
-      "invalid_person_presence": "Doğrulamayı etkinleştirmeden önce varlık sensörü seçin."
+      "invalid_person_presence": "Doğrulamayı etkinleştirmeden önce varlık sensörü seçin.",
+      "invalid_sleep_source": "Uyuyan oda kaynağı geçersiz; Durum veya kullanılabilir bir nitelik seçin."
     }
   },
   "selector": {

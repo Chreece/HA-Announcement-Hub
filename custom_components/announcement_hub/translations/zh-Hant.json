@@ -123,7 +123,8 @@
           "default_ai_agent": "預設 AI 提供者（對話或 AI 任務）",
           "fallback_ai_agent": "備用 AI 提供者（對話或 AI 任務）",
           "channel_fallback_mode": "通知渠道備用方式",
-          "sleep_rooms": "睡眠房間"
+          "sleep_rooms_entity": "目前睡眠房間實體",
+          "sleep_rooms_attribute": "目前睡眠房間數值"
         },
         "data_description": {
           "queue_max": "允許同時處於等待或活動狀態的公告任務最大數量。達到上限時將拒絕新的發送請求。",
@@ -143,7 +144,8 @@
           "default_ai_agent": "Home Assistant 預設選項使用首選 Assist 流程中的對話代理，而不是內置的 conversation.process 意圖代理。發送時才確定具體代理，並在下拉列表中顯示。如果首選流程使用內置代理，請明確選擇基於 LLM 的代理或配置備用代理。",
           "fallback_ai_agent": "主 AI 代理失敗時使用的可選備用代理。Home Assistant 預設選項同樣遵循首選 Assist 流程；選擇原始公告則跳過第二次 AI 嘗試。若所有 AI 都失敗，仍始終發送原始文本。",
           "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。",
-          "sleep_rooms": "有人時視為睡眠中的房間。若所有有人房間都屬於此類，禁止所有語音播報，僅向已設定的手機應用程式傳送文字通知。"
+          "sleep_rooms_entity": "選擇其狀態或屬性列出目前有人正在睡覺之房間的 Home Assistant 實體。此清單會動態變更，並非永久指定臥室。",
+          "sleep_rooms_attribute": "選擇實體狀態或某個屬性。支援區域 ID、名稱、別名、清單或逗號分隔的文字。未知房間將被忽略；若來源無法使用但已知有人在家，則禁止語音播報。"
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "僅當選定傳感器為 on 時，才在個人所在房間播放公告；缺失資料時禁止送達。",
           "presence_sensor": "選擇實體實際位於該區域的 binary_sensor 佔用或存在狀態傳感器。"
         }
+      },
+      "sleep_rooms": {
+        "title": "有人睡覺的房間 — 實體",
+        "description": "選擇回報目前哪些房間有人正在睡覺的實體。沒有合適的感測器時可留空。",
+        "data": {
+          "sleep_rooms_entity": "目前睡眠房間實體"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "選擇其狀態或屬性列出目前有人正在睡覺之房間的 Home Assistant 實體。此清單會動態變更，並非永久指定臥室。"
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "有人睡覺的房間 — 狀態或屬性",
+        "description": "選擇包含目前房間清單的狀態或屬性。空清單表示目前沒有人睡覺。",
+        "data": {
+          "sleep_rooms_attribute": "目前睡眠房間數值"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "選擇實體狀態或某個屬性。支援區域 ID、名稱、別名、清單或逗號分隔的文字。未知房間將被忽略；若來源無法使用但已知有人在家，則禁止語音播報。"
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "自定義 AI 風格只能使用 {message} 和 {language} 佔位符，且不得超過 1200 個字符。",
       "invalid_chime_url": "提示音音訊必須使用 /local/ 下的文件。",
       "invalid_person_area": "請選擇有效的 Home Assistant 房間。",
-      "invalid_person_presence": "啟用驗證前請先選擇存在狀態傳感器。"
+      "invalid_person_presence": "啟用驗證前請先選擇存在狀態傳感器。",
+      "invalid_sleep_source": "睡眠房間來源無效；請選擇狀態或可用屬性。"
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub 已配置。"
@@ -430,7 +453,8 @@
           "default_ai_agent": "預設 AI 提供者（對話或 AI 任務）",
           "fallback_ai_agent": "備用 AI 提供者（對話或 AI 任務）",
           "channel_fallback_mode": "通知渠道備用方式",
-          "sleep_rooms": "睡眠房間"
+          "sleep_rooms_entity": "目前睡眠房間實體",
+          "sleep_rooms_attribute": "目前睡眠房間數值"
         },
         "data_description": {
           "queue_max": "允許同時處於等待或活動狀態的公告任務最大數量。達到上限時將拒絕新的發送請求。",
@@ -450,7 +474,8 @@
           "default_ai_agent": "Home Assistant 預設選項使用首選 Assist 流程中的對話代理，而不是內置的 conversation.process 意圖代理。發送時才確定具體代理，並在下拉列表中顯示。如果首選流程使用內置代理，請明確選擇基於 LLM 的代理或配置備用代理。",
           "fallback_ai_agent": "主 AI 代理失敗時使用的可選備用代理。Home Assistant 預設選項同樣遵循首選 Assist 流程；選擇原始公告則跳過第二次 AI 嘗試。若所有 AI 都失敗，仍始終發送原始文本。",
           "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。",
-          "sleep_rooms": "有人時視為睡眠中的房間。若所有有人房間都屬於此類，禁止所有語音播報，僅向已設定的手機應用程式傳送文字通知。"
+          "sleep_rooms_entity": "選擇其狀態或屬性列出目前有人正在睡覺之房間的 Home Assistant 實體。此清單會動態變更，並非永久指定臥室。",
+          "sleep_rooms_attribute": "選擇實體狀態或某個屬性。支援區域 ID、名稱、別名、清單或逗號分隔的文字。未知房間將被忽略；若來源無法使用但已知有人在家，則禁止語音播報。"
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "僅當選定傳感器為 on 時，才在個人所在房間播放公告；缺失資料時禁止送達。",
           "presence_sensor": "選擇實體實際位於該區域的 binary_sensor 佔用或存在狀態傳感器。"
         }
+      },
+      "sleep_rooms": {
+        "title": "有人睡覺的房間 — 實體",
+        "description": "選擇回報目前哪些房間有人正在睡覺的實體。沒有合適的感測器時可留空。",
+        "data": {
+          "sleep_rooms_entity": "目前睡眠房間實體"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "選擇其狀態或屬性列出目前有人正在睡覺之房間的 Home Assistant 實體。此清單會動態變更，並非永久指定臥室。"
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "有人睡覺的房間 — 狀態或屬性",
+        "description": "選擇包含目前房間清單的狀態或屬性。空清單表示目前沒有人睡覺。",
+        "data": {
+          "sleep_rooms_attribute": "目前睡眠房間數值"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "選擇實體狀態或某個屬性。支援區域 ID、名稱、別名、清單或逗號分隔的文字。未知房間將被忽略；若來源無法使用但已知有人在家，則禁止語音播報。"
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "自定義 AI 風格只能使用 {message} 和 {language} 佔位符，且不得超過 1200 個字符。",
       "invalid_chime_url": "提示音音訊必須使用 /local/ 下的文件。",
       "invalid_person_area": "請選擇有效的 Home Assistant 房間。",
-      "invalid_person_presence": "啟用驗證前請先選擇存在狀態傳感器。"
+      "invalid_person_presence": "啟用驗證前請先選擇存在狀態傳感器。",
+      "invalid_sleep_source": "睡眠房間來源無效；請選擇狀態或可用屬性。"
     }
   },
   "selector": {

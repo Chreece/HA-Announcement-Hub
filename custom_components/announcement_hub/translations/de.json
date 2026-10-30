@@ -123,7 +123,8 @@
           "default_ai_agent": "Standard-KI-Konversationsagent",
           "fallback_ai_agent": "Ersatz-KI-Konversationsagent",
           "channel_fallback_mode": "Kanal-Fallback für Mitteilungen",
-          "sleep_rooms": "Schlafräume"
+          "sleep_rooms_entity": "Entität für aktuell schlafende Räume",
+          "sleep_rooms_attribute": "Wert der Schlafräume"
         },
         "data_description": {
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "Home Assistant Standard verwendet den Konversationsagenten der bevorzugten Assist-Pipeline, nicht den integrierten Intent-Agenten von conversation.process. Die Auswahl wird bei jeder Ankündigung neu ermittelt und im Menü angezeigt. Falls die Pipeline den integrierten Agenten nutzt, einen LLM-Agenten ausdrücklich auswählen oder einen Ersatzagenten konfigurieren.",
           "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt.",
           "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam.",
-          "sleep_rooms": "Räume, die bei Belegung als Schlafräume gelten. Sind alle belegten Räume Schlafräume, wird jede Sprachausgabe unterdrückt und nur eine schriftliche Mitteilung an konfigurierte mobile Apps gesendet."
+          "sleep_rooms_entity": "Wähle die Home-Assistant-Entität aus, deren Zustand oder Attribut die Räume meldet, in denen gerade Menschen schlafen. Die Liste ist dynamisch und bezeichnet keine dauerhaft festgelegten Schlafzimmer.",
+          "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Personenansagen in den Raum werden nur bei eingeschaltetem Sensor zugestellt. Fehlende Daten verhindern die Zustellung.",
           "presence_sensor": "Einen binary_sensor für Anwesenheit oder Belegung auswählen, der diesem Bereich zugeordnet ist."
         }
+      },
+      "sleep_rooms": {
+        "title": "Schlafende Räume — Entität",
+        "description": "Wähle die Entität, die die momentan von schlafenden Personen belegten Räume meldet. Ohne geeigneten Sensor leer lassen.",
+        "data": {
+          "sleep_rooms_entity": "Entität für aktuell schlafende Räume"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Wähle die Home-Assistant-Entität aus, deren Zustand oder Attribut die Räume meldet, in denen gerade Menschen schlafen. Die Liste ist dynamisch und bezeichnet keine dauerhaft festgelegten Schlafzimmer."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Schlafende Räume — Zustand oder Attribut",
+        "description": "Wähle den Zustand oder das Attribut mit der aktuellen Raumliste. Eine leere Liste bedeutet, dass niemand schläft.",
+        "data": {
+          "sleep_rooms_attribute": "Wert der Schlafräume"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "KI-Stilvorlagen dürfen nur {message} und {language} verwenden und höchstens 1.200 Zeichen lang sein.",
       "invalid_chime_url": "Die Signaltongdatei muss unter /local/ liegen.",
       "invalid_person_area": "Bitte einen gültigen Home-Assistant-Bereich auswählen.",
-      "invalid_person_presence": "Vor dem Aktivieren einen Anwesenheitssensor auswählen."
+      "invalid_person_presence": "Vor dem Aktivieren einen Anwesenheitssensor auswählen.",
+      "invalid_sleep_source": "Ungültige Schlafraumquelle; bitte Zustand oder ein vorhandenes Attribut wählen."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub ist bereits eingerichtet."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Standard-KI-Konversationsagent",
           "fallback_ai_agent": "Ersatz-KI-Konversationsagent",
           "channel_fallback_mode": "Kanal-Fallback für Mitteilungen",
-          "sleep_rooms": "Schlafräume"
+          "sleep_rooms_entity": "Entität für aktuell schlafende Räume",
+          "sleep_rooms_attribute": "Wert der Schlafräume"
         },
         "data_description": {
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "Home Assistant Standard verwendet den Konversationsagenten der bevorzugten Assist-Pipeline, nicht den integrierten Intent-Agenten von conversation.process. Die Auswahl wird bei jeder Ankündigung neu ermittelt und im Menü angezeigt. Falls die Pipeline den integrierten Agenten nutzt, einen LLM-Agenten ausdrücklich auswählen oder einen Ersatzagenten konfigurieren.",
           "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt.",
           "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam.",
-          "sleep_rooms": "Räume, die bei Belegung als Schlafräume gelten. Sind alle belegten Räume Schlafräume, wird jede Sprachausgabe unterdrückt und nur eine schriftliche Mitteilung an konfigurierte mobile Apps gesendet."
+          "sleep_rooms_entity": "Wähle die Home-Assistant-Entität aus, deren Zustand oder Attribut die Räume meldet, in denen gerade Menschen schlafen. Die Liste ist dynamisch und bezeichnet keine dauerhaft festgelegten Schlafzimmer.",
+          "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Personenansagen in den Raum werden nur bei eingeschaltetem Sensor zugestellt. Fehlende Daten verhindern die Zustellung.",
           "presence_sensor": "Einen binary_sensor für Anwesenheit oder Belegung auswählen, der diesem Bereich zugeordnet ist."
         }
+      },
+      "sleep_rooms": {
+        "title": "Schlafende Räume — Entität",
+        "description": "Wähle die Entität, die die momentan von schlafenden Personen belegten Räume meldet. Ohne geeigneten Sensor leer lassen.",
+        "data": {
+          "sleep_rooms_entity": "Entität für aktuell schlafende Räume"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Wähle die Home-Assistant-Entität aus, deren Zustand oder Attribut die Räume meldet, in denen gerade Menschen schlafen. Die Liste ist dynamisch und bezeichnet keine dauerhaft festgelegten Schlafzimmer."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Schlafende Räume — Zustand oder Attribut",
+        "description": "Wähle den Zustand oder das Attribut mit der aktuellen Raumliste. Eine leere Liste bedeutet, dass niemand schläft.",
+        "data": {
+          "sleep_rooms_attribute": "Wert der Schlafräume"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "KI-Stilvorlagen dürfen nur {message} und {language} verwenden und höchstens 1.200 Zeichen lang sein.",
       "invalid_chime_url": "Die Signaltongdatei muss unter /local/ liegen.",
       "invalid_person_area": "Bitte einen gültigen Home-Assistant-Bereich auswählen.",
-      "invalid_person_presence": "Vor dem Aktivieren einen Anwesenheitssensor auswählen."
+      "invalid_person_presence": "Vor dem Aktivieren einen Anwesenheitssensor auswählen.",
+      "invalid_sleep_source": "Ungültige Schlafraumquelle; bitte Zustand oder ein vorhandenes Attribut wählen."
     }
   },
   "selector": {

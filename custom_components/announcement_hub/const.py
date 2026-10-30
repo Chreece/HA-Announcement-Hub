@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.10.0b22"
+VERSION: Final = "0.10.0b23"
 PLATFORMS: Final = [Platform.SENSOR, Platform.SWITCH]
 
 SERVICE_SEND: Final = "send"
@@ -121,7 +121,9 @@ CONF_NOTIFY_ERROR_OUTPUTS: Final = "notify_error_outputs"
 CONF_NOTIFY_CRITICAL_OUTPUTS: Final = "notify_critical_outputs"
 CONF_OCCUPANCY_SENSOR: Final = "occupancy_sensor"
 CONF_OCCUPANCY_ATTRIBUTE: Final = "occupancy_attribute"
-CONF_SLEEP_ROOMS: Final = "sleep_rooms"
+CONF_SLEEP_ROOMS: Final = "sleep_rooms"  # Legacy fixed-area selection; read-only migration fallback.
+CONF_SLEEP_ROOMS_ENTITY: Final = "sleep_rooms_entity"
+CONF_SLEEP_ROOMS_ATTRIBUTE: Final = "sleep_rooms_attribute"
 CONF_FALLBACK_ROOM: Final = "fallback_room"
 CONF_PERSON_PROFILES: Final = "person_profiles"
 CONF_PERSON_GROUP_LANGUAGE: Final = "person_group_language"

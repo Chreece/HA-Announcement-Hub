@@ -123,7 +123,8 @@
           "default_ai_agent": "Standardleverantör av AI (konversation eller AI-uppgift)",
           "fallback_ai_agent": "Reservleverantör av AI (konversation eller AI-uppgift)",
           "channel_fallback_mode": "Reservkanal för aviseringar",
-          "sleep_rooms": "Sovrum"
+          "sleep_rooms_entity": "Entitet för rum där personer sover",
+          "sleep_rooms_attribute": "Värde för rum där någon sover"
         },
         "data_description": {
           "queue_max": "Högsta antal väntande eller aktiva meddelandejobb som kan accepteras. Nya förfrågningar avvisas när gränsen är nådd.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "Home Assistant-standard följer konversationsagenten i din föredragna Assist-pipeline, inte den inbyggda intent-agenten conversation.process. Agenten bestäms vid sändning och visas i listan. Om standardpipelinen använder den inbyggda agenten, välj uttryckligen en LLM-agent eller konfigurera en reservagent.",
           "fallback_ai_agent": "Valfri reserv-AI-agent när den primära agenten misslyckas. Home Assistant-standard följer också din föredragna Assist-pipeline; alternativet Ursprungligt meddelande hoppar över ett andra AI-försök. Om ingen AI fungerar levereras alltid originaltexten.",
           "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande.",
-          "sleep_rooms": "Rum som räknas som sovrum när de är upptagna. Om alla upptagna rum är sovrum tystas alla röstmeddelanden och endast skriftliga aviseringar skickas till konfigurerade mobilappar."
+          "sleep_rooms_entity": "Välj den Home Assistant-entitet vars tillstånd eller attribut listar rum där personer sover just nu. Listan är dynamisk och innebär inte att vissa sovrum alltid är valda.",
+          "sleep_rooms_attribute": "Välj Tillstånd eller ett attribut hos entiteten. Områdes-ID:n, namn, alias, listor och kommaseparerad text stöds. Okända rum ignoreras; om källan är otillgänglig tystas tal när närvaron är känd."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Spela bara upp personliga rumsmeddelanden om den valda sensorn är på; saknade uppgifter blockerar leveransen.",
           "presence_sensor": "Välj en binary_sensor-entitet för närvaro eller beläggning som fysiskt hör till området."
         }
+      },
+      "sleep_rooms": {
+        "title": "Rum med sovande personer — entitet",
+        "description": "Välj entiteten som visar i vilka rum personer sover just nu. Lämna tomt om det inte finns någon lämplig sensor.",
+        "data": {
+          "sleep_rooms_entity": "Entitet för rum där personer sover"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Välj den Home Assistant-entitet vars tillstånd eller attribut listar rum där personer sover just nu. Listan är dynamisk och innebär inte att vissa sovrum alltid är valda."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Rum med sovande personer — tillstånd eller attribut",
+        "description": "Välj tillståndet eller attributet med den aktuella listan över rum. En tom lista betyder att ingen sover.",
+        "data": {
+          "sleep_rooms_attribute": "Värde för rum där någon sover"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Välj Tillstånd eller ett attribut hos entiteten. Områdes-ID:n, namn, alias, listor och kommaseparerad text stöds. Okända rum ignoreras; om källan är otillgänglig tystas tal när närvaron är känd."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "En egen AI-stil får bara använda platshållarna {message} och {language} och får inte överstiga 1200 tecken.",
       "invalid_chime_url": "Signalljudet måste vara en fil under /local/.",
       "invalid_person_area": "Välj ett giltigt rum i Home Assistant.",
-      "invalid_person_presence": "Välj en närvarosensor innan kontrollen aktiveras."
+      "invalid_person_presence": "Välj en närvarosensor innan kontrollen aktiveras.",
+      "invalid_sleep_source": "Ogiltig källa för sovande rum; välj Tillstånd eller ett tillgängligt attribut."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub är redan konfigurerat."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Standardleverantör av AI (konversation eller AI-uppgift)",
           "fallback_ai_agent": "Reservleverantör av AI (konversation eller AI-uppgift)",
           "channel_fallback_mode": "Reservkanal för aviseringar",
-          "sleep_rooms": "Sovrum"
+          "sleep_rooms_entity": "Entitet för rum där personer sover",
+          "sleep_rooms_attribute": "Värde för rum där någon sover"
         },
         "data_description": {
           "queue_max": "Högsta antal väntande eller aktiva meddelandejobb som kan accepteras. Nya förfrågningar avvisas när gränsen är nådd.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "Home Assistant-standard följer konversationsagenten i din föredragna Assist-pipeline, inte den inbyggda intent-agenten conversation.process. Agenten bestäms vid sändning och visas i listan. Om standardpipelinen använder den inbyggda agenten, välj uttryckligen en LLM-agent eller konfigurera en reservagent.",
           "fallback_ai_agent": "Valfri reserv-AI-agent när den primära agenten misslyckas. Home Assistant-standard följer också din föredragna Assist-pipeline; alternativet Ursprungligt meddelande hoppar över ett andra AI-försök. Om ingen AI fungerar levereras alltid originaltexten.",
           "channel_fallback_mode": "Endast när BÅDE talad text_tts och skriven text_notify OCH lämpliga TTS- och visuella enheter finns: Visuellt → TTS meddelar först och talar om det misslyckas; TTS → Visuellt talar först och meddelar om det misslyckas; Båda försöker båda kanalerna. En enda tillgänglig kanal fungerar normalt. Skapar inte text som saknas eller fler mottagare; nivåreglerna gäller fortfarande.",
-          "sleep_rooms": "Rum som räknas som sovrum när de är upptagna. Om alla upptagna rum är sovrum tystas alla röstmeddelanden och endast skriftliga aviseringar skickas till konfigurerade mobilappar."
+          "sleep_rooms_entity": "Välj den Home Assistant-entitet vars tillstånd eller attribut listar rum där personer sover just nu. Listan är dynamisk och innebär inte att vissa sovrum alltid är valda.",
+          "sleep_rooms_attribute": "Välj Tillstånd eller ett attribut hos entiteten. Områdes-ID:n, namn, alias, listor och kommaseparerad text stöds. Okända rum ignoreras; om källan är otillgänglig tystas tal när närvaron är känd."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Spela bara upp personliga rumsmeddelanden om den valda sensorn är på; saknade uppgifter blockerar leveransen.",
           "presence_sensor": "Välj en binary_sensor-entitet för närvaro eller beläggning som fysiskt hör till området."
         }
+      },
+      "sleep_rooms": {
+        "title": "Rum med sovande personer — entitet",
+        "description": "Välj entiteten som visar i vilka rum personer sover just nu. Lämna tomt om det inte finns någon lämplig sensor.",
+        "data": {
+          "sleep_rooms_entity": "Entitet för rum där personer sover"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Välj den Home Assistant-entitet vars tillstånd eller attribut listar rum där personer sover just nu. Listan är dynamisk och innebär inte att vissa sovrum alltid är valda."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Rum med sovande personer — tillstånd eller attribut",
+        "description": "Välj tillståndet eller attributet med den aktuella listan över rum. En tom lista betyder att ingen sover.",
+        "data": {
+          "sleep_rooms_attribute": "Värde för rum där någon sover"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Välj Tillstånd eller ett attribut hos entiteten. Områdes-ID:n, namn, alias, listor och kommaseparerad text stöds. Okända rum ignoreras; om källan är otillgänglig tystas tal när närvaron är känd."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "En egen AI-stil får bara använda platshållarna {message} och {language} och får inte överstiga 1200 tecken.",
       "invalid_chime_url": "Signalljudet måste vara en fil under /local/.",
       "invalid_person_area": "Välj ett giltigt rum i Home Assistant.",
-      "invalid_person_presence": "Välj en närvarosensor innan kontrollen aktiveras."
+      "invalid_person_presence": "Välj en närvarosensor innan kontrollen aktiveras.",
+      "invalid_sleep_source": "Ogiltig källa för sovande rum; välj Tillstånd eller ett tillgängligt attribut."
     }
   },
   "selector": {

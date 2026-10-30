@@ -69,6 +69,8 @@ from .const import (
     CONF_OCCUPANCY_ATTRIBUTE,
     CONF_OCCUPANCY_SENSOR,
     CONF_SLEEP_ROOMS,
+    CONF_SLEEP_ROOMS_ENTITY,
+    CONF_SLEEP_ROOMS_ATTRIBUTE,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
     CONF_POST_PLAY_DELAY,
@@ -2384,19 +2386,70 @@ class AnnouncementManager:
             self._schedule_save()
             self._notify_update()
 
+    def _sleep_rooms_source_unavailable(self) -> bool:
+        """Unknown sleep state fails closed for sound, not for the queue."""
+        entity = str(self.settings.get(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
+        if not entity:
+            return False
+        state = self.hass.states.get(entity)
+        if state is None or state.state in {STATE_UNAVAILABLE, STATE_UNKNOWN}:
+            return True
+        attribute = str(
+            self.settings.get(CONF_SLEEP_ROOMS_ATTRIBUTE, "") or ""
+        ).strip()
+        return bool(attribute and attribute not in state.attributes)
+
     def _sleep_area_ids(self) -> frozenset[str]:
-        """Resolve configured sleeping rooms to Home Assistant area IDs."""
+        """Read the CURRENT sleeping-room list from an entity state/attribute.
+
+        The live source replaces the legacy fixed-area list as soon as it is
+        selected. Invalid/renamed rooms are skipped, not routing exceptions.
+        """
+        entity = str(self.settings.get(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
+        if entity:
+            if self._sleep_rooms_source_unavailable():
+                _LOGGER.debug(
+                    "Sleeping-room source %s unavailable; sound stays muted "
+                    "while occupancy is known", entity
+                )
+                return frozenset()
+            state = self.hass.states.get(entity)
+            if state is None:
+                return frozenset()
+            attribute = str(
+                self.settings.get(CONF_SLEEP_ROOMS_ATTRIBUTE, "") or ""
+            ).strip()
+            raw: Any = (
+                state.attributes.get(attribute) if attribute else state.state
+            )
+            return frozenset(self._observed_area_ids(
+                self._occupancy_values(raw), entity
+            ))
+
+        # Existing pre-b23 installations continue to respect their previously
+        # selected rooms until the owner picks a live source; no static
+        # area selector is exposed for new configurations.
         configured = self.settings.get(CONF_SLEEP_ROOMS, ()) or ()
         if isinstance(configured, str):
             configured = (configured,)
-        return frozenset(
-            self._resolve_area_ids(tuple(str(value) for value in configured))
-        )
+        try:
+            return frozenset(
+                self._resolve_area_ids(tuple(str(value) for value in configured))
+            )
+        except ServiceValidationError:
+            _LOGGER.debug("Legacy sleeping-room selection contains an unknown area")
+            return frozenset()
 
     def _all_occupied_rooms_sleeping(self) -> bool:
-        """Never infer sleep from an absent/empty occupancy reading."""
+        """Silence sound when everybody is sleeping or the live source fails."""
         occupied = self._occupied_area_ids()
-        return bool(occupied and set(occupied).issubset(self._sleep_area_ids()))
+        if not occupied:
+            return False
+        if self._sleep_rooms_source_unavailable():
+            # An unavailable sleeping sensor cannot prove anyone is awake.
+            # Use only mobile written delivery until it recovers.
+            return True
+        return set(occupied).issubset(self._sleep_area_ids())
 
     def _staged_areas(
         self, job: AnnouncementJob, stage: str
@@ -2409,7 +2462,7 @@ class AnnouncementManager:
 
         # When everyone is in a sleeping room, physical-room routing never
         # wakes them. General delivery is restricted to mobile visuals.
-        if occupied_now and set(occupied_now).issubset(sleep_rooms):
+        if self._all_occupied_rooms_sleeping():
             return ()
 
         preferred = tuple(
@@ -3766,6 +3819,8 @@ class AnnouncementManager:
         self, job: AnnouncementJob, player: str,
     ) -> None:
         """Only selected direct room speakers; never a shared Snapcast source."""
+        if self._all_occupied_rooms_sleeping():
+            return  # Even the pre-announcement bell must not wake sleepers.
         enabled = (
             job.pre_announce_sound
             if job.pre_announce_sound is not None
@@ -4276,6 +4331,8 @@ class AnnouncementManager:
     ) -> None:
         channel = f"companion_tts:{output.entry_id}"
         self._raise_if_cancelled(job)
+        if self._all_occupied_rooms_sleeping():
+            return  # Recheck after availability waits, before phone TTS.
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person disabled during Companion TTS")
         if self._group_already_delivered(job, channel):
@@ -4330,6 +4387,11 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
+        if self._all_occupied_rooms_sleeping():
+            raise HomeAssistantError(
+                "TTS suppressed because everybody is sleeping "
+                "or the live sleep-room source is unavailable"
+            )
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled before audio playback")
         shared_path = bool(
@@ -5249,10 +5311,14 @@ class AnnouncementManager:
             self.settings.get(CONF_OCCUPANCY_ATTRIBUTE, "") or ""
         ).strip()
         raw: Any = state.attributes.get(attribute) if attribute else state.state
-        values = self._occupancy_values(raw)
+        return self._observed_area_ids(self._occupancy_values(raw), sensor)
+
+    def _observed_area_ids(
+        self, values: Sequence[str], source: str
+    ) -> tuple[str, ...]:
+        """Resolve observed areas, ignoring invalid names rather than aborting."""
         if not values:
             return ()
-
         registry = ar.async_get(self.hass)
         areas = registry.async_list_areas()
         by_name = {area.name.casefold(): area.id for area in areas}
@@ -5272,12 +5338,10 @@ class AnnouncementManager:
                 resolved.append(area_id)
             else:
                 unknown.append(value)
-
         if unknown:
             _LOGGER.debug(
-                "Occupancy source %s reported unknown area value(s): %s",
-                sensor,
-                unknown,
+                "Room source %s reported unknown area value(s): %s",
+                source, unknown,
             )
         return tuple(dict.fromkeys(resolved))
 

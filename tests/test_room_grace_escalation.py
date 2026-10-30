@@ -8,6 +8,8 @@ Python: no actual devices are needed and no announcements are played.
 from __future__ import annotations
 
 import ast
+import json
+import re
 from datetime import UTC, datetime, timedelta
 from collections import deque
 import importlib.util
@@ -98,12 +100,17 @@ class FakeManager:
         living_snapcast=False,
         entrance_snapcast=False,
     ):
-        self.hass = SimpleNamespace()
+        self.live_states = {}
+        self.hass = SimpleNamespace(
+            states=SimpleNamespace(get=lambda entity: self.live_states.get(entity))
+        )
         self.settings = {
             "tts_min_level": "warning",
             "notify_profiles": {},
             "channel_fallback_mode": "both",
             "sleep_rooms": (),
+            "sleep_rooms_entity": None,
+            "sleep_rooms_attribute": "",
         }
         self._availability_timeout = timeout
         self.occupied = tuple(occupied)
@@ -144,6 +151,11 @@ class FakeManager:
     @staticmethod
     def _resolve_area_ids(areas):
         return tuple(areas)
+
+    @staticmethod
+    def _observed_area_ids(values, source):
+        known = {"kueche", "wohnzimmer", "schlafzimmer", "eingang"}
+        return tuple(dict.fromkeys(v for v in values if v in known))
 
     def _fallback_area_id(self):
         return "eingang"
@@ -215,7 +227,9 @@ class FakeManager:
 
 
 METHODS = (
+    "_sleep_rooms_source_unavailable",
     "_sleep_area_ids",
+    "_occupancy_values",
     "_all_occupied_rooms_sleeping",
     "_staged_areas",
     "_prepare_staged_route",
@@ -247,6 +261,12 @@ namespace = {
     "TTS_LEVEL_NEVER": "never",
     "CONF_TTS_MIN_LEVEL": "tts_min_level",
     "CONF_SLEEP_ROOMS": "sleep_rooms",
+    "CONF_SLEEP_ROOMS_ENTITY": "sleep_rooms_entity",
+    "CONF_SLEEP_ROOMS_ATTRIBUTE": "sleep_rooms_attribute",
+    "STATE_UNAVAILABLE": "unavailable",
+    "STATE_UNKNOWN": "unknown",
+    "json": json,
+    "re": re,
     "DEFAULT_TTS_MIN_LEVEL": "debug",
     "CONF_CHANNEL_FALLBACK_MODE": "channel_fallback_mode",
     "DEFAULT_CHANNEL_FALLBACK_MODE": "both",
@@ -260,6 +280,7 @@ namespace = {
     "datetime": datetime,
     "utcnow_iso": lambda: datetime.now(UTC).isoformat(),
     "Mapping": __import__("collections.abc", fromlist=["Mapping"]).Mapping,
+    "Any": __import__("typing", fromlist=["Any"]).Any,
     "ServiceValidationError": ValueError,
     "resolve_notify_outputs": lambda hass, refs: tuple(
         manager.notifications[ref]
@@ -974,3 +995,87 @@ def test_sleeping_room_scoped_mobile_still_receives_written_fallback(monkeypatch
     assert j.routing_stage == "general"
     assert j.notify_outputs == ("entity:notify.phone",)
     assert j.tts_text is None
+
+
+def test_live_sleep_room_source_uses_attribute_and_rechecks_updates(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",), available={"entity:notify.phone": True},
+    )
+    manager.settings["sleep_rooms_entity"] = "sensor.sleeping"
+    manager.settings["sleep_rooms_attribute"] = "rooms"
+    manager.live_states["sensor.sleeping"] = SimpleNamespace(
+        state="active", attributes={"rooms": ["schlafzimmer"]},
+    )
+    configure_manager(monkeypatch, manager)
+    assert manager._sleep_area_ids() == frozenset(("schlafzimmer",))
+    assert manager._all_occupied_rooms_sleeping()
+    j = job(level="critical")
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
+    assert j.tts_text is None
+
+    # The source is dynamic: no reload or new config entry required.
+    manager.live_states["sensor.sleeping"].attributes["rooms"] = []
+    assert not manager._all_occupied_rooms_sleeping()
+    assert manager._sleep_area_ids() == frozenset()
+
+
+def test_live_sleep_room_source_state_supports_csv_and_json_lists(monkeypatch):
+    global manager
+    manager = FakeManager(occupied=("schlafzimmer",))
+    manager.settings["sleep_rooms_entity"] = "sensor.sleeping"
+    manager.settings["sleep_rooms_attribute"] = ""
+    manager.live_states["sensor.sleeping"] = SimpleNamespace(
+        state="schlafzimmer, wohnzimmer", attributes={},
+    )
+    configure_manager(monkeypatch, manager)
+    assert manager._sleep_area_ids() == frozenset(("schlafzimmer", "wohnzimmer"))
+    manager.live_states["sensor.sleeping"].state = '["schlafzimmer"]'
+    assert manager._sleep_area_ids() == frozenset(("schlafzimmer",))
+    manager.live_states["sensor.sleeping"].state = "not_a_room"
+    assert manager._sleep_area_ids() == frozenset()
+    assert not manager._all_occupied_rooms_sleeping()
+
+
+def test_unavailable_live_sleep_source_silences_audio_and_uses_mobile(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",), living_snapcast=True,
+        available={
+            "media_player.living_snapcast": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["sleep_rooms_entity"] = "sensor.sleeping"
+    manager.settings["sleep_rooms_attribute"] = "asleep"
+    manager.live_states["sensor.sleeping"] = SimpleNamespace(
+        state="unavailable", attributes={"asleep": ["schlafzimmer"]},
+    )
+    configure_manager(monkeypatch, manager)
+    assert manager._sleep_rooms_source_unavailable()
+    assert manager._all_occupied_rooms_sleeping()
+    j = job(level="critical")
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
+    assert not j.tts_text
+
+    manager.live_states["sensor.sleeping"] = SimpleNamespace(
+        state="active", attributes={},
+    )
+    assert manager._sleep_rooms_source_unavailable()  # missing chosen attribute
+
+
+def test_legacy_static_sleep_rooms_remain_until_live_source_selected(monkeypatch):
+    global manager
+    manager = FakeManager(occupied=("schlafzimmer",))
+    manager.settings["sleep_rooms"] = ["schlafzimmer"]
+    configure_manager(monkeypatch, manager)
+    assert manager._all_occupied_rooms_sleeping()
+    manager.settings["sleep_rooms_entity"] = "sensor.sleeping"
+    manager.live_states["sensor.sleeping"] = SimpleNamespace(
+        state="[]", attributes={},
+    )
+    assert not manager._all_occupied_rooms_sleeping()

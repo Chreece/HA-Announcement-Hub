@@ -123,7 +123,8 @@
           "default_ai_agent": "Proveedor de IA predeterminado (conversación o tarea de IA)",
           "fallback_ai_agent": "Proveedor de IA de respaldo (conversación o tarea de IA)",
           "channel_fallback_mode": "Canal alternativo de notificación",
-          "sleep_rooms": "Habitaciones para dormir"
+          "sleep_rooms_entity": "Entidad de habitaciones donde se duerme",
+          "sleep_rooms_attribute": "Valor de habitaciones con personas dormidas"
         },
         "data_description": {
           "queue_max": "Número máximo de trabajos de anuncio pendientes o activos. Se rechazan los nuevos envíos al alcanzar este límite.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "El valor predeterminado de Home Assistant usa el agente de conversación de la canalización Assist preferida, no el agente integrado de intenciones conversation.process. El agente se determina al enviar y se muestra en la lista. Si la canalización preferida utiliza el agente integrado, elige explícitamente uno basado en un LLM o configura uno de respaldo.",
           "fallback_ai_agent": "Agente de respaldo opcional si falla el principal. El valor predeterminado de Home Assistant también sigue la canalización Assist preferida; « Anuncio original » omite el segundo intento con IA. Si ninguno funciona, siempre se entrega el texto original.",
           "channel_fallback_mode": "Solo se aplica si están presentes AMBOS textos text_tts y text_notify Y existen dispositivos de voz y visuales válidos: Visual → TTS notifica primero y habla si falla; TTS → Visual habla primero y notifica si falla; Ambos intenta los dos canales. Un único canal disponible funciona con normalidad. No crea texto ausente ni amplía destinatarios; siguen aplicándose los niveles.",
-          "sleep_rooms": "Habitaciones consideradas de descanso cuando están ocupadas. Si todas las habitaciones ocupadas son de descanso, se suprime toda voz y solo se envían avisos escritos a las aplicaciones móviles configuradas."
+          "sleep_rooms_entity": "Elige la entidad de Home Assistant cuyo estado o atributo indica las habitaciones en las que hay personas durmiendo en este momento. Es una lista dinámica, no una selección permanente de dormitorios.",
+          "sleep_rooms_attribute": "Elige Estado o un atributo de la entidad. Admite identificadores, nombres, alias, listas y textos separados por comas. Se ignoran las habitaciones desconocidas; si la fuente no está disponible, se silencia la voz cuando se conoce la ocupación."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Reproduce los anuncios personales destinados a la habitación solo si el sensor seleccionado está activado; la ausencia de datos bloquea el envío.",
           "presence_sensor": "Elige una entidad binary_sensor de ocupación o presencia situada físicamente en esta área."
         }
+      },
+      "sleep_rooms": {
+        "title": "Habitaciones con personas dormidas — entidad",
+        "description": "Selecciona la entidad que informa en qué habitaciones hay personas durmiendo ahora. Déjala vacía si no tienes un sensor adecuado.",
+        "data": {
+          "sleep_rooms_entity": "Entidad de habitaciones donde se duerme"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Elige la entidad de Home Assistant cuyo estado o atributo indica las habitaciones en las que hay personas durmiendo en este momento. Es una lista dinámica, no una selección permanente de dormitorios."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Habitaciones con personas dormidas — estado o atributo",
+        "description": "Selecciona el estado o atributo que contiene la lista actual de habitaciones. Una lista vacía significa que nadie está durmiendo.",
+        "data": {
+          "sleep_rooms_attribute": "Valor de habitaciones con personas dormidas"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Elige Estado o un atributo de la entidad. Admite identificadores, nombres, alias, listas y textos separados por comas. Se ignoran las habitaciones desconocidas; si la fuente no está disponible, se silencia la voz cuando se conoce la ocupación."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "El estilo personalizado de IA solo puede utilizar los marcadores {message} y {language}, y no debe superar los 1200 caracteres.",
       "invalid_chime_url": "El audio del aviso sonoro debe proceder de un archivo /local/.",
       "invalid_person_area": "Selecciona una habitación válida de Home Assistant.",
-      "invalid_person_presence": "Selecciona un sensor de presencia antes de activar la verificación."
+      "invalid_person_presence": "Selecciona un sensor de presencia antes de activar la verificación.",
+      "invalid_sleep_source": "Fuente de habitaciones con personas dormidas no válida; elige Estado o un atributo disponible."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub ya está configurado."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Proveedor de IA predeterminado (conversación o tarea de IA)",
           "fallback_ai_agent": "Proveedor de IA de respaldo (conversación o tarea de IA)",
           "channel_fallback_mode": "Canal alternativo de notificación",
-          "sleep_rooms": "Habitaciones para dormir"
+          "sleep_rooms_entity": "Entidad de habitaciones donde se duerme",
+          "sleep_rooms_attribute": "Valor de habitaciones con personas dormidas"
         },
         "data_description": {
           "queue_max": "Número máximo de trabajos de anuncio pendientes o activos. Se rechazan los nuevos envíos al alcanzar este límite.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "El valor predeterminado de Home Assistant usa el agente de conversación de la canalización Assist preferida, no el agente integrado de intenciones conversation.process. El agente se determina al enviar y se muestra en la lista. Si la canalización preferida utiliza el agente integrado, elige explícitamente uno basado en un LLM o configura uno de respaldo.",
           "fallback_ai_agent": "Agente de respaldo opcional si falla el principal. El valor predeterminado de Home Assistant también sigue la canalización Assist preferida; « Anuncio original » omite el segundo intento con IA. Si ninguno funciona, siempre se entrega el texto original.",
           "channel_fallback_mode": "Solo se aplica si están presentes AMBOS textos text_tts y text_notify Y existen dispositivos de voz y visuales válidos: Visual → TTS notifica primero y habla si falla; TTS → Visual habla primero y notifica si falla; Ambos intenta los dos canales. Un único canal disponible funciona con normalidad. No crea texto ausente ni amplía destinatarios; siguen aplicándose los niveles.",
-          "sleep_rooms": "Habitaciones consideradas de descanso cuando están ocupadas. Si todas las habitaciones ocupadas son de descanso, se suprime toda voz y solo se envían avisos escritos a las aplicaciones móviles configuradas."
+          "sleep_rooms_entity": "Elige la entidad de Home Assistant cuyo estado o atributo indica las habitaciones en las que hay personas durmiendo en este momento. Es una lista dinámica, no una selección permanente de dormitorios.",
+          "sleep_rooms_attribute": "Elige Estado o un atributo de la entidad. Admite identificadores, nombres, alias, listas y textos separados por comas. Se ignoran las habitaciones desconocidas; si la fuente no está disponible, se silencia la voz cuando se conoce la ocupación."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Reproduce los anuncios personales destinados a la habitación solo si el sensor seleccionado está activado; la ausencia de datos bloquea el envío.",
           "presence_sensor": "Elige una entidad binary_sensor de ocupación o presencia situada físicamente en esta área."
         }
+      },
+      "sleep_rooms": {
+        "title": "Habitaciones con personas dormidas — entidad",
+        "description": "Selecciona la entidad que informa en qué habitaciones hay personas durmiendo ahora. Déjala vacía si no tienes un sensor adecuado.",
+        "data": {
+          "sleep_rooms_entity": "Entidad de habitaciones donde se duerme"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Elige la entidad de Home Assistant cuyo estado o atributo indica las habitaciones en las que hay personas durmiendo en este momento. Es una lista dinámica, no una selección permanente de dormitorios."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Habitaciones con personas dormidas — estado o atributo",
+        "description": "Selecciona el estado o atributo que contiene la lista actual de habitaciones. Una lista vacía significa que nadie está durmiendo.",
+        "data": {
+          "sleep_rooms_attribute": "Valor de habitaciones con personas dormidas"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Elige Estado o un atributo de la entidad. Admite identificadores, nombres, alias, listas y textos separados por comas. Se ignoran las habitaciones desconocidas; si la fuente no está disponible, se silencia la voz cuando se conoce la ocupación."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "El estilo personalizado de IA solo puede utilizar los marcadores {message} y {language}, y no debe superar los 1200 caracteres.",
       "invalid_chime_url": "El audio del aviso sonoro debe proceder de un archivo /local/.",
       "invalid_person_area": "Selecciona una habitación válida de Home Assistant.",
-      "invalid_person_presence": "Selecciona un sensor de presencia antes de activar la verificación."
+      "invalid_person_presence": "Selecciona un sensor de presencia antes de activar la verificación.",
+      "invalid_sleep_source": "Fuente de habitaciones con personas dormidas no válida; elige Estado o un atributo disponible."
     }
   },
   "selector": {

@@ -123,7 +123,8 @@
           "default_ai_agent": "Výchozí poskytovatel AI (konverzace nebo úloha)",
           "fallback_ai_agent": "Záložní poskytovatel AI (konverzace nebo úloha)",
           "channel_fallback_mode": "Záložní kanál oznámení",
-          "sleep_rooms": "Místnosti pro spánek"
+          "sleep_rooms_entity": "Entita místností, kde někdo spí",
+          "sleep_rooms_attribute": "Hodnota místností se spícími lidmi"
         },
         "data_description": {
           "queue_max": "Nejvyšší povolený počet čekajících nebo aktivních úloh oznámení. Po dosažení limitu se nové požadavky na odeslání odmítají.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "Výchozí nastavení Home Assistant používá konverzačního agenta preferovaného řetězce Assist, nikoli vestavěného agenta záměrů conversation.process. Agent se určí při odeslání a zobrazí v nabídce. Pokud preferovaný řetězec používá vestavěného agenta, výslovně vyberte agenta založeného na LLM nebo nastavte záložního.",
           "fallback_ai_agent": "Volitelný záložní agent AI při selhání primárního. Také výchozí agent Home Assistant následuje preferovaný řetězec Assist; možnost Původní oznámení přeskočí druhý pokus AI. Pokud žádný agent AI nefunguje, doručí se vždy původní text.",
           "channel_fallback_mode": "Pouze pokud existují OBA texty, mluvený text_tts i psaný text_notify, A ZÁROVEŇ vhodná TTS a vizuální zařízení: Vizuálně → TTS nejprve upozorní a při selhání mluví; TTS → Vizuálně nejprve mluví a při selhání upozorní; Obojí zkusí oba kanály. Jediný dostupný kanál funguje normálně. Nevytváří chybějící text ani nerozšiřuje příjemce; nastavené úrovně platí dál.",
-          "sleep_rooms": "Místnosti považované za spací, pokud jsou obsazené. Když jsou všechny obsazené místnosti spací, hlasová oznámení se vypnou a odešlou se jen písemná upozornění do nastavených mobilních aplikací."
+          "sleep_rooms_entity": "Vyberte entitu Home Assistant, jejíž stav nebo atribut obsahuje místnosti, ve kterých právě spí lidé. Jde o dynamický seznam, nikoli trvale určené ložnice.",
+          "sleep_rooms_attribute": "Vyberte Stav nebo atribut entity. Podporována jsou ID oblastí, názvy, přezdívky, seznamy a hodnoty oddělené čárkami. Neznámé místnosti se ignorují; při nedostupném zdroji se mluvení ztlumí, pokud je známá obsazenost."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Přehrávejte osobní oznámení v místnosti pouze při zapnutém vybraném senzoru; chybějící data doručení zablokují.",
           "presence_sensor": "Vyberte entitu binary_sensor pro obsazenost nebo přítomnost, která se fyzicky nachází v této oblasti."
         }
+      },
+      "sleep_rooms": {
+        "title": "Místnosti se spícími lidmi — entita",
+        "description": "Vyberte entitu, která hlásí místnosti, kde právě někdo spí. Pokud nemáte vhodný senzor, nechte pole prázdné.",
+        "data": {
+          "sleep_rooms_entity": "Entita místností, kde někdo spí"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Vyberte entitu Home Assistant, jejíž stav nebo atribut obsahuje místnosti, ve kterých právě spí lidé. Jde o dynamický seznam, nikoli trvale určené ložnice."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Místnosti se spícími lidmi — stav nebo atribut",
+        "description": "Vyberte stav nebo atribut s aktuálním seznamem místností. Prázdný seznam znamená, že nikdo nespí.",
+        "data": {
+          "sleep_rooms_attribute": "Hodnota místností se spícími lidmi"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Vyberte Stav nebo atribut entity. Podporována jsou ID oblastí, názvy, přezdívky, seznamy a hodnoty oddělené čárkami. Neznámé místnosti se ignorují; při nedostupném zdroji se mluvení ztlumí, pokud je známá obsazenost."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "Vlastní styl AI smí obsahovat pouze zástupné symboly {message} a {language} a maximálně 1200 znaků.",
       "invalid_chime_url": "Zvuk signálu musí používat soubor ve složce /local/.",
       "invalid_person_area": "Vyberte platnou místnost v Home Assistant.",
-      "invalid_person_presence": "Vyberte senzor přítomnosti před povolením kontroly."
+      "invalid_person_presence": "Vyberte senzor přítomnosti před povolením kontroly.",
+      "invalid_sleep_source": "Neplatný zdroj spících místností; vyberte Stav nebo dostupný atribut."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub je již nastaven."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Výchozí poskytovatel AI (konverzace nebo úloha)",
           "fallback_ai_agent": "Záložní poskytovatel AI (konverzace nebo úloha)",
           "channel_fallback_mode": "Záložní kanál oznámení",
-          "sleep_rooms": "Místnosti pro spánek"
+          "sleep_rooms_entity": "Entita místností, kde někdo spí",
+          "sleep_rooms_attribute": "Hodnota místností se spícími lidmi"
         },
         "data_description": {
           "queue_max": "Nejvyšší povolený počet čekajících nebo aktivních úloh oznámení. Po dosažení limitu se nové požadavky na odeslání odmítají.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "Výchozí nastavení Home Assistant používá konverzačního agenta preferovaného řetězce Assist, nikoli vestavěného agenta záměrů conversation.process. Agent se určí při odeslání a zobrazí v nabídce. Pokud preferovaný řetězec používá vestavěného agenta, výslovně vyberte agenta založeného na LLM nebo nastavte záložního.",
           "fallback_ai_agent": "Volitelný záložní agent AI při selhání primárního. Také výchozí agent Home Assistant následuje preferovaný řetězec Assist; možnost Původní oznámení přeskočí druhý pokus AI. Pokud žádný agent AI nefunguje, doručí se vždy původní text.",
           "channel_fallback_mode": "Pouze pokud existují OBA texty, mluvený text_tts i psaný text_notify, A ZÁROVEŇ vhodná TTS a vizuální zařízení: Vizuálně → TTS nejprve upozorní a při selhání mluví; TTS → Vizuálně nejprve mluví a při selhání upozorní; Obojí zkusí oba kanály. Jediný dostupný kanál funguje normálně. Nevytváří chybějící text ani nerozšiřuje příjemce; nastavené úrovně platí dál.",
-          "sleep_rooms": "Místnosti považované za spací, pokud jsou obsazené. Když jsou všechny obsazené místnosti spací, hlasová oznámení se vypnou a odešlou se jen písemná upozornění do nastavených mobilních aplikací."
+          "sleep_rooms_entity": "Vyberte entitu Home Assistant, jejíž stav nebo atribut obsahuje místnosti, ve kterých právě spí lidé. Jde o dynamický seznam, nikoli trvale určené ložnice.",
+          "sleep_rooms_attribute": "Vyberte Stav nebo atribut entity. Podporována jsou ID oblastí, názvy, přezdívky, seznamy a hodnoty oddělené čárkami. Neznámé místnosti se ignorují; při nedostupném zdroji se mluvení ztlumí, pokud je známá obsazenost."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Přehrávejte osobní oznámení v místnosti pouze při zapnutém vybraném senzoru; chybějící data doručení zablokují.",
           "presence_sensor": "Vyberte entitu binary_sensor pro obsazenost nebo přítomnost, která se fyzicky nachází v této oblasti."
         }
+      },
+      "sleep_rooms": {
+        "title": "Místnosti se spícími lidmi — entita",
+        "description": "Vyberte entitu, která hlásí místnosti, kde právě někdo spí. Pokud nemáte vhodný senzor, nechte pole prázdné.",
+        "data": {
+          "sleep_rooms_entity": "Entita místností, kde někdo spí"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Vyberte entitu Home Assistant, jejíž stav nebo atribut obsahuje místnosti, ve kterých právě spí lidé. Jde o dynamický seznam, nikoli trvale určené ložnice."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Místnosti se spícími lidmi — stav nebo atribut",
+        "description": "Vyberte stav nebo atribut s aktuálním seznamem místností. Prázdný seznam znamená, že nikdo nespí.",
+        "data": {
+          "sleep_rooms_attribute": "Hodnota místností se spícími lidmi"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Vyberte Stav nebo atribut entity. Podporována jsou ID oblastí, názvy, přezdívky, seznamy a hodnoty oddělené čárkami. Neznámé místnosti se ignorují; při nedostupném zdroji se mluvení ztlumí, pokud je známá obsazenost."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "Vlastní styl AI smí obsahovat pouze zástupné symboly {message} a {language} a maximálně 1200 znaků.",
       "invalid_chime_url": "Zvuk signálu musí používat soubor ve složce /local/.",
       "invalid_person_area": "Vyberte platnou místnost v Home Assistant.",
-      "invalid_person_presence": "Vyberte senzor přítomnosti před povolením kontroly."
+      "invalid_person_presence": "Vyberte senzor přítomnosti před povolením kontroly.",
+      "invalid_sleep_source": "Neplatný zdroj spících místností; vyberte Stav nebo dostupný atribut."
     }
   },
   "selector": {

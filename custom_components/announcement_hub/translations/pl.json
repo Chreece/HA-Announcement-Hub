@@ -123,7 +123,8 @@
           "default_ai_agent": "Domyślny dostawca AI (rozmowa lub zadanie AI)",
           "fallback_ai_agent": "Zapasowy dostawca AI (rozmowa lub zadanie AI)",
           "channel_fallback_mode": "Zastępczy kanał powiadamiania",
-          "sleep_rooms": "Pokoje do spania"
+          "sleep_rooms_entity": "Encja pomieszczeń, w których ktoś śpi",
+          "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi"
         },
         "data_description": {
           "queue_max": "Maksymalna dopuszczalna liczba oczekujących lub aktywnych zadań ogłoszeń. Nowe wysyłki są odrzucane po osiągnięciu tego limitu.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "Domyślny wybór Home Assistant odpowiada agentowi rozmowy w preferowanym potoku Assist, a nie wbudowanemu agentowi intencji conversation.process. Agent jest ustalany w chwili wysyłania i pokazywany na liście. Jeśli preferowany potok używa agenta wbudowanego, wybierz wyraźnie agenta opartego na LLM albo skonfiguruj rezerwowego.",
           "fallback_ai_agent": "Opcjonalny zapasowy agent AI na wypadek błędu agenta głównego. Wartość domyślna Home Assistant również podąża za preferowanym potokiem Assist; wybór oryginalnego ogłoszenia pomija drugą próbę AI. Jeśli oba agenty zawiodą, zawsze dostarczany jest oryginalny tekst.",
           "channel_fallback_mode": "Tylko gdy są ZARÓWNO text_tts i text_notify, JAK I odpowiednie urządzenia mowy i obrazu: Wizualnie → TTS najpierw powiadamia, potem mówi po błędzie; TTS → Wizualnie odwrotnie; Oba próbuje obu kanałów. Jeden kanał działa normalnie. Nie tworzy tekstu ani nie dodaje odbiorców; poziomy pozostają ważne.",
-          "sleep_rooms": "Pokoje uznawane za sypialne, gdy są zajęte. Jeśli wszyscy przebywają w tych pokojach, wyłączane są wszystkie komunikaty głosowe, a do skonfigurowanych aplikacji mobilnych trafiają wyłącznie powiadomienia tekstowe."
+          "sleep_rooms_entity": "Wybierz encję Home Assistant, której stan lub atrybut zawiera pomieszczenia, w których obecnie śpią ludzie. To lista dynamiczna, a nie stały wybór sypialni.",
+          "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Odtwarzaj ogłoszenia do osób w ich pokojach wyłącznie wtedy, gdy wybrany czujnik ma stan włączony; brak danych blokuje dostarczenie.",
           "presence_sensor": "Wybierz encję binary_sensor wykrywającą zajętość lub obecność, która fizycznie znajduje się na tym obszarze."
         }
+      },
+      "sleep_rooms": {
+        "title": "Pomieszczenia z osobami śpiącymi — encja",
+        "description": "Wybierz encję pokazującą pomieszczenia, w których ktoś teraz śpi. Pozostaw puste, jeśli nie masz odpowiedniego czujnika.",
+        "data": {
+          "sleep_rooms_entity": "Encja pomieszczeń, w których ktoś śpi"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Wybierz encję Home Assistant, której stan lub atrybut zawiera pomieszczenia, w których obecnie śpią ludzie. To lista dynamiczna, a nie stały wybór sypialni."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Pomieszczenia z osobami śpiącymi — stan lub atrybut",
+        "description": "Wybierz stan lub atrybut zawierający aktualną listę pomieszczeń. Pusta lista oznacza, że nikt nie śpi.",
+        "data": {
+          "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "Własny styl AI może używać tylko znaczników {message} i {language} i nie może przekraczać 1200 znaków.",
       "invalid_chime_url": "Dźwięk dzwonka musi pochodzić z pliku w /local/.",
       "invalid_person_area": "Wybierz prawidłowy pokój Home Assistant.",
-      "invalid_person_presence": "Przed włączeniem weryfikacji wybierz czujnik obecności."
+      "invalid_person_presence": "Przed włączeniem weryfikacji wybierz czujnik obecności.",
+      "invalid_sleep_source": "Nieprawidłowe źródło pomieszczeń z osobami śpiącymi; wybierz Stan lub dostępny atrybut."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub jest już skonfigurowany."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Domyślny dostawca AI (rozmowa lub zadanie AI)",
           "fallback_ai_agent": "Zapasowy dostawca AI (rozmowa lub zadanie AI)",
           "channel_fallback_mode": "Zastępczy kanał powiadamiania",
-          "sleep_rooms": "Pokoje do spania"
+          "sleep_rooms_entity": "Encja pomieszczeń, w których ktoś śpi",
+          "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi"
         },
         "data_description": {
           "queue_max": "Maksymalna dopuszczalna liczba oczekujących lub aktywnych zadań ogłoszeń. Nowe wysyłki są odrzucane po osiągnięciu tego limitu.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "Domyślny wybór Home Assistant odpowiada agentowi rozmowy w preferowanym potoku Assist, a nie wbudowanemu agentowi intencji conversation.process. Agent jest ustalany w chwili wysyłania i pokazywany na liście. Jeśli preferowany potok używa agenta wbudowanego, wybierz wyraźnie agenta opartego na LLM albo skonfiguruj rezerwowego.",
           "fallback_ai_agent": "Opcjonalny zapasowy agent AI na wypadek błędu agenta głównego. Wartość domyślna Home Assistant również podąża za preferowanym potokiem Assist; wybór oryginalnego ogłoszenia pomija drugą próbę AI. Jeśli oba agenty zawiodą, zawsze dostarczany jest oryginalny tekst.",
           "channel_fallback_mode": "Tylko gdy są ZARÓWNO text_tts i text_notify, JAK I odpowiednie urządzenia mowy i obrazu: Wizualnie → TTS najpierw powiadamia, potem mówi po błędzie; TTS → Wizualnie odwrotnie; Oba próbuje obu kanałów. Jeden kanał działa normalnie. Nie tworzy tekstu ani nie dodaje odbiorców; poziomy pozostają ważne.",
-          "sleep_rooms": "Pokoje uznawane za sypialne, gdy są zajęte. Jeśli wszyscy przebywają w tych pokojach, wyłączane są wszystkie komunikaty głosowe, a do skonfigurowanych aplikacji mobilnych trafiają wyłącznie powiadomienia tekstowe."
+          "sleep_rooms_entity": "Wybierz encję Home Assistant, której stan lub atrybut zawiera pomieszczenia, w których obecnie śpią ludzie. To lista dynamiczna, a nie stały wybór sypialni.",
+          "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Odtwarzaj ogłoszenia do osób w ich pokojach wyłącznie wtedy, gdy wybrany czujnik ma stan włączony; brak danych blokuje dostarczenie.",
           "presence_sensor": "Wybierz encję binary_sensor wykrywającą zajętość lub obecność, która fizycznie znajduje się na tym obszarze."
         }
+      },
+      "sleep_rooms": {
+        "title": "Pomieszczenia z osobami śpiącymi — encja",
+        "description": "Wybierz encję pokazującą pomieszczenia, w których ktoś teraz śpi. Pozostaw puste, jeśli nie masz odpowiedniego czujnika.",
+        "data": {
+          "sleep_rooms_entity": "Encja pomieszczeń, w których ktoś śpi"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Wybierz encję Home Assistant, której stan lub atrybut zawiera pomieszczenia, w których obecnie śpią ludzie. To lista dynamiczna, a nie stały wybór sypialni."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Pomieszczenia z osobami śpiącymi — stan lub atrybut",
+        "description": "Wybierz stan lub atrybut zawierający aktualną listę pomieszczeń. Pusta lista oznacza, że nikt nie śpi.",
+        "data": {
+          "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "Własny styl AI może używać tylko znaczników {message} i {language} i nie może przekraczać 1200 znaków.",
       "invalid_chime_url": "Dźwięk dzwonka musi pochodzić z pliku w /local/.",
       "invalid_person_area": "Wybierz prawidłowy pokój Home Assistant.",
-      "invalid_person_presence": "Przed włączeniem weryfikacji wybierz czujnik obecności."
+      "invalid_person_presence": "Przed włączeniem weryfikacji wybierz czujnik obecności.",
+      "invalid_sleep_source": "Nieprawidłowe źródło pomieszczeń z osobami śpiącymi; wybierz Stan lub dostępny atrybut."
     }
   },
   "selector": {

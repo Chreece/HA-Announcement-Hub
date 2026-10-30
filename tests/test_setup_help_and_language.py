@@ -34,7 +34,7 @@ def test_every_visible_four_step_field_has_specific_help_in_all_locales() -> Non
     for relative in ("strings.json","translations/en.json","translations/de.json","translations/el.json"):
         data=json.loads((C/relative).read_text(encoding="utf-8"))
         for section in ("config","options"):
-            for step_name in ("outputs","tts","notification_profile","queue"):
+            for step_name in ("outputs","tts","notification_profile","queue","sleep_rooms","sleep_rooms_source"):
                 step=data[section]["step"][step_name]
                 descriptions=step.get("data_description",{})
                 for key,label in step.get("data",{}).items():
