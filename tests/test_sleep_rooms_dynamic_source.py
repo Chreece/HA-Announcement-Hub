@@ -135,7 +135,10 @@ def test_sleep_attribute_options_track_entity_attributes_and_preserve_offline_ch
     method = next(node for node in klass.body
                   if isinstance(node, ast.FunctionDef)
                   and node.name == "_sleep_rooms_attribute_options")
-    namespace = {}
+    namespace = {
+        "CONF_SLEEP_ROOMS_ENTITY": "sleep_rooms_entity",
+        "CONF_SLEEP_ROOMS_ATTRIBUTE": "sleep_rooms_attribute",
+    }
     exec(compile(ast.fix_missing_locations(
         ast.Module(body=[method], type_ignores=[])), "sleep attribute selector", "exec"
     ), namespace)
