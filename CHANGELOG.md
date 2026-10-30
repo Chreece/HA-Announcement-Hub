@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.10.0b25 - 2026-10-30
+
+**Beta — follow current occupancy on burst delivery and release persistent mobile notification lanes promptly.**
+
+- Recheck the current occupancy of automatic room-routed announcements before
+  dispatch, direct speaker chimes, Snapcast routing/TTS playback, and room-bound
+  visual notifications. Never treat a stale room output as a successful
+  delivery if the person left before the provider action began.
+- On an observed room move, keep the durable queue entry, reset its routing
+  stage and retry in currently occupied rooms without making another AI
+  request. Preserve FIFO lane reservations, strict recipient/device/integration
+  restrictions, configured fallback door checks and output acknowledgments.
+- Persist the most recent observed occupied-room list so jobs already waiting
+  in the final/general stage immediately reconsider live rooms when occupancy
+  changes instead of waiting out the old availability grace period.
+- Persistent mobile-app written notifications now release their room lane
+  immediately after the service call instead of holding a simulated
+  visual-reading timer. Expiring TV/other overlays retain the configured
+  reading time and multipart sequencing.
+- Add executable regressions for kitchen-to-living movement, stale
+  multiroom targets, the fallback room's original occupancy, strict/general
+  targets, immediate queue rerouting, and mobile versus TV reading holds.
+- Document the separate automation pitfalls of indefinite waits without
+  `timeout`, `mode: single` script invocation drops, and many sequential
+  AI generation requests; existing AI provider timeout and prompt contracts
+  are intentionally unchanged.
+
 ## 0.10.0b24 - 2026-10-30
 
 **Beta — configurable sleep muting and explicitly selected written fallback recipients.**
