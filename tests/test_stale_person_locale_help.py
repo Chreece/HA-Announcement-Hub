@@ -61,7 +61,7 @@ def read(lang):
 
 def test_person_legacy_english_not_present_after_source_rewrites():
     en = read("en")
-    assert len(en) == 603
+    assert len(en) == 625
     for lang in LANGUAGES:
         translated = read(lang)
         assert set(en) == set(translated), lang
