@@ -16,6 +16,9 @@ LABELS = {
     "agent_unavailable": "Unavailable agent ({name})",
     "original": "Original announcement (no backup AI)",
     "backup_unavailable": "Unavailable backup agent ({name})",
+    "sleep_all_devices": "Integration · {name} — all devices ({count})",
+    "sleep_device": "Device · {name}",
+    "sleep_unavailable": "Unavailable · {name}",
     "state": "State"
   },
   "el": {
@@ -26,6 +29,9 @@ LABELS = {
     "agent_unavailable": "Μη διαθέσιμος πράκτορας ({name})",
     "original": "Αρχική ανακοίνωση (χωρίς εφεδρικό AI)",
     "backup_unavailable": "Μη διαθέσιμος εφεδρικός πράκτορας ({name})",
+    "sleep_all_devices": "Ενσωμάτωση · {name} — όλες οι συσκευές ({count})",
+    "sleep_device": "Συσκευή · {name}",
+    "sleep_unavailable": "Μη διαθέσιμο · {name}",
     "state": "Κατάσταση"
   },
   "de": {
@@ -36,6 +42,9 @@ LABELS = {
     "agent_unavailable": "Agent nicht verfügbar ({name})",
     "original": "Originalankündigung (ohne Ersatz-KI)",
     "backup_unavailable": "Ersatzagent nicht verfügbar ({name})",
+    "sleep_all_devices": "Integration · {name} — alle Geräte ({count})",
+    "sleep_device": "Gerät · {name}",
+    "sleep_unavailable": "Nicht verfügbar · {name}",
     "state": "Zustand"
   },
   "fr": {
@@ -46,6 +55,9 @@ LABELS = {
     "agent_unavailable": "Agent indisponible ({name})",
     "original": "Annonce d'origine (sans IA de secours)",
     "backup_unavailable": "Agent de secours indisponible ({name})",
+    "sleep_all_devices": "Intégration · {name} — tous les appareils ({count})",
+    "sleep_device": "Appareil · {name}",
+    "sleep_unavailable": "Indisponible · {name}",
     "state": "État"
   },
   "es": {
@@ -56,6 +68,9 @@ LABELS = {
     "agent_unavailable": "Agente no disponible ({name})",
     "original": "Anuncio original (sin IA de respaldo)",
     "backup_unavailable": "Agente de respaldo no disponible ({name})",
+    "sleep_all_devices": "Integración · {name} — todos los dispositivos ({count})",
+    "sleep_device": "Dispositivo · {name}",
+    "sleep_unavailable": "No disponible · {name}",
     "state": "Estado"
   },
   "it": {
@@ -66,6 +81,9 @@ LABELS = {
     "agent_unavailable": "Agente non disponibile ({name})",
     "original": "Annuncio originale (senza IA di riserva)",
     "backup_unavailable": "Agente di riserva non disponibile ({name})",
+    "sleep_all_devices": "Integrazione · {name} — tutti i dispositivi ({count})",
+    "sleep_device": "Dispositivo · {name}",
+    "sleep_unavailable": "Non disponibile · {name}",
     "state": "Stato"
   },
   "pt": {
@@ -76,6 +94,9 @@ LABELS = {
     "agent_unavailable": "Agente indisponível ({name})",
     "original": "Anúncio original (sem IA alternativa)",
     "backup_unavailable": "Agente alternativo indisponível ({name})",
+    "sleep_all_devices": "Integração · {name} — todos os dispositivos ({count})",
+    "sleep_device": "Dispositivo · {name}",
+    "sleep_unavailable": "Indisponível · {name}",
     "state": "Estado"
   },
   "pt-BR": {
@@ -86,6 +107,9 @@ LABELS = {
     "agent_unavailable": "Agente indisponível ({name})",
     "original": "Anúncio original (sem IA alternativa)",
     "backup_unavailable": "Agente alternativo indisponível ({name})",
+    "sleep_all_devices": "Integração · {name} — todos os dispositivos ({count})",
+    "sleep_device": "Dispositivo · {name}",
+    "sleep_unavailable": "Indisponível · {name}",
     "state": "Estado"
   },
   "nl": {
@@ -96,6 +120,9 @@ LABELS = {
     "agent_unavailable": "Agent niet beschikbaar ({name})",
     "original": "Oorspronkelijke aankondiging (geen reserve-AI)",
     "backup_unavailable": "Reserveagent niet beschikbaar ({name})",
+    "sleep_all_devices": "Integratie · {name} — alle apparaten ({count})",
+    "sleep_device": "Apparaat · {name}",
+    "sleep_unavailable": "Niet beschikbaar · {name}",
     "state": "Status"
   },
   "pl": {
@@ -106,6 +133,9 @@ LABELS = {
     "agent_unavailable": "Agent niedostępny ({name})",
     "original": "Oryginalne ogłoszenie (bez zapasowej AI)",
     "backup_unavailable": "Zapasowy agent niedostępny ({name})",
+    "sleep_all_devices": "Integracja · {name} — wszystkie urządzenia ({count})",
+    "sleep_device": "Urządzenie · {name}",
+    "sleep_unavailable": "Niedostępne · {name}",
     "state": "Stan"
   },
   "ru": {
@@ -116,6 +146,9 @@ LABELS = {
     "agent_unavailable": "Агент недоступен ({name})",
     "original": "Исходное объявление (без резервного ИИ)",
     "backup_unavailable": "Резервный агент недоступен ({name})",
+    "sleep_all_devices": "Интеграция · {name} — все устройства ({count})",
+    "sleep_device": "Устройство · {name}",
+    "sleep_unavailable": "Недоступно · {name}",
     "state": "Состояние"
   },
   "tr": {
@@ -126,6 +159,9 @@ LABELS = {
     "agent_unavailable": "Aracı kullanılamıyor ({name})",
     "original": "Özgün duyuru (yedek YZ olmadan)",
     "backup_unavailable": "Yedek aracı kullanılamıyor ({name})",
+    "sleep_all_devices": "Entegrasyon · {name} — tüm cihazlar ({count})",
+    "sleep_device": "Cihaz · {name}",
+    "sleep_unavailable": "Kullanılamıyor · {name}",
     "state": "Durum"
   },
   "uk": {
@@ -136,6 +172,9 @@ LABELS = {
     "agent_unavailable": "Агент недоступний ({name})",
     "original": "Початкове оголошення (без резервного ШІ)",
     "backup_unavailable": "Резервний агент недоступний ({name})",
+    "sleep_all_devices": "Інтеграція · {name} — усі пристрої ({count})",
+    "sleep_device": "Пристрій · {name}",
+    "sleep_unavailable": "Недоступно · {name}",
     "state": "Стан"
   },
   "ar": {
@@ -146,6 +185,9 @@ LABELS = {
     "agent_unavailable": "الوكيل غير متاح ({name})",
     "original": "الإعلان الأصلي (من دون ذكاء اصطناعي بديل)",
     "backup_unavailable": "الوكيل البديل غير متاح ({name})",
+    "sleep_all_devices": "التكامل · {name} — جميع الأجهزة ({count})",
+    "sleep_device": "الجهاز · {name}",
+    "sleep_unavailable": "غير متاح · {name}",
     "state": "الحالة"
   },
   "zh-Hans": {
@@ -156,6 +198,9 @@ LABELS = {
     "agent_unavailable": "代理不可用（{name}）",
     "original": "原始公告（无备用 AI）",
     "backup_unavailable": "备用代理不可用（{name}）",
+    "sleep_all_devices": "集成 · {name} — 所有设备（{count}）",
+    "sleep_device": "设备 · {name}",
+    "sleep_unavailable": "不可用 · {name}",
     "state": "状态"
   },
   "zh-Hant": {
@@ -166,6 +211,9 @@ LABELS = {
     "agent_unavailable": "代理無法使用（{name}）",
     "original": "原始公告（無備用 AI）",
     "backup_unavailable": "備用代理無法使用（{name}）",
+    "sleep_all_devices": "整合 · {name} — 所有裝置（{count}）",
+    "sleep_device": "裝置 · {name}",
+    "sleep_unavailable": "無法使用 · {name}",
     "state": "狀態"
   },
   "ja": {
@@ -176,6 +224,9 @@ LABELS = {
     "agent_unavailable": "利用できないエージェント（{name}）",
     "original": "元のアナウンス（予備AIなし）",
     "backup_unavailable": "予備エージェントは利用不可（{name}）",
+    "sleep_all_devices": "連携 · {name} — すべての端末（{count}）",
+    "sleep_device": "端末 · {name}",
+    "sleep_unavailable": "利用不可 · {name}",
     "state": "状態"
   },
   "ko": {
@@ -186,6 +237,9 @@ LABELS = {
     "agent_unavailable": "사용할 수 없는 에이전트({name})",
     "original": "원본 안내(예비 AI 없음)",
     "backup_unavailable": "예비 에이전트를 사용할 수 없음({name})",
+    "sleep_all_devices": "통합 · {name} — 모든 기기 ({count})",
+    "sleep_device": "기기 · {name}",
+    "sleep_unavailable": "사용 불가 · {name}",
     "state": "상태"
   },
   "sv": {
@@ -196,6 +250,9 @@ LABELS = {
     "agent_unavailable": "Agent otillgänglig ({name})",
     "original": "Originalmeddelande (utan reserv-AI)",
     "backup_unavailable": "Reservagent otillgänglig ({name})",
+    "sleep_all_devices": "Integration · {name} — alla enheter ({count})",
+    "sleep_device": "Enhet · {name}",
+    "sleep_unavailable": "Otillgänglig · {name}",
     "state": "Tillstånd"
   },
   "cs": {
@@ -206,6 +263,9 @@ LABELS = {
     "agent_unavailable": "Agent není dostupný ({name})",
     "original": "Původní oznámení (bez záložní AI)",
     "backup_unavailable": "Záložní agent není dostupný ({name})",
+    "sleep_all_devices": "Integrace · {name} — všechna zařízení ({count})",
+    "sleep_device": "Zařízení · {name}",
+    "sleep_unavailable": "Nedostupné · {name}",
     "state": "Stav"
   }
 }
