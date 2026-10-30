@@ -178,6 +178,7 @@ _SCOPE = {
     "DEFAULT_DISPATCH_ORDER": "notify_then_tts",
     "DISPATCH_NOTIFY_THEN_TTS": "notify_then_tts",
     "HomeAssistantError": RuntimeError,
+    "RoomRouteMoved": type("RoomRouteMoved", (RuntimeError,), {}),
 }
 exec(
     compile(
@@ -287,3 +288,21 @@ def test_no_fallback_changes_text_payload_or_exact_recipient_list():
     assert "self._select_requested_outputs(" in MANAGER
     assert "job.routing_channel_retry = desired_retry" in MANAGER
     assert "self._prepare_staged_route(job)" in MANAGER
+
+
+def test_directional_fallback_does_not_speak_in_stale_room_after_a_move():
+    moved = _SCOPE["RoomRouteMoved"]
+
+    class MovingRoomHarness(DeliveryHarness):
+        async def _async_send_notifications(self, job):
+            self.calls.append("visual")
+            raise moved("The person walked into a different room")
+
+    h = MovingRoomHarness("visual_then_tts")
+    j = job()
+    with pytest.raises(moved):
+        asyncio.run(_async_process_job(h, j))
+    # The second TTS channel must not play on the old physical speaker;
+    # the durable room-move handler will replan both channels instead.
+    assert h.calls == ["visual"]
+    assert not j.successful_channels
