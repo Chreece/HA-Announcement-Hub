@@ -92,7 +92,7 @@ class FakeManager:
         fallback_min="info",
         door_open=True,
         timeout=10,
-        occupied=("wohnzimmer",),
+        occupied=("kueche", "wohnzimmer"),
         available=None,
         kitchen_snapcast=False,
         living_snapcast=False,
@@ -103,6 +103,7 @@ class FakeManager:
             "tts_min_level": "warning",
             "notify_profiles": {},
             "channel_fallback_mode": "both",
+            "sleep_rooms": (),
         }
         self._availability_timeout = timeout
         self.occupied = tuple(occupied)
@@ -139,6 +140,10 @@ class FakeManager:
 
     def _occupied_area_ids(self):
         return self.occupied
+
+    @staticmethod
+    def _resolve_area_ids(areas):
+        return tuple(areas)
 
     def _fallback_area_id(self):
         return "eingang"
@@ -210,6 +215,8 @@ class FakeManager:
 
 
 METHODS = (
+    "_sleep_area_ids",
+    "_all_occupied_rooms_sleeping",
     "_staged_areas",
     "_prepare_staged_route",
     "_advance_staged_route",
@@ -239,6 +246,7 @@ namespace = {
     "DEFAULT_NOTIFY_MIN_LEVEL": "info",
     "TTS_LEVEL_NEVER": "never",
     "CONF_TTS_MIN_LEVEL": "tts_min_level",
+    "CONF_SLEEP_ROOMS": "sleep_rooms",
     "DEFAULT_TTS_MIN_LEVEL": "debug",
     "CONF_CHANNEL_FALLBACK_MODE": "channel_fallback_mode",
     "DEFAULT_CHANNEL_FALLBACK_MODE": "both",
@@ -359,7 +367,7 @@ def test_fallback_room_only_when_original_room_door_open(monkeypatch):
     manager = FakeManager(
         kitchen_min="warning",
         available={"entity:notify.entrance": True, "entity:notify.phone": True},
-        door_open=True, occupied=(),
+        door_open=True, occupied=("kueche",),
     )
     configure_manager(monkeypatch, manager)
     j = job()
@@ -378,7 +386,7 @@ def test_fallback_room_only_when_original_room_door_open(monkeypatch):
 def test_fallback_room_unavailable_waits_before_general_phone(monkeypatch):
     global manager
     manager = FakeManager(
-        kitchen_min="warning", occupied=(),
+        kitchen_min="warning", occupied=("kueche",),
         available={"entity:notify.entrance": False, "entity:notify.phone": True},
         timeout=5,
     )
@@ -553,7 +561,7 @@ def test_moved_to_occupied_room_prefers_speech_even_with_visual(monkeypatch):
 def test_door_gated_fallback_uses_room_speech_at_info_all_levels(monkeypatch):
     global manager
     manager = FakeManager(
-        kitchen_min="warning", occupied=(), entrance_snapcast=True,
+        kitchen_min="warning", occupied=("kueche",), entrance_snapcast=True,
         available={
             "entity:notify.entrance": True,
             "media_player.entrance_snapcast": True,
@@ -712,7 +720,7 @@ def test_tts_first_uses_visual_immediately_if_audio_offline(monkeypatch):
 def test_directional_fallback_never_creates_missing_tts_text(monkeypatch):
     global manager
     manager = FakeManager(
-        kitchen_snapcast=True, occupied=(), door_open=False,
+        kitchen_snapcast=True, occupied=("kueche",), door_open=False,
         available={
             "entity:notify.kitchen": True,
             "media_player.kitchen_snapcast": True,
@@ -842,3 +850,110 @@ def test_scheduler_does_not_drop_undelivered_jobs():
     assert "return None" in scheduler
     assert "self._staged_route_ready(job)" in scheduler
     assert "elif self._job_runnable_now(job)" in scheduler
+
+
+def test_empty_target_routes_to_other_occupied_room_not_fallback(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("wohnzimmer",), living_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "entity:notify.living": True,
+            "entity:notify.entrance": True,
+            "media_player.living_snapcast": True,
+        },
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "occupied"
+    assert j.outputs == ("wohnzimmer",)
+    assert j.snapcast_clients == ("media_player.living_snapcast",)
+    assert "entity:notify.kitchen" not in j.notify_outputs
+
+
+def test_unoccupied_target_cannot_trigger_door_gated_fallback(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("wohnzimmer",), kitchen_min="warning",
+        available={
+            "entity:notify.entrance": True,
+            "entity:notify.phone": True,
+        },
+        timeout=0, door_open=True,
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
+    assert "fallback" in " ".join(j.routing_history)
+
+
+def test_all_sleeping_uses_only_mobile_written_text_without_speech(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",), entrance_snapcast=True,
+        available={
+            "entity:notify.kitchen": True,
+            "entity:notify.entrance": True,
+            "entity:notify.phone": True,
+            "media_player.entrance_snapcast": True,
+        },
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    configure_manager(monkeypatch, manager)
+    j = job()
+    j.text_notify = None  # TTS-only messages still become written mobile info.
+    j.level = "critical"  # Critical must not wake the sleeping household.
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
+    assert j.notify_text == j.text_tts
+    assert j.tts_text is None
+    assert j.room_tts_players == ()
+    assert j.snapcast_clients == ()
+    assert j.companion_tts_entries == ()
+
+
+def test_sleep_rooms_do_not_silence_other_occupied_awake_rooms(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer", "wohnzimmer"), living_snapcast=True,
+        available={"media_player.living_snapcast": True},
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "occupied"
+    assert j.outputs == ("wohnzimmer",)
+    assert j.snapcast_clients == ("media_player.living_snapcast",)
+
+
+def test_sleeping_target_cannot_authorize_fallback_even_with_open_door(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("kueche",), kitchen_min="warning",
+        available={
+            "entity:notify.entrance": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["sleep_rooms"] = ("kueche",)
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
+
+
+def test_sleep_guard_applies_even_to_normal_jobs_and_before_chime():
+    assert "if self._all_occupied_rooms_sleeping():" in SRC[
+        SRC.index("    async def _async_send_tts("):
+        SRC.index("    async def _async_restore_volume(")
+    ]
+    assert "return self._job_has_ready_visual_output(job)" in SRC[
+        SRC.index("    def _job_runnable_now("):
+        SRC.index("    @staticmethod\n    def _room_lane_keys(")
+    ]
