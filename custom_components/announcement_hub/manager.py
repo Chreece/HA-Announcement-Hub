@@ -3557,9 +3557,10 @@ class AnnouncementManager:
         part_index: int,
         part_count: int,
     ) -> None:
-        area = job.notify_output_areas.get(output.ref, output.area_id)
-        if area is not None:
-            self._assert_live_room_route(job, (area,))
+        if getattr(job, "routing_mode", "normal") == "room_fallback":
+            area = job.notify_output_areas.get(output.ref, output.area_id)
+            if area is not None:
+                self._assert_live_room_route(job, (area,))
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person or room disabled during delivery")
         integration_data = profile.get(PROFILE_INTEGRATION_DATA, {})
@@ -3959,11 +3960,13 @@ class AnnouncementManager:
         )
         if not enabled:
             return
-        self._assert_live_room_route(
-            job, (job.room_tts_player_areas.get(player) or entity_area_id(
-                self.hass, player
-            ),)
-        )
+        if getattr(job, "routing_mode", "normal") == "room_fallback":
+            self._assert_live_room_route(
+                job, (
+                    getattr(job, "room_tts_player_areas", {}).get(player)
+                    or entity_area_id(self.hass, player),
+                )
+            )
         if player == job.tts_media_player:
             # Never publish pre-roll to a shared TTS source, even if it
             # currently appears routed or muted to one room.
@@ -4022,11 +4025,13 @@ class AnnouncementManager:
             }
 
         async def deliver(player: str) -> None:
-            self._assert_live_room_route(
-                job, (job.room_tts_player_areas.get(player) or entity_area_id(
-                    self.hass, player
-                ),)
-            )
+            if getattr(job, "routing_mode", "normal") == "room_fallback":
+                self._assert_live_room_route(
+                    job, (
+                        getattr(job, "room_tts_player_areas", {}).get(player)
+                        or entity_area_id(self.hass, player),
+                    )
+                )
             physical = f"room_tts:{player}"
             if self._group_already_delivered(job, physical):
                 engine = job.tts_engines[0]
@@ -4045,11 +4050,13 @@ class AnnouncementManager:
                 ducked = await self._async_duck_direct_player(job, player)
                 if not ducked:
                     await self._wait_audio_path_idle(player, idle_timeout, job)
-                self._assert_live_room_route(
-                    job, (job.room_tts_player_areas.get(player) or entity_area_id(
-                        self.hass, player
-                    ),)
-                )
+                if getattr(job, "routing_mode", "normal") == "room_fallback":
+                    self._assert_live_room_route(
+                        job, (
+                            getattr(job, "room_tts_player_areas", {}).get(player)
+                            or entity_area_id(self.hass, player),
+                        )
+                    )
                 await self._async_optional_direct_chime(job, player)
                 engines = await self._async_available_tts_engines(job)
                 if not engines:
@@ -4283,12 +4290,13 @@ class AnnouncementManager:
         await self._wait_audio_path_idle(
             player, idle_timeout, job, selected_clients
         )
-        self._assert_live_room_route(job, tuple(
-            job.snapcast_client_areas.get(client) or entity_area_id(
-                self.hass, client
-            )
-            for client in target_clients
-        ))
+        if getattr(job, "routing_mode", "normal") == "room_fallback":
+            self._assert_live_room_route(job, tuple(
+                job.snapcast_client_areas.get(client) or entity_area_id(
+                    self.hass, client
+                )
+                for client in target_clients
+            ))
 
         route_snapshot: dict[str, bool] | None = None
         route_targets: tuple[str, ...] = ()
@@ -4545,18 +4553,19 @@ class AnnouncementManager:
         route_targets: Sequence[str] = (),
     ) -> None:
         self._raise_if_cancelled(job)
-        self._assert_live_room_route(job, (
-            tuple(
-                job.snapcast_client_areas.get(client) or entity_area_id(
-                    self.hass, client
+        if getattr(job, "routing_mode", "normal") == "room_fallback":
+            self._assert_live_room_route(job, (
+                tuple(
+                    job.snapcast_client_areas.get(client) or entity_area_id(
+                        self.hass, client
+                    )
+                    for client in route_targets
                 )
-                for client in route_targets
-            )
-            if route_targets else (
-                job.room_tts_player_areas.get(player)
-                or entity_area_id(self.hass, player),
-            )
-        ))
+                if route_targets else (
+                    getattr(job, "room_tts_player_areas", {}).get(player)
+                    or entity_area_id(self.hass, player),
+                )
+            ))
         if self._sleep_tts_muted_now():
             raise HomeAssistantError(
                 "TTS suppressed by the enabled sleep-mute policy"
