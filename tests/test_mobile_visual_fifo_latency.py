@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ast
 import asyncio
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -20,6 +21,7 @@ METHOD = next(n for n in MANAGER.body
 
 NS = {
     "asyncio": asyncio,
+    "math": math,
     "JobCancelled": type("JobCancelled", (Exception,), {}),
     "HomeAssistantError": RuntimeError,
     "EVENT_CHANNEL_STARTED": "started",
