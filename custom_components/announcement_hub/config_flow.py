@@ -1905,11 +1905,15 @@ class _AnnouncementFlowMixin:
                     )
                 )
             )
-            available_options, _ = self._sleep_written_recipient_options()
+            available_options, default_sleep_recipients = (
+                self._sleep_written_recipient_options()
+            )
             valid_targets = {
                 str(option["value"]) for option in available_options
             }
-            choices = user_input.get(CONF_SLEEP_FALLBACK_OUTPUTS, [])
+            choices = user_input.get(
+                CONF_SLEEP_FALLBACK_OUTPUTS, default_sleep_recipients
+            )
             if isinstance(choices, str):
                 choices = [choices]
             choices = list(dict.fromkeys(str(item) for item in (choices or [])))
