@@ -122,7 +122,8 @@
           "default_use_ai": "Réécrire les annonces avec l’IA",
           "default_ai_agent": "Fournisseur IA par défaut (conversation ou tâche IA)",
           "fallback_ai_agent": "Fournisseur IA de secours (conversation ou tâche IA)",
-          "channel_fallback_mode": "Canal de secours des notifications"
+          "channel_fallback_mode": "Canal de secours des notifications",
+          "sleep_rooms": "Pièces de sommeil"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Données propres au fournisseur, ajoutées uniquement aux notifications visuelles Critiques, par exemple les options d’urgence ou de priorité compatibles avec l’intégration de notification.",
           "occupancy_sensor": "Entité dont l'état ou l'attribut choisi contient les noms ou ID des zones Home Assistant actuellement occupées. Elle n'est utilisée que lorsqu'un envoi active le routage vers les pièces occupées.",
           "occupancy_attribute": "Choisissez de lire les pièces occupées dans l'état de l'entité ou dans l'un de ses attributs actuels.",
-          "fallback_room": "Zone TTS de repli utilisée uniquement lorsque l'ensemble des pièces ciblées ne contient aucun appareil fixe candidat. Les candidats fixes existants, même indisponibles ou inconnus, bloquent ce repli et restent soumis au délai normal de disponibilité.",
+          "fallback_room": "Uniquement si une personne éveillée se trouve dans la pièce initialement visée, qu'aucune sortie autorisée n'a pu y diffuser le message et que la condition de porte est remplie. Jamais si la pièce est vide ou réservée au sommeil.",
           "fallback_check_door": "Lorsque cette option est activée, le repli n'est autorisé que si un capteur de porte admissible dans l'une des pièces ciblées indique explicitement que la porte est ouverte.",
           "fallback_door_label": "Étiquette facultative de Home Assistant. Si elle est choisie, seuls les capteurs binaires de porte portant cette étiquette peuvent autoriser le repli ; laissez vide pour considérer toutes les portes des pièces ciblées.",
           "default_use_ai": "Une fois activé, chaque annonce hérite de la reformulation par IA, sauf si son action d'envoi indique explicitement use_ai: false. L'absence de use_ai suit ce réglage. En cas d'échec de l'IA, le texte d'origine est transmis. Consultez l'état de l'IA dans response_variable de l'action d'envoi.",
           "default_ai_agent": "La valeur Home Assistant par défaut utilise l'agent conversationnel du pipeline Assist préféré et non l'agent intégré de traitement des intentions conversation.process. L'agent est déterminé au moment de l'envoi et indiqué dans la liste. Si votre pipeline préféré utilise l'agent intégré, choisissez explicitement un agent adossé à un LLM ou configurez un agent de secours.",
           "fallback_ai_agent": "Agent de secours facultatif utilisé en cas d'échec de l'agent principal. La valeur Home Assistant par défaut suit aussi le pipeline Assist préféré ; « Annonce d'origine » évite un second appel à l'IA. Si aucun agent ne fonctionne, le texte d'origine est toujours transmis.",
-          "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables."
+          "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables.",
+          "sleep_rooms": "Pièces considérées comme des lieux de sommeil lorsqu'elles sont occupées. Si toutes les pièces occupées en font partie, aucune annonce vocale n'est émise et seules les applications mobiles configurées reçoivent une notification écrite."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Réécrire les annonces avec l’IA",
           "default_ai_agent": "Fournisseur IA par défaut (conversation ou tâche IA)",
           "fallback_ai_agent": "Fournisseur IA de secours (conversation ou tâche IA)",
-          "channel_fallback_mode": "Canal de secours des notifications"
+          "channel_fallback_mode": "Canal de secours des notifications",
+          "sleep_rooms": "Pièces de sommeil"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Données propres au fournisseur, ajoutées uniquement aux notifications visuelles Critiques, par exemple les options d’urgence ou de priorité compatibles avec l’intégration de notification.",
           "occupancy_sensor": "Entité dont l'état ou l'attribut choisi contient les noms ou ID des zones Home Assistant actuellement occupées. Elle n'est utilisée que lorsqu'un envoi active le routage vers les pièces occupées.",
           "occupancy_attribute": "Choisissez de lire les pièces occupées dans l'état de l'entité ou dans l'un de ses attributs actuels.",
-          "fallback_room": "Zone TTS de repli utilisée uniquement lorsque l'ensemble des pièces ciblées ne contient aucun appareil fixe candidat. Les candidats fixes existants, même indisponibles ou inconnus, bloquent ce repli et restent soumis au délai normal de disponibilité.",
+          "fallback_room": "Uniquement si une personne éveillée se trouve dans la pièce initialement visée, qu'aucune sortie autorisée n'a pu y diffuser le message et que la condition de porte est remplie. Jamais si la pièce est vide ou réservée au sommeil.",
           "fallback_check_door": "Lorsque cette option est activée, le repli n'est autorisé que si un capteur de porte admissible dans l'une des pièces ciblées indique explicitement que la porte est ouverte.",
           "fallback_door_label": "Étiquette facultative de Home Assistant. Si elle est choisie, seuls les capteurs binaires de porte portant cette étiquette peuvent autoriser le repli ; laissez vide pour considérer toutes les portes des pièces ciblées.",
           "default_use_ai": "Une fois activé, chaque annonce hérite de la reformulation par IA, sauf si son action d'envoi indique explicitement use_ai: false. L'absence de use_ai suit ce réglage. En cas d'échec de l'IA, le texte d'origine est transmis. Consultez l'état de l'IA dans response_variable de l'action d'envoi.",
           "default_ai_agent": "La valeur Home Assistant par défaut utilise l'agent conversationnel du pipeline Assist préféré et non l'agent intégré de traitement des intentions conversation.process. L'agent est déterminé au moment de l'envoi et indiqué dans la liste. Si votre pipeline préféré utilise l'agent intégré, choisissez explicitement un agent adossé à un LLM ou configurez un agent de secours.",
           "fallback_ai_agent": "Agent de secours facultatif utilisé en cas d'échec de l'agent principal. La valeur Home Assistant par défaut suit aussi le pipeline Assist préféré ; « Annonce d'origine » évite un second appel à l'IA. Si aucun agent ne fonctionne, le texte d'origine est toujours transmis.",
-          "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables."
+          "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables.",
+          "sleep_rooms": "Pièces considérées comme des lieux de sommeil lorsqu'elles sont occupées. Si toutes les pièces occupées en font partie, aucune annonce vocale n'est émise et seules les applications mobiles configurées reçoivent une notification écrite."
         }
       },
       "init": {

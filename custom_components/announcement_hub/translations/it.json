@@ -122,7 +122,8 @@
           "default_use_ai": "Riscrivi annunci con IA",
           "default_ai_agent": "Provider IA predefinito (conversazione o attività IA)",
           "fallback_ai_agent": "Provider IA di riserva (conversazione o attività IA)",
-          "channel_fallback_mode": "Ripiego fra canali di notifica"
+          "channel_fallback_mode": "Ripiego fra canali di notifica",
+          "sleep_rooms": "Stanze per dormire"
         },
         "data_description": {
           "queue_max": "Numero massimo di lavori di annuncio in attesa o attivi che possono essere accettati. Le nuove richieste vengono rifiutate quando viene raggiunto questo limite.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Dati specifici del provider aggiunti soltanto alle notifiche visive Critical, come le opzioni di urgenza o priorità supportate dall'integrazione di notifica.",
           "occupancy_sensor": "L'entità il cui stato o attributo scelto contiene i nomi o gli ID delle aree Home Assistant attualmente occupate. È usata solo se l'azione di invio abilita l'instradamento limitato alle aree occupate.",
           "occupancy_attribute": "Scegli se leggere le stanze occupate dallo stato dell'entità o da uno dei suoi attributi correnti.",
-          "fallback_room": "Area TTS di ripiego, usata solo se nell'insieme delle stanze di destinazione non esiste alcun candidato fisso di stanza. I candidati fissi presenti, anche se sconosciuti o non disponibili, impediscono il ripiego e restano soggetti al normale tempo di attesa della disponibilità.",
+          "fallback_room": "Solo se una persona sveglia è presente nella stanza di destinazione originale, nessun'uscita consentita ha funzionato e la condizione della porta è soddisfatta. Mai per una stanza vuota o dedicata al sonno.",
           "fallback_check_door": "Se attivato, il ripiego è consentito solo quando un sensore porta idoneo in una delle stanze di destinazione segnala esplicitamente che la porta è aperta.",
           "fallback_door_label": "Etichetta facoltativa di Home Assistant. Se selezionata, solo i sensori binari delle porte con questa etichetta possono autorizzare il ripiego; se lasciata vuota vengono considerati tutti i sensori delle porte nelle stanze di destinazione.",
           "default_use_ai": "Se attivato, ogni annuncio eredita la riformulazione AI, salvo che l'azione di invio specifichi use_ai: false. Se use_ai è omesso, vale questa impostazione. Se l'AI fallisce viene consegnato il messaggio originale. Controlla lo stato ai nella response_variable dell'azione.",
           "default_ai_agent": "Il valore predefinito di Home Assistant segue l'agente di conversazione della pipeline Assist preferita, non l'agente intent integrato conversation.process. L'agente viene risolto all'invio e mostrato nel menu. Se la pipeline preferita usa l'agente integrato, seleziona esplicitamente un agente basato su LLM oppure configura un agente di riserva.",
           "fallback_ai_agent": "Agente AI di riserva facoltativo quando quello principale non funziona. Anche il valore predefinito di Home Assistant segue la pipeline Assist preferita; scegliendo l'annuncio originale non viene eseguito un secondo tentativo AI. Se nessun agente AI funziona, viene sempre inviato il testo originale.",
-          "channel_fallback_mode": "Solo quando sono presenti SIA text_tts parlato e text_notify scritto SIA dispositivi TTS e visivi idonei: Visivo → TTS invia prima la notifica e parla se la consegna fallisce; TTS → Visivo parla prima e notifica in caso di errore; Entrambi prova entrambi i canali. Un singolo canale disponibile funziona normalmente. Non crea testi mancanti né allarga i destinatari; i livelli restano validi."
+          "channel_fallback_mode": "Solo quando sono presenti SIA text_tts parlato e text_notify scritto SIA dispositivi TTS e visivi idonei: Visivo → TTS invia prima la notifica e parla se la consegna fallisce; TTS → Visivo parla prima e notifica in caso di errore; Entrambi prova entrambi i canali. Un singolo canale disponibile funziona normalmente. Non crea testi mancanti né allarga i destinatari; i livelli restano validi.",
+          "sleep_rooms": "Stanze considerate dedicate al sonno quando occupate. Se tutte le stanze occupate sono di questo tipo, ogni annuncio vocale viene disattivato e restano solo le notifiche scritte alle app mobili configurate."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Riscrivi annunci con IA",
           "default_ai_agent": "Provider IA predefinito (conversazione o attività IA)",
           "fallback_ai_agent": "Provider IA di riserva (conversazione o attività IA)",
-          "channel_fallback_mode": "Ripiego fra canali di notifica"
+          "channel_fallback_mode": "Ripiego fra canali di notifica",
+          "sleep_rooms": "Stanze per dormire"
         },
         "data_description": {
           "queue_max": "Numero massimo di lavori di annuncio in attesa o attivi che possono essere accettati. Le nuove richieste vengono rifiutate quando viene raggiunto questo limite.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Dati specifici del provider aggiunti soltanto alle notifiche visive Critical, come le opzioni di urgenza o priorità supportate dall'integrazione di notifica.",
           "occupancy_sensor": "L'entità il cui stato o attributo scelto contiene i nomi o gli ID delle aree Home Assistant attualmente occupate. È usata solo se l'azione di invio abilita l'instradamento limitato alle aree occupate.",
           "occupancy_attribute": "Scegli se leggere le stanze occupate dallo stato dell'entità o da uno dei suoi attributi correnti.",
-          "fallback_room": "Area TTS di ripiego, usata solo se nell'insieme delle stanze di destinazione non esiste alcun candidato fisso di stanza. I candidati fissi presenti, anche se sconosciuti o non disponibili, impediscono il ripiego e restano soggetti al normale tempo di attesa della disponibilità.",
+          "fallback_room": "Solo se una persona sveglia è presente nella stanza di destinazione originale, nessun'uscita consentita ha funzionato e la condizione della porta è soddisfatta. Mai per una stanza vuota o dedicata al sonno.",
           "fallback_check_door": "Se attivato, il ripiego è consentito solo quando un sensore porta idoneo in una delle stanze di destinazione segnala esplicitamente che la porta è aperta.",
           "fallback_door_label": "Etichetta facoltativa di Home Assistant. Se selezionata, solo i sensori binari delle porte con questa etichetta possono autorizzare il ripiego; se lasciata vuota vengono considerati tutti i sensori delle porte nelle stanze di destinazione.",
           "default_use_ai": "Se attivato, ogni annuncio eredita la riformulazione AI, salvo che l'azione di invio specifichi use_ai: false. Se use_ai è omesso, vale questa impostazione. Se l'AI fallisce viene consegnato il messaggio originale. Controlla lo stato ai nella response_variable dell'azione.",
           "default_ai_agent": "Il valore predefinito di Home Assistant segue l'agente di conversazione della pipeline Assist preferita, non l'agente intent integrato conversation.process. L'agente viene risolto all'invio e mostrato nel menu. Se la pipeline preferita usa l'agente integrato, seleziona esplicitamente un agente basato su LLM oppure configura un agente di riserva.",
           "fallback_ai_agent": "Agente AI di riserva facoltativo quando quello principale non funziona. Anche il valore predefinito di Home Assistant segue la pipeline Assist preferita; scegliendo l'annuncio originale non viene eseguito un secondo tentativo AI. Se nessun agente AI funziona, viene sempre inviato il testo originale.",
-          "channel_fallback_mode": "Solo quando sono presenti SIA text_tts parlato e text_notify scritto SIA dispositivi TTS e visivi idonei: Visivo → TTS invia prima la notifica e parla se la consegna fallisce; TTS → Visivo parla prima e notifica in caso di errore; Entrambi prova entrambi i canali. Un singolo canale disponibile funziona normalmente. Non crea testi mancanti né allarga i destinatari; i livelli restano validi."
+          "channel_fallback_mode": "Solo quando sono presenti SIA text_tts parlato e text_notify scritto SIA dispositivi TTS e visivi idonei: Visivo → TTS invia prima la notifica e parla se la consegna fallisce; TTS → Visivo parla prima e notifica in caso di errore; Entrambi prova entrambi i canali. Un singolo canale disponibile funziona normalmente. Non crea testi mancanti né allarga i destinatari; i livelli restano validi.",
+          "sleep_rooms": "Stanze considerate dedicate al sonno quando occupate. Se tutte le stanze occupate sono di questo tipo, ogni annuncio vocale viene disattivato e restano solo le notifiche scritte alle app mobili configurate."
         }
       },
       "init": {
