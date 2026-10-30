@@ -122,7 +122,8 @@
           "default_use_ai": "Przeredaguj ogłoszenia przez AI",
           "default_ai_agent": "Domyślny dostawca AI (rozmowa lub zadanie AI)",
           "fallback_ai_agent": "Zapasowy dostawca AI (rozmowa lub zadanie AI)",
-          "channel_fallback_mode": "Zastępczy kanał powiadamiania"
+          "channel_fallback_mode": "Zastępczy kanał powiadamiania",
+          "sleep_rooms": "Pokoje do spania"
         },
         "data_description": {
           "queue_max": "Maksymalna dopuszczalna liczba oczekujących lub aktywnych zadań ogłoszeń. Nowe wysyłki są odrzucane po osiągnięciu tego limitu.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Dane specyficzne dla dostawcy dodawane wyłącznie do wizualnych powiadomień Critical, np. obsługiwane przez integrację opcje pilności lub priorytetu.",
           "occupancy_sensor": "Encja, której stan lub wybrany atrybut zawiera nazwy lub identyfikatory aktualnie zajętych obszarów Home Assistant. Stosowana tylko wtedy, gdy akcja włącza kierowanie do zajętych pomieszczeń.",
           "occupancy_attribute": "Wybierz, czy zajęte pokoje są odczytywane ze stanu encji, czy z jednego z jej bieżących atrybutów.",
-          "fallback_room": "Zastępczy obszar TTS jest używany tylko przy braku jakiegokolwiek stałego kandydata w docelowych pokojach. Nawet niedostępny lub nieznany stały kandydat blokuje przekierowanie i podlega zwykłemu limitowi oczekiwania na dostępność.",
+          "fallback_room": "Tylko gdy w pierwotnym pokoju docelowym jest osoba, która nie śpi, nie udało się tam dostarczyć komunikatu i spełniono warunek drzwi. Nigdy gdy pokój jest pusty lub sypialny.",
           "fallback_check_door": "Przekierowanie jest dozwolone tylko wtedy, gdy odpowiedni czujnik drzwi w jednym z docelowych pokoi wyraźnie zgłasza stan otwarty.",
           "fallback_door_label": "Opcjonalna etykieta Home Assistant. Jeśli jest wybrana, tylko binarne czujniki drzwi z tą etykietą mogą zezwolić na przekierowanie. Pozostaw puste, aby uwzględnić wszystkie czujniki drzwi w obecnych pokojach docelowych.",
           "default_use_ai": "Każde ogłoszenie dziedziczy przeredagowywanie AI, chyba że akcja podaje use_ai: false. Pominięcie use_ai oznacza to ustawienie. Przy błędzie AI dostarczany jest oryginał; status ai sprawdź w response_variable.",
           "default_ai_agent": "Domyślny wybór Home Assistant odpowiada agentowi rozmowy w preferowanym potoku Assist, a nie wbudowanemu agentowi intencji conversation.process. Agent jest ustalany w chwili wysyłania i pokazywany na liście. Jeśli preferowany potok używa agenta wbudowanego, wybierz wyraźnie agenta opartego na LLM albo skonfiguruj rezerwowego.",
           "fallback_ai_agent": "Opcjonalny zapasowy agent AI na wypadek błędu agenta głównego. Wartość domyślna Home Assistant również podąża za preferowanym potokiem Assist; wybór oryginalnego ogłoszenia pomija drugą próbę AI. Jeśli oba agenty zawiodą, zawsze dostarczany jest oryginalny tekst.",
-          "channel_fallback_mode": "Tylko gdy są ZARÓWNO text_tts i text_notify, JAK I odpowiednie urządzenia mowy i obrazu: Wizualnie → TTS najpierw powiadamia, potem mówi po błędzie; TTS → Wizualnie odwrotnie; Oba próbuje obu kanałów. Jeden kanał działa normalnie. Nie tworzy tekstu ani nie dodaje odbiorców; poziomy pozostają ważne."
+          "channel_fallback_mode": "Tylko gdy są ZARÓWNO text_tts i text_notify, JAK I odpowiednie urządzenia mowy i obrazu: Wizualnie → TTS najpierw powiadamia, potem mówi po błędzie; TTS → Wizualnie odwrotnie; Oba próbuje obu kanałów. Jeden kanał działa normalnie. Nie tworzy tekstu ani nie dodaje odbiorców; poziomy pozostają ważne.",
+          "sleep_rooms": "Pokoje uznawane za sypialne, gdy są zajęte. Jeśli wszyscy przebywają w tych pokojach, wyłączane są wszystkie komunikaty głosowe, a do skonfigurowanych aplikacji mobilnych trafiają wyłącznie powiadomienia tekstowe."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Przeredaguj ogłoszenia przez AI",
           "default_ai_agent": "Domyślny dostawca AI (rozmowa lub zadanie AI)",
           "fallback_ai_agent": "Zapasowy dostawca AI (rozmowa lub zadanie AI)",
-          "channel_fallback_mode": "Zastępczy kanał powiadamiania"
+          "channel_fallback_mode": "Zastępczy kanał powiadamiania",
+          "sleep_rooms": "Pokoje do spania"
         },
         "data_description": {
           "queue_max": "Maksymalna dopuszczalna liczba oczekujących lub aktywnych zadań ogłoszeń. Nowe wysyłki są odrzucane po osiągnięciu tego limitu.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Dane specyficzne dla dostawcy dodawane wyłącznie do wizualnych powiadomień Critical, np. obsługiwane przez integrację opcje pilności lub priorytetu.",
           "occupancy_sensor": "Encja, której stan lub wybrany atrybut zawiera nazwy lub identyfikatory aktualnie zajętych obszarów Home Assistant. Stosowana tylko wtedy, gdy akcja włącza kierowanie do zajętych pomieszczeń.",
           "occupancy_attribute": "Wybierz, czy zajęte pokoje są odczytywane ze stanu encji, czy z jednego z jej bieżących atrybutów.",
-          "fallback_room": "Zastępczy obszar TTS jest używany tylko przy braku jakiegokolwiek stałego kandydata w docelowych pokojach. Nawet niedostępny lub nieznany stały kandydat blokuje przekierowanie i podlega zwykłemu limitowi oczekiwania na dostępność.",
+          "fallback_room": "Tylko gdy w pierwotnym pokoju docelowym jest osoba, która nie śpi, nie udało się tam dostarczyć komunikatu i spełniono warunek drzwi. Nigdy gdy pokój jest pusty lub sypialny.",
           "fallback_check_door": "Przekierowanie jest dozwolone tylko wtedy, gdy odpowiedni czujnik drzwi w jednym z docelowych pokoi wyraźnie zgłasza stan otwarty.",
           "fallback_door_label": "Opcjonalna etykieta Home Assistant. Jeśli jest wybrana, tylko binarne czujniki drzwi z tą etykietą mogą zezwolić na przekierowanie. Pozostaw puste, aby uwzględnić wszystkie czujniki drzwi w obecnych pokojach docelowych.",
           "default_use_ai": "Każde ogłoszenie dziedziczy przeredagowywanie AI, chyba że akcja podaje use_ai: false. Pominięcie use_ai oznacza to ustawienie. Przy błędzie AI dostarczany jest oryginał; status ai sprawdź w response_variable.",
           "default_ai_agent": "Domyślny wybór Home Assistant odpowiada agentowi rozmowy w preferowanym potoku Assist, a nie wbudowanemu agentowi intencji conversation.process. Agent jest ustalany w chwili wysyłania i pokazywany na liście. Jeśli preferowany potok używa agenta wbudowanego, wybierz wyraźnie agenta opartego na LLM albo skonfiguruj rezerwowego.",
           "fallback_ai_agent": "Opcjonalny zapasowy agent AI na wypadek błędu agenta głównego. Wartość domyślna Home Assistant również podąża za preferowanym potokiem Assist; wybór oryginalnego ogłoszenia pomija drugą próbę AI. Jeśli oba agenty zawiodą, zawsze dostarczany jest oryginalny tekst.",
-          "channel_fallback_mode": "Tylko gdy są ZARÓWNO text_tts i text_notify, JAK I odpowiednie urządzenia mowy i obrazu: Wizualnie → TTS najpierw powiadamia, potem mówi po błędzie; TTS → Wizualnie odwrotnie; Oba próbuje obu kanałów. Jeden kanał działa normalnie. Nie tworzy tekstu ani nie dodaje odbiorców; poziomy pozostają ważne."
+          "channel_fallback_mode": "Tylko gdy są ZARÓWNO text_tts i text_notify, JAK I odpowiednie urządzenia mowy i obrazu: Wizualnie → TTS najpierw powiadamia, potem mówi po błędzie; TTS → Wizualnie odwrotnie; Oba próbuje obu kanałów. Jeden kanał działa normalnie. Nie tworzy tekstu ani nie dodaje odbiorców; poziomy pozostają ważne.",
+          "sleep_rooms": "Pokoje uznawane za sypialne, gdy są zajęte. Jeśli wszyscy przebywają w tych pokojach, wyłączane są wszystkie komunikaty głosowe, a do skonfigurowanych aplikacji mobilnych trafiają wyłącznie powiadomienia tekstowe."
         }
       },
       "init": {

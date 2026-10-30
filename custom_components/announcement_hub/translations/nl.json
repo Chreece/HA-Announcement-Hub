@@ -122,7 +122,8 @@
           "default_use_ai": "Aankondigingen herschrijven met AI",
           "default_ai_agent": "Standaard AI-provider (gesprek of AI-taak)",
           "fallback_ai_agent": "Reserve AI-provider (gesprek of AI-taak)",
-          "channel_fallback_mode": "Terugvalkanaal voor meldingen"
+          "channel_fallback_mode": "Terugvalkanaal voor meldingen",
+          "sleep_rooms": "Slaapkamers"
         },
         "data_description": {
           "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Providerspecifieke gegevens die alleen aan visuele meldingen van niveau Kritiek worden toegevoegd, zoals urgentie- of prioriteitsopties die de meldingsintegratie ondersteunt.",
           "occupancy_sensor": "Entiteit waarvan de status of het gekozen attribuut de namen of ID's bevat van momenteel bezette Home Assistant-ruimtes. Wordt alleen gebruikt als een verzendactie routering naar bezette ruimtes inschakelt.",
           "occupancy_attribute": "Geef aan of bezette ruimtes worden uitgelezen uit de entiteitsstatus of een van de actuele attributen.",
-          "fallback_room": "TTS-uitwijkruimte die alleen wordt gebruikt als er onder de huidige doelruimtes helemaal geen vaste ruimtekandidaten bestaan. Bestaande vaste kandidaten, ook als ze onbekend of onbeschikbaar zijn, verhinderen uitwijken en blijven onder de normale beschikbaarheidswachttijd vallen.",
+          "fallback_room": "Alleen wanneer iemand wakker en aanwezig is in de oorspronkelijke doelruimte, levering daar niet mogelijk was en de deurvoorwaarde is voldaan. Nooit bij een lege of slapende doelruimte.",
           "fallback_check_door": "Als dit aanstaat, is uitwijken alleen toegestaan wanneer een geschikte deursensor in een van de huidige doelruimtes uitdrukkelijk 'open' meldt.",
           "fallback_door_label": "Optioneel Home Assistant-label. Als er een label is gekozen, mogen alleen binaire deursensoren met dat label het uitwijken toestaan. Laat dit veld leeg om alle deursensoren in de huidige doelruimtes mee te nemen.",
           "default_use_ai": "Wanneer ingeschakeld erven alle aankondigingen AI-herschrijving, tenzij de verzendactie expliciet use_ai: false opgeeft. Zonder use_ai geldt deze instelling. Als AI faalt, wordt de oorspronkelijke tekst afgeleverd. Controleer de ai-status in de response_variable van de verzendactie.",
           "default_ai_agent": "De standaardoptie van Home Assistant volgt de conversatieagent van je voorkeurs-Assist-pijplijn, niet de ingebouwde intent-agent conversation.process. De agent wordt bij het verzenden bepaald en in de keuzelijst getoond. Als de voorkeurs-pijplijn de ingebouwde agent gebruikt, kies dan expliciet een LLM-agent of stel een reserveagent in.",
           "fallback_ai_agent": "Optionele reserve-AI-agent als de primaire agent faalt. Ook de Home Assistant-standaard volgt de voorkeurs-Assist-pijplijn; de optie 'Oorspronkelijke aankondiging' slaat een tweede AI-poging over. Als beide AI-agents falen, wordt altijd de oorspronkelijke tekst afgeleverd.",
-          "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden."
+          "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden.",
+          "sleep_rooms": "Ruimten die bij aanwezigheid als slaapruimte gelden. Zijn alle bezette ruimten slaapruimten, dan wordt alle spraak onderdrukt en gaan alleen schriftelijke meldingen naar ingestelde mobiele apps."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Aankondigingen herschrijven met AI",
           "default_ai_agent": "Standaard AI-provider (gesprek of AI-taak)",
           "fallback_ai_agent": "Reserve AI-provider (gesprek of AI-taak)",
-          "channel_fallback_mode": "Terugvalkanaal voor meldingen"
+          "channel_fallback_mode": "Terugvalkanaal voor meldingen",
+          "sleep_rooms": "Slaapkamers"
         },
         "data_description": {
           "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Providerspecifieke gegevens die alleen aan visuele meldingen van niveau Kritiek worden toegevoegd, zoals urgentie- of prioriteitsopties die de meldingsintegratie ondersteunt.",
           "occupancy_sensor": "Entiteit waarvan de status of het gekozen attribuut de namen of ID's bevat van momenteel bezette Home Assistant-ruimtes. Wordt alleen gebruikt als een verzendactie routering naar bezette ruimtes inschakelt.",
           "occupancy_attribute": "Geef aan of bezette ruimtes worden uitgelezen uit de entiteitsstatus of een van de actuele attributen.",
-          "fallback_room": "TTS-uitwijkruimte die alleen wordt gebruikt als er onder de huidige doelruimtes helemaal geen vaste ruimtekandidaten bestaan. Bestaande vaste kandidaten, ook als ze onbekend of onbeschikbaar zijn, verhinderen uitwijken en blijven onder de normale beschikbaarheidswachttijd vallen.",
+          "fallback_room": "Alleen wanneer iemand wakker en aanwezig is in de oorspronkelijke doelruimte, levering daar niet mogelijk was en de deurvoorwaarde is voldaan. Nooit bij een lege of slapende doelruimte.",
           "fallback_check_door": "Als dit aanstaat, is uitwijken alleen toegestaan wanneer een geschikte deursensor in een van de huidige doelruimtes uitdrukkelijk 'open' meldt.",
           "fallback_door_label": "Optioneel Home Assistant-label. Als er een label is gekozen, mogen alleen binaire deursensoren met dat label het uitwijken toestaan. Laat dit veld leeg om alle deursensoren in de huidige doelruimtes mee te nemen.",
           "default_use_ai": "Wanneer ingeschakeld erven alle aankondigingen AI-herschrijving, tenzij de verzendactie expliciet use_ai: false opgeeft. Zonder use_ai geldt deze instelling. Als AI faalt, wordt de oorspronkelijke tekst afgeleverd. Controleer de ai-status in de response_variable van de verzendactie.",
           "default_ai_agent": "De standaardoptie van Home Assistant volgt de conversatieagent van je voorkeurs-Assist-pijplijn, niet de ingebouwde intent-agent conversation.process. De agent wordt bij het verzenden bepaald en in de keuzelijst getoond. Als de voorkeurs-pijplijn de ingebouwde agent gebruikt, kies dan expliciet een LLM-agent of stel een reserveagent in.",
           "fallback_ai_agent": "Optionele reserve-AI-agent als de primaire agent faalt. Ook de Home Assistant-standaard volgt de voorkeurs-Assist-pijplijn; de optie 'Oorspronkelijke aankondiging' slaat een tweede AI-poging over. Als beide AI-agents falen, wordt altijd de oorspronkelijke tekst afgeleverd.",
-          "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden."
+          "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden.",
+          "sleep_rooms": "Ruimten die bij aanwezigheid als slaapruimte gelden. Zijn alle bezette ruimten slaapruimten, dan wordt alle spraak onderdrukt en gaan alleen schriftelijke meldingen naar ingestelde mobiele apps."
         }
       },
       "init": {

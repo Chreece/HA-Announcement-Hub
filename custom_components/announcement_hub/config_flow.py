@@ -40,6 +40,7 @@ from .const import (
     CONF_NOTIFY_PROFILES,
     CONF_OCCUPANCY_ATTRIBUTE,
     CONF_OCCUPANCY_SENSOR,
+    CONF_SLEEP_ROOMS,
     CONF_PERSON_PROFILES,
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
@@ -1545,6 +1546,7 @@ class _AnnouncementFlowMixin:
                 user_input,
                 {
                     CONF_OCCUPANCY_SENSOR: None,
+                    CONF_SLEEP_ROOMS: [],
                     CONF_FALLBACK_ROOM: None,
                     CONF_FALLBACK_CHECK_DOOR: DEFAULT_FALLBACK_CHECK_DOOR,
                 },
@@ -1562,6 +1564,10 @@ class _AnnouncementFlowMixin:
                 ): selector.EntitySelector(
                     selector.EntitySelectorConfig(domain="sensor")
                 ),
+                probatio.Optional(
+                    CONF_SLEEP_ROOMS,
+                    default=list(self._value(CONF_SLEEP_ROOMS, []) or []),
+                ): selector.AreaSelector(selector.AreaSelectorConfig(multiple=True)),
                 _optional_marker(
                     CONF_FALLBACK_ROOM,
                     self._value(CONF_FALLBACK_ROOM, None),
@@ -1723,6 +1729,7 @@ class _AnnouncementFlowMixin:
                 (CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT),
                 (CONF_CRITICAL_NOTIFY_DATA, {}),
                 (CONF_OCCUPANCY_SENSOR, None),
+                (CONF_SLEEP_ROOMS, []),
                 (CONF_FALLBACK_ROOM, None),
                 (CONF_FALLBACK_CHECK_DOOR, DEFAULT_FALLBACK_CHECK_DOOR),
                 (CONF_FALLBACK_DOOR_LABEL, None),
@@ -1831,6 +1838,10 @@ class _AnnouncementFlowMixin:
 
         fields.update(
             {
+                probatio.Optional(
+                    CONF_SLEEP_ROOMS,
+                    default=list(self._value(CONF_SLEEP_ROOMS, []) or []),
+                ): selector.AreaSelector(selector.AreaSelectorConfig(multiple=True)),
                 _optional_marker(
                     CONF_FALLBACK_ROOM,
                     self._value(CONF_FALLBACK_ROOM, None),

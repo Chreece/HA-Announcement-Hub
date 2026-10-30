@@ -122,7 +122,8 @@
           "default_use_ai": "使用 AI 改寫公告",
           "default_ai_agent": "預設 AI 提供者（對話或 AI 任務）",
           "fallback_ai_agent": "備用 AI 提供者（對話或 AI 任務）",
-          "channel_fallback_mode": "通知渠道備用方式"
+          "channel_fallback_mode": "通知渠道備用方式",
+          "sleep_rooms": "睡眠房間"
         },
         "data_description": {
           "queue_max": "允許同時處於等待或活動狀態的公告任務最大數量。達到上限時將拒絕新的發送請求。",
@@ -135,13 +136,14 @@
           "critical_notify_data": "僅向 Critical 級別可視通知合並的提供商專用資料，例如通知集成支持的緊急度或優先級選項。",
           "occupancy_sensor": "此實體的狀態或選取屬性包含目前有人使用的 Home Assistant 區域名稱或 ID。僅在傳送動作啟用「僅限有人房間」路由時使用。",
           "occupancy_attribute": "選擇從實體狀態還是其當前某個屬性讀取有人佔用的房間。",
-          "fallback_room": "備用 TTS 區域僅在目前目標房間完全沒有固定房間候選輸出時使用。即使現有固定候選輸出無法使用或狀態不明，也會阻止備用路由，並繼續遵守正常的可用性等待逾時。",
+          "fallback_room": "僅當原目標房間有人且未睡眠、無法在該房間送達並符合開門條件時使用。目標房間無人或屬於睡眠房間時絕不使用。",
           "fallback_check_door": "啟用後，只有目前目標房間之一的合格門感測器明確回報門已開啟，才允許轉至備用房間。",
           "fallback_door_label": "可選的 Home Assistant 標籤。選擇後，只有帶有該標籤的二元門傳感器才可允許備用路由；留空則考慮當前目標房間中的所有門傳感器。",
           "default_use_ai": "啟用後，所有公告預設沿用 AI 改寫，除非傳送動作明確指定 use_ai: false。未設定 use_ai 時採用本設定。AI 失敗時仍傳送原始訊息。可在動作的 response_variable 查看 ai 狀態。",
           "default_ai_agent": "Home Assistant 預設選項使用首選 Assist 流程中的對話代理，而不是內置的 conversation.process 意圖代理。發送時才確定具體代理，並在下拉列表中顯示。如果首選流程使用內置代理，請明確選擇基於 LLM 的代理或配置備用代理。",
           "fallback_ai_agent": "主 AI 代理失敗時使用的可選備用代理。Home Assistant 預設選項同樣遵循首選 Assist 流程；選擇原始公告則跳過第二次 AI 嘗試。若所有 AI 都失敗，仍始終發送原始文本。",
-          "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。"
+          "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。",
+          "sleep_rooms": "有人時視為睡眠中的房間。若所有有人房間都屬於此類，禁止所有語音播報，僅向已設定的手機應用程式傳送文字通知。"
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "使用 AI 改寫公告",
           "default_ai_agent": "預設 AI 提供者（對話或 AI 任務）",
           "fallback_ai_agent": "備用 AI 提供者（對話或 AI 任務）",
-          "channel_fallback_mode": "通知渠道備用方式"
+          "channel_fallback_mode": "通知渠道備用方式",
+          "sleep_rooms": "睡眠房間"
         },
         "data_description": {
           "queue_max": "允許同時處於等待或活動狀態的公告任務最大數量。達到上限時將拒絕新的發送請求。",
@@ -440,13 +443,14 @@
           "critical_notify_data": "僅向 Critical 級別可視通知合並的提供商專用資料，例如通知集成支持的緊急度或優先級選項。",
           "occupancy_sensor": "此實體的狀態或選取屬性包含目前有人使用的 Home Assistant 區域名稱或 ID。僅在傳送動作啟用「僅限有人房間」路由時使用。",
           "occupancy_attribute": "選擇從實體狀態還是其當前某個屬性讀取有人佔用的房間。",
-          "fallback_room": "備用 TTS 區域僅在目前目標房間完全沒有固定房間候選輸出時使用。即使現有固定候選輸出無法使用或狀態不明，也會阻止備用路由，並繼續遵守正常的可用性等待逾時。",
+          "fallback_room": "僅當原目標房間有人且未睡眠、無法在該房間送達並符合開門條件時使用。目標房間無人或屬於睡眠房間時絕不使用。",
           "fallback_check_door": "啟用後，只有目前目標房間之一的合格門感測器明確回報門已開啟，才允許轉至備用房間。",
           "fallback_door_label": "可選的 Home Assistant 標籤。選擇後，只有帶有該標籤的二元門傳感器才可允許備用路由；留空則考慮當前目標房間中的所有門傳感器。",
           "default_use_ai": "啟用後，所有公告預設沿用 AI 改寫，除非傳送動作明確指定 use_ai: false。未設定 use_ai 時採用本設定。AI 失敗時仍傳送原始訊息。可在動作的 response_variable 查看 ai 狀態。",
           "default_ai_agent": "Home Assistant 預設選項使用首選 Assist 流程中的對話代理，而不是內置的 conversation.process 意圖代理。發送時才確定具體代理，並在下拉列表中顯示。如果首選流程使用內置代理，請明確選擇基於 LLM 的代理或配置備用代理。",
           "fallback_ai_agent": "主 AI 代理失敗時使用的可選備用代理。Home Assistant 預設選項同樣遵循首選 Assist 流程；選擇原始公告則跳過第二次 AI 嘗試。若所有 AI 都失敗，仍始終發送原始文本。",
-          "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。"
+          "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。",
+          "sleep_rooms": "有人時視為睡眠中的房間。若所有有人房間都屬於此類，禁止所有語音播報，僅向已設定的手機應用程式傳送文字通知。"
         }
       },
       "init": {

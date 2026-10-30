@@ -122,7 +122,8 @@
           "default_use_ai": "Reescrever anúncios com IA",
           "default_ai_agent": "Fornecedor IA predefinido (conversação ou tarefa IA)",
           "fallback_ai_agent": "Fornecedor IA alternativo (conversação ou tarefa IA)",
-          "channel_fallback_mode": "Recurso entre canais de notificação"
+          "channel_fallback_mode": "Recurso entre canais de notificação",
+          "sleep_rooms": "Quartos de dormir"
         },
         "data_description": {
           "queue_max": "Número máximo aceite de trabalhos de anúncio pendentes ou ativos. Os novos envios são rejeitados quando este limite é atingido.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Dados específicos do fornecedor acrescentados apenas às notificações visuais Critical, como as opções de urgência ou prioridade suportadas pela integração de notificação.",
           "occupancy_sensor": "Entidade cujo estado ou atributo selecionado contém os nomes ou IDs das áreas do Home Assistant atualmente ocupadas. Só é utilizada quando a ação de envio ativa o encaminhamento limitado às áreas ocupadas.",
           "occupancy_attribute": "Escolha se as divisões ocupadas são lidas do estado da entidade ou de um dos seus atributos atuais.",
-          "fallback_room": "Área TTS de recurso usada apenas quando o conjunto atual de divisões de destino não contém nenhum candidato fixo de divisão. Candidatos fixos existentes, mesmo indisponíveis ou desconhecidos, impedem o recurso e ficam sujeitos ao tempo normal de espera pela disponibilidade.",
+          "fallback_room": "Apenas se houver alguém acordado na divisão original, as saídas permitidas não conseguirem entregar a mensagem e a condição da porta for cumprida. Nunca para uma divisão vazia ou de dormir.",
           "fallback_check_door": "Quando ativado, o recurso só é permitido se um sensor de porta elegível numa das divisões de destino indicar explicitamente que a porta está aberta.",
           "fallback_door_label": "Etiqueta opcional do Home Assistant. Se selecionada, apenas sensores binários de porta com essa etiqueta podem autorizar o recurso; deixe em branco para considerar todos os sensores de porta das divisões de destino.",
           "default_use_ai": "Quando ativado, todos os anúncios herdam a reformulação por IA, exceto se a ação de envio indicar use_ai: false. Se use_ai for omitido, aplica-se esta definição. Se a IA falhar, é enviada a mensagem original. Consulta o estado ai na response_variable da ação.",
           "default_ai_agent": "O valor predefinido do Home Assistant segue o agente de conversação do pipeline Assist preferido, e não o agente de intenções integrado conversation.process. O agente é escolhido no envio e apresentado na lista. Se o pipeline preferido utilizar o agente integrado, selecione explicitamente um agente baseado em LLM ou configure um de reserva.",
           "fallback_ai_agent": "Agente AI de reserva opcional caso o principal falhe. O valor predefinido do Home Assistant também segue o pipeline Assist preferido; a opção de anúncio original ignora uma segunda tentativa de AI. Se nenhum agente AI funcionar, o texto original é sempre entregue.",
-          "channel_fallback_mode": "Apenas quando existem AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala em caso de falha; TTS → Visual fala primeiro e notifica em caso de falha; Ambos tenta ambos os canais. Um único canal disponível funciona normalmente. Não cria texto em falta nem amplia os destinatários; os níveis continuam a aplicar-se."
+          "channel_fallback_mode": "Apenas quando existem AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala em caso de falha; TTS → Visual fala primeiro e notifica em caso de falha; Ambos tenta ambos os canais. Um único canal disponível funciona normalmente. Não cria texto em falta nem amplia os destinatários; os níveis continuam a aplicar-se.",
+          "sleep_rooms": "Divisões consideradas de descanso quando ocupadas. Se todas as divisões ocupadas forem quartos de dormir, toda a fala é suprimida e apenas são enviadas notificações escritas para as aplicações móveis configuradas."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Reescrever anúncios com IA",
           "default_ai_agent": "Fornecedor IA predefinido (conversação ou tarefa IA)",
           "fallback_ai_agent": "Fornecedor IA alternativo (conversação ou tarefa IA)",
-          "channel_fallback_mode": "Recurso entre canais de notificação"
+          "channel_fallback_mode": "Recurso entre canais de notificação",
+          "sleep_rooms": "Quartos de dormir"
         },
         "data_description": {
           "queue_max": "Número máximo aceite de trabalhos de anúncio pendentes ou ativos. Os novos envios são rejeitados quando este limite é atingido.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Dados específicos do fornecedor acrescentados apenas às notificações visuais Critical, como as opções de urgência ou prioridade suportadas pela integração de notificação.",
           "occupancy_sensor": "Entidade cujo estado ou atributo selecionado contém os nomes ou IDs das áreas do Home Assistant atualmente ocupadas. Só é utilizada quando a ação de envio ativa o encaminhamento limitado às áreas ocupadas.",
           "occupancy_attribute": "Escolha se as divisões ocupadas são lidas do estado da entidade ou de um dos seus atributos atuais.",
-          "fallback_room": "Área TTS de recurso usada apenas quando o conjunto atual de divisões de destino não contém nenhum candidato fixo de divisão. Candidatos fixos existentes, mesmo indisponíveis ou desconhecidos, impedem o recurso e ficam sujeitos ao tempo normal de espera pela disponibilidade.",
+          "fallback_room": "Apenas se houver alguém acordado na divisão original, as saídas permitidas não conseguirem entregar a mensagem e a condição da porta for cumprida. Nunca para uma divisão vazia ou de dormir.",
           "fallback_check_door": "Quando ativado, o recurso só é permitido se um sensor de porta elegível numa das divisões de destino indicar explicitamente que a porta está aberta.",
           "fallback_door_label": "Etiqueta opcional do Home Assistant. Se selecionada, apenas sensores binários de porta com essa etiqueta podem autorizar o recurso; deixe em branco para considerar todos os sensores de porta das divisões de destino.",
           "default_use_ai": "Quando ativado, todos os anúncios herdam a reformulação por IA, exceto se a ação de envio indicar use_ai: false. Se use_ai for omitido, aplica-se esta definição. Se a IA falhar, é enviada a mensagem original. Consulta o estado ai na response_variable da ação.",
           "default_ai_agent": "O valor predefinido do Home Assistant segue o agente de conversação do pipeline Assist preferido, e não o agente de intenções integrado conversation.process. O agente é escolhido no envio e apresentado na lista. Se o pipeline preferido utilizar o agente integrado, selecione explicitamente um agente baseado em LLM ou configure um de reserva.",
           "fallback_ai_agent": "Agente AI de reserva opcional caso o principal falhe. O valor predefinido do Home Assistant também segue o pipeline Assist preferido; a opção de anúncio original ignora uma segunda tentativa de AI. Se nenhum agente AI funcionar, o texto original é sempre entregue.",
-          "channel_fallback_mode": "Apenas quando existem AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala em caso de falha; TTS → Visual fala primeiro e notifica em caso de falha; Ambos tenta ambos os canais. Um único canal disponível funciona normalmente. Não cria texto em falta nem amplia os destinatários; os níveis continuam a aplicar-se."
+          "channel_fallback_mode": "Apenas quando existem AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala em caso de falha; TTS → Visual fala primeiro e notifica em caso de falha; Ambos tenta ambos os canais. Um único canal disponível funciona normalmente. Não cria texto em falta nem amplia os destinatários; os níveis continuam a aplicar-se.",
+          "sleep_rooms": "Divisões consideradas de descanso quando ocupadas. Se todas as divisões ocupadas forem quartos de dormir, toda a fala é suprimida e apenas são enviadas notificações escritas para as aplicações móveis configuradas."
         }
       },
       "init": {

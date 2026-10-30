@@ -311,7 +311,8 @@ The **4. General options** page includes:
 | Backup AI conversation agent | Alternate agent, or original message without a second AI attempt |
 | Room-presence entity | A sensor reporting currently occupied Home Assistant rooms |
 | Occupied rooms value | Sensor state or attribute containing room names / area IDs |
-| Fallback room | An alternate area eligible after the requested and occupied areas |
+| Sleep rooms | Areas treated as sleeping when occupied; all-asleep homes use configured written mobile-app notifications instead of speech |
+| Fallback room | Alternate area only if the target room contains an awake person, local delivery failed and the door rule permits |
 | Require an open occupied-room door for fallback | Door rule that must pass before using the configured alternate room |
 | Door sensor label filter | Optional label to restrict which door sensors count |
 | Visual/TTS fallback preference | Visual first → TTS if it fails, TTS first → Visual if it fails, or Both eligible channels; applies only when both channel texts **and** both permitted output types exist |
@@ -518,11 +519,23 @@ Configured alternate room (only if the door rule permits)
 General/non-room notification outputs
 ```
 
-- The **requested room** is attempted even if it is not currently listed as
-  occupied.
+- With a configured occupancy source, an **unoccupied requested room** is
+  skipped in favor of other occupied rooms with authorized room devices.
+  With no occupancy source configured, the requested room is retained, but
+  the alternate fallback room still requires confirmed target-room presence.
+  If the configured source is unavailable, unconfirmed room presence is not
+  assumed, and the alternate fallback room remains ineligible.
+- **Sleep rooms** are configured under General options. If all currently
+  occupied rooms belong to them, no TTS is started (even Critical, Snapcast
+  and companion speech). Only configured mobile-app written notifications
+  are eligible; a TTS-only room message uses its spoken text as written text.
+  If no configured mobile-app output is available, the job stays queued.
 - The **occupied-room stage** uses the configured occupancy sensor; it does
   not guess where people are.
-- The **alternate-room stage** observes the configured open-door condition.
+- The **alternate-room stage** is allowed only for a targeted, non-sleep room
+  with a confirmed occupant, after the original room and other occupied-room
+  delivery paths did not succeed. It is never used when the targeted room
+  is unoccupied. The stage also observes the configured open-door condition.
   When enabled, the relevant door sensor must belong to the originally
   targeted area, have device class `door`, and have state `on`. An optional
   label filter narrows which doors qualify.

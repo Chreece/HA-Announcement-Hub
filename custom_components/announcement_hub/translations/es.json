@@ -122,7 +122,8 @@
           "default_use_ai": "Reescribir anuncios con IA",
           "default_ai_agent": "Proveedor de IA predeterminado (conversación o tarea de IA)",
           "fallback_ai_agent": "Proveedor de IA de respaldo (conversación o tarea de IA)",
-          "channel_fallback_mode": "Canal alternativo de notificación"
+          "channel_fallback_mode": "Canal alternativo de notificación",
+          "sleep_rooms": "Habitaciones para dormir"
         },
         "data_description": {
           "queue_max": "Número máximo de trabajos de anuncio pendientes o activos. Se rechazan los nuevos envíos al alcanzar este límite.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Datos específicos del proveedor que se añaden solo a las notificaciones visuales Críticas, por ejemplo, opciones de urgencia o prioridad compatibles con la integración de notificaciones.",
           "occupancy_sensor": "Entidad cuyo estado o atributo seleccionado contiene los nombres o ID de las áreas de Home Assistant ocupadas actualmente. Solo se usa cuando un envío activa el enrutamiento por ocupación.",
           "occupancy_attribute": "Elige si las habitaciones ocupadas se leen del estado de la entidad o de uno de sus atributos actuales.",
-          "fallback_room": "Área TTS de respaldo usada solo si el conjunto de habitaciones objetivo no contiene ningún dispositivo fijo candidato. Los candidatos fijos existentes, incluso no disponibles o desconocidos, impiden este respaldo y siguen sujetos al tiempo normal de disponibilidad.",
+          "fallback_room": "Solo si hay una persona despierta en la habitación de destino original, no se pudo entregar allí y se cumple la condición de la puerta. Nunca si está vacía o es una habitación de descanso.",
           "fallback_check_door": "Cuando está activado, el respaldo solo se permite si un sensor de puerta válido en una de las habitaciones objetivo indica explícitamente que la puerta está abierta.",
           "fallback_door_label": "Etiqueta opcional de Home Assistant. Si se selecciona, solo los sensores binarios de puerta con esa etiqueta pueden permitir el respaldo; déjala vacía para considerar todas las puertas de las habitaciones objetivo.",
           "default_use_ai": "Si se activa, cada anuncio hereda la reformulación con IA salvo que su acción de envío indique explícitamente use_ai: false. Si se omite use_ai, se usa esta opción. Si falla la IA, se entrega el texto original. Consulta el estado de IA en response_variable de la acción de envío.",
           "default_ai_agent": "El valor predeterminado de Home Assistant usa el agente de conversación de la canalización Assist preferida, no el agente integrado de intenciones conversation.process. El agente se determina al enviar y se muestra en la lista. Si la canalización preferida utiliza el agente integrado, elige explícitamente uno basado en un LLM o configura uno de respaldo.",
           "fallback_ai_agent": "Agente de respaldo opcional si falla el principal. El valor predeterminado de Home Assistant también sigue la canalización Assist preferida; « Anuncio original » omite el segundo intento con IA. Si ninguno funciona, siempre se entrega el texto original.",
-          "channel_fallback_mode": "Solo se aplica si están presentes AMBOS textos text_tts y text_notify Y existen dispositivos de voz y visuales válidos: Visual → TTS notifica primero y habla si falla; TTS → Visual habla primero y notifica si falla; Ambos intenta los dos canales. Un único canal disponible funciona con normalidad. No crea texto ausente ni amplía destinatarios; siguen aplicándose los niveles."
+          "channel_fallback_mode": "Solo se aplica si están presentes AMBOS textos text_tts y text_notify Y existen dispositivos de voz y visuales válidos: Visual → TTS notifica primero y habla si falla; TTS → Visual habla primero y notifica si falla; Ambos intenta los dos canales. Un único canal disponible funciona con normalidad. No crea texto ausente ni amplía destinatarios; siguen aplicándose los niveles.",
+          "sleep_rooms": "Habitaciones consideradas de descanso cuando están ocupadas. Si todas las habitaciones ocupadas son de descanso, se suprime toda voz y solo se envían avisos escritos a las aplicaciones móviles configuradas."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Reescribir anuncios con IA",
           "default_ai_agent": "Proveedor de IA predeterminado (conversación o tarea de IA)",
           "fallback_ai_agent": "Proveedor de IA de respaldo (conversación o tarea de IA)",
-          "channel_fallback_mode": "Canal alternativo de notificación"
+          "channel_fallback_mode": "Canal alternativo de notificación",
+          "sleep_rooms": "Habitaciones para dormir"
         },
         "data_description": {
           "queue_max": "Número máximo de trabajos de anuncio pendientes o activos. Se rechazan los nuevos envíos al alcanzar este límite.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Datos específicos del proveedor que se añaden solo a las notificaciones visuales Críticas, por ejemplo, opciones de urgencia o prioridad compatibles con la integración de notificaciones.",
           "occupancy_sensor": "Entidad cuyo estado o atributo seleccionado contiene los nombres o ID de las áreas de Home Assistant ocupadas actualmente. Solo se usa cuando un envío activa el enrutamiento por ocupación.",
           "occupancy_attribute": "Elige si las habitaciones ocupadas se leen del estado de la entidad o de uno de sus atributos actuales.",
-          "fallback_room": "Área TTS de respaldo usada solo si el conjunto de habitaciones objetivo no contiene ningún dispositivo fijo candidato. Los candidatos fijos existentes, incluso no disponibles o desconocidos, impiden este respaldo y siguen sujetos al tiempo normal de disponibilidad.",
+          "fallback_room": "Solo si hay una persona despierta en la habitación de destino original, no se pudo entregar allí y se cumple la condición de la puerta. Nunca si está vacía o es una habitación de descanso.",
           "fallback_check_door": "Cuando está activado, el respaldo solo se permite si un sensor de puerta válido en una de las habitaciones objetivo indica explícitamente que la puerta está abierta.",
           "fallback_door_label": "Etiqueta opcional de Home Assistant. Si se selecciona, solo los sensores binarios de puerta con esa etiqueta pueden permitir el respaldo; déjala vacía para considerar todas las puertas de las habitaciones objetivo.",
           "default_use_ai": "Si se activa, cada anuncio hereda la reformulación con IA salvo que su acción de envío indique explícitamente use_ai: false. Si se omite use_ai, se usa esta opción. Si falla la IA, se entrega el texto original. Consulta el estado de IA en response_variable de la acción de envío.",
           "default_ai_agent": "El valor predeterminado de Home Assistant usa el agente de conversación de la canalización Assist preferida, no el agente integrado de intenciones conversation.process. El agente se determina al enviar y se muestra en la lista. Si la canalización preferida utiliza el agente integrado, elige explícitamente uno basado en un LLM o configura uno de respaldo.",
           "fallback_ai_agent": "Agente de respaldo opcional si falla el principal. El valor predeterminado de Home Assistant también sigue la canalización Assist preferida; « Anuncio original » omite el segundo intento con IA. Si ninguno funciona, siempre se entrega el texto original.",
-          "channel_fallback_mode": "Solo se aplica si están presentes AMBOS textos text_tts y text_notify Y existen dispositivos de voz y visuales válidos: Visual → TTS notifica primero y habla si falla; TTS → Visual habla primero y notifica si falla; Ambos intenta los dos canales. Un único canal disponible funciona con normalidad. No crea texto ausente ni amplía destinatarios; siguen aplicándose los niveles."
+          "channel_fallback_mode": "Solo se aplica si están presentes AMBOS textos text_tts y text_notify Y existen dispositivos de voz y visuales válidos: Visual → TTS notifica primero y habla si falla; TTS → Visual habla primero y notifica si falla; Ambos intenta los dos canales. Un único canal disponible funciona con normalidad. No crea texto ausente ni amplía destinatarios; siguen aplicándose los niveles.",
+          "sleep_rooms": "Habitaciones consideradas de descanso cuando están ocupadas. Si todas las habitaciones ocupadas son de descanso, se suprime toda voz y solo se envían avisos escritos a las aplicaciones móviles configuradas."
         }
       },
       "init": {

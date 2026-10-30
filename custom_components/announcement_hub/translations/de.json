@@ -122,7 +122,8 @@
           "default_use_ai": "Ankündigungen mit KI umformulieren",
           "default_ai_agent": "Standard-KI-Konversationsagent",
           "fallback_ai_agent": "Ersatz-KI-Konversationsagent",
-          "channel_fallback_mode": "Kanal-Fallback für Mitteilungen"
+          "channel_fallback_mode": "Kanal-Fallback für Mitteilungen",
+          "sleep_rooms": "Schlafräume"
         },
         "data_description": {
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Provider-spezifische Daten, die nur bei kritischen visuellen Benachrichtigungen ergänzt werden, z. B. Prioritätsoptionen.",
           "occupancy_sensor": "Entität, deren Zustand oder ausgewähltes Attribut die aktuell belegten Home-Assistant-Bereiche enthält. Wird nur bei occupied-only Routing verwendet.",
           "occupancy_attribute": "Wähle, ob belegte Räume aus dem Entitätszustand oder einem aktuellen Attribut gelesen werden.",
-          "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen Raum-Kandidaten enthalten. Vorhandene feste Raum-Kandidaten, auch bei nicht verfügbarem oder unbekanntem Status, blockieren den Fallback und unterliegen weiterhin dem normalen Verfügbarkeits-Timeout.",
+          "fallback_room": "Nur wenn jemand im ursprünglichen Zielraum anwesend und wach ist, dort keine erlaubte Ausgabe zustellen konnte und die Türbedingung erfüllt ist. Niemals bei leerem oder schlafendem Zielraum.",
           "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor in einem der aktuellen Zielräume ausdrücklich offen meldet.",
           "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen.",
           "default_use_ai": "Wenn aktiviert, verwenden Ankündigungen standardmäßig die KI, solange die einzelne Aktion nicht ausdrücklich use_ai: false setzt. Ein nicht angegebenes use_ai übernimmt diese Integrationseinstellung. Bei KI-Fehlern bleibt die Originalmeldung erhalten. Der KI-Status steht in der Antwortvariable der Aktion.",
           "default_ai_agent": "Home Assistant Standard verwendet den Konversationsagenten der bevorzugten Assist-Pipeline, nicht den integrierten Intent-Agenten von conversation.process. Die Auswahl wird bei jeder Ankündigung neu ermittelt und im Menü angezeigt. Falls die Pipeline den integrierten Agenten nutzt, einen LLM-Agenten ausdrücklich auswählen oder einen Ersatzagenten konfigurieren.",
           "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt.",
-          "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam."
+          "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam.",
+          "sleep_rooms": "Räume, die bei Belegung als Schlafräume gelten. Sind alle belegten Räume Schlafräume, wird jede Sprachausgabe unterdrückt und nur eine schriftliche Mitteilung an konfigurierte mobile Apps gesendet."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Ankündigungen mit KI umformulieren",
           "default_ai_agent": "Standard-KI-Konversationsagent",
           "fallback_ai_agent": "Ersatz-KI-Konversationsagent",
-          "channel_fallback_mode": "Kanal-Fallback für Mitteilungen"
+          "channel_fallback_mode": "Kanal-Fallback für Mitteilungen",
+          "sleep_rooms": "Schlafräume"
         },
         "data_description": {
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Provider-spezifische Daten, die nur bei kritischen visuellen Benachrichtigungen ergänzt werden, z. B. Prioritätsoptionen.",
           "occupancy_sensor": "Entität, deren Zustand oder ausgewähltes Attribut die aktuell belegten Home-Assistant-Bereiche enthält. Wird nur bei occupied-only Routing verwendet.",
           "occupancy_attribute": "Wähle, ob belegte Räume aus dem Entitätszustand oder einem aktuellen Attribut gelesen werden.",
-          "fallback_room": "Fallback-TTS-Bereich, der nur verwendet wird, wenn die aktuellen Zielräume überhaupt keinen festen Raum-Kandidaten enthalten. Vorhandene feste Raum-Kandidaten, auch bei nicht verfügbarem oder unbekanntem Status, blockieren den Fallback und unterliegen weiterhin dem normalen Verfügbarkeits-Timeout.",
+          "fallback_room": "Nur wenn jemand im ursprünglichen Zielraum anwesend und wach ist, dort keine erlaubte Ausgabe zustellen konnte und die Türbedingung erfüllt ist. Niemals bei leerem oder schlafendem Zielraum.",
           "fallback_check_door": "Wenn aktiv, ist Fallback nur erlaubt, wenn ein geeigneter Türsensor in einem der aktuellen Zielräume ausdrücklich offen meldet.",
           "fallback_door_label": "Optionales Home-Assistant-Label. Nur Türsensoren mit diesem Label dürfen Fallback erlauben; leer bedeutet alle Türsensoren in den aktuellen Zielräumen.",
           "default_use_ai": "Wenn aktiviert, verwenden Ankündigungen standardmäßig die KI, solange die einzelne Aktion nicht ausdrücklich use_ai: false setzt. Ein nicht angegebenes use_ai übernimmt diese Integrationseinstellung. Bei KI-Fehlern bleibt die Originalmeldung erhalten. Der KI-Status steht in der Antwortvariable der Aktion.",
           "default_ai_agent": "Home Assistant Standard verwendet den Konversationsagenten der bevorzugten Assist-Pipeline, nicht den integrierten Intent-Agenten von conversation.process. Die Auswahl wird bei jeder Ankündigung neu ermittelt und im Menü angezeigt. Falls die Pipeline den integrierten Agenten nutzt, einen LLM-Agenten ausdrücklich auswählen oder einen Ersatzagenten konfigurieren.",
           "fallback_ai_agent": "Optionaler Ersatzagent bei Ausfall des primären KI-Agenten. Home Assistant Standard verwendet auch hier die bevorzugte Assist-Pipeline; Originalankündigung verzichtet auf einen zweiten KI-Versuch. Bei beiden Ausfällen wird immer der Originaltext zugestellt.",
-          "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam."
+          "channel_fallback_mode": "Nur wenn sowohl gesprochener (text_tts) als auch schriftlicher Text (text_notify) UND beide erlaubten Ausgabekanäle verfügbar sind: Visuell → TTS sendet zuerst eine schriftliche Mitteilung und spricht nur bei fehlgeschlagener Zustellung; TTS → Visuell spricht zuerst und sendet bei Fehlern eine Mitteilung; Beide nutzt beide erlaubten Kanäle. Bei nur einem Kanal gilt diese Auswahl nicht. Keine zusätzlichen Geräte oder Kanäle; Schweregrad und TTS Nie bleiben wirksam.",
+          "sleep_rooms": "Räume, die bei Belegung als Schlafräume gelten. Sind alle belegten Räume Schlafräume, wird jede Sprachausgabe unterdrückt und nur eine schriftliche Mitteilung an konfigurierte mobile Apps gesendet."
         }
       },
       "init": {

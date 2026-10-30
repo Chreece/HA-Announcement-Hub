@@ -122,7 +122,8 @@
           "default_use_ai": "Reescrever anúncios com IA",
           "default_ai_agent": "Provedor de IA padrão (conversa ou tarefa de IA)",
           "fallback_ai_agent": "Provedor de IA alternativo (conversa ou tarefa de IA)",
-          "channel_fallback_mode": "Alternativa entre canais de notificação"
+          "channel_fallback_mode": "Alternativa entre canais de notificação",
+          "sleep_rooms": "Quartos de dormir"
         },
         "data_description": {
           "queue_max": "Número máximo aceito de trabalhos de anúncio pendentes ou ativos. Os novos envios são rejeitados quando este limite é atingido.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Dados específicos do provedor acrescentados apenas às notificações visuais Critical, como as opções de urgência ou prioridade suportadas pela integração de notificação.",
           "occupancy_sensor": "Entidade cujo estado ou atributo selecionado contém os nomes ou IDs das áreas do Home Assistant ocupadas no momento. É usada apenas quando a ação de envio ativa o roteamento para áreas ocupadas.",
           "occupancy_attribute": "Escolha se os cômodos ocupados são obtidos do estado da entidade ou de um de seus atributos atuais.",
-          "fallback_room": "Área TTS alternativa usada somente quando não há nenhum candidato fixo de cômodo entre os cômodos de destino. Candidatos fixos existentes, mesmo indisponíveis ou desconhecidos, impedem a alternativa e seguem o tempo normal de espera por disponibilidade.",
+          "fallback_room": "Somente quando alguém estiver acordado no cômodo de destino original, a entrega lá não for possível e a condição da porta for satisfeita. Nunca quando o cômodo estiver vazio ou for um quarto de dormir.",
           "fallback_check_door": "Quando ativado, o encaminhamento alternativo só é permitido se um sensor de porta elegível em um dos cômodos de destino informar explicitamente que a porta está aberta.",
           "fallback_door_label": "Etiqueta opcional do Home Assistant. Quando selecionada, somente sensores binários de porta com essa etiqueta podem autorizar o encaminhamento alternativo; deixe em branco para considerar todos os sensores de porta dos cômodos de destino.",
           "default_use_ai": "Quando ativado, todos os anúncios herdam a reescrita por IA, a menos que a ação de envio especifique use_ai: false. Se use_ai for omitido, vale esta configuração. Se a IA falhar, a mensagem original será entregue. Confira o status ai na response_variable da ação.",
           "default_ai_agent": "O valor padrão do Home Assistant segue o agente de conversação do pipeline Assist preferido, e não o agente de intenções integrado conversation.process. O agente é escolhido no envio e exibido na lista. Se o pipeline preferido utilizar o agente integrado, selecione explicitamente um agente baseado em LLM ou configure um de reserva.",
           "fallback_ai_agent": "Agente AI de reserva opcional caso o principal falhe. O valor padrão do Home Assistant também segue o pipeline Assist preferido; a opção de anúncio original ignora uma segunda tentativa de AI. Se nenhum agente AI funcionar, o texto original é sempre entregue.",
-          "channel_fallback_mode": "Somente quando houver AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala se falhar; TTS → Visual fala primeiro e notifica se falhar; Ambos tenta os dois canais. Um único canal disponível funciona normalmente. Não cria texto ausente nem amplia destinatários; os níveis continuam valendo."
+          "channel_fallback_mode": "Somente quando houver AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala se falhar; TTS → Visual fala primeiro e notifica se falhar; Ambos tenta os dois canais. Um único canal disponível funciona normalmente. Não cria texto ausente nem amplia destinatários; os níveis continuam valendo.",
+          "sleep_rooms": "Cômodos considerados de descanso quando ocupados. Se todos os cômodos ocupados forem quartos de dormir, toda fala será silenciada e somente notificações escritas serão enviadas aos aplicativos móveis configurados."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Reescrever anúncios com IA",
           "default_ai_agent": "Provedor de IA padrão (conversa ou tarefa de IA)",
           "fallback_ai_agent": "Provedor de IA alternativo (conversa ou tarefa de IA)",
-          "channel_fallback_mode": "Alternativa entre canais de notificação"
+          "channel_fallback_mode": "Alternativa entre canais de notificação",
+          "sleep_rooms": "Quartos de dormir"
         },
         "data_description": {
           "queue_max": "Número máximo aceito de trabalhos de anúncio pendentes ou ativos. Os novos envios são rejeitados quando este limite é atingido.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Dados específicos do provedor acrescentados apenas às notificações visuais Critical, como as opções de urgência ou prioridade suportadas pela integração de notificação.",
           "occupancy_sensor": "Entidade cujo estado ou atributo selecionado contém os nomes ou IDs das áreas do Home Assistant ocupadas no momento. É usada apenas quando a ação de envio ativa o roteamento para áreas ocupadas.",
           "occupancy_attribute": "Escolha se os cômodos ocupados são obtidos do estado da entidade ou de um de seus atributos atuais.",
-          "fallback_room": "Área TTS alternativa usada somente quando não há nenhum candidato fixo de cômodo entre os cômodos de destino. Candidatos fixos existentes, mesmo indisponíveis ou desconhecidos, impedem a alternativa e seguem o tempo normal de espera por disponibilidade.",
+          "fallback_room": "Somente quando alguém estiver acordado no cômodo de destino original, a entrega lá não for possível e a condição da porta for satisfeita. Nunca quando o cômodo estiver vazio ou for um quarto de dormir.",
           "fallback_check_door": "Quando ativado, o encaminhamento alternativo só é permitido se um sensor de porta elegível em um dos cômodos de destino informar explicitamente que a porta está aberta.",
           "fallback_door_label": "Etiqueta opcional do Home Assistant. Quando selecionada, somente sensores binários de porta com essa etiqueta podem autorizar o encaminhamento alternativo; deixe em branco para considerar todos os sensores de porta dos cômodos de destino.",
           "default_use_ai": "Quando ativado, todos os anúncios herdam a reescrita por IA, a menos que a ação de envio especifique use_ai: false. Se use_ai for omitido, vale esta configuração. Se a IA falhar, a mensagem original será entregue. Confira o status ai na response_variable da ação.",
           "default_ai_agent": "O valor padrão do Home Assistant segue o agente de conversação do pipeline Assist preferido, e não o agente de intenções integrado conversation.process. O agente é escolhido no envio e exibido na lista. Se o pipeline preferido utilizar o agente integrado, selecione explicitamente um agente baseado em LLM ou configure um de reserva.",
           "fallback_ai_agent": "Agente AI de reserva opcional caso o principal falhe. O valor padrão do Home Assistant também segue o pipeline Assist preferido; a opção de anúncio original ignora uma segunda tentativa de AI. Se nenhum agente AI funcionar, o texto original é sempre entregue.",
-          "channel_fallback_mode": "Somente quando houver AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala se falhar; TTS → Visual fala primeiro e notifica se falhar; Ambos tenta os dois canais. Um único canal disponível funciona normalmente. Não cria texto ausente nem amplia destinatários; os níveis continuam valendo."
+          "channel_fallback_mode": "Somente quando houver AMBOS os textos text_tts falado e text_notify escrito E dispositivos TTS e visuais elegíveis: Visual → TTS notifica primeiro e fala se falhar; TTS → Visual fala primeiro e notifica se falhar; Ambos tenta os dois canais. Um único canal disponível funciona normalmente. Não cria texto ausente nem amplia destinatários; os níveis continuam valendo.",
+          "sleep_rooms": "Cômodos considerados de descanso quando ocupados. Se todos os cômodos ocupados forem quartos de dormir, toda fala será silenciada e somente notificações escritas serão enviadas aos aplicativos móveis configurados."
         }
       },
       "init": {

@@ -32,7 +32,7 @@ def _read(lang):
 
 def test_dutch_native_catalog_has_no_unreviewed_english_fallback():
     english, dutch = _read("en"), _read("nl")
-    assert len(english) == 599
+    assert len(english) == 603
     assert set(dutch) == set(english)
     identical = {key: source for key, source in english.items()
                  if dutch[key] == source}
