@@ -213,6 +213,16 @@ def main():
              "ai_pending": (j.get("ai") or {}).get("pending_preprocessing")}
             for j in queued[:40]]
         report["persisted_queue_count"] = len(queued)
+        last = stored.get("last") or {}
+        report["last_job"] = {
+            "status": last.get("status"),
+            "routing_mode": last.get("routing_mode"),
+            "routing_stage": last.get("routing_stage"),
+            "successful_output_count": len(last.get("successful_channels") or []),
+            "failed_output_count": len(last.get("channel_errors") or {}),
+            "ai_status": (last.get("ai") or {}).get("status"),
+            "recent_routing": (last.get("routing_history") or [])[-4:],
+        }
         report["recent_AI"] = [
             {k: x.get(k) for k in ("status", "elapsed_seconds", "retry_count", "failure_reason")}
             for x in (stored.get("ai_history") or [])[-20:]]
@@ -255,6 +265,10 @@ def main():
         report["potential_blockers"] = []
         if report["installed_version"] != "0.10.0b25":
             report["potential_blockers"].append("Installed integration is not v0.10.0b25")
+        if not entry:
+            report["potential_blockers"].append("Announcement Hub config entry not found")
+        if report["last_job"]["status"] in ("failed", "completed_with_errors"):
+            report["potential_blockers"].append("Previous completed announcement had delivery errors")
         if not cfg.get("occupancy_sensor"):
             report["potential_blockers"].append("No occupancy sensor: cannot follow movement")
         if len(queued):
@@ -271,6 +285,7 @@ def main():
     lines = ["READ_ONLY=YES", f"VERSION={report.get('installed_version','unknown')}",
              f"SCENARIOS={s.get('passed',0)}/{s.get('total',0)}",
              f"PERSISTED_QUEUE={report.get('persisted_queue_count','unknown')}",
+             f"LAST_JOB_STATUS={report.get('last_job',{}).get('status','unknown')}",
              f"LIVE_API={report.get('current_state',{}).get('live_api', False)}",
              *("BLOCKER=" + x for x in report.get("potential_blockers", [])),
              *("SCENARIO_" + v + "=" + k for k,v in s.get("results",{}).items()),
