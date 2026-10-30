@@ -124,7 +124,10 @@
           "fallback_ai_agent": "備用 AI 提供者（對話或 AI 任務）",
           "channel_fallback_mode": "通知渠道備用方式",
           "sleep_rooms_entity": "目前睡眠房間實體",
-          "sleep_rooms_attribute": "目前睡眠房間數值"
+          "sleep_rooms_attribute": "目前睡眠房間數值",
+          "sleep_mute_tts": "所有人睡覺時將 TTS 靜音",
+          "sleep_fallback_written": "睡眠期間改送文字通知",
+          "sleep_fallback_outputs": "睡眠期間文字通知接收者"
         },
         "data_description": {
           "queue_max": "允許同時處於等待或活動狀態的公告任務最大數量。達到上限時將拒絕新的發送請求。",
@@ -145,7 +148,10 @@
           "fallback_ai_agent": "主 AI 代理失敗時使用的可選備用代理。Home Assistant 預設選項同樣遵循首選 Assist 流程；選擇原始公告則跳過第二次 AI 嘗試。若所有 AI 都失敗，仍始終發送原始文本。",
           "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。",
           "sleep_rooms_entity": "選擇其狀態或屬性列出目前有人正在睡覺之房間的 Home Assistant 實體。此清單會動態變更，並非永久指定臥室。",
-          "sleep_rooms_attribute": "選擇實體狀態或某個屬性。支援區域 ID、名稱、別名、清單或逗號分隔的文字。未知房間將被忽略；若來源無法使用但已知有人在家，則禁止語音播報。"
+          "sleep_rooms_attribute": "選擇實體狀態或某個屬性。支援區域 ID、名稱、別名、清單或逗號分隔的文字。未知房間將被忽略；若來源無法使用但已知有人在家，則禁止語音播報。",
+          "sleep_mute_tts": "當所有有人房間都被回報為目前睡眠房間時，禁止任何語音播報與提示音，包括嚴重等級、Snapcast 和 Companion App TTS。如果睡眠資料來源無法使用，但已知房間有人，也會謹慎靜音。關閉此項可保留正常語音。",
+          "sleep_fallback_written": "睡眠靜音 TTS 生效時，僅向下方選定的接收者傳送文字通知。只有 TTS 文字的公告會使用朗讀文字作為通知內容。關閉後，自動公告將保留在佇列中。若停用睡眠靜音，本選項無效。",
+          "sleep_fallback_outputs": "可複選：先選取一個整合以包含其所有已設定的通知裝置，或在下方選取個別裝置。僅允許已在 Announcement Hub 中啟用的通知輸出。未選取任何項目就不傳送內容。現有安裝預設選取所有已設定的 Companion App 裝置。"
         }
       },
       "reconfigure": {
@@ -324,7 +330,8 @@
       "invalid_chime_url": "提示音音訊必須使用 /local/ 下的文件。",
       "invalid_person_area": "請選擇有效的 Home Assistant 房間。",
       "invalid_person_presence": "啟用驗證前請先選擇存在狀態傳感器。",
-      "invalid_sleep_source": "睡眠房間來源無效；請選擇狀態或可用屬性。"
+      "invalid_sleep_source": "睡眠房間來源無效；請選擇狀態或可用屬性。",
+      "invalid_sleep_fallback_target": "只能選取已設定的整合或裝置作為睡眠期間文字通知接收者。"
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub 已配置。"
@@ -454,7 +461,10 @@
           "fallback_ai_agent": "備用 AI 提供者（對話或 AI 任務）",
           "channel_fallback_mode": "通知渠道備用方式",
           "sleep_rooms_entity": "目前睡眠房間實體",
-          "sleep_rooms_attribute": "目前睡眠房間數值"
+          "sleep_rooms_attribute": "目前睡眠房間數值",
+          "sleep_mute_tts": "所有人睡覺時將 TTS 靜音",
+          "sleep_fallback_written": "睡眠期間改送文字通知",
+          "sleep_fallback_outputs": "睡眠期間文字通知接收者"
         },
         "data_description": {
           "queue_max": "允許同時處於等待或活動狀態的公告任務最大數量。達到上限時將拒絕新的發送請求。",
@@ -475,7 +485,10 @@
           "fallback_ai_agent": "主 AI 代理失敗時使用的可選備用代理。Home Assistant 預設選項同樣遵循首選 Assist 流程；選擇原始公告則跳過第二次 AI 嘗試。若所有 AI 都失敗，仍始終發送原始文本。",
           "channel_fallback_mode": "僅當同時提供語音 text_tts、文字 text_notify，且有合格的 TTS 與視覺裝置時生效：視覺 → TTS 先通知，失敗後朗讀；TTS → 視覺 先朗讀，失敗後通知；兩者嘗試兩個管道。只有一個管道時正常運作。不會產生缺少的文字或擴大接收範圍，原有等級限制仍適用。",
           "sleep_rooms_entity": "選擇其狀態或屬性列出目前有人正在睡覺之房間的 Home Assistant 實體。此清單會動態變更，並非永久指定臥室。",
-          "sleep_rooms_attribute": "選擇實體狀態或某個屬性。支援區域 ID、名稱、別名、清單或逗號分隔的文字。未知房間將被忽略；若來源無法使用但已知有人在家，則禁止語音播報。"
+          "sleep_rooms_attribute": "選擇實體狀態或某個屬性。支援區域 ID、名稱、別名、清單或逗號分隔的文字。未知房間將被忽略；若來源無法使用但已知有人在家，則禁止語音播報。",
+          "sleep_mute_tts": "當所有有人房間都被回報為目前睡眠房間時，禁止任何語音播報與提示音，包括嚴重等級、Snapcast 和 Companion App TTS。如果睡眠資料來源無法使用，但已知房間有人，也會謹慎靜音。關閉此項可保留正常語音。",
+          "sleep_fallback_written": "睡眠靜音 TTS 生效時，僅向下方選定的接收者傳送文字通知。只有 TTS 文字的公告會使用朗讀文字作為通知內容。關閉後，自動公告將保留在佇列中。若停用睡眠靜音，本選項無效。",
+          "sleep_fallback_outputs": "可複選：先選取一個整合以包含其所有已設定的通知裝置，或在下方選取個別裝置。僅允許已在 Announcement Hub 中啟用的通知輸出。未選取任何項目就不傳送內容。現有安裝預設選取所有已設定的 Companion App 裝置。"
         }
       },
       "init": {
@@ -654,7 +667,8 @@
       "invalid_chime_url": "提示音音訊必須使用 /local/ 下的文件。",
       "invalid_person_area": "請選擇有效的 Home Assistant 房間。",
       "invalid_person_presence": "啟用驗證前請先選擇存在狀態傳感器。",
-      "invalid_sleep_source": "睡眠房間來源無效；請選擇狀態或可用屬性。"
+      "invalid_sleep_source": "睡眠房間來源無效；請選擇狀態或可用屬性。",
+      "invalid_sleep_fallback_target": "只能選取已設定的整合或裝置作為睡眠期間文字通知接收者。"
     }
   },
   "selector": {
