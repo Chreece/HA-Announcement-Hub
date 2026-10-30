@@ -112,6 +112,10 @@ class FakeManager:
         return False
 
     @staticmethod
+    def _assert_live_room_route(job, physical_areas=()):
+        return None
+
+    @staticmethod
     def _is_player_busy(_player):
         return True
 
