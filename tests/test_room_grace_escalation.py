@@ -280,6 +280,7 @@ namespace = {
     "datetime": datetime,
     "utcnow_iso": lambda: datetime.now(UTC).isoformat(),
     "Mapping": __import__("collections.abc", fromlist=["Mapping"]).Mapping,
+    "Any": __import__("typing", fromlist=["Any"]).Any,
     "ServiceValidationError": ValueError,
     "resolve_notify_outputs": lambda hass, refs: tuple(
         manager.notifications[ref]
