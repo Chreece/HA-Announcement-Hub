@@ -32,7 +32,7 @@ def _read(lang):
 
 def test_turkish_all_native_keys_and_help_are_localized():
     en, tr = _read("en"), _read("tr")
-    assert len(en) == 625
+    assert len(en) == 639
     assert set(en) == set(tr)
     equal = {key: value for key, value in en.items() if tr[key] == value}
     assert len(equal) == 6, equal
