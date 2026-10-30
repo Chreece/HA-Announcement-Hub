@@ -32,7 +32,7 @@ def _read(lang):
 
 def test_arabic_every_native_key_localized():
     en, ar = _read("en"), _read("ar")
-    assert len(en) == 599
+    assert len(en) == 603
     assert set(en) == set(ar)
     unchanged = {key: source for key, source in en.items()
                  if ar[key] == source}

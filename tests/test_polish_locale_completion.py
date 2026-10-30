@@ -32,7 +32,7 @@ def _read(locale):
 
 def test_polish_native_catalog_is_complete_and_has_no_english_help():
     en, pl = _read("en"), _read("pl")
-    assert len(en) == 599
+    assert len(en) == 603
     assert set(pl) == set(en)
     identical = {key: source for key, source in en.items() if pl[key] == source}
     assert len(identical) == 6, identical

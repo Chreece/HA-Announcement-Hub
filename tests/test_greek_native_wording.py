@@ -45,7 +45,7 @@ def _read(lang):
 def test_greek_native_599_keys_and_placeholders_remain_identical():
     _, english = _read("en")
     _, greek = _read("el")
-    assert len(english) == 599
+    assert len(english) == 603
     assert set(greek) == set(english)
     for key, source in english.items():
         assert greek[key].strip(), key
