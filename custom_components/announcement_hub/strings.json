@@ -123,7 +123,8 @@
           "default_ai_agent": "Default AI provider (conversation or AI Task)",
           "fallback_ai_agent": "Backup AI provider (conversation or AI Task)",
           "channel_fallback_mode": "Notification channel fallback",
-          "sleep_rooms": "Sleep rooms"
+          "sleep_rooms_entity": "Sleeping-room entity",
+          "sleep_rooms_attribute": "Sleeping-room value"
         },
         "data_description": {
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
           "channel_fallback_mode": "Only when the announcement includes BOTH spoken (text_tts) and written (text_notify) text AND both permitted output types exist: Visual → TTS attempts a written notification first and speaks only if it cannot be delivered; TTS → Visual speaks first and shows a notification only if speech fails; Both attempts both eligible channels. When only one channel or output type is present, it is delivered normally. Never creates another channel, adds devices or overrides the TTS Never/severity settings.",
-          "sleep_rooms": "Areas treated as sleeping when occupied. If everyone is in these rooms, suppress all speech and use only configured written mobile-app notifications."
+          "sleep_rooms_entity": "Choose the Home Assistant entity whose state or an attribute lists the rooms where people are sleeping right now. This is a live list, not a permanent bedroom assignment.",
+          "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
           "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
         }
+      },
+      "sleep_rooms": {
+        "title": "Sleeping rooms — entity",
+        "description": "Choose the entity that reports where people are currently sleeping. Leave empty if you do not have a sleep-room sensor.",
+        "data": {
+          "sleep_rooms_entity": "Sleeping-room entity"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Choose the Home Assistant entity whose state or an attribute lists the rooms where people are sleeping right now. This is a live list, not a permanent bedroom assignment."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Sleeping rooms — state or attribute",
+        "description": "Select the state or attribute containing the current room list. An empty list means no rooms are sleeping.",
+        "data": {
+          "sleep_rooms_attribute": "Sleeping-room value"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
       "invalid_chime_url": "Chime audio must use a /local/ file.",
       "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_person_presence": "Select a presence sensor before enabling verification.",
+      "invalid_sleep_source": "Invalid sleeping-room source; select State or an available attribute."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is already configured."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Default AI provider (conversation or AI Task)",
           "fallback_ai_agent": "Backup AI provider (conversation or AI Task)",
           "channel_fallback_mode": "Notification channel fallback",
-          "sleep_rooms": "Sleep rooms"
+          "sleep_rooms_entity": "Sleeping-room entity",
+          "sleep_rooms_attribute": "Sleeping-room value"
         },
         "data_description": {
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
           "channel_fallback_mode": "Only when the announcement includes BOTH spoken (text_tts) and written (text_notify) text AND both permitted output types exist: Visual → TTS attempts a written notification first and speaks only if it cannot be delivered; TTS → Visual speaks first and shows a notification only if speech fails; Both attempts both eligible channels. When only one channel or output type is present, it is delivered normally. Never creates another channel, adds devices or overrides the TTS Never/severity settings.",
-          "sleep_rooms": "Areas treated as sleeping when occupied. If everyone is in these rooms, suppress all speech and use only configured written mobile-app notifications."
+          "sleep_rooms_entity": "Choose the Home Assistant entity whose state or an attribute lists the rooms where people are sleeping right now. This is a live list, not a permanent bedroom assignment.",
+          "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Only play person Room announcements when its selected sensor is on; missing data fails closed.",
           "presence_sensor": "Choose a binary_sensor occupancy/presence entity physically belonging to this area."
         }
+      },
+      "sleep_rooms": {
+        "title": "Sleeping rooms — entity",
+        "description": "Choose the entity that reports where people are currently sleeping. Leave empty if you do not have a sleep-room sensor.",
+        "data": {
+          "sleep_rooms_entity": "Sleeping-room entity"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Choose the Home Assistant entity whose state or an attribute lists the rooms where people are sleeping right now. This is a live list, not a permanent bedroom assignment."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Sleeping rooms — state or attribute",
+        "description": "Select the state or attribute containing the current room list. An empty list means no rooms are sleeping.",
+        "data": {
+          "sleep_rooms_attribute": "Sleeping-room value"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "Custom AI style must use only {message} and {language} placeholders and no more than 1200 characters.",
       "invalid_chime_url": "Chime audio must use a /local/ file.",
       "invalid_person_area": "Select a valid Home Assistant room.",
-      "invalid_person_presence": "Select a presence sensor before enabling verification."
+      "invalid_person_presence": "Select a presence sensor before enabling verification.",
+      "invalid_sleep_source": "Invalid sleeping-room source; select State or an available attribute."
     }
   },
   "selector": {

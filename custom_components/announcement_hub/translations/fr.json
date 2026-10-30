@@ -123,7 +123,8 @@
           "default_ai_agent": "Fournisseur IA par défaut (conversation ou tâche IA)",
           "fallback_ai_agent": "Fournisseur IA de secours (conversation ou tâche IA)",
           "channel_fallback_mode": "Canal de secours des notifications",
-          "sleep_rooms": "Pièces de sommeil"
+          "sleep_rooms_entity": "Entité des pièces où l’on dort",
+          "sleep_rooms_attribute": "Valeur des pièces endormies"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "La valeur Home Assistant par défaut utilise l'agent conversationnel du pipeline Assist préféré et non l'agent intégré de traitement des intentions conversation.process. L'agent est déterminé au moment de l'envoi et indiqué dans la liste. Si votre pipeline préféré utilise l'agent intégré, choisissez explicitement un agent adossé à un LLM ou configurez un agent de secours.",
           "fallback_ai_agent": "Agent de secours facultatif utilisé en cas d'échec de l'agent principal. La valeur Home Assistant par défaut suit aussi le pipeline Assist préféré ; « Annonce d'origine » évite un second appel à l'IA. Si aucun agent ne fonctionne, le texte d'origine est toujours transmis.",
           "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables.",
-          "sleep_rooms": "Pièces considérées comme des lieux de sommeil lorsqu'elles sont occupées. Si toutes les pièces occupées en font partie, aucune annonce vocale n'est émise et seules les applications mobiles configurées reçoivent une notification écrite."
+          "sleep_rooms_entity": "Sélectionnez l’entité Home Assistant dont l’état ou un attribut indique les pièces où des personnes dorment actuellement. Cette liste est dynamique et ne correspond pas à des chambres fixes.",
+          "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Ne lire les annonces destinées à une personne dans sa pièce que si le capteur sélectionné est activé ; en l’absence de données, la remise est bloquée.",
           "presence_sensor": "Choisir une entité binary_sensor de présence ou d’occupation située physiquement dans cette zone."
         }
+      },
+      "sleep_rooms": {
+        "title": "Pièces endormies — entité",
+        "description": "Choisissez l’entité signalant les pièces où des personnes dorment en ce moment. Laissez vide si aucun capteur approprié n’est disponible.",
+        "data": {
+          "sleep_rooms_entity": "Entité des pièces où l’on dort"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Sélectionnez l’entité Home Assistant dont l’état ou un attribut indique les pièces où des personnes dorment actuellement. Cette liste est dynamique et ne correspond pas à des chambres fixes."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Pièces endormies — état ou attribut",
+        "description": "Choisissez l’état ou l’attribut contenant la liste actuelle des pièces. Une liste vide signifie que personne ne dort.",
+        "data": {
+          "sleep_rooms_attribute": "Valeur des pièces endormies"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "Le style IA personnalisé ne doit contenir que les paramètres {message} et {language}, et ne peut pas dépasser 1200 caractères.",
       "invalid_chime_url": "Le fichier audio du carillon doit être accessible sous /local/.",
       "invalid_person_area": "Sélectionnez une pièce Home Assistant valide.",
-      "invalid_person_presence": "Sélectionnez un capteur de présence avant d’activer la vérification."
+      "invalid_person_presence": "Sélectionnez un capteur de présence avant d’activer la vérification.",
+      "invalid_sleep_source": "Source des pièces endormies incorrecte ; choisissez État ou un attribut disponible."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub est déjà configuré."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Fournisseur IA par défaut (conversation ou tâche IA)",
           "fallback_ai_agent": "Fournisseur IA de secours (conversation ou tâche IA)",
           "channel_fallback_mode": "Canal de secours des notifications",
-          "sleep_rooms": "Pièces de sommeil"
+          "sleep_rooms_entity": "Entité des pièces où l’on dort",
+          "sleep_rooms_attribute": "Valeur des pièces endormies"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "La valeur Home Assistant par défaut utilise l'agent conversationnel du pipeline Assist préféré et non l'agent intégré de traitement des intentions conversation.process. L'agent est déterminé au moment de l'envoi et indiqué dans la liste. Si votre pipeline préféré utilise l'agent intégré, choisissez explicitement un agent adossé à un LLM ou configurez un agent de secours.",
           "fallback_ai_agent": "Agent de secours facultatif utilisé en cas d'échec de l'agent principal. La valeur Home Assistant par défaut suit aussi le pipeline Assist préféré ; « Annonce d'origine » évite un second appel à l'IA. Si aucun agent ne fonctionne, le texte d'origine est toujours transmis.",
           "channel_fallback_mode": "S'applique uniquement si le texte vocal text_tts ET le texte écrit text_notify sont présents ET que les deux types d'appareils sont admissibles : Visuel → TTS avertit d'abord puis parle en cas d'échec ; TTS → Visuel parle d'abord puis notifie en cas d'échec ; Les deux tentent les deux canaux. Un seul canal disponible fonctionne normalement. Aucun contenu absent ni destinataire supplémentaire n'est créé ; les niveaux restent applicables.",
-          "sleep_rooms": "Pièces considérées comme des lieux de sommeil lorsqu'elles sont occupées. Si toutes les pièces occupées en font partie, aucune annonce vocale n'est émise et seules les applications mobiles configurées reçoivent une notification écrite."
+          "sleep_rooms_entity": "Sélectionnez l’entité Home Assistant dont l’état ou un attribut indique les pièces où des personnes dorment actuellement. Cette liste est dynamique et ne correspond pas à des chambres fixes.",
+          "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Ne lire les annonces destinées à une personne dans sa pièce que si le capteur sélectionné est activé ; en l’absence de données, la remise est bloquée.",
           "presence_sensor": "Choisir une entité binary_sensor de présence ou d’occupation située physiquement dans cette zone."
         }
+      },
+      "sleep_rooms": {
+        "title": "Pièces endormies — entité",
+        "description": "Choisissez l’entité signalant les pièces où des personnes dorment en ce moment. Laissez vide si aucun capteur approprié n’est disponible.",
+        "data": {
+          "sleep_rooms_entity": "Entité des pièces où l’on dort"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Sélectionnez l’entité Home Assistant dont l’état ou un attribut indique les pièces où des personnes dorment actuellement. Cette liste est dynamique et ne correspond pas à des chambres fixes."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Pièces endormies — état ou attribut",
+        "description": "Choisissez l’état ou l’attribut contenant la liste actuelle des pièces. Une liste vide signifie que personne ne dort.",
+        "data": {
+          "sleep_rooms_attribute": "Valeur des pièces endormies"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "Le style IA personnalisé ne doit contenir que les paramètres {message} et {language}, et ne peut pas dépasser 1200 caractères.",
       "invalid_chime_url": "Le fichier audio du carillon doit être accessible sous /local/.",
       "invalid_person_area": "Sélectionnez une pièce Home Assistant valide.",
-      "invalid_person_presence": "Sélectionnez un capteur de présence avant d’activer la vérification."
+      "invalid_person_presence": "Sélectionnez un capteur de présence avant d’activer la vérification.",
+      "invalid_sleep_source": "Source des pièces endormies incorrecte ; choisissez État ou un attribut disponible."
     }
   },
   "selector": {
