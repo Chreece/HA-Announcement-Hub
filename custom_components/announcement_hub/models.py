@@ -279,8 +279,6 @@ class AnnouncementJob:
 
     def to_dict(self) -> dict[str, Any]:
         data = asdict(self)
-        if payload.get("routing_seen_occupied") is not None:
-            payload["routing_seen_occupied"] = tuple(payload["routing_seen_occupied"])
         for key in (
             "outputs",
             "requested_services",
@@ -353,6 +351,8 @@ class AnnouncementJob:
         payload.setdefault("group_id", None)
         payload.setdefault("ai", {})
 
+        if payload["routing_seen_occupied"] is not None:
+            payload["routing_seen_occupied"] = tuple(payload["routing_seen_occupied"])
         for key in (
             "outputs",
             "requested_services",
