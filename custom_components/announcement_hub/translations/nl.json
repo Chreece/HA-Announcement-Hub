@@ -123,7 +123,8 @@
           "default_ai_agent": "Standaard AI-provider (gesprek of AI-taak)",
           "fallback_ai_agent": "Reserve AI-provider (gesprek of AI-taak)",
           "channel_fallback_mode": "Terugvalkanaal voor meldingen",
-          "sleep_rooms": "Slaapkamers"
+          "sleep_rooms_entity": "Entiteit met ruimten waar mensen slapen",
+          "sleep_rooms_attribute": "Waarde van ruimten met slapende personen"
         },
         "data_description": {
           "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "De standaardoptie van Home Assistant volgt de conversatieagent van je voorkeurs-Assist-pijplijn, niet de ingebouwde intent-agent conversation.process. De agent wordt bij het verzenden bepaald en in de keuzelijst getoond. Als de voorkeurs-pijplijn de ingebouwde agent gebruikt, kies dan expliciet een LLM-agent of stel een reserveagent in.",
           "fallback_ai_agent": "Optionele reserve-AI-agent als de primaire agent faalt. Ook de Home Assistant-standaard volgt de voorkeurs-Assist-pijplijn; de optie 'Oorspronkelijke aankondiging' slaat een tweede AI-poging over. Als beide AI-agents falen, wordt altijd de oorspronkelijke tekst afgeleverd.",
           "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden.",
-          "sleep_rooms": "Ruimten die bij aanwezigheid als slaapruimte gelden. Zijn alle bezette ruimten slaapruimten, dan wordt alle spraak onderdrukt en gaan alleen schriftelijke meldingen naar ingestelde mobiele apps."
+          "sleep_rooms_entity": "Kies de Home Assistant-entiteit waarvan de status of een kenmerk aangeeft in welke ruimten momenteel mensen slapen. De lijst is dynamisch en wijst geen vaste slaapkamers aan.",
+          "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Speel aankondigingen voor een persoon in diens ruimte alleen af wanneer de geselecteerde sensor aan staat; ontbrekende gegevens blokkeren de aflevering.",
           "presence_sensor": "Kies een binary_sensor-entiteit voor aanwezigheid of bezetting die zich fysiek in deze ruimte bevindt."
         }
+      },
+      "sleep_rooms": {
+        "title": "Ruimten waar mensen slapen — entiteit",
+        "description": "Selecteer de entiteit die doorgeeft in welke ruimten nu mensen slapen. Laat leeg als je geen geschikte sensor hebt.",
+        "data": {
+          "sleep_rooms_entity": "Entiteit met ruimten waar mensen slapen"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Kies de Home Assistant-entiteit waarvan de status of een kenmerk aangeeft in welke ruimten momenteel mensen slapen. De lijst is dynamisch en wijst geen vaste slaapkamers aan."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Ruimten waar mensen slapen — status of kenmerk",
+        "description": "Kies de status of het kenmerk met de actuele ruimtelijst. Een lege lijst betekent dat niemand slaapt.",
+        "data": {
+          "sleep_rooms_attribute": "Waarde van ruimten met slapende personen"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "De aangepaste AI-stijl mag alleen {message} en {language} als placeholders gebruiken en mag maximaal 1200 tekens bevatten.",
       "invalid_chime_url": "De beltoonaudio moet een bestand onder /local/ gebruiken.",
       "invalid_person_area": "Selecteer een geldige Home Assistant-ruimte.",
-      "invalid_person_presence": "Selecteer een aanwezigheidssensor voordat verificatie wordt ingeschakeld."
+      "invalid_person_presence": "Selecteer een aanwezigheidssensor voordat verificatie wordt ingeschakeld.",
+      "invalid_sleep_source": "Ongeldige bron voor slapende ruimten; kies Status of een beschikbaar kenmerk."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub is al geconfigureerd."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Standaard AI-provider (gesprek of AI-taak)",
           "fallback_ai_agent": "Reserve AI-provider (gesprek of AI-taak)",
           "channel_fallback_mode": "Terugvalkanaal voor meldingen",
-          "sleep_rooms": "Slaapkamers"
+          "sleep_rooms_entity": "Entiteit met ruimten waar mensen slapen",
+          "sleep_rooms_attribute": "Waarde van ruimten met slapende personen"
         },
         "data_description": {
           "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "De standaardoptie van Home Assistant volgt de conversatieagent van je voorkeurs-Assist-pijplijn, niet de ingebouwde intent-agent conversation.process. De agent wordt bij het verzenden bepaald en in de keuzelijst getoond. Als de voorkeurs-pijplijn de ingebouwde agent gebruikt, kies dan expliciet een LLM-agent of stel een reserveagent in.",
           "fallback_ai_agent": "Optionele reserve-AI-agent als de primaire agent faalt. Ook de Home Assistant-standaard volgt de voorkeurs-Assist-pijplijn; de optie 'Oorspronkelijke aankondiging' slaat een tweede AI-poging over. Als beide AI-agents falen, wordt altijd de oorspronkelijke tekst afgeleverd.",
           "channel_fallback_mode": "Alleen wanneer BEIDE teksten, gesproken text_tts en geschreven text_notify, EN geschikte TTS- en visuele apparaten aanwezig zijn: Visueel → TTS meldt eerst en spreekt bij mislukking; TTS → Visueel spreekt eerst en meldt bij mislukking; Beide probeert beide kanalen. Eén beschikbaar kanaal werkt normaal. Er wordt geen ontbrekende tekst aangemaakt en er worden geen ontvangers toegevoegd; de ingestelde niveaus blijven gelden.",
-          "sleep_rooms": "Ruimten die bij aanwezigheid als slaapruimte gelden. Zijn alle bezette ruimten slaapruimten, dan wordt alle spraak onderdrukt en gaan alleen schriftelijke meldingen naar ingestelde mobiele apps."
+          "sleep_rooms_entity": "Kies de Home Assistant-entiteit waarvan de status of een kenmerk aangeeft in welke ruimten momenteel mensen slapen. De lijst is dynamisch en wijst geen vaste slaapkamers aan.",
+          "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Speel aankondigingen voor een persoon in diens ruimte alleen af wanneer de geselecteerde sensor aan staat; ontbrekende gegevens blokkeren de aflevering.",
           "presence_sensor": "Kies een binary_sensor-entiteit voor aanwezigheid of bezetting die zich fysiek in deze ruimte bevindt."
         }
+      },
+      "sleep_rooms": {
+        "title": "Ruimten waar mensen slapen — entiteit",
+        "description": "Selecteer de entiteit die doorgeeft in welke ruimten nu mensen slapen. Laat leeg als je geen geschikte sensor hebt.",
+        "data": {
+          "sleep_rooms_entity": "Entiteit met ruimten waar mensen slapen"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Kies de Home Assistant-entiteit waarvan de status of een kenmerk aangeeft in welke ruimten momenteel mensen slapen. De lijst is dynamisch en wijst geen vaste slaapkamers aan."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Ruimten waar mensen slapen — status of kenmerk",
+        "description": "Kies de status of het kenmerk met de actuele ruimtelijst. Een lege lijst betekent dat niemand slaapt.",
+        "data": {
+          "sleep_rooms_attribute": "Waarde van ruimten met slapende personen"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "De aangepaste AI-stijl mag alleen {message} en {language} als placeholders gebruiken en mag maximaal 1200 tekens bevatten.",
       "invalid_chime_url": "De beltoonaudio moet een bestand onder /local/ gebruiken.",
       "invalid_person_area": "Selecteer een geldige Home Assistant-ruimte.",
-      "invalid_person_presence": "Selecteer een aanwezigheidssensor voordat verificatie wordt ingeschakeld."
+      "invalid_person_presence": "Selecteer een aanwezigheidssensor voordat verificatie wordt ingeschakeld.",
+      "invalid_sleep_source": "Ongeldige bron voor slapende ruimten; kies Status of een beschikbaar kenmerk."
     }
   },
   "selector": {

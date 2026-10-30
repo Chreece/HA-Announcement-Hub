@@ -123,7 +123,8 @@
           "default_ai_agent": "Provider IA predefinito (conversazione o attività IA)",
           "fallback_ai_agent": "Provider IA di riserva (conversazione o attività IA)",
           "channel_fallback_mode": "Ripiego fra canali di notifica",
-          "sleep_rooms": "Stanze per dormire"
+          "sleep_rooms_entity": "Entità delle stanze in cui si dorme",
+          "sleep_rooms_attribute": "Valore delle stanze con persone addormentate"
         },
         "data_description": {
           "queue_max": "Numero massimo di lavori di annuncio in attesa o attivi che possono essere accettati. Le nuove richieste vengono rifiutate quando viene raggiunto questo limite.",
@@ -143,7 +144,8 @@
           "default_ai_agent": "Il valore predefinito di Home Assistant segue l'agente di conversazione della pipeline Assist preferita, non l'agente intent integrato conversation.process. L'agente viene risolto all'invio e mostrato nel menu. Se la pipeline preferita usa l'agente integrato, seleziona esplicitamente un agente basato su LLM oppure configura un agente di riserva.",
           "fallback_ai_agent": "Agente AI di riserva facoltativo quando quello principale non funziona. Anche il valore predefinito di Home Assistant segue la pipeline Assist preferita; scegliendo l'annuncio originale non viene eseguito un secondo tentativo AI. Se nessun agente AI funziona, viene sempre inviato il testo originale.",
           "channel_fallback_mode": "Solo quando sono presenti SIA text_tts parlato e text_notify scritto SIA dispositivi TTS e visivi idonei: Visivo → TTS invia prima la notifica e parla se la consegna fallisce; TTS → Visivo parla prima e notifica in caso di errore; Entrambi prova entrambi i canali. Un singolo canale disponibile funziona normalmente. Non crea testi mancanti né allarga i destinatari; i livelli restano validi.",
-          "sleep_rooms": "Stanze considerate dedicate al sonno quando occupate. Se tutte le stanze occupate sono di questo tipo, ogni annuncio vocale viene disattivato e restano solo le notifiche scritte alle app mobili configurate."
+          "sleep_rooms_entity": "Seleziona l'entità di Home Assistant il cui stato o attributo elenca le stanze in cui qualcuno sta dormendo adesso. La lista è dinamica, non un elenco fisso di camere da letto.",
+          "sleep_rooms_attribute": "Seleziona Stato o un attributo dell'entità. Sono supportati ID, nomi, alias, elenchi e stringhe separate da virgole. Le stanze sconosciute vengono ignorate; se la fonte non è disponibile, la voce viene silenziata quando l'occupazione è nota."
         }
       },
       "reconfigure": {
@@ -285,6 +287,26 @@
           "verify_presence": "Riproduci gli annunci destinati a una persona nella sua stanza solo se il sensore scelto segnala on; l'assenza di dati impedisce la consegna.",
           "presence_sensor": "Seleziona un'entità binary_sensor di occupazione o presenza che appartenga fisicamente a quest'area."
         }
+      },
+      "sleep_rooms": {
+        "title": "Stanze con persone addormentate — entità",
+        "description": "Scegli l'entità che indica in quali stanze qualcuno sta dormendo in questo momento. Lascia vuoto se non hai un sensore adatto.",
+        "data": {
+          "sleep_rooms_entity": "Entità delle stanze in cui si dorme"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Seleziona l'entità di Home Assistant il cui stato o attributo elenca le stanze in cui qualcuno sta dormendo adesso. La lista è dinamica, non un elenco fisso di camere da letto."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Stanze con persone addormentate — stato o attributo",
+        "description": "Seleziona lo stato o l'attributo che contiene l'elenco attuale delle stanze. Un elenco vuoto significa che nessuno dorme.",
+        "data": {
+          "sleep_rooms_attribute": "Valore delle stanze con persone addormentate"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Seleziona Stato o un attributo dell'entità. Sono supportati ID, nomi, alias, elenchi e stringhe separate da virgole. Le stanze sconosciute vengono ignorate; se la fonte non è disponibile, la voce viene silenziata quando l'occupazione è nota."
+        }
       }
     },
     "error": {
@@ -301,7 +323,8 @@
       "invalid_prompt_template": "Lo stile AI personalizzato deve contenere soltanto i segnaposto {message} e {language} e non superare 1200 caratteri.",
       "invalid_chime_url": "L'audio del campanello deve usare un file /local/.",
       "invalid_person_area": "Seleziona una stanza Home Assistant valida.",
-      "invalid_person_presence": "Seleziona un sensore di presenza prima di attivare la verifica."
+      "invalid_person_presence": "Seleziona un sensore di presenza prima di attivare la verifica.",
+      "invalid_sleep_source": "Fonte delle stanze con persone addormentate non valida; seleziona Stato o un attributo disponibile."
     },
     "abort": {
       "single_instance_allowed": "Announcement Hub è già configurato."
@@ -430,7 +453,8 @@
           "default_ai_agent": "Provider IA predefinito (conversazione o attività IA)",
           "fallback_ai_agent": "Provider IA di riserva (conversazione o attività IA)",
           "channel_fallback_mode": "Ripiego fra canali di notifica",
-          "sleep_rooms": "Stanze per dormire"
+          "sleep_rooms_entity": "Entità delle stanze in cui si dorme",
+          "sleep_rooms_attribute": "Valore delle stanze con persone addormentate"
         },
         "data_description": {
           "queue_max": "Numero massimo di lavori di annuncio in attesa o attivi che possono essere accettati. Le nuove richieste vengono rifiutate quando viene raggiunto questo limite.",
@@ -450,7 +474,8 @@
           "default_ai_agent": "Il valore predefinito di Home Assistant segue l'agente di conversazione della pipeline Assist preferita, non l'agente intent integrato conversation.process. L'agente viene risolto all'invio e mostrato nel menu. Se la pipeline preferita usa l'agente integrato, seleziona esplicitamente un agente basato su LLM oppure configura un agente di riserva.",
           "fallback_ai_agent": "Agente AI di riserva facoltativo quando quello principale non funziona. Anche il valore predefinito di Home Assistant segue la pipeline Assist preferita; scegliendo l'annuncio originale non viene eseguito un secondo tentativo AI. Se nessun agente AI funziona, viene sempre inviato il testo originale.",
           "channel_fallback_mode": "Solo quando sono presenti SIA text_tts parlato e text_notify scritto SIA dispositivi TTS e visivi idonei: Visivo → TTS invia prima la notifica e parla se la consegna fallisce; TTS → Visivo parla prima e notifica in caso di errore; Entrambi prova entrambi i canali. Un singolo canale disponibile funziona normalmente. Non crea testi mancanti né allarga i destinatari; i livelli restano validi.",
-          "sleep_rooms": "Stanze considerate dedicate al sonno quando occupate. Se tutte le stanze occupate sono di questo tipo, ogni annuncio vocale viene disattivato e restano solo le notifiche scritte alle app mobili configurate."
+          "sleep_rooms_entity": "Seleziona l'entità di Home Assistant il cui stato o attributo elenca le stanze in cui qualcuno sta dormendo adesso. La lista è dinamica, non un elenco fisso di camere da letto.",
+          "sleep_rooms_attribute": "Seleziona Stato o un attributo dell'entità. Sono supportati ID, nomi, alias, elenchi e stringhe separate da virgole. Le stanze sconosciute vengono ignorate; se la fonte non è disponibile, la voce viene silenziata quando l'occupazione è nota."
         }
       },
       "init": {
@@ -592,6 +617,26 @@
           "verify_presence": "Riproduci gli annunci destinati a una persona nella sua stanza solo se il sensore scelto segnala on; l'assenza di dati impedisce la consegna.",
           "presence_sensor": "Seleziona un'entità binary_sensor di occupazione o presenza che appartenga fisicamente a quest'area."
         }
+      },
+      "sleep_rooms": {
+        "title": "Stanze con persone addormentate — entità",
+        "description": "Scegli l'entità che indica in quali stanze qualcuno sta dormendo in questo momento. Lascia vuoto se non hai un sensore adatto.",
+        "data": {
+          "sleep_rooms_entity": "Entità delle stanze in cui si dorme"
+        },
+        "data_description": {
+          "sleep_rooms_entity": "Seleziona l'entità di Home Assistant il cui stato o attributo elenca le stanze in cui qualcuno sta dormendo adesso. La lista è dinamica, non un elenco fisso di camere da letto."
+        }
+      },
+      "sleep_rooms_source": {
+        "title": "Stanze con persone addormentate — stato o attributo",
+        "description": "Seleziona lo stato o l'attributo che contiene l'elenco attuale delle stanze. Un elenco vuoto significa che nessuno dorme.",
+        "data": {
+          "sleep_rooms_attribute": "Valore delle stanze con persone addormentate"
+        },
+        "data_description": {
+          "sleep_rooms_attribute": "Seleziona Stato o un attributo dell'entità. Sono supportati ID, nomi, alias, elenchi e stringhe separate da virgole. Le stanze sconosciute vengono ignorate; se la fonte non è disponibile, la voce viene silenziata quando l'occupazione è nota."
+        }
       }
     },
     "error": {
@@ -608,7 +653,8 @@
       "invalid_prompt_template": "Lo stile AI personalizzato deve contenere soltanto i segnaposto {message} e {language} e non superare 1200 caratteri.",
       "invalid_chime_url": "L'audio del campanello deve usare un file /local/.",
       "invalid_person_area": "Seleziona una stanza Home Assistant valida.",
-      "invalid_person_presence": "Seleziona un sensore di presenza prima di attivare la verifica."
+      "invalid_person_presence": "Seleziona un sensore di presenza prima di attivare la verifica.",
+      "invalid_sleep_source": "Fonte delle stanze con persone addormentate non valida; seleziona Stato o un attributo disponibile."
     }
   },
   "selector": {
