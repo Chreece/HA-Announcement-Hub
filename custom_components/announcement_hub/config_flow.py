@@ -42,6 +42,9 @@ from .const import (
     CONF_OCCUPANCY_SENSOR,
     CONF_SLEEP_ROOMS_ENTITY,
     CONF_SLEEP_ROOMS_ATTRIBUTE,
+    CONF_SLEEP_MUTE_TTS,
+    CONF_SLEEP_FALLBACK_WRITTEN,
+    CONF_SLEEP_FALLBACK_OUTPUTS,
     CONF_PERSON_PROFILES,
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
@@ -82,6 +85,8 @@ from .const import (
     DEFAULT_AI_AGENT,
     DEFAULT_FALLBACK_AI_AGENT,
     DEFAULT_FALLBACK_CHECK_DOOR,
+    DEFAULT_SLEEP_MUTE_TTS,
+    DEFAULT_SLEEP_FALLBACK_WRITTEN,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_NOTIFY_MIN_LEVEL,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
@@ -136,6 +141,10 @@ from .const import (
 from .ai_filter import resolve_preferred_assist_agent
 from .flow_settings import merge_reconfiguration
 from .provider_labels import provider_label
+from .sleep_delivery import (
+    INTEGRATION_TOKEN_PREFIX,
+    sleep_notify_output_options,
+)
 from .message_parts import (
     integration_label,
     normalise_notify_profile,
@@ -1794,6 +1803,43 @@ class _AnnouncementFlowMixin:
             )
         return choices
 
+    def _sleep_written_recipient_options(
+        self,
+    ) -> tuple[list[dict[str, str]], list[str]]:
+        """Offer configured supported integrations first, then their devices.
+
+        A selected integration expands only to already configured Announcement
+        Hub notification outputs. Never re-enable outputs the owner disabled.
+        Preserve existing offline selections in the UI without broadening them.
+        """
+        configured_refs = expand_notify_output_tokens(
+            self.hass, list(self._value(CONF_NOTIFY_OUTPUTS, []) or [])
+        )
+        catalog = resolve_notify_outputs(self.hass, configured_refs)
+        labels = {
+            str(option["value"]): str(option["label"])
+            for option in notify_output_options(self.hass)
+        }
+        options = sleep_notify_output_options(catalog, labels)
+        known = {str(option["value"]) for option in options}
+        saved = self._value(CONF_SLEEP_FALLBACK_OUTPUTS, None)
+        if saved is None:
+            default_mobile = f"{INTEGRATION_TOKEN_PREFIX}{INTEGRATION_MOBILE_APP}"
+            selected = [default_mobile] if default_mobile in known else []
+        else:
+            selected = (
+                [saved] if isinstance(saved, str) else list(saved or [])
+            )
+            for token in selected:
+                if token not in known:
+                    options.append(
+                        selector.SelectOptionDict(
+                            value=token, label=f"Unavailable · {token}"
+                        )
+                    )
+                    known.add(token)
+        return options, list(dict.fromkeys(selected))
+
     async def async_step_queue(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -1816,6 +1862,8 @@ class _AnnouncementFlowMixin:
                 (CONF_CRITICAL_NOTIFY_DATA, {}),
                 (CONF_OCCUPANCY_SENSOR, None),
                 (CONF_SLEEP_ROOMS_ENTITY, None),
+                (CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS),
+                (CONF_SLEEP_FALLBACK_WRITTEN, DEFAULT_SLEEP_FALLBACK_WRITTEN),
                 (CONF_FALLBACK_ROOM, None),
                 (CONF_FALLBACK_CHECK_DOOR, DEFAULT_FALLBACK_CHECK_DOOR),
                 (CONF_FALLBACK_DOOR_LABEL, None),
@@ -1857,13 +1905,26 @@ class _AnnouncementFlowMixin:
                     )
                 )
             )
+            available_options, _ = self._sleep_written_recipient_options()
+            valid_targets = {
+                str(option["value"]) for option in available_options
+            }
+            choices = user_input.get(CONF_SLEEP_FALLBACK_OUTPUTS, [])
+            if isinstance(choices, str):
+                choices = [choices]
+            choices = list(dict.fromkeys(str(item) for item in (choices or [])))
+            if any(choice not in valid_targets for choice in choices):
+                errors["base"] = "invalid_sleep_fallback_target"
+            else:
+                self._working[CONF_SLEEP_FALLBACK_OUTPUTS] = choices
+
             if not (
                 self._working.get(CONF_NOTIFY_OUTPUTS)
                 or self._working.get(CONF_COMPANION_TTS_OUTPUTS)
                 or has_tts
             ):
                 errors["base"] = "output_required"
-            else:
+            if not errors:
                 if incoming_sleep_entity and incoming_sleep_entity != previous_sleep_entity:
                     self._sleep_source_from_queue = True
                     return await self.async_step_sleep_rooms_source()
@@ -1966,8 +2027,28 @@ class _AnnouncementFlowMixin:
                 )
             )
 
+        sleep_target_options, sleep_target_defaults = (
+            self._sleep_written_recipient_options()
+        )
         fields.update(
             {
+                probatio.Required(
+                    CONF_SLEEP_MUTE_TTS,
+                    default=self._value(
+                        CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS
+                    ),
+                ): selector.BooleanSelector(),
+                probatio.Required(
+                    CONF_SLEEP_FALLBACK_WRITTEN,
+                    default=self._value(
+                        CONF_SLEEP_FALLBACK_WRITTEN,
+                        DEFAULT_SLEEP_FALLBACK_WRITTEN,
+                    ),
+                ): selector.BooleanSelector(),
+                probatio.Optional(
+                    CONF_SLEEP_FALLBACK_OUTPUTS,
+                    default=sleep_target_defaults,
+                ): _known_multi_select(sleep_target_options),
                 _optional_marker(
                     CONF_FALLBACK_ROOM,
                     self._value(CONF_FALLBACK_ROOM, None),
