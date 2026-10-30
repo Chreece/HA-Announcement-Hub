@@ -3392,6 +3392,11 @@ class AnnouncementManager:
             for sender in (preferred, fallback):
                 try:
                     await sender(job)
+                except RoomRouteMoved:
+                    # A person moving rooms is not a failed provider or an
+                    # invitation to speak on an old second-channel target.
+                    # Re-plan against live occupancy before either channel.
+                    raise
                 except asyncio.CancelledError:
                     raise
                 except Exception as err:  # noqa: BLE001
