@@ -3531,6 +3531,13 @@ class AnnouncementManager:
                     index < len(parts)
                     or not job.tts_text
                 )
+                # Companion App push notifications remain in the phone's
+                # notification tray. Do NOT reserve an occupied room for up
+                # to 30 seconds merely to simulate a TV overlay read time.
+                # TV overlays and other expiring visual providers keep their
+                # existing dwell/part ordering.
+                if output.integration == INTEGRATION_MOBILE_APP:
+                    hold_after_part = False
                 if hold_after_part:
                     await self._async_reading_hold(job, hold_seconds)
                 if index < len(parts):
