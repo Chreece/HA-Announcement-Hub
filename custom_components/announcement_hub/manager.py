@@ -2623,11 +2623,20 @@ class AnnouncementManager:
             )
         )
         level_priority = LEVEL_PRIORITY.get(job.level, LEVEL_PRIORITY[LEVEL_INFO])
-        notify_policy = {
-            output.ref: (self._notify_policy(output, manual=True)
-                         if job_manual else self._notify_policy(output))
-            for output in notifications
-        }
+        notify_policy = {}
+        for output in notifications:
+            scope, minimum = (
+                self._notify_policy(output, manual=True)
+                if job_manual else self._notify_policy(output)
+            )
+            if (
+                sleeping_home and stage_kind == "general"
+                and output.integration == INTEGRATION_MOBILE_APP
+            ):
+                # A configured mobile app stays a written destination even
+                # when assigned an HA area/room scope in its normal profile.
+                scope = NOTIFY_SCOPE_GENERAL
+            notify_policy[output.ref] = (scope, minimum)
         targets = select_stage_targets(
             stage=stage_kind,
             areas=areas,
