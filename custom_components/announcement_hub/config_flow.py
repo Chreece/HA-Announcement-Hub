@@ -1802,6 +1802,12 @@ class _AnnouncementFlowMixin:
         if user_input is not None:
             incoming_sensor = user_input.get(CONF_OCCUPANCY_SENSOR)
             had_source_field = CONF_OCCUPANCY_ATTRIBUTE in user_input
+            previous_sleep_entity = str(
+                self._working.get(CONF_SLEEP_ROOMS_ENTITY, "") or ""
+            ).strip()
+            incoming_sleep_entity = str(
+                user_input.get(CONF_SLEEP_ROOMS_ENTITY, "") or ""
+            ).strip()
             for key, default in (
                 (CONF_DEFAULT_TITLE, DEFAULT_TITLE),
                 (CONF_DEFAULT_USE_AI, DEFAULT_USE_AI),
@@ -1809,7 +1815,7 @@ class _AnnouncementFlowMixin:
                 (CONF_FALLBACK_AI_AGENT, DEFAULT_FALLBACK_AI_AGENT),
                 (CONF_CRITICAL_NOTIFY_DATA, {}),
                 (CONF_OCCUPANCY_SENSOR, None),
-                (CONF_SLEEP_ROOMS, []),
+                (CONF_SLEEP_ROOMS_ENTITY, None),
                 (CONF_FALLBACK_ROOM, None),
                 (CONF_FALLBACK_CHECK_DOOR, DEFAULT_FALLBACK_CHECK_DOOR),
                 (CONF_FALLBACK_DOOR_LABEL, None),
@@ -1833,6 +1839,14 @@ class _AnnouncementFlowMixin:
             else:
                 self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
 
+            if not incoming_sleep_entity or incoming_sleep_entity != previous_sleep_entity:
+                self._working[CONF_SLEEP_ROOMS_ATTRIBUTE] = ""
+            elif CONF_SLEEP_ROOMS_ATTRIBUTE in user_input:
+                sleep_source = str(user_input[CONF_SLEEP_ROOMS_ATTRIBUTE])
+                self._working[CONF_SLEEP_ROOMS_ATTRIBUTE] = (
+                    "" if sleep_source == "state" else sleep_source
+                )
+
             has_tts = bool(
                 self._working.get(CONF_TTS_ENGINES)
                 and (
@@ -1850,9 +1864,13 @@ class _AnnouncementFlowMixin:
             ):
                 errors["base"] = "output_required"
             else:
+                if incoming_sleep_entity and incoming_sleep_entity != previous_sleep_entity:
+                    self._sleep_source_from_queue = True
+                    return await self.async_step_sleep_rooms_source()
                 return await self._async_finish()
 
         sensor = str(self._value(CONF_OCCUPANCY_SENSOR, "") or "").strip()
+        sleep_entity = str(self._value(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
         fields: dict[probatio.Marker, Any] = {
             probatio.Required(
                 CONF_DEFAULT_TITLE,
@@ -1890,6 +1908,10 @@ class _AnnouncementFlowMixin:
                 CONF_OCCUPANCY_SENSOR,
                 self._value(CONF_OCCUPANCY_SENSOR, None),
             ): selector.EntitySelector(),
+            _optional_marker(
+                CONF_SLEEP_ROOMS_ENTITY,
+                self._value(CONF_SLEEP_ROOMS_ENTITY, None),
+            ): selector.EntitySelector(),
         }
 
         if sensor:
@@ -1916,12 +1938,36 @@ class _AnnouncementFlowMixin:
                 )
             )
 
+        if sleep_entity:
+            sleep_options = self._sleep_rooms_attribute_options()
+            current_sleep_source = str(
+                self._value(CONF_SLEEP_ROOMS_ATTRIBUTE, "") or ""
+            )
+            fields[
+                probatio.Required(
+                    CONF_SLEEP_ROOMS_ATTRIBUTE,
+                    default=(
+                        current_sleep_source
+                        if current_sleep_source in sleep_options else "state"
+                    ),
+                )
+            ] = selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=[
+                        selector.SelectOptionDict(
+                            value="state", label=provider_label(self.hass, "state")
+                        ),
+                        *[
+                            selector.SelectOptionDict(value=key, label=key)
+                            for key in sleep_options if key != "state"
+                        ],
+                    ],
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            )
+
         fields.update(
             {
-                probatio.Optional(
-                    CONF_SLEEP_ROOMS,
-                    default=list(self._value(CONF_SLEEP_ROOMS, []) or []),
-                ): selector.AreaSelector(selector.AreaSelectorConfig(multiple=True)),
                 _optional_marker(
                     CONF_FALLBACK_ROOM,
                     self._value(CONF_FALLBACK_ROOM, None),
