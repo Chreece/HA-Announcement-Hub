@@ -8,7 +8,7 @@ by the routing policy, and unknown/stale tokens do not broaden recipients.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 INTEGRATION_TOKEN_PREFIX = "integration:"
@@ -18,6 +18,9 @@ DEFAULT_SLEEP_NOTIFICATION_INTEGRATION = "mobile_app"
 def sleep_notify_output_options(
     outputs: Sequence[Any],
     labels: Mapping[str, str] | None = None,
+    *,
+    integration_label: Callable[[str, int], str] | None = None,
+    device_label: Callable[[str], str] | None = None,
 ) -> list[dict[str, str]]:
     """Integration/all-devices first, then individual supported devices."""
     labels = labels or {}
@@ -33,6 +36,8 @@ def sleep_notify_output_options(
         options.append({
             "value": f"{INTEGRATION_TOKEN_PREFIX}{integration}",
             "label": (
+                integration_label(integration, len(set(groups[integration])))
+                if integration_label else
                 f"Integration · {integration.replace('_', ' ').title()}"
                 f" — all devices ({len(set(groups[integration]))})"
             ),
@@ -45,7 +50,10 @@ def sleep_notify_output_options(
     ):
         options.append({
             "value": ref,
-            "label": f"Device · {labels.get(ref, ref)}",
+            "label": (
+                device_label(labels.get(ref, ref))
+                if device_label else f"Device · {labels.get(ref, ref)}"
+            ),
         })
     return options
 
