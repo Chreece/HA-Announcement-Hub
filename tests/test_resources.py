@@ -46,7 +46,7 @@ def test_service_fields_sections_and_translations_match() -> None:
 
 def test_config_and_options_steps_match_flow_contract() -> None:
     strings = json.loads((COMPONENT / "strings.json").read_text())
-    expected_steps = {"outputs", "tts", "notification_profile", "queue", "people", "person_profile", "edit_advanced_ai", "edit_audio", "edit_room_safety"}
+    expected_steps = {"outputs", "tts", "notification_profile", "queue", "people", "person_profile", "edit_advanced_ai", "edit_audio", "edit_room_safety", "sleep_rooms", "sleep_rooms_source"}
     assert set(strings["config"]["step"]) == expected_steps | {"reconfigure"}
     assert set(strings["options"]["step"]) == expected_steps | {"init"}
 
@@ -77,6 +77,8 @@ def test_config_and_options_steps_match_flow_contract() -> None:
         "output_availability_timeout",
         "occupancy_sensor",
         "occupancy_attribute",
+        "sleep_rooms_entity",
+        "sleep_rooms_attribute",
         "fallback_room",
         "fallback_check_door",
         "fallback_door_label",
