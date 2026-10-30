@@ -125,6 +125,7 @@ class FakeManager:
         self.door_open = door_open
         self.available = available or {}
         self._queue = deque()
+        self._wake = SimpleNamespace(set=lambda: None)
         self.snapcast_outputs = tuple(
             name for name, included in (
                 ("media_player.kitchen_snapcast", kitchen_snapcast),
@@ -240,6 +241,9 @@ METHODS = (
     "_occupancy_values",
     "_all_occupied_rooms_sleeping",
     "_sleep_tts_muted_now",
+    "_room_route_moved",
+    "_assert_live_room_route",
+    "_requeue_after_room_move",
     "_staged_areas",
     "_prepare_staged_route",
     "_advance_staged_route",
@@ -297,6 +301,8 @@ namespace = {
     "Mapping": __import__("collections.abc", fromlist=["Mapping"]).Mapping,
     "Any": __import__("typing", fromlist=["Any"]).Any,
     "ServiceValidationError": ValueError,
+    "RoomRouteMoved": type("RoomRouteMoved", (ValueError,), {}),
+    "Sequence": __import__("collections.abc", fromlist=["Sequence"]).Sequence,
     "resolve_notify_outputs": lambda hass, refs: tuple(
         manager.notifications[ref]
         for ref in refs if ref in manager.notifications
@@ -333,6 +339,7 @@ def job(*, preferred=("kueche",), services=(), level="info", age=0):
         routing_retry_after=None,
         routing_audio_retry=False,
         routing_channel_retry=None,
+        routing_seen_occupied=None,
         status="pending", started_at=None, finished_at=None,
         error=None, channel_errors={},
         preferred_areas=tuple(preferred),
@@ -1209,3 +1216,113 @@ def test_sleep_written_fallback_respects_configured_output_opt_out(monkeypatch):
     j = job()
     assert manager._staged_route_ready(j)
     assert j.notify_outputs == ("entity:notify.kitchen",)
+
+
+def test_active_room_job_retargets_without_reporting_playback_in_empty_room(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("kueche",),
+        available={"entity:notify.kitchen": True, "entity:notify.living": True},
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.outputs == ("kueche",)
+
+    # A person walks to the living room between planning and playback.
+    manager.occupied = ("wohnzimmer",)
+    assert manager._room_route_moved(j)
+    assert manager._room_route_moved(j, ("kueche",))
+    with pytest.raises(namespace["RoomRouteMoved"]):
+        manager._assert_live_room_route(j, ("kueche",))
+
+    manager._requeue_after_room_move(j, "target-room listener moved")
+    assert list(manager._queue) == [j]
+    assert j.routing_stage == "primary"
+    assert j.routing_seen_occupied == ("wohnzimmer",)
+    assert j.status == "pending"
+    assert not j.successful_channels
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "occupied"
+    assert j.outputs == ("wohnzimmer",)
+    assert j.notify_outputs == ("entity:notify.living",)
+
+
+def test_multi_room_output_does_not_play_to_stale_room(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("kueche", "wohnzimmer"),
+        available={"entity:notify.kitchen": True},
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert not manager._room_route_moved(j, ("kueche",))
+    manager.occupied = ("wohnzimmer",)
+    # If a plan carried both areas, one stale area is enough to reject
+    # this physical batch before any device service call.
+    assert manager._room_route_moved(j, ("kueche", "wohnzimmer"))
+    assert not manager._room_route_moved(j, ("wohnzimmer",))
+
+
+def test_fallback_rechecks_original_target_not_empty_relay_room(monkeypatch):
+    global manager
+    manager = FakeManager(occupied=("kueche",))
+    configure_manager(monkeypatch, manager)
+    j = job()
+    j.routing_stage = "fallback"
+    j.outputs = ("eingang",)
+    assert not manager._room_route_moved(j, ("eingang",))
+    manager.occupied = ("wohnzimmer",)
+    assert manager._room_route_moved(j, ("eingang",))
+
+
+def test_movement_guards_do_not_change_hard_or_general_recipients(monkeypatch):
+    global manager
+    manager = FakeManager(occupied=("wohnzimmer",))
+    configure_manager(monkeypatch, manager)
+    j = job()
+    j.outputs = ("kueche",)
+    j.routing_mode = "normal"
+    assert not manager._room_route_moved(j, ("kueche",))
+    j.routing_mode = "room_fallback"
+    j.occupancy_requested = False
+    assert not manager._room_route_moved(j, ("kueche",))
+    j.occupancy_requested = True
+    j.routing_stage = "general"
+    assert not manager._room_route_moved(j, ("kueche",))
+
+
+def test_queued_general_route_revisits_new_room_immediately(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("wohnzimmer",),
+        available={"entity:notify.kitchen": True},
+        timeout=30,
+    )
+    configure_manager(monkeypatch, manager)
+    j = job()
+    j.routing_stage = "general"
+    j.routing_seen_occupied = ("wohnzimmer",)
+    j.routing_stage_started_at = datetime.now(UTC).isoformat()
+    manager.occupied = ("kueche",)
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "primary"
+    assert j.outputs == ("kueche",)
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    assert any("occupancy changed" in item for item in j.routing_history)
+
+
+def test_movement_guards_placed_before_physical_service_calls():
+    methods = {
+        name: SRC[SRC.index(f"    async def {name}("):
+                  SRC.find("\n    async def ", SRC.index(f"    async def {name}(")+5)
+                  if SRC.find("\n    async def ", SRC.index(f"    async def {name}(")+5) >= 0
+                  else len(SRC)]
+        for name in ("_async_play_media_source", "_async_deliver_notification_part")
+    }
+    assert "self._assert_live_room_route(job," in methods["_async_play_media_source"]
+    assert "self._assert_live_room_route(job," in methods["_async_deliver_notification_part"]
+    assert "class RoomRouteMoved(HomeAssistantError)" in SRC
+    assert "except RoomRouteMoved:" in SRC
