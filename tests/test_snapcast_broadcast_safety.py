@@ -104,6 +104,10 @@ class FakeManager:
         pass
 
     @staticmethod
+    def _all_occupied_rooms_sleeping():
+        return False
+
+    @staticmethod
     def _is_player_busy(_player):
         return True
 
