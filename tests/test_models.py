@@ -194,6 +194,7 @@ def test_job_round_trip_preserves_output_and_room_binding() -> None:
     job.title = "Έκτακτη Ενημέρωση"
     job.group_id = "group-123"
     job.related_job_ids = ("child-456",)
+    job.routing_seen_occupied = ("living_room", "kitchen")
     job.delivered_physical.append("notify:entity:notify.wall_display")
 
     restored = AnnouncementJob.from_dict(job.to_dict())
@@ -203,6 +204,8 @@ def test_job_round_trip_preserves_output_and_room_binding() -> None:
     assert restored.public_dict(include_text=True)["title"] == "Έκτακτη Ενημέρωση"
     assert restored.group_id == "group-123"
     assert restored.related_job_ids == ("child-456",)
+    assert restored.routing_seen_occupied == ("living_room", "kitchen")
+    assert job.to_dict()["routing_seen_occupied"] == ["living_room", "kitchen"]
     assert restored.delivered_physical == ["notify:entity:notify.wall_display"]
     assert restored.outputs == ("living_room", "kitchen")
     assert restored.requested_services == ("all",)
@@ -234,6 +237,9 @@ def test_job_round_trip_preserves_output_and_room_binding() -> None:
     assert restored.companion_tts_words_per_minute == 165
     assert restored.media_source_ids == {"tts.piper": "media-source://tts/test"}
     assert restored.tts_cache is True
+    old_payload = job.to_dict()
+    old_payload.pop("routing_seen_occupied")
+    assert AnnouncementJob.from_dict(old_payload).routing_seen_occupied is None
     public = restored.public_dict()
     assert "integration_data" not in public["notify_output_profiles"][
         "entity:notify.wall_display"
