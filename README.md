@@ -521,8 +521,10 @@ General/non-room notification outputs
 
 - With a configured occupancy source, an **unoccupied requested room** is
   skipped in favor of other occupied rooms with authorized room devices.
-  Without a trustworthy room reading, the requested room is retained, but an
-  alternate fallback room is not authorized without confirmed presence.
+  With no occupancy source configured, the requested room is retained, but
+  the alternate fallback room still requires confirmed target-room presence.
+  If the configured source is unavailable, unconfirmed room presence is not
+  assumed, and the alternate fallback room remains ineligible.
 - **Sleep rooms** are configured under General options. If all currently
   occupied rooms belong to them, no TTS is started (even Critical, Snapcast
   and companion speech). Only configured mobile-app written notifications
