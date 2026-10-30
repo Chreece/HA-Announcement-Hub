@@ -34,7 +34,7 @@ def _read(lang):
 
 def test_russian_native_strings_complete_without_english_help():
     en, ru = _read("en"), _read("ru")
-    assert len(en) == 599
+    assert len(en) == 603
     assert set(en) == set(ru)
     identical = {key: source for key, source in en.items() if ru[key] == source}
     assert len(identical) == 5, identical
