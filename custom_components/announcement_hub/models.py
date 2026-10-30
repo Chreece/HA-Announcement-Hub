@@ -159,6 +159,8 @@ class AnnouncementJob:
     routing_audio_retry: bool = False
     # Alternate channel attempted after a failed visual/audio room route.
     routing_channel_retry: str | None = None
+    # Last reliable occupancy snapshot, used to revisit a room when people move.
+    routing_seen_occupied: tuple[str, ...] | None = None
     channel_services: tuple[str, ...] = ()
     excluded_physical: tuple[str, ...] = ()
     related_job_ids: tuple[str, ...] = ()
@@ -277,6 +279,8 @@ class AnnouncementJob:
 
     def to_dict(self) -> dict[str, Any]:
         data = asdict(self)
+        if payload.get("routing_seen_occupied") is not None:
+            payload["routing_seen_occupied"] = tuple(payload["routing_seen_occupied"])
         for key in (
             "outputs",
             "requested_services",
@@ -293,6 +297,8 @@ class AnnouncementJob:
             "presence_sensors",
         ):
             data[key] = list(data[key])
+        if self.routing_seen_occupied is not None:
+            data["routing_seen_occupied"] = list(self.routing_seen_occupied)
         return data
 
     @classmethod
@@ -340,6 +346,7 @@ class AnnouncementJob:
         payload.setdefault("routing_retry_after", None)
         payload.setdefault("routing_audio_retry", False)
         payload.setdefault("routing_channel_retry", None)
+        payload.setdefault("routing_seen_occupied", None)
         payload.setdefault("channel_services", ())
         payload.setdefault("excluded_physical", ())
         payload.setdefault("related_job_ids", ())
