@@ -255,6 +255,7 @@ namespace = {
     "LEVEL_CRITICAL": "critical",
     "CONF_NOTIFY_PROFILES": "notify_profiles",
     "NOTIFY_SCOPE_GENERAL": "general",
+    "INTEGRATION_MOBILE_APP": "mobile_app",
     "UTC": UTC,
     "datetime": datetime,
     "utcnow_iso": lambda: datetime.now(UTC).isoformat(),
@@ -957,3 +958,19 @@ def test_sleep_guard_applies_even_to_normal_jobs_and_before_chime():
         SRC.index("    def _job_runnable_now("):
         SRC.index("    @staticmethod\n    def _room_lane_keys(")
     ]
+
+
+def test_sleeping_room_scoped_mobile_still_receives_written_fallback(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("schlafzimmer",), available={"entity:notify.phone": True},
+    )
+    manager.settings["sleep_rooms"] = ("schlafzimmer",)
+    manager.notifications["entity:notify.phone"].scope = "room"
+    manager.notifications["entity:notify.phone"].area_id = "schlafzimmer"
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
+    assert j.tts_text is None
