@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.10.0b24 - 2026-10-30
+
+**Beta — configurable sleep muting and explicitly selected written fallback recipients.**
+
+- Add three General options: **Mute TTS while everyone is sleeping**,
+  **Written fallback while sleeping**, and a multiselect for sleep-time
+  written notification recipients.
+- Display supported **Integration — all configured devices** choices first,
+  then individual notification devices. Selecting an integration includes only
+  notification outputs already enabled in Announcement Hub, never unrelated
+  Home Assistant devices. Multiple integrations/devices can be combined
+  without duplicate deliveries.
+- Support independent toggles: mute Off preserves ordinary speech, while
+  written fallback Off leaves automatic sleeping-house announcements queued.
+  The written fallback applies only while sleep muting is active.
+- Default existing installations to their previous sleep behavior: muting On,
+  written fallback On, all currently configured Companion App notification
+  devices. An explicit empty recipient selection sends no written fallback.
+- Remove the former hardcoded mobile-app-only written fallback and respect
+  explicit per-integration or per-device selections; unchanged strict
+  integration/device/entity service targeting cannot be broadened.
+- Preserve live sleeping-room entity/attribute detection, fail-safe sound
+  suppression on missing sleep data when occupancy is known, late checks
+  before TTS/chimes, existing room-first delivery and queue durability.
+- Add localized descriptions and integration/device option labels for all
+  20 supported languages, plus focused tests for toggles, recipient
+  selection, opt-outs, unavailable choices and non-broadcast safety.
+
 ## 0.10.0b23 - 2026-10-30
 
 **Beta — dynamically sourced sleeping rooms from a Home Assistant entity.**
