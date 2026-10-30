@@ -122,7 +122,8 @@
           "default_use_ai": "Rewrite announcements with AI",
           "default_ai_agent": "Default AI provider (conversation or AI Task)",
           "fallback_ai_agent": "Backup AI provider (conversation or AI Task)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Notification channel fallback",
+          "sleep_rooms": "Sleep rooms"
         },
         "data_description": {
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
@@ -135,13 +136,14 @@
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
           "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
+          "fallback_room": "Only when an awake person is in the originally targeted room, its permitted outputs could not deliver, and the door condition passes. Never for an empty or sleeping target.",
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
           "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply.",
+          "sleep_rooms": "Areas treated as sleeping when occupied. If everyone is in these rooms, suppress all speech and use only configured written mobile-app notifications."
         }
       },
       "reconfigure": {
@@ -427,7 +429,8 @@
           "default_use_ai": "Rewrite announcements with AI",
           "default_ai_agent": "Default AI provider (conversation or AI Task)",
           "fallback_ai_agent": "Backup AI provider (conversation or AI Task)",
-          "channel_fallback_mode": "Notification channel fallback"
+          "channel_fallback_mode": "Notification channel fallback",
+          "sleep_rooms": "Sleep rooms"
         },
         "data_description": {
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
@@ -440,13 +443,14 @@
           "critical_notify_data": "Provider-specific data merged only into Critical visual notifications, for example urgency/priority options supported by the notification integration.",
           "occupancy_sensor": "Entity whose state or selected attribute contains the currently occupied Home Assistant area names/IDs. It is used only when occupied-only routing is enabled for a send action.",
           "occupancy_attribute": "Choose whether occupied rooms are read from the entity state or from one of its current attributes.",
-          "fallback_room": "Fallback TTS area used only when the current target room set contains zero fixed room candidates at all. Existing fixed room candidates, including unavailable/unknown ones, block fallback and remain subject to the normal availability timeout.",
+          "fallback_room": "Only when an awake person is in the originally targeted room, its permitted outputs could not deliver, and the door condition passes. Never for an empty or sleeping target.",
           "fallback_check_door": "When enabled, fallback is allowed only if an eligible door sensor in one of the current target rooms explicitly reports open.",
           "fallback_door_label": "Optional Home Assistant label. When selected, only door binary sensors carrying this label may authorize fallback; leave empty to consider every door sensor in the current target rooms.",
           "default_use_ai": "Enabled means every announcement inherits AI rewriting unless its send action explicitly provides use_ai: false. Omitted use_ai follows this integration setting. When AI fails, the original message is delivered. Check the send action's ai status in its response_variable.",
           "default_ai_agent": "Home Assistant default follows the conversation agent of your preferred Assist pipeline, rather than the built-in conversation.process intent agent. The selected agent is resolved at send time and shown in the dropdown. If your preferred pipeline uses the built-in agent, select an LLM-backed agent explicitly or configure a backup.",
           "fallback_ai_agent": "An optional backup AI agent when the primary agent fails. Home Assistant default follows the preferred Assist pipeline too; Original announcement skips a second AI attempt. If neither AI works, the original text is always delivered.",
-          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply."
+          "channel_fallback_mode": "Only when BOTH spoken text_tts and written text_notify AND eligible TTS and visual devices are present: Visual → TTS notifies first, then speaks if delivery fails; TTS → Visual speaks first, then notifies if speech fails; Both attempts both channels. A single available channel works normally. Does not create missing text or broaden recipients; existing levels still apply.",
+          "sleep_rooms": "Areas treated as sleeping when occupied. If everyone is in these rooms, suppress all speech and use only configured written mobile-app notifications."
         }
       },
       "init": {
