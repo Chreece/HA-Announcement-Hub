@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.10.0b22 - 2026-10-30
+
+**Beta — sleep-aware notifications and verified presence-based fallback.**
+
+- Add a Sleep rooms selector to general options. When all currently occupied
+  rooms are sleep rooms, suppress every spoken announcement, including
+  Critical TTS, room speakers, Snapcast and companion TTS. Automatic room
+  announcements instead use configured mobile-app written notifications.
+- For TTS-only automatic room messages during sleep, use the original spoken
+  text as a written mobile-app notification; explicit service/device/integration
+  recipient restrictions are never widened.
+- Prevent automatic announcements in empty targeted rooms when occupancy
+  reports a different occupied room. Prioritize authorized outputs in other
+  awake occupied rooms before trying the alternate room.
+- Require confirmed presence in the original non-sleep target, failure of
+  local delivery, and the configured door rule before using the fallback room.
+  Do not use the fallback room for an unoccupied or sleeping target.
+- Honor sleep-room silence again at dispatch, including already-queued jobs;
+  do not trigger an announcement chime or speech when all rooms are sleeping.
+- Localize sleep-room settings and updated fallback guidance in all
+  supported languages; update the README and regression tests.
+- Preserve the FIFO queue, retry persistence, hard recipient/service limits
+  and previous channel fallback preferences outside sleep-only routing.
+
 ## 0.10.0b21 - 2026-10-23
 
 **Beta — Greek setup and TTS/help language-quality follow-up.**
