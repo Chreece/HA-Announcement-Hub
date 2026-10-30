@@ -341,7 +341,7 @@ def job(*, preferred=("kueche",), services=(), level="info", age=0):
         routing_channel_retry=None,
         routing_seen_occupied=None,
         status="pending", started_at=None, finished_at=None,
-        error=None, channel_errors={},
+        error=None, channel_errors={}, successful_channels=[],
         preferred_areas=tuple(preferred),
         requested_services=tuple(services),
         channel_services=(),
