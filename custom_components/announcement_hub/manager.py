@@ -275,6 +275,9 @@ class AnnouncementManager:
         # AI tasks are separate from the delivery worker: cold model loading
         # cannot block a later, ready announcement from another room.
         self._ai_tasks: dict[str, asyncio.Task[None]] = {}
+        # A timed-out provider is temporarily skipped so it cannot
+        # serially hold up every copyediting announcement in the queue.
+        self._ai_provider_cooldowns: dict[str, datetime] = {}
         # Keep outcome summaries for intermittent failures even after a
         # later successful notification overwrites the "last" sensor field.
         # No generated messages, source texts or model prompts are stored.
@@ -2250,7 +2253,13 @@ class AnnouncementManager:
 
     async def _async_worker(self) -> None:
         """Launch concurrent disjoint room lanes; shared output locks stay exclusive."""
+        next_ai_retry_scan = 0.0
         while self._running:
+            # Revisit deferred generation even when no new jobs arrive.
+            now_monotonic = asyncio.get_running_loop().time()
+            if now_monotonic >= next_ai_retry_scan:
+                next_ai_retry_scan = now_monotonic + 1.0
+                self._fill_ai_slots()
             while len(self._active_jobs) < self._max_parallel_deliveries:
                 job = self._next_runnable_job()
                 if job is None:
@@ -5138,6 +5147,17 @@ class AnnouncementManager:
                 blocking=True,
             )
 
+    def _ai_provider_cooling(self, agent: str | None) -> bool:
+        """Check the in-memory, per-provider short circuit breaker."""
+        key = str(agent or "")
+        until = self._ai_provider_cooldowns.get(key)
+        if until is None:
+            return False
+        if until <= datetime.now(UTC):
+            self._ai_provider_cooldowns.pop(key, None)
+            return False
+        return True
+
     def _fill_ai_slots(self) -> None:
         """Fairly fill bounded AI slots from the oldest available room heads."""
         if not self._running:
@@ -5157,6 +5177,21 @@ class AnnouncementManager:
                >= self._max_parallel_ai
         ):
             return
+        # Failed generation remains durable, never becomes spoken prompt.
+        retry_after = job.ai.get("generation_retry_after")
+        if retry_after:
+            try:
+                if datetime.now(UTC) < datetime.fromisoformat(retry_after):
+                    return
+            except (TypeError, ValueError):
+                # Corrupt retry metadata must not make the job permanent.
+                job.ai.pop("generation_retry_after", None)
+        if job.ai.get("requested_mode") == "generate":
+            primary = job.ai.get("requested_agent_id")
+            fallback = job.ai.get("requested_fallback_agent_id")
+            if (self._ai_provider_cooling(primary) and
+                    (not fallback or self._ai_provider_cooling(fallback))):
+                return
         # Same-room jobs, and jobs using the SAME AI provider, must not
         # issue overlapping model calls. A local model may be live while
         # simultaneously rejecting another generation request. Different
@@ -5216,20 +5251,44 @@ class AnnouncementManager:
         title_result: dict[str, str] = {}
         started = asyncio.get_running_loop().time()
         try:
-            rewritten_tts, rewritten_notify = await async_filter_announcement(
-                self.hass,
-                text_tts=original_tts,
-                text_notify=original_notify,
-                agent_id=ai.get("requested_agent_id"),
-                fallback_agent_id=ai.get("requested_fallback_agent_id"),
-                diagnostics=ai,
-                mode=ai.get("requested_mode", "rewrite"),
-                target_language=ai.get("requested_target_language"),
-                prompt_templates=getattr(self, "settings", {}).get("ai_prompt_templates", {}),
-                title_result=(
-                    title_result if ai.get("requested_generate_title") else None
-                ),
-            )
+            primary = ai.get("requested_agent_id")
+            backup = ai.get("requested_fallback_agent_id")
+            use_primary, use_backup = primary, backup
+            skip_provider = False
+            if self._ai_provider_cooling(primary):
+                if backup and not self._ai_provider_cooling(backup):
+                    # A healthy backup is still allowed to generate text.
+                    use_primary, use_backup = backup, None
+                else:
+                    skip_provider = True
+            elif backup and self._ai_provider_cooling(backup):
+                use_backup = None
+            if skip_provider:
+                # For rewrite/translate only, the original is usable text.
+                # For generate, it remains *instructions*, never output.
+                rewritten_tts, rewritten_notify = original_tts, original_notify
+                ai.update({
+                    "attempted": False,
+                    "status": "fallback_original",
+                    "agent_used": None,
+                    "attempts": [],
+                    "failure_reason": "provider_cooldown",
+                })
+            else:
+                rewritten_tts, rewritten_notify = await async_filter_announcement(
+                    self.hass,
+                    text_tts=original_tts,
+                    text_notify=original_notify,
+                    agent_id=use_primary,
+                    fallback_agent_id=use_backup,
+                    diagnostics=ai,
+                    mode=ai.get("requested_mode", "rewrite"),
+                    target_language=ai.get("requested_target_language"),
+                    prompt_templates=getattr(self, "settings", {}).get("ai_prompt_templates", {}),
+                    title_result=(
+                        title_result if ai.get("requested_generate_title") else None
+                    ),
+                )
         except asyncio.CancelledError:
             ai["status"] = "pending"
             raise
@@ -5249,6 +5308,37 @@ class AnnouncementManager:
         # Cancellation or queue clearing can race with completion.
         if job not in self._queue or not self._running:
             return
+        # Record actual timeouts per provider, including a primary that
+        # timed out before a working fallback succeeded.
+        for attempt in ai.get("attempts", []):
+            if not isinstance(attempt, dict) or attempt.get("outcome") != "provider_timeout":
+                continue
+            key = str(attempt.get("agent") or primary or "")
+            cooldown_end = datetime.now(UTC) + timedelta(minutes=5)
+            self._ai_provider_cooldowns[key] = cooldown_end
+            if key == str(ai.get("agent") or primary or ""):
+                self._ai_provider_cooldowns[str(primary or "")] = cooldown_end
+            _LOGGER.warning("Announcement AI provider %s timed out; cooling for 300s", key)
+        if ai.get("requested_mode") == "generate" and ai.get("status") == "fallback_original":
+            # Crucial: source_tts/source_notify here contain writing INSTRUCTIONS.
+            # Do NOT change job.text_*, do NOT clear pending_preprocessing, and
+            # do NOT prefetch or dispatch any channel with these instructions.
+            failed_attempts = min(int(ai.get("generation_failed_attempts") or 0) + 1, 100)
+            ai["generation_failed_attempts"] = failed_attempts
+            delay = min(3600, 300 * 2 ** min(failed_attempts - 1, 4))
+            ai["generation_retry_after"] = (
+                datetime.now(UTC) + timedelta(seconds=delay)
+            ).isoformat()
+            ai["status"] = "waiting_for_ai"
+            ai["pending_preprocessing"] = True
+            _LOGGER.warning("Announcement generation %s deferred for %ds after AI failure",
+                            job.job_id, delay)
+            self._schedule_save()
+            self._wake.set()
+            self._notify_update()
+            return
+        ai.pop("generation_retry_after", None)
+        ai.pop("generation_failed_attempts", None)
         job.text_tts, job.text_notify = rewritten_tts, rewritten_notify
         if ai.get("requested_generate_title") and title_result.get("title"):
             job.title = title_result["title"]

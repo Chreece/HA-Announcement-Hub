@@ -16,6 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 # Advisory log interval only: model cold starts are not AI failures.
 # Home Assistant conversation.process has no portable generation-progress API.
 AI_FILTER_SLOW_REQUEST_SECONDS = 60.0
+AI_FILTER_PROVIDER_TIMEOUT_SECONDS = 120.0
 
 # Numerical readings, time, dates and quantities must never be silently changed.
 _NUMBER_PATTERN = re.compile(r"(?<![0-9])[-+]?[0-9]+(?:[.,][0-9]+)*")
@@ -655,24 +656,28 @@ async def async_filter_announcement(
             if target_language or preferred_language:
                 payload["language"] = target_language or preferred_language
         # Await the *same* in-flight request for as long as the agent needs.
-        # Do not cancel generation just because a local model is loading.
+        # Permit model cold starts, but never allow an unbounded provider wait.
         loop = asyncio.get_running_loop()
         attempt_started = loop.time()
         pending_notice = loop.call_later(
             AI_FILTER_SLOW_REQUEST_SECONDS,
             _LOGGER.warning,
             "Announcement AI agent %s has not responded after %.0f seconds; "
-            "continuing to await AI provider (no Hub timeout)",
+            "provider timeout is %.0f seconds",
             agent_label,
             AI_FILTER_SLOW_REQUEST_SECONDS,
+            AI_FILTER_PROVIDER_TIMEOUT_SECONDS,
         )
         try:
-            response = await hass.services.async_call(
-                "ai_task" if is_ai_task else "conversation",
-                "generate_data" if is_ai_task else "process",
-                payload,
-                blocking=True,
-                return_response=True,
+            response = await asyncio.wait_for(
+                hass.services.async_call(
+                    "ai_task" if is_ai_task else "conversation",
+                    "generate_data" if is_ai_task else "process",
+                    payload,
+                    blocking=True,
+                    return_response=True,
+                ),
+                timeout=AI_FILTER_PROVIDER_TIMEOUT_SECONDS,
             )
         except Exception as error:
             # The HA service supports structure, but individual AI Task
@@ -695,9 +700,12 @@ async def async_filter_announcement(
                 unstructured_payload = dict(payload)
                 unstructured_payload.pop("structure", None)
                 try:
-                    response = await hass.services.async_call(
-                        "ai_task", "generate_data", unstructured_payload,
-                        blocking=True, return_response=True,
+                    response = await asyncio.wait_for(
+                        hass.services.async_call(
+                            "ai_task", "generate_data", unstructured_payload,
+                            blocking=True, return_response=True,
+                        ),
+                        timeout=AI_FILTER_PROVIDER_TIMEOUT_SECONDS,
                     )
                 except Exception as retry_error:
                     error = retry_error
@@ -791,12 +799,15 @@ async def async_filter_announcement(
                     target_language=target_language,
                 )
                 try:
-                    retry_response = await hass.services.async_call(
-                        "ai_task" if is_ai_task else "conversation",
-                        "generate_data" if is_ai_task else "process",
-                        retry_payload,
-                        blocking=True,
-                        return_response=True,
+                    retry_response = await asyncio.wait_for(
+                        hass.services.async_call(
+                            "ai_task" if is_ai_task else "conversation",
+                            "generate_data" if is_ai_task else "process",
+                            retry_payload,
+                            blocking=True,
+                            return_response=True,
+                        ),
+                        timeout=AI_FILTER_PROVIDER_TIMEOUT_SECONDS,
                     )
                 except Exception as retry_error:
                     retry_error_reason = (

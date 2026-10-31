@@ -381,8 +381,8 @@ def test_faulty_numeric_or_refusal_without_backup_uses_original() -> None:
         assert got == ("The temperature is 23°C", None)
 
 
-def test_slow_primary_finishes_without_hub_timeout_or_backup(monkeypatch, caplog) -> None:
-    """A cold-started model must get its response even after the advisory minute."""
+def test_slow_primary_finishes_before_timeout_without_backup(monkeypatch, caplog) -> None:
+    """The 60-second advisory warning does not prematurely cancel a healthy call."""
     monkeypatch.setattr(ai, "AI_FILTER_SLOW_REQUEST_SECONDS", 0.01)
 
     class ColdStartServices:
@@ -406,7 +406,7 @@ def test_slow_primary_finishes_without_hub_timeout_or_backup(monkeypatch, caplog
     assert len(hass.services.calls) == 1
     assert diag["status"] == "rewritten"
     assert diag["attempt_duration_seconds"]["conversation.primary"] >= 0.05
-    assert "continuing to await AI provider" in caplog.text
+    assert "provider timeout is 120 seconds" in caplog.text
 
 
 def test_backend_timeout_is_reported_as_provider_failure_not_local_cutoff() -> None:
@@ -427,7 +427,7 @@ def test_backend_timeout_is_reported_as_provider_failure_not_local_cutoff() -> N
     assert diag["attempts"][1]["outcome"] == "rewritten"
 
 
-def test_no_hub_timeout_even_without_backup(monkeypatch) -> None:
+def test_slow_response_within_provider_deadline_succeeds(monkeypatch) -> None:
     monkeypatch.setattr(ai, "AI_FILTER_SLOW_REQUEST_SECONDS", 0.001)
 
     class SlowServices:

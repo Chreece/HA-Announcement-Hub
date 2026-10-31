@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.10.0b26 - 2026-10-31
+
+**Beta — recover durable AI announcement queues after provider stalls without speaking generation instructions.**
+
+- Bound each Home Assistant AI Task/conversation provider call (including
+  structured-output compatibility and formatting retries) to 120 seconds.
+  Retain the 60-second slow-provider diagnostic warning.
+- Record provider timeouts and avoid retrying a known-stalled provider for
+  five minutes. Rewrite/translation announcements can deliver the saved
+  original text immediately while the provider is cooling down; a configured
+  healthy backup can still run.
+- Keep AI **generate** prompts in the durable queue on timeout, invalid
+  output or internal errors. Never speak or display the raw writing
+  instructions. Retry these jobs automatically with persisted exponential
+  backoff, capped at one hour; do not release their room or recipient FIFO
+  constraints prematurely.
+- Periodically revisit pending AI generation without requiring another
+  announcement, and resume after Home Assistant restarts. Keep unrelated
+  ready room lanes able to deliver, without clearing or reordering the queue.
+- Add regression tests for bounded waits, timeout diagnostics, circuit
+  breaker, safe generation deferral and successful recovery. Existing channel,
+  person, occupancy, sleep and fallback restrictions remain unchanged.
+
 ## 0.10.0b25 - 2026-10-30
 
 **Beta — follow current occupancy on burst delivery and release persistent mobile notification lanes promptly.**
