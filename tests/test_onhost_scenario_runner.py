@@ -76,6 +76,9 @@ def test_host_run_is_read_only_and_redacts_message_body(tmp_path, monkeypatch, c
     data = json.loads(report)
     assert data["scenarios"]["passed"] == 14
     assert data["persisted_queue_count"] == 1
+    assert data["host_queue_store_status"] == "readable"
+    assert "log_signals_24h" in data
+    assert "log_signals_6h" in data
     assert data["current_state"] == {"live_api": False}
     assert "HASS_TOKEN" not in report
     assert next((tmp_path / "logs").glob("*.tar.gz")).is_file()
