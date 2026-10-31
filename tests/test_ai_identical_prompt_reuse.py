@@ -79,6 +79,7 @@ class Harness:
         self.settings = {"ai_prompt_templates": {}}
         self._running = True
         self._queue = deque()
+        self._wake = SimpleNamespace(set=lambda: None)
         self._ai_history = deque(maxlen=20)
         self._ai_result_cache = mod.AIResultCache(max_entries=16)
         self.generations = 0
