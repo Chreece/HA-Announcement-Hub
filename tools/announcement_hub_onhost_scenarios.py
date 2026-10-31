@@ -204,15 +204,35 @@ def main():
             k: len(cfg.get(k) or ()) for k in
             ("notify_outputs", "tts_engines", "tts_room_players",
              "snapcast_outputs", "companion_tts_outputs")}
-        stored = load(root / ".storage" / ("announcement_hub.queue." + entry.get("entry_id", ""))).get("data", {})
-        queued = stored.get("jobs", [])
+        store_path = root / ".storage" / (
+            "announcement_hub.queue." + entry.get("entry_id", "")
+        )
+        if not store_path.exists():
+            report["host_queue_store_status"] = "missing"
+        else:
+            try:
+                raw_storage = json.loads(store_path.read_text(encoding="utf-8"))
+                report["host_queue_store_status"] = "readable"
+            except PermissionError:
+                report["host_queue_store_status"] = "PermissionError"
+                raw_storage = {}
+            except (ValueError, OSError, UnicodeError) as exc:
+                report["host_queue_store_status"] = type(exc).__name__
+                raw_storage = {}
+        if report["host_queue_store_status"] == "missing":
+            raw_storage = {}
+        stored = raw_storage.get("data", {}) if isinstance(raw_storage, dict) else {}
+        queued = stored.get("jobs", []) if isinstance(stored, dict) else []
         report["persisted_queue"] = [
             {"routing_stage": j.get("routing_stage"), "status": j.get("status"),
              "routing_history": (j.get("routing_history") or [])[-3:],
              "ai_status": (j.get("ai") or {}).get("status"),
              "ai_pending": (j.get("ai") or {}).get("pending_preprocessing")}
             for j in queued[:40]]
-        report["persisted_queue_count"] = len(queued)
+        report["persisted_queue_count"] = (
+            len(queued) if report["host_queue_store_status"] == "readable"
+            else None
+        )
         last = stored.get("last") or {}
         report["last_job"] = {
             "status": last.get("status"),
@@ -236,6 +256,49 @@ def main():
                 for k, pattern in SIGNALS.items()}
         except (OSError, subprocess.TimeoutExpired):
             report["log_signals_6h"] = {"unavailable": True}
+        # A private Home Assistant Store is often mode 0600 inside the
+        # container even when the config-entry file is host-readable.
+        # Use a read-only Python subprocess INSIDE the existing HA container
+        # to distinguish a missing file from an empty queue, and inspect
+        # historical recorder samples without requesting an API credential.
+        helper = Path(__file__).with_name(
+            "announcement_hub_container_evidence.py"
+        )
+        report["container_probe"] = {"status": "helper_missing"}
+        if helper.is_file():
+            try:
+                result = subprocess.run(
+                    ["docker", "exec", "-i", "homeassistant", "python3", "-"],
+                    input=helper.read_text(encoding="utf-8"),
+                    capture_output=True,
+                    text=True,
+                    timeout=24,
+                    check=False,
+                )
+                if result.returncode == 0:
+                    detail = json.loads(result.stdout)
+                    report["container_probe"] = detail
+                    item = detail.get("queue_store", {})
+                    if item.get("status") == "readable" and "job_count" in item:
+                        report["persisted_queue_count"] = item["job_count"]
+                        report["queue_store_verified_by_container"] = True
+                    else:
+                        report["queue_store_verified_by_container"] = False
+                else:
+                    report["container_probe"] = {
+                        "status": "docker_probe_failed",
+                        "exit_code": result.returncode,
+                    }
+            except (OSError, ValueError, subprocess.TimeoutExpired) as exc:
+                report["container_probe"] = {
+                    "status": "docker_probe_unavailable",
+                    "error_type": type(exc).__name__,
+                }
+        if report["persisted_queue_count"] is None:
+            report["persisted_queue"] = []
+            report["last_job"] = {"status": "unverified"}
+            report["recent_AI"] = []
+
         token = os.environ.get("HASS_TOKEN") or os.environ.get("HA_TOKEN")
         report["current_state"] = {"live_api": False}
         if token:
@@ -267,16 +330,43 @@ def main():
             report["potential_blockers"].append("Installed integration is not v0.10.0b25")
         if not entry:
             report["potential_blockers"].append("Announcement Hub config entry not found")
-        if report["last_job"]["status"] in ("failed", "completed_with_errors"):
+        container_store = (
+            report.get("container_probe", {}).get("queue_store", {})
+        )
+        if report["persisted_queue_count"] is None:
+            report["potential_blockers"].append(
+                "Persisted queue could not be verified (missing/private storage)"
+            )
+        if report["last_job"]["status"] in ("failed", "completed_with_errors") or (
+            container_store.get("last", {}).get("status")
+            in ("failed", "completed_with_errors")
+        ):
             report["potential_blockers"].append("Previous completed announcement had delivery errors")
         if not cfg.get("occupancy_sensor"):
             report["potential_blockers"].append("No occupancy sensor: cannot follow movement")
-        if len(queued):
-            report["potential_blockers"].append("Persisted undelivered queue is non-empty")
+        if report["persisted_queue_count"] not in (None, 0):
+            report["potential_blockers"].append(
+                "Persisted undelivered queue is non-empty"
+            )
         if any(item.get("ai_pending") for item in report["persisted_queue"]):
             report["potential_blockers"].append("One or more AI generations remain pending")
+        snapshots = report.get("container_probe", {}).get("sources", {})
+        for label in ("occupied_rooms", "sleeping_rooms"):
+            source_report = snapshots.get(label, {})
+            if source_report.get("unknown_values"):
+                report["potential_blockers"].append(
+                    f"Recorder sample for {label} contains unrecognized areas"
+                )
+            if source_report.get("configured") and source_report.get(
+                "selected_attribute_present"
+            ) is False:
+                report["potential_blockers"].append(
+                    f"Recorder sample for {label} lacks selected attribute"
+                )
         if not report["current_state"]["live_api"]:
-            report["potential_blockers"].append("No authenticated live HA API read; cannot confirm present device states")
+            report["potential_blockers"].append(
+                "No authenticated live HA API read; recorder data is historical"
+            )
     json_path = out / f"ah-scenarios-{STAMP}.json"
     txt_path = out / f"ah-scenarios-{STAMP}.txt"
     tar_path = out / f"ah-scenarios-{STAMP}.tar.gz"
@@ -284,7 +374,10 @@ def main():
     s = report.get("scenarios", {})
     lines = ["READ_ONLY=YES", f"VERSION={report.get('installed_version','unknown')}",
              f"SCENARIOS={s.get('passed',0)}/{s.get('total',0)}",
-             f"PERSISTED_QUEUE={report.get('persisted_queue_count','unknown')}",
+             f"PERSISTED_QUEUE={report.get('persisted_queue_count','unverified')}",
+             f"HOST_STORE={report.get('host_queue_store_status','unverified')}",
+             f"CONTAINER_STORE={report.get('container_probe',{}).get('queue_store',{}).get('status','unverified')}",
+             f"RECORDER={report.get('container_probe',{}).get('recorder_status','unavailable')}",
              f"LAST_JOB_STATUS={report.get('last_job',{}).get('status','unknown')}",
              f"LIVE_API={report.get('current_state',{}).get('live_api', False)}",
              *("BLOCKER=" + x for x in report.get("potential_blockers", [])),
