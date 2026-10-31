@@ -283,6 +283,7 @@ class AnnouncementManager:
         self._ai_result_cache = AIResultCache(
             max_entries=128, ttl_seconds=900.0
         )
+        self._ai_cache_reuses = 0
         # Keep outcome summaries for intermittent failures even after a
         # later successful notification overwrites the "last" sensor field.
         # No generated messages, source texts or model prompts are stored.
@@ -352,6 +353,9 @@ class AnnouncementManager:
             "ai_processing": sorted(
                 job_id for job_id, task in self._ai_tasks.items()
                 if not task.done()
+            ),
+            "ai_cache_reuses_since_restart": getattr(
+                self, "_ai_cache_reuses", 0
             ),
             "ai_waiting_count": sum(
                 bool(job.ai.get("pending_preprocessing"))
@@ -578,6 +582,8 @@ class AnnouncementManager:
             # queue. Cancelled jobs retain original text and retry after boot.
             ai_tasks = tuple(self._ai_tasks.values())
             self._ai_tasks.clear()
+            self._ai_task_started.clear()
+            self._ai_result_cache.clear()
             for task in ai_tasks:
                 task.cancel()
             if ai_tasks:
@@ -5274,6 +5280,9 @@ class AnnouncementManager:
                 rewritten_notify = cached_result.notify
                 if cached_result.title:
                     title_result["title"] = cached_result.title
+                self._ai_cache_reuses = getattr(
+                    self, "_ai_cache_reuses", 0
+                ) + 1
                 ai.update({
                     "status": "reused_cached_generation",
                     "agent_used": cached_result.agent_used,
@@ -5321,7 +5330,13 @@ class AnnouncementManager:
             cache is not None
             and cache_key is not None
             and cached_result is None
-            and ai.get("status") in {"rewritten", "accepted_unchanged"}
+            and (
+                ai.get("status") == "rewritten"
+                or (
+                    ai.get("status") == "accepted_unchanged"
+                    and ai.get("requested_mode") != "generate"
+                )
+            )
         ):
             cache.put(
                 cache_key,
