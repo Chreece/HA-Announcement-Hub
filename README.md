@@ -401,6 +401,29 @@ a new live sleep-room entity is configured.
 
 ### Bursts when arriving home or moving between rooms
 
+#### Reusing identical AI generations during bursts
+
+When several pending announcements have **exactly the same AI instructions,
+original channel texts, chosen primary/backup provider, language, generated-title
+preference and AI prompt templates**, Announcement Hub may reuse the first
+successfully completed generation for up to 15 minutes instead of requesting
+the same result again. The cache is memory-only, bounded to 128 entries and
+cleared on integration shutdown. Failed or fallback-original generations
+are never cached, nor are unchanged prompt-only responses in Generate mode.
+
+**The result cache never deduplicates or drops the announcements themselves.**
+Each pending job keeps its original recipients, severity, room FIFO, delivery
+receipts and independent delivery attempt. The queue sensor exposes
+`ai_cache_reuses_since_restart`, `ai_waiting_count`, `ai_active_count`
+and `ai_oldest_active_seconds` for troubleshooting without storing the
+source prompts in diagnostic attributes.
+
+This improves throughput **after an AI provider returns successfully**. It
+does not remedy an unresponsive provider request already waiting in Home
+Assistant. The Hub intentionally does not impose an arbitrary timeout on
+cold-loading local AI providers; assess their backend health before clearing
+saved jobs or restarting the integration.
+
 For a door/welcome automation, always give `wait_template` a finite
 `timeout` when using `continue_on_timeout`: without one, waiting for
 both a closed entrance door and a non-zero entrance people-counter can block
