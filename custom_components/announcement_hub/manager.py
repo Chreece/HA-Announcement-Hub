@@ -13,6 +13,7 @@ import json
 import logging
 import math
 import re
+import time
 from uuid import uuid4
 from typing import Any
 
@@ -43,6 +44,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
 
 from .ai_filter import async_filter_announcement
+from .ai_reuse import AIResultCache, CachedAIResult, fingerprint as ai_request_fingerprint
 from .ai_settings import resolve_ai_enabled
 from .person_delivery import person_is_enabled, presence_confirmed
 from .targeting import channel_selection, filter_selected_outputs, physical_keys, restrict_physical_keys
@@ -275,6 +277,13 @@ class AnnouncementManager:
         # AI tasks are separate from the delivery worker: cold model loading
         # cannot block a later, ready announcement from another room.
         self._ai_tasks: dict[str, asyncio.Task[None]] = {}
+        self._ai_task_started: dict[str, float] = {}
+        # Reuse only successful exact-input generations during short bursts.
+        # This cache and its generated texts never enter persistent storage.
+        self._ai_result_cache = AIResultCache(
+            max_entries=128, ttl_seconds=900.0
+        )
+        self._ai_cache_reuses = 0
         # Keep outcome summaries for intermittent failures even after a
         # later successful notification overwrites the "last" sensor field.
         # No generated messages, source texts or model prompts are stored.
@@ -344,6 +353,30 @@ class AnnouncementManager:
             "ai_processing": sorted(
                 job_id for job_id, task in self._ai_tasks.items()
                 if not task.done()
+            ),
+            "ai_cache_reuses_since_restart": getattr(
+                self, "_ai_cache_reuses", 0
+            ),
+            "ai_waiting_count": sum(
+                bool(job.ai.get("pending_preprocessing"))
+                for job in self._queue
+            ),
+            "ai_active_count": sum(
+                not task.done() for task in self._ai_tasks.values()
+            ),
+            "ai_oldest_active_seconds": (
+                round(max(
+                    time.monotonic() - started
+                    for job_id, started in getattr(self, "_ai_task_started", {}).items()
+                    if job_id in self._ai_tasks
+                    and not self._ai_tasks[job_id].done()
+                ), 1)
+                if any(
+                    job_id in self._ai_tasks
+                    and not self._ai_tasks[job_id].done()
+                    for job_id in getattr(self, "_ai_task_started", {})
+                )
+                else None
             ),
             "recent_ai": list(self._ai_history),
             "worker_alive": bool(
@@ -549,6 +582,8 @@ class AnnouncementManager:
             # queue. Cancelled jobs retain original text and retry after boot.
             ai_tasks = tuple(self._ai_tasks.values())
             self._ai_tasks.clear()
+            self._ai_task_started.clear()
+            self._ai_result_cache.clear()
             for task in ai_tasks:
                 task.cancel()
             if ai_tasks:
@@ -5184,10 +5219,14 @@ class AnnouncementManager:
             f"{DOMAIN} AI {job.job_id}",
         )
         self._ai_tasks[job.job_id] = task
+        started_tasks = getattr(self, "_ai_task_started", None)
+        if started_tasks is not None:
+            started_tasks[job.job_id] = time.monotonic()
 
         def _done(done_task: asyncio.Task[None]) -> None:
             if self._ai_tasks.get(job.job_id) is done_task:
                 self._ai_tasks.pop(job.job_id, None)
+            getattr(self, "_ai_task_started", {}).pop(job.job_id, None)
             if not done_task.cancelled() and (error := done_task.exception()):
                 _LOGGER.error(
                     "Announcement AI preprocessing task failed for %s",
@@ -5214,22 +5253,60 @@ class AnnouncementManager:
         # not a diagnostic value. The queued job already has its configured
         # fallback title if generation fails.
         title_result: dict[str, str] = {}
-        started = asyncio.get_running_loop().time()
-        try:
-            rewritten_tts, rewritten_notify = await async_filter_announcement(
-                self.hass,
-                text_tts=original_tts,
-                text_notify=original_notify,
-                agent_id=ai.get("requested_agent_id"),
-                fallback_agent_id=ai.get("requested_fallback_agent_id"),
-                diagnostics=ai,
+        cache = getattr(self, "_ai_result_cache", None)
+        cache_key = (
+            ai_request_fingerprint(
+                original_tts=original_tts,
+                original_notify=original_notify,
+                requested_agent=ai.get("requested_agent_id"),
+                fallback_agent=ai.get("requested_fallback_agent_id"),
                 mode=ai.get("requested_mode", "rewrite"),
-                target_language=ai.get("requested_target_language"),
-                prompt_templates=getattr(self, "settings", {}).get("ai_prompt_templates", {}),
-                title_result=(
-                    title_result if ai.get("requested_generate_title") else None
+                language=ai.get("requested_target_language"),
+                generate_title=bool(ai.get("requested_generate_title")),
+                prompt_templates=getattr(self, "settings", {}).get(
+                    "ai_prompt_templates", {}
+                ),
+                ha_language=getattr(
+                    getattr(self.hass, "config", None), "language", None
                 ),
             )
+            if cache is not None else None
+        )
+        cached_result = cache.get(cache_key) if cache_key else None
+        started = asyncio.get_running_loop().time()
+        try:
+            if cached_result is not None:
+                rewritten_tts = cached_result.tts
+                rewritten_notify = cached_result.notify
+                if cached_result.title:
+                    title_result["title"] = cached_result.title
+                self._ai_cache_reuses = getattr(
+                    self, "_ai_cache_reuses", 0
+                ) + 1
+                ai.update({
+                    "status": "reused_cached_generation",
+                    "agent_used": cached_result.agent_used,
+                    "attempted": False,
+                    "attempts": [{"outcome": "cache_reuse"}],
+                    "failure_reason": None,
+                })
+            else:
+                rewritten_tts, rewritten_notify = await async_filter_announcement(
+                    self.hass,
+                    text_tts=original_tts,
+                    text_notify=original_notify,
+                    agent_id=ai.get("requested_agent_id"),
+                    fallback_agent_id=ai.get("requested_fallback_agent_id"),
+                    diagnostics=ai,
+                    mode=ai.get("requested_mode", "rewrite"),
+                    target_language=ai.get("requested_target_language"),
+                    prompt_templates=getattr(self, "settings", {}).get(
+                        "ai_prompt_templates", {}
+                    ),
+                    title_result=(
+                        title_result if ai.get("requested_generate_title") else None
+                    ),
+                )
         except asyncio.CancelledError:
             ai["status"] = "pending"
             raise
@@ -5244,6 +5321,29 @@ class AnnouncementManager:
         finally:
             ai["elapsed_seconds"] = round(
                 asyncio.get_running_loop().time() - started, 3
+            )
+
+        # Cache only verified completed provider generations. Never cache
+        # fallback_original/failed responses, prompt-only text, or exceptions.
+        # Each waiting announcement still uses its own frozen recipients.
+        if (
+            cache is not None
+            and cache_key is not None
+            and cached_result is None
+            and (
+                ai.get("status") == "rewritten"
+                or (
+                    ai.get("status") == "accepted_unchanged"
+                    and ai.get("requested_mode") != "generate"
+                )
+            )
+        ):
+            cache.put(
+                cache_key,
+                CachedAIResult(
+                    rewritten_tts, rewritten_notify,
+                    title_result.get("title"), ai.get("agent_used"),
+                ),
             )
 
         # Cancellation or queue clearing can race with completion.
