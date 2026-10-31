@@ -45,6 +45,12 @@ function harness() {
   );
   fields.send = { disabled: false };
   fields["send-label"] = { textContent: "" };
+  fields["queue-number"] = { textContent: "" };
+  fields["queue-pill"] = { title: "", hidden: false };
+  fields["stop-clear-confirm"] = { hidden: true };
+  fields["stop-clear"] = { disabled: false, setAttribute(k, v) { this[k] = v; } };
+  fields["confirm-stop-clear"] = { disabled: false, focus() {} };
+  fields["cancel-stop-clear"] = { disabled: false };
   fields["critical-confirm"] = { hidden: true };
   const notices = [];
   card.$ = (name) => {
@@ -70,6 +76,7 @@ test("bundled HTML/CSS support a modern card with safe input controls", () => {
   for (const id of ["message", "text-tts", "text-notify", "message-title",
     "area-options", "integration-options", "device-options", "entity-options",
     "level", "channels", "ai-choices", "send", "critical-confirm",
+    "stop-clear", "stop-clear-confirm", "confirm-stop-clear", "cancel-stop-clear",
   ]) {
     const actual = id === "level" ? "levels" : id;
     assert.match(html, new RegExp("id=" + JSON.stringify(actual)));
@@ -227,6 +234,56 @@ test("errors do not retry automatically or claim delivery", async () => {
   assert.match(notices[0].message, /Check the queue before retrying/);
 });
 
+test("Stop & Clear requires explicit confirmation and stops active jobs with the queue", async () => {
+  const { card, fields, notices } = harness();
+  let calls = 0;
+  card._hass = {
+    callService: async (...args) => {
+      calls++;
+      assert.deepEqual(args, [
+        "announcement_hub", "clear_queue", { include_current: true },
+        undefined, false, true,
+      ]);
+      assert.equal(fields["stop-clear"].disabled, true);
+      assert.equal(fields.send.disabled, true);
+      return { cleared: 12, active_cancel_requested: 2, queue_size: 0 };
+    },
+  };
+  await card._stopAndClear();
+  assert.equal(calls, 0, "first tap cannot execute a destructive operation");
+  card._stopConfirming = true;
+  await Promise.all([card._stopAndClear(), card._stopAndClear()]);
+  assert.equal(calls, 1, "repeated confirmation cannot clear twice");
+  assert.equal(fields["stop-clear"].disabled, false);
+  assert.equal(fields.send.disabled, false);
+  assert.equal(fields["stop-clear-confirm"].hidden, true);
+  assert.equal(fields["stop-clear"]["aria-expanded"], "false");
+  assert.equal(notices.length, 1);
+  assert.equal(notices[0].success, true);
+  assert.match(notices[0].message, /Cleared 12 queued jobs/);
+});
+
+test("Stop & Clear fails safely without an automatic retry", async () => {
+  const { card, notices } = harness();
+  let calls = 0;
+  card._hass = { callService: async () => { calls++; throw new Error("Device unavailable"); } };
+  card._stopConfirming = true;
+  await card._stopAndClear();
+  assert.equal(calls, 1);
+  assert.equal(notices.length, 1);
+  assert.equal(notices[0].success, false);
+  assert.match(notices[0].message, /Check the queue before retrying/);
+});
+
+test("Stop & Clear cannot race a pending send on this card", async () => {
+  const { card, notices } = harness();
+  card._sending = true;
+  card._stopConfirming = true;
+  card._hass = { callService: async () => { throw new Error("should not call service"); } };
+  await card._stopAndClear();
+  assert.equal(notices.length, 0);
+});
+
 test("module does not embed external JS/CSS dependencies or unsafe user markup", () => {
   const js = readFileSync(CARD_PATH, "utf8");
   assert.doesNotMatch(js, /\bimport\s*\(\s*["']https?:/);
@@ -249,12 +306,14 @@ test("Greek, German and regional languages use correct card translations", async
   card._hass = { language: "el" };
   await card._applyLocale();
   assert.equal(card._t("Send announcement"), "Αποστολή ανακοίνωσης");
+  assert.equal(card._t("Stop & Clear"), "Διακοπή & Εκκαθάριση");
   assert.equal(card._t("Confirm"), "Επιβεβαίωση");
   assert.equal(card._t("Queued #{id}{related}. Delivery will follow Hub routing.",
     { id: "12345", related: "" }).includes("12345"), true);
   card._hass = { locale: { language: "de-DE" } };
   await card._applyLocale();
   assert.equal(card._t("Send announcement"), "Ankündigung senden");
+  assert.equal(card._t("Stop & Clear"), "Stopp & Leeren");
   card._hass = { locale: { language: "pt-BR" } };
   await card._applyLocale();
   assert.equal(card._t("Send announcement"), "Enviar anúncio");

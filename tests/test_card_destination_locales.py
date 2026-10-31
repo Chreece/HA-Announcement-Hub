@@ -28,7 +28,7 @@ INTERPOLATION = re.compile(r"\{[a-z]+\}")
 def test_destination_chips_translated_into_every_dashboard_locale():
     locales = json.loads(LOCALE_FILE.read_text(encoding="utf-8"))
     assert len(locales) == 19
-    assert all(len(messages) == 156 for messages in locales.values())
+    assert all(len(messages) == 167 for messages in locales.values())
     for language, messages in locales.items():
         for english in LABELS:
             assert english in messages, (language, english)

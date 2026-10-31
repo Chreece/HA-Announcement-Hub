@@ -291,6 +291,9 @@ class AnnouncementManager:
         self._cancel_requested: set[str] = set()
         self._active_tts_players: set[str] = set()
         self._players_by_job: dict[str, set[str]] = {}
+        # Only sources actually playing a Hub chime/TTS belong to a stop
+        # request. A player merely waiting to become idle may have music.
+        self._hub_playing_players_by_job: dict[str, set[str]] = {}
         self._held_snapcast_snapshot: dict[str, bool] | None = None
         self._held_snapcast_selected: tuple[str, ...] = ()
         self._held_snapcast_targets: tuple[str, ...] = ()
@@ -527,6 +530,13 @@ class AnnouncementManager:
 
             self._running = False
             self._wake.set()
+            # Snapshot ownership before task cancellation discards it. A
+            # shutdown must not leave interrupted Hub audio still playing.
+            owned_before_cancel = {
+                player
+                for players in self._hub_playing_players_by_job.values()
+                for player in players
+            }
 
             # The permanent queue worker is a config-entry background task so it
             # never participates in Home Assistant's startup barrier. We still
@@ -566,7 +576,11 @@ class AnnouncementManager:
             if prefetch_tasks:
                 await asyncio.gather(*prefetch_tasks, return_exceptions=True)
 
-            active_players = tuple(self._active_tts_players)
+            active_players = tuple(owned_before_cancel | {
+                player
+                for players in self._hub_playing_players_by_job.values()
+                for player in players
+            })
             self._active_tts_players.clear()
             if active_players:
                 await asyncio.gather(
@@ -574,6 +588,7 @@ class AnnouncementManager:
                     return_exceptions=True,
                 )
             await self._async_restore_held_snapcast_route()
+            self._hub_playing_players_by_job.clear()
 
             self._queue = type(self._queue)(sorted(
                 self._queue, key=lambda item: (getattr(item, "created_at", ""), item.job_id)
@@ -2166,6 +2181,14 @@ class AnnouncementManager:
         return job
 
     async def async_clear_queue(self, *, include_current: bool = False) -> int:
+        """Clear waiting jobs and optionally stop all active Hub output.
+
+        Mark all active jobs first, synchronously, so one slow media-stop
+        service call cannot let another parallel room start a new output.
+        Newly submitted announcements after this action are not paused.
+        """
+        if include_current:
+            self._cancel_requested.update(self._active_jobs)
         removed = 0
         while self._queue:
             job = self._queue.popleft()
@@ -2193,7 +2216,11 @@ class AnnouncementManager:
                 self._group_success.pop(group_id, None)
         self._fill_ai_slots()
         self._fill_prefetch_slots()
-        self._schedule_save()
+        # Persist the clear immediately. Waiting for the delayed-save timer
+        # could replay a cleared announcement after a rapid HA shutdown.
+        async with self._save_lock:
+            await self._store.async_save(self._serialize())
+        self._wake.set()
         self.hass.bus.async_fire(
             EVENT_QUEUE_CLEARED,
             {"removed": removed, "include_current": include_current},
@@ -2220,7 +2247,7 @@ class AnnouncementManager:
                         await self.async_cancel(sibling_id, _cascade=False)
         if job_id in getattr(self, "_active_jobs", {}):
             self._cancel_requested.add(job_id)
-            active_players = tuple(getattr(self, "_players_by_job", {}).get(job_id, ()))
+            active_players = tuple(getattr(self, "_hub_playing_players_by_job", {}).get(job_id, ()))
             if active_players:
                 await asyncio.gather(
                     *(self._async_stop_player(player) for player in active_players),
@@ -2371,7 +2398,7 @@ class AnnouncementManager:
                 job.status = "completed"
                 terminal_event = EVENT_FINISHED
         except asyncio.CancelledError:
-            if not self._running:
+            if not self._running and job.job_id not in self._cancel_requested:
                 job.status = "pending"
                 job.started_at = None
                 job.finished_at = None
@@ -2414,6 +2441,7 @@ class AnnouncementManager:
             self._cancel_requested.discard(job.job_id)
             self._active_jobs.pop(job.job_id, None)
             self._players_by_job.pop(job.job_id, None)
+            self._hub_playing_players_by_job.pop(job.job_id, None)
             self._current = next(iter(self._active_jobs.values()), None)
             if not requeued:
                 job.finished_at = utcnow_iso()
@@ -4001,20 +4029,27 @@ class AnnouncementManager:
         self._raise_if_cancelled(job)
         if job.person_ids and not self._person_authorized_now(job):
             raise HomeAssistantError("No longer authorized to play chime in this room")
-        await self.hass.services.async_call(
-            MEDIA_PLAYER_DOMAIN, "play_media",
-            {
-                ATTR_ENTITY_ID: player,
-                ATTR_MEDIA_CONTENT_ID: url,
-                ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
-                ATTR_MEDIA_ANNOUNCE: True,
-            },
-            blocking=True,
-        )
-        delay = float(self.settings.get("person_chime_delay", 0.5) or 0)
-        if delay:
-            await asyncio.sleep(max(0.0, min(delay, 10.0)))
-            self._raise_if_cancelled(job)
+        self._hub_playing_players_by_job.setdefault(job.job_id, set()).add(player)
+        try:
+            await self.hass.services.async_call(
+                MEDIA_PLAYER_DOMAIN, "play_media",
+                {
+                    ATTR_ENTITY_ID: player,
+                    ATTR_MEDIA_CONTENT_ID: url,
+                    ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
+                    ATTR_MEDIA_ANNOUNCE: True,
+                },
+                blocking=True,
+            )
+            # A stop may have raced with the provider accepting play_media.
+            if job.job_id in getattr(self, "_cancel_requested", set()):
+                await self._async_stop_player(player)
+                self._raise_if_cancelled(job)
+            delay = float(self.settings.get("person_chime_delay", 0.5) or 0)
+            if delay:
+                await self._async_reading_hold(job, max(0.0, min(delay, 10.0)))
+        finally:
+            self._hub_playing_players_by_job.get(job.job_id, set()).discard(player)
 
     async def _async_send_room_tts(self, job: AnnouncementJob) -> None:
         """Speak directly on area-bound media players using the TTS engine chain."""
@@ -4407,6 +4442,24 @@ class AnnouncementManager:
             elif post_delay > 0 and not self._has_pending_audible_job():
                 await asyncio.sleep(post_delay)
         finally:
+            if route_snapshot is not None and job.job_id in getattr(self, "_cancel_requested", set()):
+                # Immediately silence selected clients, then drain the MPD
+                # buffer BEFORE restoring previously unmuted other rooms.
+                # Never modify an unrelated stream's clients here.
+                hold_route = False
+                await self._async_stop_player(player)
+                if route_targets:
+                    try:
+                        await self._async_set_mute_states({
+                            entity_id: True for entity_id in route_targets
+                        })
+                    except asyncio.CancelledError:
+                        raise
+                    except Exception as err:  # noqa: BLE001
+                        _LOGGER.warning(
+                            "Could not mute cancelled Hub Snapcast targets: %s", err
+                        )
+                await asyncio.sleep(_SNAPCAST_TAIL_DRAIN_SECONDS)
             if route_snapshot is not None and restore_route:
                 try:
                     if hold_route:
@@ -4543,11 +4596,12 @@ class AnnouncementManager:
             await self.hass.services.async_call(
                 "notify", "mobile_app", data, blocking=True
             )
-            await asyncio.sleep(
+            await self._async_reading_hold(
+                job,
                 self._companion_tts_hold_time(
                     job.tts_text or "",
                     job.companion_tts_words_per_minute,
-                )
+                ),
             )
         except JobCancelled:
             raise
@@ -4613,51 +4667,61 @@ class AnnouncementManager:
             CONF_DIRECT_TTS_ANNOUNCE, DEFAULT_DIRECT_TTS_ANNOUNCE
         )):
             payload[ATTR_MEDIA_ANNOUNCE] = True
-        await self.hass.services.async_call(
-            MEDIA_PLAYER_DOMAIN, "play_media", payload, blocking=True
-        )
-
-        start_timeout = float(
-            self.settings.get(CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT)
-        )
-        def playback_started() -> bool:
-            if shared_path:
-                self._assert_snapcast_route_isolated(route_targets)
-            return self._is_player_busy(player) or self._any_snapcast_busy(
-                route_targets
+        self._hub_playing_players_by_job.setdefault(job.job_id, set()).add(player)
+        try:
+            await self.hass.services.async_call(
+                MEDIA_PLAYER_DOMAIN, "play_media", payload, blocking=True
             )
+            # Ensure a late provider start cannot outlive a stop request
+            # that arrived while the play_media service call was in flight.
+            if job.job_id in getattr(self, "_cancel_requested", set()):
+                await self._async_stop_player(player)
+                self._raise_if_cancelled(job)
 
-        started = await self._wait_for(
-            playback_started,
-            timeout=start_timeout,
-            job=job,
-        )
-        if not started:
-            raise HomeAssistantError(
-                f"TTS playback did not start on {player} or its routed "
-                f"Snapcast clients within {start_timeout}s"
+            start_timeout = float(
+                self.settings.get(CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT)
             )
+            def playback_started() -> bool:
+                if shared_path:
+                    self._assert_snapcast_route_isolated(route_targets)
+                return self._is_player_busy(player) or self._any_snapcast_busy(
+                    route_targets
+                )
 
-        playback_timeout = float(
-            self.settings.get(CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT)
-        )
-        def playback_finished() -> bool:
-            if shared_path:
-                self._assert_snapcast_route_isolated(route_targets)
-            return not self._is_player_busy(player) and not (
-                self._any_snapcast_busy(route_targets)
+            started = await self._wait_for(
+                playback_started,
+                timeout=start_timeout,
+                job=job,
             )
+            if not started:
+                raise HomeAssistantError(
+                    f"TTS playback did not start on {player} or its routed "
+                    f"Snapcast clients within {start_timeout}s"
+                )
 
-        finished = await self._wait_for(
-            playback_finished,
-            timeout=playback_timeout,
-            job=job,
-        )
-        if not finished:
-            await self._async_stop_player(player)
-            raise HomeAssistantError(
-                f"TTS playback exceeded {playback_timeout}s on {player}"
+            playback_timeout = float(
+                self.settings.get(CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT)
             )
+            def playback_finished() -> bool:
+                if shared_path:
+                    self._assert_snapcast_route_isolated(route_targets)
+                return not self._is_player_busy(player) and not (
+                    self._any_snapcast_busy(route_targets)
+                )
+
+            finished = await self._wait_for(
+                playback_finished,
+                timeout=playback_timeout,
+                job=job,
+            )
+            if not finished:
+                await self._async_stop_player(player)
+                raise HomeAssistantError(
+                    f"TTS playback exceeded {playback_timeout}s on {player}"
+                )
+
+        finally:
+            self._hub_playing_players_by_job.get(job.job_id, set()).discard(player)
 
     def _snapcast_source_matches(self, entity_id: str) -> bool:
         """Match a Snapcast client's current stream to the configured TTS source.
@@ -5735,7 +5799,8 @@ class AnnouncementManager:
     def _serialize(self) -> dict[str, Any]:
         jobs = [job.to_dict() for job in self._queue]
         jobs.extend(job.to_dict() for job in self._active_jobs.values()
-                    if job.status not in _TERMINAL_JOB_STATES)
+                    if job.status not in _TERMINAL_JOB_STATES
+                    and job.job_id not in self._cancel_requested)
         jobs.sort(key=lambda item: (item["created_at"], item["job_id"]))
         return {
             "jobs": jobs,

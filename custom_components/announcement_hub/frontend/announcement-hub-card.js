@@ -120,6 +120,8 @@
       this._loaded = false;
       this._loading = false;
       this._sending = false;
+      this._stopping = false;
+      this._stopConfirming = false;
       this._confirming = false;
       this._localeCode = null;
       this._localeRendered = false;
@@ -254,6 +256,19 @@
         this._confirming = false;
         this.$("critical-confirm").hidden = true;
       });
+      this.$("stop-clear").addEventListener("click", () => {
+        if (this._stopping) return;
+        if (this._sending) {
+          this._notice(this._t("Wait for the current submission before stopping."), false);
+          return;
+        }
+        this._stopConfirming = true;
+        this.$("stop-clear-confirm").hidden = false;
+        this.$("stop-clear").setAttribute("aria-expanded", "true");
+        this.$("confirm-stop-clear").focus();
+      });
+      this.$("confirm-stop-clear").addEventListener("click", () => void this._stopAndClear());
+      this.$("cancel-stop-clear").addEventListener("click", () => this._closeStopConfirmation());
       this.$("occupied-only").addEventListener("change", () => this._updateSummary());
     }
 
@@ -521,6 +536,50 @@
       this.$("queue-pill").title = count === "–" ? this._t("Queue sensor unavailable") : this._t("{count} waiting announcements", { count });
     }
 
+    _closeStopConfirmation() {
+      this._stopConfirming = false;
+      this.$("stop-clear-confirm").hidden = true;
+      this.$("stop-clear").setAttribute("aria-expanded", "false");
+    }
+
+    async _stopAndClear() {
+      // No destructive action on the first tap. Only the confirmation button
+      // invokes the authenticated integration service.
+      if (!this._stopConfirming || this._stopping || this._sending) return;
+      this._clearNotice();
+      if (!this._hass?.callService) {
+        this._notice(this._t("Home Assistant is not connected."), false);
+        return;
+      }
+      this._stopping = true;
+      this.$("stop-clear").disabled = true;
+      this.$("confirm-stop-clear").disabled = true;
+      this.$("send").disabled = true;
+      try {
+        // Do not use queue-only default: also request cancellation of
+        // every active delivery and interruption of Hub-owned audio.
+        const reply = await this._hass.callService(
+          "announcement_hub", "clear_queue", { include_current: true }, undefined, false, true
+        );
+        if (Number.isInteger(reply?.cleared) && reply.cleared >= 0) {
+          this._notice(this._t("Cleared {count} queued jobs. Stop requested for active Hub outputs.", { count: reply.cleared }), true);
+        } else {
+          // The service may have run even if its response was lost.
+          this._notice(this._t("Stop request sent. Check the queue before retrying."), true);
+        }
+        this._updateQueue();
+      } catch (error) {
+        // Never automatically repeat a destructive service call.
+        this._notice(this._t("Could not stop or clear: {error}. Check the queue before retrying.", { error: error?.message || this._t("Unknown error") }), false);
+      } finally {
+        this._stopping = false;
+        this.$("stop-clear").disabled = false;
+        this.$("confirm-stop-clear").disabled = false;
+        this.$("send").disabled = this._sending;
+        this._closeStopConfirmation();
+      }
+    }
+
     _clearNotice() {
       const notice = this.$("notice");
       notice.hidden = true;
@@ -535,7 +594,7 @@
     }
 
     async _send() {
-      if (this._sending) return;
+      if (this._sending || this._stopping) return;
       this._clearNotice();
       let payload;
       try { payload = this._buildPayload(); }

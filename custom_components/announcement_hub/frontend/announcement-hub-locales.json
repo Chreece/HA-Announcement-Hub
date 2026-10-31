@@ -155,7 +155,18 @@
     "TTS engine": "Μηχανή TTS",
     "Direct-room pre-announcement chime": "Προειδοποιητικός ήχος δωματίου",
     "Pre-announcement chime": "Ήχος πριν από την ανακοίνωση",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Σταμάτημα αναπαραγωγής του Hub και εκκαθάριση ουράς",
+    "Stop & Clear": "Διακοπή & Εκκαθάριση",
+    "Confirm stop and clear": "Επιβεβαίωση διακοπής και εκκαθάρισης",
+    "Stop all Hub announcements?": "Να διακοπούν όλες οι ανακοινώσεις του Hub;",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Διακόπτει τον ήχο του Hub και αδειάζει την ουρά. Οι ήδη παραδομένες ειδοποιήσεις δεν μπορούν να ανακληθούν.",
+    "Yes, stop & clear": "Ναι, διακοπή & εκκαθάριση",
+    "Keep announcements": "Διατήρηση ανακοινώσεων",
+    "Wait for the current submission before stopping.": "Περιμένετε να ολοκληρωθεί η τρέχουσα υποβολή πριν από τη διακοπή.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "Εκκαθαρίστηκαν {count} ανακοινώσεις από την ουρά. Ζητήθηκε διακοπή των ενεργών εξόδων του Hub.",
+    "Stop request sent. Check the queue before retrying.": "Στάλθηκε αίτημα διακοπής. Ελέγξτε την ουρά πριν επαναλάβετε.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Αποτυχία διακοπής ή εκκαθάρισης: {error}. Ελέγξτε την ουρά πριν επαναλάβετε."
   },
   "de": {
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · NACHRICHTEN",
@@ -313,7 +324,18 @@
     "TTS engine": "TTS-Engine",
     "Direct-room pre-announcement chime": "Vorgong im gewählten Raum",
     "Pre-announcement chime": "Vorgong vor der Ansage",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Laufende Hub-Wiedergabe stoppen und Warteschlange leeren",
+    "Stop & Clear": "Stopp & Leeren",
+    "Confirm stop and clear": "Stopp und Leeren bestätigen",
+    "Stop all Hub announcements?": "Alle Hub-Durchsagen stoppen?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Laufende Hub-Audioausgaben werden gestoppt und wartende Aufträge gelöscht. Bereits zugestellte Benachrichtigungen können nicht zurückgerufen werden.",
+    "Yes, stop & clear": "Ja, stoppen & leeren",
+    "Keep announcements": "Durchsagen behalten",
+    "Wait for the current submission before stopping.": "Bitte warten, bis die aktuelle Übermittlung abgeschlossen ist.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "{count} Aufträge aus der Warteschlange entfernt. Stopp für aktive Hub-Ausgaben angefordert.",
+    "Stop request sent. Check the queue before retrying.": "Stopp angefordert. Vor erneutem Versuch die Warteschlange prüfen.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Stopp oder Leeren fehlgeschlagen: {error}. Vor erneutem Versuch die Warteschlange prüfen."
   },
   "fr": {
     "The message": "Le message",
@@ -471,7 +493,18 @@
     "TTS engine": "Moteur TTS",
     "Direct-room pre-announcement chime": "Carillon avant annonce dans la pièce",
     "Pre-announcement chime": "Carillon avant annonce",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Arrêter la lecture du Hub et vider la file",
+    "Stop & Clear": "Arrêter et vider",
+    "Confirm stop and clear": "Confirmer l’arrêt et le vidage",
+    "Stop all Hub announcements?": "Arrêter toutes les annonces du Hub ?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Interrompt l’audio actif du Hub et vide la file. Les notifications déjà remises ne peuvent pas être rappelées.",
+    "Yes, stop & clear": "Oui, arrêter et vider",
+    "Keep announcements": "Conserver les annonces",
+    "Wait for the current submission before stopping.": "Attendez la fin de l’envoi en cours avant d’arrêter.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "{count} annonces retirées de la file. Arrêt demandé pour les sorties actives du Hub.",
+    "Stop request sent. Check the queue before retrying.": "Arrêt demandé. Vérifiez la file avant de réessayer.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Impossible d’arrêter ou de vider : {error}. Vérifiez la file avant de réessayer."
   },
   "es": {
     "The message": "El mensaje",
@@ -629,7 +662,18 @@
     "TTS engine": "Motor TTS",
     "Direct-room pre-announcement chime": "Aviso sonoro previo en la habitación",
     "Pre-announcement chime": "Sonido antes del anuncio",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Detener la reproducción del Hub y vaciar la cola",
+    "Stop & Clear": "Detener y vaciar",
+    "Confirm stop and clear": "Confirmar detención y vaciado",
+    "Stop all Hub announcements?": "¿Detener todos los anuncios del Hub?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Interrumpe el audio activo del Hub y vacía la cola. Las notificaciones ya entregadas no pueden retirarse.",
+    "Yes, stop & clear": "Sí, detener y vaciar",
+    "Keep announcements": "Conservar anuncios",
+    "Wait for the current submission before stopping.": "Espera a que termine el envío actual antes de detener.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "Se eliminaron {count} anuncios de la cola. Se solicitó detener las salidas activas del Hub.",
+    "Stop request sent. Check the queue before retrying.": "Se solicitó detener. Comprueba la cola antes de volver a intentarlo.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "No se pudo detener o vaciar: {error}. Comprueba la cola antes de volver a intentarlo."
   },
   "it": {
     "The message": "Il messaggio",
@@ -787,7 +831,18 @@
     "TTS engine": "Motore TTS",
     "Direct-room pre-announcement chime": "Suono prima dell'annuncio nella stanza",
     "Pre-announcement chime": "Suono prima dell'annuncio",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Interrompi la riproduzione Hub e svuota la coda",
+    "Stop & Clear": "Ferma e svuota",
+    "Confirm stop and clear": "Conferma arresto e svuotamento",
+    "Stop all Hub announcements?": "Fermare tutti gli annunci di Hub?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Interrompe l’audio attivo di Hub e svuota la coda. Le notifiche già consegnate non possono essere ritirate.",
+    "Yes, stop & clear": "Sì, ferma e svuota",
+    "Keep announcements": "Mantieni gli annunci",
+    "Wait for the current submission before stopping.": "Attendi il completamento dell’invio corrente prima di fermare.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "Rimossi {count} annunci dalla coda. Richiesto l’arresto delle uscite Hub attive.",
+    "Stop request sent. Check the queue before retrying.": "Arresto richiesto. Controlla la coda prima di riprovare.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Impossibile fermare o svuotare: {error}. Controlla la coda prima di riprovare."
   },
   "pt": {
     "The message": "A mensagem",
@@ -945,7 +1000,18 @@
     "TTS engine": "Motor TTS",
     "Direct-room pre-announcement chime": "Som prévio na divisão",
     "Pre-announcement chime": "Som antes do anúncio",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Parar a reprodução do Hub e limpar a fila",
+    "Stop & Clear": "Parar e limpar",
+    "Confirm stop and clear": "Confirmar paragem e limpeza",
+    "Stop all Hub announcements?": "Parar todos os anúncios do Hub?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Interrompe o áudio ativo do Hub e limpa a fila. As notificações já entregues não podem ser retiradas.",
+    "Yes, stop & clear": "Sim, parar e limpar",
+    "Keep announcements": "Manter anúncios",
+    "Wait for the current submission before stopping.": "Aguarde a conclusão do envio atual antes de parar.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "{count} anúncios removidos da fila. Paragem solicitada para as saídas ativas do Hub.",
+    "Stop request sent. Check the queue before retrying.": "Paragem solicitada. Verifique a fila antes de repetir.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Não foi possível parar ou limpar: {error}. Verifique a fila antes de repetir."
   },
   "nl": {
     "The message": "Het bericht",
@@ -1103,7 +1169,18 @@
     "TTS engine": "TTS-engine",
     "Direct-room pre-announcement chime": "Vooraankondigingsgeluid in kamer",
     "Pre-announcement chime": "Vooraankondigingsgeluid",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Hub-weergave stoppen en de wachtrij wissen",
+    "Stop & Clear": "Stoppen en wissen",
+    "Confirm stop and clear": "Stoppen en wissen bevestigen",
+    "Stop all Hub announcements?": "Alle Hub-meldingen stoppen?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Stopt actieve Hub-audio en wist de wachtrij. Eerder afgeleverde meldingen kunnen niet worden teruggehaald.",
+    "Yes, stop & clear": "Ja, stoppen en wissen",
+    "Keep announcements": "Meldingen behouden",
+    "Wait for the current submission before stopping.": "Wacht tot de huidige verzending klaar is voordat je stopt.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "{count} berichten uit de wachtrij verwijderd. Stop aangevraagd voor actieve Hub-uitvoer.",
+    "Stop request sent. Check the queue before retrying.": "Stop aangevraagd. Controleer de wachtrij voordat je opnieuw probeert.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Stoppen of wissen mislukt: {error}. Controleer de wachtrij voordat je opnieuw probeert."
   },
   "pl": {
     "The message": "Wiadomość",
@@ -1261,7 +1338,18 @@
     "TTS engine": "Silnik TTS",
     "Direct-room pre-announcement chime": "Dźwięk przed ogłoszeniem w pokoju",
     "Pre-announcement chime": "Dźwięk przed ogłoszeniem",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Zatrzymaj odtwarzanie Hub i wyczyść kolejkę",
+    "Stop & Clear": "Zatrzymaj i wyczyść",
+    "Confirm stop and clear": "Potwierdź zatrzymanie i czyszczenie",
+    "Stop all Hub announcements?": "Zatrzymać wszystkie komunikaty Hub?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Przerywa dźwięk Hub i czyści kolejkę. Już dostarczonych powiadomień nie można wycofać.",
+    "Yes, stop & clear": "Tak, zatrzymaj i wyczyść",
+    "Keep announcements": "Zachowaj komunikaty",
+    "Wait for the current submission before stopping.": "Poczekaj na zakończenie bieżącego wysyłania przed zatrzymaniem.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "Usunięto z kolejki {count} komunikatów. Zlecono zatrzymanie aktywnych wyjść Hub.",
+    "Stop request sent. Check the queue before retrying.": "Zlecono zatrzymanie. Sprawdź kolejkę przed ponowną próbą.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Nie udało się zatrzymać lub wyczyścić: {error}. Sprawdź kolejkę przed ponowną próbą."
   },
   "pt-BR": {
     "The message": "A mensagem",
@@ -1419,7 +1507,18 @@
     "TTS engine": "Motor TTS",
     "Direct-room pre-announcement chime": "Som antes do anúncio no cômodo",
     "Pre-announcement chime": "Som antes do anúncio",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Parar a reprodução do Hub e limpar a fila",
+    "Stop & Clear": "Parar e limpar",
+    "Confirm stop and clear": "Confirmar parada e limpeza",
+    "Stop all Hub announcements?": "Parar todos os anúncios do Hub?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Interrompe o áudio ativo do Hub e limpa a fila. Notificações já entregues não podem ser retiradas.",
+    "Yes, stop & clear": "Sim, parar e limpar",
+    "Keep announcements": "Manter anúncios",
+    "Wait for the current submission before stopping.": "Aguarde o envio atual terminar antes de parar.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "{count} anúncios removidos da fila. Parada solicitada para as saídas ativas do Hub.",
+    "Stop request sent. Check the queue before retrying.": "Parada solicitada. Confira a fila antes de tentar novamente.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Não foi possível parar ou limpar: {error}. Confira a fila antes de tentar novamente."
   },
   "ru": {
     "The message": "Сообщение",
@@ -1577,7 +1676,18 @@
     "TTS engine": "Движок TTS",
     "Direct-room pre-announcement chime": "Звук перед объявлением в комнате",
     "Pre-announcement chime": "Звук перед объявлением",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Остановить воспроизведение Hub и очистить очередь",
+    "Stop & Clear": "Стоп и очистка",
+    "Confirm stop and clear": "Подтвердить остановку и очистку",
+    "Stop all Hub announcements?": "Остановить все объявления Hub?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Останавливает звук Hub и очищает очередь. Уже доставленные уведомления нельзя отозвать.",
+    "Yes, stop & clear": "Да, остановить и очистить",
+    "Keep announcements": "Оставить объявления",
+    "Wait for the current submission before stopping.": "Дождитесь завершения текущей отправки перед остановкой.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "Удалено из очереди: {count}. Запрошена остановка активных выходов Hub.",
+    "Stop request sent. Check the queue before retrying.": "Остановка запрошена. Проверьте очередь перед повтором.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Не удалось остановить или очистить: {error}. Проверьте очередь перед повтором."
   },
   "tr": {
     "The message": "Mesaj",
@@ -1735,7 +1845,18 @@
     "TTS engine": "TTS motoru",
     "Direct-room pre-announcement chime": "Oda duyurusundan önce ses",
     "Pre-announcement chime": "Duyuru öncesi ses",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Hub oynatmasını durdur ve kuyruğu temizle",
+    "Stop & Clear": "Durdur ve Temizle",
+    "Confirm stop and clear": "Durdurma ve temizlemeyi onayla",
+    "Stop all Hub announcements?": "Tüm Hub duyuruları durdurulsun mu?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Etkin Hub sesini durdurur ve kuyruğu temizler. Önceden iletilmiş bildirimler geri alınamaz.",
+    "Yes, stop & clear": "Evet, durdur ve temizle",
+    "Keep announcements": "Duyuruları koru",
+    "Wait for the current submission before stopping.": "Durdurmadan önce mevcut gönderimin tamamlanmasını bekleyin.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "Kuyruktan {count} duyuru temizlendi. Etkin Hub çıkışları için durdurma istendi.",
+    "Stop request sent. Check the queue before retrying.": "Durdurma istendi. Yeniden denemeden önce kuyruğu kontrol edin.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Durdurma veya temizleme başarısız: {error}. Yeniden denemeden önce kuyruğu kontrol edin."
   },
   "uk": {
     "The message": "Повідомлення",
@@ -1893,7 +2014,18 @@
     "TTS engine": "Рушій TTS",
     "Direct-room pre-announcement chime": "Звук перед оголошенням у кімнаті",
     "Pre-announcement chime": "Звук перед оголошенням",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Зупинити відтворення Hub та очистити чергу",
+    "Stop & Clear": "Зупинити й очистити",
+    "Confirm stop and clear": "Підтвердити зупинку й очищення",
+    "Stop all Hub announcements?": "Зупинити всі оголошення Hub?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Зупиняє активне аудіо Hub та очищує чергу. Уже доставлені сповіщення відкликати неможливо.",
+    "Yes, stop & clear": "Так, зупинити й очистити",
+    "Keep announcements": "Залишити оголошення",
+    "Wait for the current submission before stopping.": "Дочекайтеся завершення поточного надсилання перед зупинкою.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "Із черги видалено {count} оголошень. Запитано зупинку активних виходів Hub.",
+    "Stop request sent. Check the queue before retrying.": "Зупинку запитано. Перед повтором перевірте чергу.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Не вдалося зупинити або очистити: {error}. Перед повтором перевірте чергу."
   },
   "ar": {
     "The message": "الرسالة",
@@ -2051,7 +2183,18 @@
     "TTS engine": "محرك TTS",
     "Direct-room pre-announcement chime": "صوت قبل الإعلان في الغرفة",
     "Pre-announcement chime": "صوت ما قبل الإعلان",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "إيقاف تشغيل Hub ومسح قائمة الانتظار",
+    "Stop & Clear": "إيقاف ومسح",
+    "Confirm stop and clear": "تأكيد الإيقاف والمسح",
+    "Stop all Hub announcements?": "هل تريد إيقاف جميع إعلانات Hub؟",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "يوقف صوت Hub النشط ويمسح قائمة الانتظار. لا يمكن سحب الإشعارات التي تم تسليمها.",
+    "Yes, stop & clear": "نعم، أوقف وامسح",
+    "Keep announcements": "الاحتفاظ بالإعلانات",
+    "Wait for the current submission before stopping.": "انتظر اكتمال الإرسال الحالي قبل الإيقاف.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "تم مسح {count} إعلان من القائمة. طُلب إيقاف مخارج Hub النشطة.",
+    "Stop request sent. Check the queue before retrying.": "تم طلب الإيقاف. تحقق من قائمة الانتظار قبل إعادة المحاولة.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "تعذر الإيقاف أو المسح: {error}. تحقق من قائمة الانتظار قبل إعادة المحاولة."
   },
   "zh-Hans": {
     "The message": "消息",
@@ -2209,7 +2352,18 @@
     "TTS engine": "TTS 引擎",
     "Direct-room pre-announcement chime": "房间公告提示音",
     "Pre-announcement chime": "公告前提示音",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "停止 Hub 播放并清空队列",
+    "Stop & Clear": "停止并清空",
+    "Confirm stop and clear": "确认停止并清空",
+    "Stop all Hub announcements?": "停止所有 Hub 播报？",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "停止正在播放的 Hub 音频并清空队列。已送达的通知无法撤回。",
+    "Yes, stop & clear": "是，停止并清空",
+    "Keep announcements": "保留播报",
+    "Wait for the current submission before stopping.": "请等待当前提交完成后再停止。",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "已清空 {count} 条排队播报。已请求停止 Hub 的活动输出。",
+    "Stop request sent. Check the queue before retrying.": "已发送停止请求。重试前请检查队列。",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "无法停止或清空：{error}。重试前请检查队列。"
   },
   "ja": {
     "The message": "メッセージ",
@@ -2367,7 +2521,18 @@
     "TTS engine": "TTSエンジン",
     "Direct-room pre-announcement chime": "部屋の通知前の音",
     "Pre-announcement chime": "通知前の音",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Hub の再生を停止してキューを消去",
+    "Stop & Clear": "停止して消去",
+    "Confirm stop and clear": "停止と消去を確認",
+    "Stop all Hub announcements?": "Hub のすべてのアナウンスを停止しますか？",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Hub の音声を停止し、待機中のキューを消去します。配信済み通知は取り消せません。",
+    "Yes, stop & clear": "はい、停止して消去",
+    "Keep announcements": "アナウンスを保持",
+    "Wait for the current submission before stopping.": "停止前に現在の送信が完了するまでお待ちください。",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "キューから {count} 件を消去しました。Hub の出力停止を要求しました。",
+    "Stop request sent. Check the queue before retrying.": "停止を要求しました。再試行前にキューを確認してください。",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "停止または消去に失敗しました: {error}。再試行前にキューを確認してください。"
   },
   "ko": {
     "The message": "메시지",
@@ -2525,7 +2690,18 @@
     "TTS engine": "TTS 엔진",
     "Direct-room pre-announcement chime": "방 알림 전 소리",
     "Pre-announcement chime": "알림 전 소리",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Hub 재생 중지 및 대기열 비우기",
+    "Stop & Clear": "중지 및 비우기",
+    "Confirm stop and clear": "중지 및 비우기 확인",
+    "Stop all Hub announcements?": "모든 Hub 안내를 중지할까요?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Hub 오디오 재생을 중지하고 대기열을 비웁니다. 이미 전달된 알림은 취소할 수 없습니다.",
+    "Yes, stop & clear": "예, 중지하고 비우기",
+    "Keep announcements": "안내 유지",
+    "Wait for the current submission before stopping.": "중지하기 전에 현재 전송이 완료되기를 기다리세요.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "대기열에서 {count}개 항목을 지웠습니다. 활성 Hub 출력 중지를 요청했습니다.",
+    "Stop request sent. Check the queue before retrying.": "중지를 요청했습니다. 다시 시도하기 전에 대기열을 확인하세요.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "중지 또는 비우기 실패: {error}. 다시 시도하기 전에 대기열을 확인하세요."
   },
   "sv": {
     "The message": "Meddelandet",
@@ -2683,7 +2859,18 @@
     "TTS engine": "TTS-motor",
     "Direct-room pre-announcement chime": "Försignal i rummet",
     "Pre-announcement chime": "Försignal före meddelande",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Stoppa Hub-uppspelning och töm kön",
+    "Stop & Clear": "Stoppa och töm",
+    "Confirm stop and clear": "Bekräfta stopp och tömning",
+    "Stop all Hub announcements?": "Stoppa alla Hub-meddelanden?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Avbryter aktivt Hub-ljud och tömmer kön. Redan levererade aviseringar kan inte återkallas.",
+    "Yes, stop & clear": "Ja, stoppa och töm",
+    "Keep announcements": "Behåll meddelanden",
+    "Wait for the current submission before stopping.": "Vänta tills aktuell sändning är klar innan du stoppar.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "{count} köade meddelanden rensade. Stopp begärt för aktiva Hub-utgångar.",
+    "Stop request sent. Check the queue before retrying.": "Stopp begärt. Kontrollera kön innan du försöker igen.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Kunde inte stoppa eller tömma: {error}. Kontrollera kön innan du försöker igen."
   },
   "cs": {
     "The message": "Zpráva",
@@ -2841,7 +3028,18 @@
     "TTS engine": "TTS engine",
     "Direct-room pre-announcement chime": "Zvuk před oznámením v místnosti",
     "Pre-announcement chime": "Zvuk před oznámením",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "Zastavit přehrávání Hub a vymazat frontu",
+    "Stop & Clear": "Zastavit a vymazat",
+    "Confirm stop and clear": "Potvrdit zastavení a vymazání",
+    "Stop all Hub announcements?": "Zastavit všechna hlášení Hub?",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "Zastaví aktivní zvuk Hub a vymaže frontu. Již doručená oznámení nelze odvolat.",
+    "Yes, stop & clear": "Ano, zastavit a vymazat",
+    "Keep announcements": "Ponechat hlášení",
+    "Wait for the current submission before stopping.": "Před zastavením počkejte na dokončení aktuálního odesílání.",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "Z fronty odstraněno {count} hlášení. Vyžádáno zastavení aktivních výstupů Hub.",
+    "Stop request sent. Check the queue before retrying.": "Zastavení vyžádáno. Před opakováním zkontrolujte frontu.",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "Zastavení nebo vymazání selhalo: {error}. Před opakováním zkontrolujte frontu."
   },
   "zh-Hant": {
     "The message": "訊息",
@@ -2999,6 +3197,17 @@
     "TTS engine": "TTS 引擎",
     "Direct-room pre-announcement chime": "房間公告提示音",
     "Pre-announcement chime": "公告前提示音",
-    "tts.piper": "tts.piper"
+    "tts.piper": "tts.piper",
+    "Stop active Hub playback and clear the queue": "停止 Hub 播放並清空佇列",
+    "Stop & Clear": "停止並清空",
+    "Confirm stop and clear": "確認停止並清空",
+    "Stop all Hub announcements?": "要停止所有 Hub 廣播嗎？",
+    "Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.": "停止正在播放的 Hub 音訊並清空佇列。已送達的通知無法收回。",
+    "Yes, stop & clear": "是，停止並清空",
+    "Keep announcements": "保留廣播",
+    "Wait for the current submission before stopping.": "請等目前傳送完成後再停止。",
+    "Cleared {count} queued jobs. Stop requested for active Hub outputs.": "已清空 {count} 則排隊廣播。已要求停止 Hub 的作用中輸出。",
+    "Stop request sent. Check the queue before retrying.": "已送出停止要求。重試前請檢查佇列。",
+    "Could not stop or clear: {error}. Check the queue before retrying.": "無法停止或清空：{error}。重試前請檢查佇列。"
   }
 }

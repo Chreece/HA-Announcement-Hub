@@ -94,6 +94,7 @@ class FakeManager:
             "media_player.bedroom_snapcast": True,
         }
         self.failures = []
+        self._hub_playing_players_by_job = {}
         self.stops = []
         self.guard_checks = 0
 
