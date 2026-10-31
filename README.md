@@ -421,6 +421,28 @@ while the first is still running. For genuinely independent invocations that
 must all run, consider `mode: queued` with an explicit `max`, after checking
 that repeated routine announcements are desirable.
 
+### Troubleshooting Ollama AI Task stalls without changing HA
+
+When Announcement Hub shows many `pending_preprocessing` announcements
+from one `ai_task.*` provider, first verify the Ollama connection from the
+**Home Assistant container's own network**, rather than assuming that the
+Ollama daemon being running means model generation works.
+
+Run `tools/announcement_hub_ollama_link_probe.py` on the Docker host.
+The script obtains the installed Ollama integration's configured endpoint
+internally and performs only `GET /api/version`, `GET /api/ps` and
+`GET /api/tags` from the Home Assistant container. It reports the AI Task
+model, context size, think setting and keep-alive, but never reveals URLs,
+API keys, raw responses or notification text. On AMD hosts it also reads
+kernel VRAM counters and the real CPU/GPU split from `ollama ps`.
+
+Optionally `AH_ACTIVE_PROBE=1` runs **one** bounded four-token Ollama
+inference directly from Home Assistant's network, with a fixed harmless
+prompt, without invoking the HA AI Task, Announcement Hub or any output
+service. This may consume model resources and is disabled by default.
+A failed timed probe does not authorize restarting a service, unloading
+the model, clearing the saved queue or broadcasting queued messages.
+
 ### Read-only diagnostics for an installed Home Assistant container
 
 The repository includes two complementary scripts under `tools/`:
