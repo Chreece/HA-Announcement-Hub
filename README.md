@@ -1175,12 +1175,16 @@ uses the rewritten text or the original if AI fails. Interrupted
 preprocessing can be retried from the saved original after Home Assistant
 restarts.
 
-Hub does **not** cancel an otherwise active AI request after a fixed
-elapsed time. At 60 seconds it can log that the request is still pending.
-The Home Assistant conversation service does not provide a universal
-generation-progress endpoint. A provider may still time out or fail on
-its own. A genuinely unresponsive provider can leave that individual job
-pending; later ready jobs are not blocked.
+Each AI provider attempt has a **120-second timeout**, including compatibility
+and formatting retries. Hub logs a slow-response warning after 60 seconds.
+After a timeout, that provider enters a **five-minute cooldown**; rewrite
+and translation announcements may use their saved original immediately,
+while a separately configured healthy backup provider can still be used.
+AI **generation** requests are different: their saved input is a writing
+instruction, not an announcement. If generation fails, Hub retains the job
+without sending the instruction and retries automatically with persisted
+backoff of 5 minutes to 1 hour. Queued generation resumes after a restart,
+and independent ready room lanes can continue delivering.
 
 Per-call AI override:
 
@@ -1324,7 +1328,7 @@ what happened during actual processing.
 
 ### AI Task providers
 
-Announcement Hub supports Home Assistant **AI Task** entities alongside conversation agents. In the integration's general AI settings, choose an `ai_task.*` entity as the primary or backup provider. For a specific announcement, set `ai_agent: ai_task.your_entity` with `use_ai: true`. The Hub calls `ai_task.generate_data` with the announcement instructions and validates its JSON response using the same factual, speech and visual safeguards as conversation agents. If the AI Task fails or returns invalid content, the configured backup provider is tried; otherwise the original announcement is delivered. AI preprocessing continues within the existing durable announcement queue.
+Announcement Hub supports Home Assistant **AI Task** entities alongside conversation agents. In the integration's general AI settings, choose an `ai_task.*` entity as the primary or backup provider. For a specific announcement, set `ai_agent: ai_task.your_entity` with `use_ai: true`. The Hub calls `ai_task.generate_data` with the announcement instructions and validates its JSON response using the same factual, speech and visual safeguards as conversation agents. If the AI Task fails or returns invalid content, the configured backup provider is tried. Rewrite/translation jobs may fall back to the original announcement; generation jobs remain queued for retry rather than displaying or speaking the writing prompt. AI preprocessing continues within the existing durable announcement queue.
 
 
 ### Concurrent delivery and queue ordering
@@ -1370,8 +1374,9 @@ that explicitly rejects structured schemas gets one compatibility attempt
 with an ordinary JSON-in-text task instead. Identical AI providers are not
 called concurrently for different rooms; independent rooms still keep their
 separate delivery queues. A genuine provider failure still uses the configured
-backup AI agent, then the original message—never a potentially altered
-measurement or an unintended new output channel.
+backup AI agent. Rewrite/translation jobs can use the saved original
+message; generation jobs safely defer delivery until AI succeeds. No
+potentially altered measurement or unintended new output channel is used.
 
 If unchanged announcements persist, the most useful evidence is the
 `last.ai` diagnostics and the relevant Announcement Hub warning from the

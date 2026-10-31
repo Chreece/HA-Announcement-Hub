@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import asyncio
 from collections import deque
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -28,11 +29,15 @@ class Harness:
         self._queue = deque()
         self._ai_history = deque(maxlen=20)
         self._running = True
+        self._ai_provider_cooldowns = {}
         self.hass = object()
         self._prefetched = []
         self._saved = 0
         self._wake = SimpleNamespace(set=lambda: None)
         self._rewrite = rewriter
+
+    def _ai_provider_cooling(self, _agent):
+        return False
 
     def _prepare_staged_route(self, job):
         job.notify_text = job.text_notify
@@ -73,7 +78,9 @@ def _run(harness, job):
     handler = _method(
         "_async_rewrite_job",
         async_filter_announcement=harness._rewrite,
-        _LOGGER=SimpleNamespace(exception=lambda *_args, **_kw: None),
+        _LOGGER=SimpleNamespace(exception=lambda *_args, **_kw: None,
+                                warning=lambda *_args, **_kw: None),
+        datetime=datetime, UTC=UTC, timedelta=timedelta,
     )
     return asyncio.run(handler(harness, job))
 
@@ -216,8 +223,11 @@ def test_failure_or_restart_preserves_default_title_and_request_flag():
     harness._rewrite = failed
     _run(harness, job)
     assert job.title == "Configured Notification Title"
-    assert job.ai["status"] == "fallback_original"
-    assert "requested_generate_title" not in job.ai
+    assert job.ai["status"] == "waiting_for_ai"
+    assert job.ai["pending_preprocessing"] is True
+    assert job.ai["requested_generate_title"] is True
+    assert job.ai["generation_retry_after"]
+    assert job.notify_text == "Window open"
 
 
 def test_queued_ai_source_is_redacted_from_public_diagnostics():
