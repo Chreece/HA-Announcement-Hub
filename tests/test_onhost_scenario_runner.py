@@ -82,3 +82,60 @@ def test_host_run_is_read_only_and_redacts_message_body(tmp_path, monkeypatch, c
     assert data["current_state"] == {"live_api": False}
     assert "HASS_TOKEN" not in report
     assert next((tmp_path / "logs").glob("*.tar.gz")).is_file()
+
+
+
+def test_two_read_only_snapshots_detect_ai_backlog_progress(tmp_path, monkeypatch):
+    config = tmp_path / "ha"
+    storage = config / ".storage"
+    comp = config / "custom_components" / "announcement_hub"
+    storage.mkdir(parents=True)
+    comp.mkdir(parents=True)
+    (comp / "manager.py").write_text(MANAGER.read_text("utf-8"))
+    (comp / "manifest.json").write_text('{"version":"0.10.0b25"}')
+    (storage / "core.config_entries").write_text(json.dumps({
+        "data": {"entries": [{
+            "domain": "announcement_hub", "entry_id": "sample",
+            "data": {"occupancy_sensor": "sensor.rooms"},
+        }]}
+    }))
+    monkeypatch.setenv("AH_CONFIG_DIR", str(config))
+    monkeypatch.setenv("AH_LOG_DIR", str(tmp_path / "logs"))
+    monkeypatch.setenv("AH_OBSERVE_SECONDS", "70")
+    monkeypatch.delenv("HASS_TOKEN", raising=False)
+    monkeypatch.delenv("HA_TOKEN", raising=False)
+    invocations = []
+    sleeps = []
+    monkeypatch.setattr(audit.time, "sleep", lambda seconds: sleeps.append(seconds))
+
+    def fake_docker(args, **kwargs):
+        if args[:3] == ["docker", "exec", "-i"]:
+            invocations.append(tuple(args))
+            waiting = 82 if len(invocations) == 1 else 81
+            data = {
+                "queue_store": {
+                    "status": "readable",
+                    "job_count": 83 if waiting == 82 else 82,
+                    "pending_summary": [],
+                    "recent_ai": [],
+                    "backlog_metrics": {
+                        "count_by_ai_state": {"waiting_for_ai": waiting},
+                        "last_AI_completed_job_marker": "old" if waiting == 82 else "new",
+                    },
+                }
+            }
+            return SimpleNamespace(returncode=0, stdout=json.dumps(data), stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(audit.subprocess, "run", fake_docker)
+    assert audit.main() == 0
+    assert sleeps == [70]
+    assert len(invocations) == 2
+    report = json.loads(next((tmp_path / "logs").glob("*.json")).read_text())
+    obs = report["AI_queue_observation"]
+    assert obs["status"] == "progress_observed"
+    assert obs["first_queue_size"] == 83
+    assert obs["second_queue_size"] == 82
+    assert obs["first_waiting_for_AI"] == 82
+    assert obs["second_waiting_for_AI"] == 81
+    assert obs["completed_AI_marker_changed"] is True
