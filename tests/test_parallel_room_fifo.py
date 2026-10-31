@@ -185,7 +185,7 @@ def test_burst_limits_are_finite_and_preprocessing_is_independent():
     assert "self._max_parallel_prefetch = 2" in SOURCE
     assert "self._fill_ai_slots()" in SOURCE
     assert "self._fill_prefetch_slots()" in SOURCE
-    assert 'getattr(self, "_players_by_job", {}).get(job_id' in SOURCE
+    assert 'getattr(self, "_hub_playing_players_by_job", {}).get(job_id' in SOURCE
 
 
 def test_pending_ai_on_shared_visual_output_does_not_block_other_rooms():

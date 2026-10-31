@@ -24,6 +24,7 @@ def isolate(name, **dependencies):
         "EVENT_CANCELLED": "announcement_hub_cancelled",
         "EVENT_QUEUE_CLEARED": "announcement_hub_queue_cleared",
         "ServiceValidationError": ValueError,
+        "_TERMINAL_JOB_STATES": {"completed", "completed_with_errors", "failed", "cancelled"},
         "utcnow_iso": lambda: "2026-10-31T13:00:00+00:00",
         **dependencies,
     }

@@ -147,8 +147,10 @@ def test_optional_chime_never_routes_to_shared_snapcast():
         _assert_live_room_route=lambda job, areas: None,
         _is_player_busy=lambda player: False,
         _wait_for=wait_for,
+        _async_reading_hold=wait_for,
+        _hub_playing_players_by_job={},
     )
-    job = SimpleNamespace(pre_announce_sound=None,
+    job = SimpleNamespace(job_id="chime", pre_announce_sound=None,
                           tts_media_player="media_player.shared", person_ids=())
     chime = methods["_async_optional_direct_chime"]
     asyncio.run(chime(fake, job, "media_player.shared"))
