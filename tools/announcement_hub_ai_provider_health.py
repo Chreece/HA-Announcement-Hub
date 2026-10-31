@@ -36,7 +36,11 @@ def safe_run(argv: list[str], *, input_text: str | None = None,
             argv, input=input_text, capture_output=True, text=True,
             timeout=timeout, check=False,
         )
-        return result.returncode, result.stdout if result.returncode == 0 else ""
+        content = result.stdout
+        if argv[:2] == ["docker", "logs"]:
+            # Docker log messages commonly arrive on stderr.
+            content += "\n" + result.stderr
+        return result.returncode, content if result.returncode == 0 else ""
     except (OSError, subprocess.TimeoutExpired):
         return None, ""
 
@@ -153,18 +157,18 @@ def probe() -> dict:
     args = ["docker", "stats", "--no-stream", "--format", "{{json .}}",
             "homeassistant", *matches[:3]]
     code, output = safe_run(args, timeout=14)
+    report["resource_usage"] = []
     if code == 0:
-        report["resource_usage"] = [
-            {
-                key: item.get(key)
-                for key in ("Name", "CPUPerc", "MemUsage", "MemPerc", "PIDs")
-            }
-            for line in output.splitlines()[:4]
-            for item in [json.loads(line)]
-            if isinstance(item, dict)
-        ]
-    else:
-        report["resource_usage"] = []
+        for line in output.splitlines()[:4]:
+            try:
+                item = json.loads(line)
+            except ValueError:
+                continue
+            if isinstance(item, dict):
+                report["resource_usage"].append({
+                    key: item.get(key)
+                    for key in ("Name", "CPUPerc", "MemUsage", "MemPerc", "PIDs")
+                })
     return report
 
 def main() -> None:
