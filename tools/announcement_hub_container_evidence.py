@@ -173,6 +173,9 @@ def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, A
         "timestamp_unavailable": 0,
     }
     pending_ages: list[float] = []
+    ready_ages: list[float] = []
+    room_load: Counter[str] = Counter()
+    job_status_count: Counter[str] = Counter()
     duplicates: Counter[tuple[Any, ...]] = Counter()
 
     for item in jobs:
@@ -183,6 +186,10 @@ def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, A
             ai = {}
         stage_count[str(item.get("routing_stage", "unknown"))] += 1
         mode_count[str(item.get("routing_mode", "unknown"))] += 1
+        job_status_count[str(item.get("status", "unknown"))] += 1
+        for room in set(item.get("preferred_areas") or item.get("outputs") or ()):
+            if isinstance(room, str):
+                room_load[room] += 1
         ai_pending = bool(ai.get("pending_preprocessing"))
         ai_count["waiting_for_ai" if ai_pending else "ai_finished_or_disabled"] += 1
         if ai_pending:
@@ -214,6 +221,8 @@ def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, A
             age_buckets["over_120_minutes"] += 1
         if ai_pending:
             pending_ages.append(elapsed)
+        else:
+            ready_ages.append(elapsed)
 
     historical = [x for x in ai_history if isinstance(x, Mapping)]
     samples = [
@@ -225,6 +234,28 @@ def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, A
         (count for count in duplicates.values() if count > 1),
         reverse=True,
     )
+    first = next((x for x in jobs if isinstance(x, Mapping)), {})
+    first_ai = first.get("ai") or {}
+    if not isinstance(first_ai, Mapping):
+        first_ai = {}
+    first_summary = {
+        "status": first.get("status"),
+        "routing_stage": first.get("routing_stage"),
+        "routing_mode": first.get("routing_mode"),
+        "ai_pending": bool(first_ai.get("pending_preprocessing")),
+        "ai_status": first_ai.get("status"),
+        "strict_targets": bool(first.get("strict_targets")),
+        "occupied_only": bool(first.get("occupancy_requested", True)),
+        "preferred_area_count": len(first.get("preferred_areas") or []),
+        "selected_area_count": len(first.get("outputs") or []),
+        "notify_outputs": len(first.get("notify_outputs") or []),
+        "room_tts_players": len(first.get("room_tts_players") or []),
+        "snapcast_clients": len(first.get("snapcast_clients") or []),
+        "companion_tts_entries": len(first.get("companion_tts_entries") or []),
+        "person_targets": len(first.get("person_ids") or []),
+        "presence_sensors": len(first.get("presence_sensors") or []),
+        "recent_routing": (first.get("routing_history") or [])[-3:],
+    }
     finished = historical[-1] if historical else {}
     last_id = str(finished.get("job_id") or "")
     ai_progress_marker = (
@@ -234,6 +265,11 @@ def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, A
     return {
         "count_by_stage": dict(stage_count),
         "count_by_routing_mode": dict(mode_count),
+        "count_by_job_status": dict(job_status_count),
+        "first_queued_job": first_summary,
+        "oldest_AI_ready_job_wait_minutes": round(max(ready_ages), 1) if ready_ages else None,
+        "most_jobs_sharing_one_room": max(room_load.values(), default=0),
+        "distinct_queued_room_count": len(room_load),
         "count_by_ai_state": dict(ai_count),
         "count_by_requested_ai_provider": dict(provider_count),
         "job_age_buckets": age_buckets,
