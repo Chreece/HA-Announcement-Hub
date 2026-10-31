@@ -17,6 +17,7 @@ import re
 import subprocess
 import sys
 import tarfile
+import time
 from types import SimpleNamespace
 from urllib.request import Request, urlopen
 
@@ -322,6 +323,63 @@ def main():
             report["last_job"] = {"status": "unverified"}
             report["recent_AI"] = []
 
+        # An optional bounded second, strictly read-only snapshot distinguishes
+        # a naturally draining queue from a producer that may be stranded.
+        # Compare counts and a one-way marker of the last completed AI job.
+        # Neither raw prompts nor original queue IDs leave the Docker process.
+        try:
+            observation_seconds = min(
+                120, max(0, int(os.environ.get("AH_OBSERVE_SECONDS", "0")))
+            )
+        except ValueError:
+            observation_seconds = 0
+        if observation_seconds and helper.is_file():
+            first_store = report.get("container_probe", {}).get("queue_store", {})
+            if first_store.get("status") == "readable":
+                first_metric = first_store.get("backlog_metrics", {})
+                report["AI_queue_observation"] = {
+                    "window_seconds": observation_seconds,
+                    "first_queue_size": first_store.get("job_count"),
+                    "first_waiting_for_AI": first_metric.get("count_by_ai_state", {}).get("waiting_for_ai", 0),
+                    "status": "observation_unavailable",
+                }
+                time.sleep(observation_seconds)
+                try:
+                    second = subprocess.run(
+                        ["docker", "exec", "-i", "homeassistant", "python3", "-"],
+                        input=helper.read_text(encoding="utf-8"),
+                        capture_output=True, text=True, timeout=24,
+                        check=False,
+                    )
+                    if second.returncode == 0:
+                        fresh = json.loads(second.stdout)
+                        second_store = fresh.get("queue_store", {})
+                        if second_store.get("status") == "readable":
+                            fresh_metric = second_store.get("backlog_metrics", {})
+                            first_waiting = first_metric.get("count_by_ai_state", {}).get("waiting_for_ai", 0)
+                            second_waiting = fresh_metric.get("count_by_ai_state", {}).get("waiting_for_ai", 0)
+                            previous_marker = first_metric.get("last_AI_completed_job_marker")
+                            next_marker = fresh_metric.get("last_AI_completed_job_marker")
+                            made_progress = bool(
+                                second_waiting < first_waiting
+                                or (
+                                    previous_marker != next_marker
+                                    and next_marker is not None
+                                )
+                            )
+                            report["AI_queue_observation"].update({
+                                "status": "progress_observed" if made_progress else "no_progress_in_window",
+                                "second_queue_size": second_store.get("job_count"),
+                                "second_waiting_for_AI": second_waiting,
+                                "completed_AI_marker_changed": (
+                                    previous_marker != next_marker
+                                    and next_marker is not None
+                                ),
+                                "second_backlog_metrics": fresh_metric,
+                            })
+                except (OSError, ValueError, subprocess.TimeoutExpired) as exc:
+                    report["AI_queue_observation"]["error_type"] = type(exc).__name__
+
         token = os.environ.get("HASS_TOKEN") or os.environ.get("HA_TOKEN")
         report["current_state"] = {"live_api": False}
         if token:
@@ -371,8 +429,40 @@ def main():
             report["potential_blockers"].append(
                 "Persisted undelivered queue is non-empty"
             )
-        if any(item.get("ai_pending") for item in report["persisted_queue"]):
-            report["potential_blockers"].append("One or more AI generations remain pending")
+        backlog_stats = report.get("container_probe", {}).get(
+            "queue_store", {}
+        ).get("backlog_metrics", {})
+        waiting_ai = backlog_stats.get("count_by_ai_state", {}).get(
+            "waiting_for_ai"
+        )
+        if isinstance(waiting_ai, int):
+            if waiting_ai >= 20:
+                report["potential_blockers"].append(
+                    f"Large AI generation backlog: {waiting_ai} jobs awaiting AI"
+                )
+            elif waiting_ai:
+                report["potential_blockers"].append(
+                    f"AI generation pending: {waiting_ai} jobs"
+                )
+            if backlog_stats.get("oldest_AI_wait_minutes") is not None:
+                age = backlog_stats["oldest_AI_wait_minutes"]
+                if age >= 120:
+                    report["potential_blockers"].append(
+                        f"Oldest pending AI job has waited {age:g} minutes"
+                    )
+            if backlog_stats.get("duplicate_AI_jobs_avoidable_by_reuse", 0) >= 10:
+                report["potential_blockers"].append(
+                    "Repeated identical AI prompt groups are accumulating"
+                )
+        elif any(item.get("ai_pending") for item in report["persisted_queue"]):
+            report["potential_blockers"].append(
+                "One or more AI generations remain pending"
+            )
+        observation = report.get("AI_queue_observation", {})
+        if observation.get("status") == "no_progress_in_window":
+            report["potential_blockers"].append(
+                "No AI completion observed in the bounded second snapshot; not proof of a deadlock"
+            )
         snapshots = report.get("container_probe", {}).get("sources", {})
         for label in ("occupied_rooms", "sleeping_rooms"):
             source_report = snapshots.get(label, {})
@@ -401,6 +491,7 @@ def main():
              f"HOST_STORE={report.get('host_queue_store_status','unverified')}",
              f"CONTAINER_STORE={report.get('container_probe',{}).get('queue_store',{}).get('status','unverified')}",
              f"RECORDER={report.get('container_probe',{}).get('recorder_status','unavailable')}",
+             f"AI_PROGRESS={report.get('AI_queue_observation',{}).get('status','not_observed')}",
              f"LAST_JOB_STATUS={report.get('last_job',{}).get('status','unknown')}",
              f"LIVE_API={report.get('current_state',{}).get('live_api', False)}",
              *("BLOCKER=" + x for x in report.get("potential_blockers", [])),

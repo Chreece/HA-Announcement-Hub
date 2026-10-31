@@ -445,6 +445,16 @@ sanitized JSON/TXT/TAR bundle under `~/projects/announcement_hub/logs`.
 A local `HASS_TOKEN` can optionally enable a true live API state check;
 never put access tokens into support archives or chat messages.
 
+For a large AI backlog, set `AH_OBSERVE_SECONDS=70` for a second read-only
+snapshot 70 seconds after the first. The report compares queue sizes, the
+number awaiting AI, and a non-reversible marker for the most recent completed
+AI job (without exporting its ID). It summarizes **all** queued jobs,
+including AI-request age buckets, provider-level counts, exact duplicate
+prompt group sizes, the oldest AI-ready head job and maximum per-room FIFO
+concentration. No queued content, prompts or provider tokens are exported.
+If the two snapshots do not differ, that indicates no observed progress in
+the sample window; it does not by itself prove a provider deadlock.
+
 ## Person-targeted announcements and personal destinations
 
 In **Configure → People and personal voices**, select Home Assistant people.
