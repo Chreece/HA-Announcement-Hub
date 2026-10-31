@@ -159,6 +159,11 @@ def test_backlog_counts_every_job_and_redacts_prompts_and_ids():
     }
     assert stats["job_age_buckets"]["30_to_120_minutes"] == 4
     assert stats["count_by_requested_ai_provider"] == {"ai_task.local": 3}
+    assert stats["count_by_job_status"] == {"unknown": 4}
+    assert stats["most_jobs_sharing_one_room"] == 0
+    assert stats["oldest_AI_ready_job_wait_minutes"] >= 44
+    assert stats["first_queued_job"]["ai_pending"] is True
+    assert stats["first_queued_job"]["routing_stage"] == "primary"
     assert stats["duplicate_AI_prompt_group_sizes"] == [2]
     assert stats["duplicate_AI_jobs_avoidable_by_reuse"] == 1
     assert stats["recent_AI_average_seconds"] == 27.0
