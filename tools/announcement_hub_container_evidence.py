@@ -8,6 +8,8 @@ configuration, or emits credentials / notification message text.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from collections import Counter
+from collections.abc import Mapping
 import json
 from pathlib import Path
 import re
@@ -91,27 +93,44 @@ def latest_states(database: Path, ids: list[str], *, count: int = 5) -> tuple[di
         return {}, "recorder_open_" + type(error).__name__
     try:
         columns = {x[1] for x in connection.execute("PRAGMA table_info(states)")}
-        modern = {"metadata_id", "attributes_id", "last_updated_ts"} <= columns
+        # HA recorder storage evolved over time. Select only known columns
+        # discovered from PRAGMA; never guess the timestamp/attribute layout.
+        stamps = (
+            "last_updated_ts", "last_changed_ts",
+            "last_reported_ts", "last_updated", "last_changed",
+        )
+        time_col = next((key for key in stamps if key in columns), None)
+        has_metadata = "metadata_id" in columns
+        has_legacy_entity = "entity_id" in columns
+        attrs_join = "attributes_id" in columns
+        if not ("state" in columns and (has_metadata or has_legacy_entity)):
+            return {}, "recorder_schema_unsupported"
+        stamp_sql = f"s.{time_col}" if time_col else "NULL"
+        if attrs_join:
+            attrs_join_sql = (
+                " LEFT JOIN state_attributes AS a"
+                " ON a.attributes_id=s.attributes_id"
+            )
+            attrs_sql = "a.shared_attrs"
+        else:
+            attrs_join_sql = ""
+            attrs_sql = "s.attributes" if "attributes" in columns else "NULL"
+        if has_metadata:
+            query = (
+                f"SELECT s.state, {stamp_sql}, {attrs_sql} FROM states AS s"
+                " JOIN states_meta AS m ON m.metadata_id=s.metadata_id"
+                + attrs_join_sql
+                + " WHERE m.entity_id=? ORDER BY s.state_id DESC LIMIT ?"
+            )
+        else:
+            query = (
+                f"SELECT s.state, {stamp_sql}, {attrs_sql} FROM states AS s"
+                + attrs_join_sql
+                + " WHERE s.entity_id=? ORDER BY s.state_id DESC LIMIT ?"
+            )
         history: dict[str, Any] = {}
         for entity_id in dict.fromkeys(ids):
-            if modern:
-                rows = connection.execute(
-                    """SELECT s.state, s.last_updated_ts, a.shared_attrs
-                       FROM states AS s
-                       JOIN states_meta AS m ON m.metadata_id=s.metadata_id
-                       LEFT JOIN state_attributes AS a ON a.attributes_id=s.attributes_id
-                       WHERE m.entity_id=?
-                       ORDER BY s.state_id DESC LIMIT ?""",
-                    (entity_id, count)
-                ).fetchall()
-            elif "entity_id" in columns:
-                rows = connection.execute(
-                    """SELECT state, last_updated, attributes FROM states
-                       WHERE entity_id=? ORDER BY state_id DESC LIMIT ?""",
-                    (entity_id, count)
-                ).fetchall()
-            else:
-                return {}, "recorder_schema_unsupported"
+            rows = connection.execute(query, (entity_id, count)).fetchall()
             snapshots = []
             for raw_state, stamp, attrs in rows:
                 if isinstance(stamp, (int, float)):
@@ -138,6 +157,84 @@ def latest_states(database: Path, ids: list[str], *, count: int = 5) -> tuple[di
     finally:
         connection.close()
 
+def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, Any]:
+    """Summarize ALL jobs without exporting job IDs, prompts, or generated text."""
+    now = datetime.now(timezone.utc)
+    stage_count: Counter[str] = Counter()
+    mode_count: Counter[str] = Counter()
+    ai_count: Counter[str] = Counter()
+    provider_count: Counter[str] = Counter()
+    age_buckets = {
+        "under_5_minutes": 0,
+        "5_to_30_minutes": 0,
+        "30_to_120_minutes": 0,
+        "over_120_minutes": 0,
+        "timestamp_unavailable": 0,
+    }
+    pending_ages: list[float] = []
+    duplicates: Counter[tuple[Any, ...]] = Counter()
+
+    for item in jobs:
+        if not isinstance(item, Mapping):
+            continue
+        ai = item.get("ai") or {}
+        if not isinstance(ai, Mapping):
+            ai = {}
+        stage_count[str(item.get("routing_stage", "unknown"))] += 1
+        mode_count[str(item.get("routing_mode", "unknown"))] += 1
+        ai_pending = bool(ai.get("pending_preprocessing"))
+        ai_count["waiting_for_ai" if ai_pending else "ai_finished_or_disabled"] += 1
+        if ai_pending:
+            provider = str(ai.get("requested_agent_id") or "not_recorded")
+            provider_count[provider] += 1
+            identity = (
+                str(ai.get("source_tts")),
+                str(ai.get("source_notify")),
+                provider,
+                str(ai.get("requested_mode")),
+                str(ai.get("requested_target_language")),
+            )
+            duplicates[identity] += 1
+        try:
+            dt = datetime.fromisoformat(str(item.get("created_at") or ""))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            elapsed = max(0.0, (now-dt).total_seconds()/60)
+        except (TypeError, ValueError, OverflowError):
+            age_buckets["timestamp_unavailable"] += 1
+            continue
+        if elapsed < 5:
+            age_buckets["under_5_minutes"] += 1
+        elif elapsed < 30:
+            age_buckets["5_to_30_minutes"] += 1
+        elif elapsed < 120:
+            age_buckets["30_to_120_minutes"] += 1
+        else:
+            age_buckets["over_120_minutes"] += 1
+        if ai_pending:
+            pending_ages.append(elapsed)
+
+    historical = [x for x in ai_history if isinstance(x, Mapping)]
+    samples = [
+        float(x["elapsed_seconds"])
+        for x in historical[-20:]
+        if isinstance(x.get("elapsed_seconds"), (float, int))
+    ]
+    duplicates_counts = sorted((count for count in duplicates.values() if count > 1), reverse=True)
+    return {
+        "count_by_stage": dict(stage_count),
+        "count_by_routing_mode": dict(mode_count),
+        "count_by_ai_state": dict(ai_count),
+        "count_by_requested_ai_provider": dict(provider_count),
+        "job_age_buckets": age_buckets,
+        "oldest_AI_wait_minutes": round(max(pending_ages), 1) if pending_ages else None,
+        "duplicate_AI_prompt_group_sizes": duplicates_counts[:10],
+        "duplicate_AI_jobs_avoidable_by_reuse": sum(n-1 for n in duplicates_counts),
+        "recent_AI_samples": len(samples),
+        "recent_AI_average_seconds": round(sum(samples)/len(samples), 1) if samples else None,
+        "recent_AI_max_seconds": round(max(samples), 1) if samples else None,
+    }
+
 def read_evidence(config: Path = Path("/config")) -> dict[str, Any]:
     entries, entries_status = read_json(config / ".storage/core.config_entries")
     rows = entries.get("data", {}).get("entries", [])
@@ -161,6 +258,9 @@ def read_evidence(config: Path = Path("/config")) -> dict[str, Any]:
             last = stored.get("last") or {}
             report["queue_store"].update({
                 "job_count": len(jobs),
+                "backlog_metrics": queue_backlog_metrics(
+                    jobs, stored.get("ai_history") or []
+                ),
                 "pending_summary": [
                     {
                         "status": j.get("status"),
