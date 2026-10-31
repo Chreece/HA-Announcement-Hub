@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from collections import Counter
 from collections.abc import Mapping
 import json
+import hashlib
 from pathlib import Path
 import re
 import sqlite3
@@ -220,7 +221,16 @@ def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, A
         for x in historical[-20:]
         if isinstance(x.get("elapsed_seconds"), (float, int))
     ]
-    duplicates_counts = sorted((count for count in duplicates.values() if count > 1), reverse=True)
+    duplicates_counts = sorted(
+        (count for count in duplicates.values() if count > 1),
+        reverse=True,
+    )
+    finished = historical[-1] if historical else {}
+    last_id = str(finished.get("job_id") or "")
+    ai_progress_marker = (
+        hashlib.sha256(last_id.encode("utf-8")).hexdigest()[:16]
+        if last_id else None
+    )
     return {
         "count_by_stage": dict(stage_count),
         "count_by_routing_mode": dict(mode_count),
@@ -231,6 +241,8 @@ def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, A
         "duplicate_AI_prompt_group_sizes": duplicates_counts[:10],
         "duplicate_AI_jobs_avoidable_by_reuse": sum(n-1 for n in duplicates_counts),
         "recent_AI_samples": len(samples),
+        "last_AI_completed_job_marker": ai_progress_marker,
+        "last_AI_completed_job_created_at": finished.get("created_at"),
         "recent_AI_average_seconds": round(sum(samples)/len(samples), 1) if samples else None,
         "recent_AI_max_seconds": round(max(samples), 1) if samples else None,
     }
