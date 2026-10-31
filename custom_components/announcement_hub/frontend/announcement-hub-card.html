@@ -10,8 +10,17 @@
           <p class="intro">Compose once. Deliver to the right place.</p>
         </div>
       </div>
-      <div id="queue-pill" class="queue-pill" aria-label="Waiting queue jobs"><ha-icon icon="mdi:playlist-check"></ha-icon><span id="queue-number">–</span><span class="queue-word">waiting</span></div>
+      <div class="top-actions">
+        <div id="queue-pill" class="queue-pill" aria-label="Waiting queue jobs"><ha-icon icon="mdi:playlist-check"></ha-icon><span id="queue-number">–</span><span class="queue-word">waiting</span></div>
+        <button type="button" id="stop-clear" class="stop-clear-button" aria-expanded="false" aria-controls="stop-clear-confirm" aria-label="Stop active Hub playback and clear the queue"><ha-icon icon="mdi:stop-circle-outline"></ha-icon><span>Stop &amp; Clear</span></button>
+      </div>
     </header>
+    <div id="stop-clear-confirm" class="stop-clear-confirm" role="group" aria-label="Confirm stop and clear" hidden>
+      <ha-icon icon="mdi:alert-octagon-outline"></ha-icon>
+      <div><strong>Stop all Hub announcements?</strong><span>Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.</span></div>
+      <button type="button" class="danger" id="confirm-stop-clear">Yes, stop &amp; clear</button>
+      <button type="button" class="quiet" id="cancel-stop-clear">Keep announcements</button>
+    </div>
     <div class="sections">
       <section class="section" aria-labelledby="message-heading">
         <div class="section-top"><div class="section-name"><span class="index">01</span><h3 id="message-heading">The message</h3></div><span class="muted micro">Your words, your tone</span></div>

@@ -144,8 +144,11 @@ send:
               domain: tts
 
 clear_queue:
+  description: Clear waiting announcements. With include_current, cancel all active Hub deliveries and stop Hub-owned audio; already delivered push notifications cannot be recalled.
   fields:
     include_current:
+      name: Include active announcements
+      description: Also request immediate cancellation of active Hub outputs. Does not pause future announcements.
       default: false
       selector:
         boolean:

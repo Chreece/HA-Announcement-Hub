@@ -139,7 +139,14 @@ The card's exact type is `custom:announcement-hub-card`; its picker name is
 
 The visual editor controls the card heading, initial importance, queue
 counter, AI controls and whether the message fields clear after a successful
-send. **Message text, target selections and credentials are not stored in the
+send. The card's **Stop & Clear** button is always available, even when the
+waiting count is zero because audio may already be playing. It requires an
+explicit second confirmation and calls `announcement_hub.clear_queue` with
+`include_current: true`. This clears waiting jobs, cancels all active
+Hub delivery lanes and stops audio currently owned by Hub; unrelated music
+is left alone. Previously delivered push notifications or remote-device
+overlays cannot necessarily be recalled. New announcements created after
+the stop action are accepted normally. **Message text, target selections and credentials are not stored in the
 dashboard configuration.** Dashboard permissions continue to be enforced by
 Home Assistant's authenticated service call.
 
@@ -1256,8 +1263,11 @@ data:
   include_current: false
 ```
 
-Set `include_current: true` to request cancellation of the active job
-as well.
+Set `include_current: true` to cancel **all** active Hub delivery
+jobs as well as the waiting queue and interrupt Hub-owned audio. The action
+does not mute Home Assistant globally, stop unrelated music, withdraw
+already-delivered device notifications, or prevent new announcements. The
+`Stop & Clear` dashboard button provides this action with confirmation.
 
 An accepted announcement with no currently usable output remains
 persisted and may be retried as availability, room occupancy and

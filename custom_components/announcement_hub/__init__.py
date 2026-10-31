@@ -620,14 +620,15 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
 
     async def async_clear_queue(call: ServiceCall) -> ServiceResponse:
         manager = _get_manager(hass)
-        removed = await manager.async_clear_queue(
-            include_current=call.data[ATTR_INCLUDE_CURRENT]
-        )
+        # Capture active state before cancellation; it may finish during
+        # media_stop, but the response must still report what was requested.
+        active_before = len(manager.status_dict()["active"])
+        include_current = call.data[ATTR_INCLUDE_CURRENT]
+        removed = await manager.async_clear_queue(include_current=include_current)
         response: ServiceResponse = {
             "cleared": removed,
-            "current_cancel_requested": bool(
-                call.data[ATTR_INCLUDE_CURRENT] and manager.current_job
-            ),
+            "active_cancel_requested": active_before if include_current else 0,
+            "current_cancel_requested": bool(include_current and active_before),
             "queue_size": manager.queue_size,
         }
         return response if call.return_response else None

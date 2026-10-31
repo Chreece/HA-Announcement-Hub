@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b27 - 2026-10-31
+
+**Beta — dashboard Stop & Clear with confirmation and safer active-output cancellation.**
+
+- Add a prominent, always-available **Stop & Clear** button to the bundled
+  Lovelace card, protected by an explicit two-step confirmation. The button
+  calls `announcement_hub.clear_queue` with `include_current: true` and
+  gives clear success/failure feedback without automatic retries.
+- Mark all parallel active room deliveries cancelled before stopping any
+  player, so a slow provider stop cannot start another Hub output.
+- Stop only media players that are actively being used for Hub chimes or
+  speech; do not stop unrelated music on idle/waiting room speakers.
+- Make Companion App speech dwell cancellation-responsive, persist queue
+  clearing immediately and do not requeue actively cancelled jobs on
+  shutdown/restart.
+- Keep Snapcast route/volume recovery and recipient restrictions intact.
+  Previously delivered push messages and remote overlays are not retractable;
+  newly submitted announcements remain allowed.
+- Add dashboard and backend cancellation regressions and localized control
+  text for all 19 dashboard languages.
+
 ## 0.10.0b26 - 2026-10-31
 
 **Beta — recover durable AI announcement queues after provider stalls without speaking generation instructions.**
