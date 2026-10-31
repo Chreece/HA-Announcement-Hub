@@ -421,6 +421,30 @@ while the first is still running. For genuinely independent invocations that
 must all run, consider `mode: queued` with an explicit `max`, after checking
 that repeated routine announcements are desirable.
 
+### Read-only diagnostics for an installed Home Assistant container
+
+The repository includes two complementary scripts under `tools/`:
+
+- `announcement_hub_onhost_scenarios.py` runs **14 simulated routing
+  transitions using the installed integration code**. It never issues HA
+  service calls, changes presence, or plays audio. It summarizes version,
+  config, saved queue/AI state and recent Docker log signals without exporting
+  announcement text or API credentials.
+- `announcement_hub_container_evidence.py` runs read-only inside the existing
+  HA Docker container. It distinguishes a genuinely empty private queue from
+  an unreadable Store and optionally analyzes the latest **historical SQLite
+  Recorder** observations for selected occupied/sleeping room entities and
+  configured output states. Recorder values are *not* live states, and no
+  Home Assistant token is required. MariaDB users may have no SQLite data.
+
+For a host-side run, place both scripts in the same directory, then execute
+`python3 announcement_hub_onhost_scenarios.py` on the **host**, not inside
+Home Assistant. The host runner invokes the second script via a read-only
+`docker exec -i homeassistant python3 -` call and writes a timestamped
+sanitized JSON/TXT/TAR bundle under `~/projects/announcement_hub/logs`.
+A local `HASS_TOKEN` can optionally enable a true live API state check;
+never put access tokens into support archives or chat messages.
+
 ## Person-targeted announcements and personal destinations
 
 In **Configure → People and personal voices**, select Home Assistant people.
