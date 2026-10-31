@@ -124,3 +124,69 @@ def test_database_connection_is_read_only_and_no_ha_service_is_called():
     assert "services.async_call(" not in code
     assert "docker stop" not in code
     assert "INSERT INTO" not in code
+
+
+def test_backlog_counts_every_job_and_redacts_prompts_and_ids():
+    from datetime import timedelta
+    created = (datetime.now(timezone.utc)-timedelta(minutes=45)).isoformat()
+    prompts = ["DO_NOT_EXPORT_SENSITIVE_PROMPT", "DO_NOT_EXPORT_SENSITIVE_PROMPT",
+               "DO_NOT_EXPORT_OTHER_PROMPT"]
+    pending = [
+        {
+            "job_id": f"private-id-{idx}",
+            "created_at": created,
+            "routing_stage": "primary", "routing_mode": "room_fallback",
+            "ai": {
+                "pending_preprocessing": True,
+                "source_tts": text, "source_notify": text,
+                "requested_agent_id": "ai_task.local",
+                "requested_mode": "generate",
+            },
+        }
+        for idx, text in enumerate(prompts)
+    ]
+    pending.append({
+        "created_at": created,
+        "routing_stage": "occupied",
+        "routing_mode": "room_fallback",
+        "ai": {"pending_preprocessing": False},
+    })
+    stats = mod.queue_backlog_metrics(
+        pending, [{"elapsed_seconds": 34}, {"elapsed_seconds": 20}]
+    )
+    assert stats["count_by_ai_state"] == {
+        "waiting_for_ai": 3, "ai_finished_or_disabled": 1
+    }
+    assert stats["job_age_buckets"]["30_to_120_minutes"] == 4
+    assert stats["count_by_requested_ai_provider"] == {"ai_task.local": 3}
+    assert stats["duplicate_AI_prompt_group_sizes"] == [2]
+    assert stats["duplicate_AI_jobs_avoidable_by_reuse"] == 1
+    assert stats["recent_AI_average_seconds"] == 27.0
+    serialized = json.dumps(stats)
+    assert "private-id-" not in serialized
+    assert "DO_NOT_EXPORT" not in serialized
+
+
+def test_recorder_without_legacy_last_updated_ts_can_be_read(tmp_path):
+    root = fixture(tmp_path)
+    db = root / "home-assistant_v2.db"
+    connection = sqlite3.connect(db)
+    connection.execute("ALTER TABLE states RENAME COLUMN last_updated_ts TO last_changed_ts")
+    connection.commit()
+    connection.close()
+    report = mod.read_evidence(root)
+    assert report["recorder_status"] == "recorder_last_observed_not_live"
+    assert report["sources"]["occupied_rooms"]["recognized_area_ids"] == ["kueche"]
+
+
+def test_recorder_without_attributes_id_still_returns_current_state(tmp_path):
+    root = fixture(tmp_path)
+    db = root / "home-assistant_v2.db"
+    connection = sqlite3.connect(db)
+    connection.execute("ALTER TABLE states DROP COLUMN attributes_id")
+    connection.commit()
+    connection.close()
+    report = mod.read_evidence(root)
+    assert report["recorder_status"] == "recorder_last_observed_not_live"
+    assert report["sources"]["occupied_rooms"]["recorder_records"] == 1
+    assert report["sources"]["occupied_rooms"]["selected_attribute_present"] is False
