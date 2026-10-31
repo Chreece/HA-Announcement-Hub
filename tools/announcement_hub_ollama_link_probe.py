@@ -227,7 +227,11 @@ def probe():
             "loaded_count":max(0,len(lines)-1),
             "model_processor_status":[
                 {"name":line.split()[0],
-                 "processor": next((v for v in line.split() if "CPU" in v or "GPU" in v),"unavailable"),
+                 "processor": (
+                     re.search(r"(?:\\d+%/\\d+%|\\d+%)\\s+(?:CPU/GPU|GPU|CPU)", line).group(0)
+                     if re.search(r"(?:\\d+%/\\d+%|\\d+%)\\s+(?:CPU/GPU|GPU|CPU)", line)
+                     else "unavailable"
+                 ),
                  "context":next((v for v in line.split() if v.isdigit() and int(v)>1024),"unknown")}
                 for line in lines[1:5] if line.split()
             ],
