@@ -363,14 +363,14 @@ class AnnouncementManager:
             "ai_oldest_active_seconds": (
                 round(max(
                     time.monotonic() - started
-                    for job_id, started in self._ai_task_started.items()
+                    for job_id, started in getattr(self, "_ai_task_started", {}).items()
                     if job_id in self._ai_tasks
                     and not self._ai_tasks[job_id].done()
                 ), 1)
                 if any(
                     job_id in self._ai_tasks
                     and not self._ai_tasks[job_id].done()
-                    for job_id in self._ai_task_started
+                    for job_id in getattr(self, "_ai_task_started", {})
                 )
                 else None
             ),
@@ -5295,8 +5295,7 @@ class AnnouncementManager:
                         "ai_prompt_templates", {}
                     ),
                     title_result=(
-                        title_result if ai.get("requested_generate_title")
-                        else None
+                        title_result if ai.get("requested_generate_title") else None
                     ),
                 )
         except asyncio.CancelledError:
