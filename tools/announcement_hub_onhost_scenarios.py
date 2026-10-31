@@ -251,16 +251,29 @@ def main():
         report["recent_AI"] = [
             {k: x.get(k) for k in ("status", "elapsed_seconds", "retry_count", "failure_reason")}
             for x in (stored.get("ai_history") or [])[-20:]]
-        try:
-            logs = subprocess.run(
-                ["docker", "logs", "--since", "6h", "--tail", "3500", "homeassistant"],
-                capture_output=True, text=True, timeout=12, check=False)
-            raw = logs.stdout + "\n" + logs.stderr
-            report["log_signals_6h"] = {
-                k: raw.casefold().count(pattern.casefold())
-                for k, pattern in SIGNALS.items()}
-        except (OSError, subprocess.TimeoutExpired):
-            report["log_signals_6h"] = {"unavailable": True}
+        # Include the preceding evening: an 08:00 audit's six-hour
+        # window starts after midnight and misses an 18:00 arrival burst.
+        # Only counts are saved; actual log lines never enter the archive.
+        for hours, max_lines in ((6, 5000), (24, 25000)):
+            key = f"log_signals_{hours}h"
+            try:
+                logs = subprocess.run(
+                    [
+                        "docker", "logs", "--since", f"{hours}h",
+                        "--tail", str(max_lines), "homeassistant",
+                    ],
+                    capture_output=True, text=True, timeout=20, check=False,
+                )
+                if logs.returncode != 0:
+                    report[key] = {"unavailable": True}
+                else:
+                    raw = (logs.stdout + "\n" + logs.stderr).casefold()
+                    report[key] = {
+                        name: raw.count(pattern.casefold())
+                        for name, pattern in SIGNALS.items()
+                    }
+            except (OSError, subprocess.TimeoutExpired):
+                report[key] = {"unavailable": True}
         # A private Home Assistant Store is often mode 0600 inside the
         # container even when the config-entry file is host-readable.
         # Use a read-only Python subprocess INSIDE the existing HA container
