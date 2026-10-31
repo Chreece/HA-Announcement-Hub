@@ -212,7 +212,12 @@ def main():
         else:
             try:
                 raw_storage = json.loads(store_path.read_text(encoding="utf-8"))
-                report["host_queue_store_status"] = "readable"
+                report["host_queue_store_status"] = (
+                    "readable"
+                    if isinstance(raw_storage, dict)
+                    and isinstance(raw_storage.get("data"), dict)
+                    else "unparseable_schema"
+                )
             except PermissionError:
                 report["host_queue_store_status"] = "PermissionError"
                 raw_storage = {}
@@ -282,6 +287,11 @@ def main():
                     if item.get("status") == "readable" and "job_count" in item:
                         report["persisted_queue_count"] = item["job_count"]
                         report["queue_store_verified_by_container"] = True
+                        report["persisted_queue"] = item.get("pending_summary", [])
+                        report["recent_AI"] = item.get("recent_ai", [])
+                        report["last_job"] = item.get(
+                            "last", {"status": "unverified"}
+                        )
                     else:
                         report["queue_store_verified_by_container"] = False
                 else:
