@@ -530,6 +530,13 @@ class AnnouncementManager:
 
             self._running = False
             self._wake.set()
+            # Snapshot ownership before task cancellation discards it. A
+            # shutdown must not leave interrupted Hub audio still playing.
+            owned_before_cancel = {
+                player
+                for players in self._hub_playing_players_by_job.values()
+                for player in players
+            }
 
             # The permanent queue worker is a config-entry background task so it
             # never participates in Home Assistant's startup barrier. We still
@@ -569,7 +576,7 @@ class AnnouncementManager:
             if prefetch_tasks:
                 await asyncio.gather(*prefetch_tasks, return_exceptions=True)
 
-            active_players = tuple({
+            active_players = tuple(owned_before_cancel | {
                 player
                 for players in self._hub_playing_players_by_job.values()
                 for player in players
@@ -4034,6 +4041,10 @@ class AnnouncementManager:
                 },
                 blocking=True,
             )
+            # A stop may have raced with the provider accepting play_media.
+            if job.job_id in getattr(self, "_cancel_requested", set()):
+                await self._async_stop_player(player)
+                self._raise_if_cancelled(job)
             delay = float(self.settings.get("person_chime_delay", 0.5) or 0)
             if delay:
                 await self._async_reading_hold(job, max(0.0, min(delay, 10.0)))
@@ -4431,6 +4442,24 @@ class AnnouncementManager:
             elif post_delay > 0 and not self._has_pending_audible_job():
                 await asyncio.sleep(post_delay)
         finally:
+            if route_snapshot is not None and job.job_id in getattr(self, "_cancel_requested", set()):
+                # Immediately silence selected clients, then drain the MPD
+                # buffer BEFORE restoring previously unmuted other rooms.
+                # Never modify an unrelated stream's clients here.
+                hold_route = False
+                await self._async_stop_player(player)
+                if route_targets:
+                    try:
+                        await self._async_set_mute_states({
+                            entity_id: True for entity_id in route_targets
+                        })
+                    except asyncio.CancelledError:
+                        raise
+                    except Exception as err:  # noqa: BLE001
+                        _LOGGER.warning(
+                            "Could not mute cancelled Hub Snapcast targets: %s", err
+                        )
+                await asyncio.sleep(_SNAPCAST_TAIL_DRAIN_SECONDS)
             if route_snapshot is not None and restore_route:
                 try:
                     if hold_route:
@@ -4643,6 +4672,11 @@ class AnnouncementManager:
             await self.hass.services.async_call(
                 MEDIA_PLAYER_DOMAIN, "play_media", payload, blocking=True
             )
+            # Ensure a late provider start cannot outlive a stop request
+            # that arrived while the play_media service call was in flight.
+            if job.job_id in getattr(self, "_cancel_requested", set()):
+                await self._async_stop_player(player)
+                self._raise_if_cancelled(job)
 
             start_timeout = float(
                 self.settings.get(CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT)

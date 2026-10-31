@@ -201,3 +201,67 @@ def test_companion_tts_hold_and_shutdown_are_cancellation_responsive():
     assert "job.job_id not in self._cancel_requested" in SOURCE
     assert "and job.job_id not in self._cancel_requested" in SOURCE
     assert "_hub_playing_players_by_job" in SOURCE
+
+
+def test_stop_racing_with_media_start_is_stopped_after_provider_ack():
+    method = isolate(
+        "_async_play_media_source",
+        MEDIA_PLAYER_DOMAIN="media_player",
+        ATTR_ENTITY_ID="entity_id",
+        ATTR_MEDIA_CONTENT_ID="media_content_id",
+        ATTR_MEDIA_CONTENT_TYPE="media_content_type",
+        ATTR_MEDIA_ANNOUNCE="announce",
+        MediaType=SimpleNamespace(MUSIC="music"),
+        CONF_DIRECT_TTS_ANNOUNCE="direct_tts_announce",
+        DEFAULT_DIRECT_TTS_ANNOUNCE=False,
+        CONF_START_TIMEOUT="start_timeout",
+        DEFAULT_START_TIMEOUT=5,
+    )
+
+    class Service:
+        async def async_call(self, domain, action, data, **kwargs):
+            assert (domain, action) == ("media_player", "play_media")
+            self.owner._cancel_requested.add("racing")
+
+    class Fake:
+        def __init__(self):
+            self._cancel_requested = set()
+            self._hub_playing_players_by_job = {}
+            self.settings = {}
+            service = Service()
+            service.owner = self
+            self.hass = SimpleNamespace(services=service)
+            self.stopped = []
+
+        def _sleep_tts_muted_now(self):
+            return False
+
+        def _raise_if_cancelled(self, job):
+            if job.job_id in self._cancel_requested:
+                raise ValueError("Cancelled during play")
+
+        async def _async_stop_player(self, player):
+            self.stopped.append(player)
+
+    h = Fake()
+    j = SimpleNamespace(job_id="racing", routing_mode="normal",
+                        tts_media_player=None, person_ids=())
+    try:
+        asyncio.run(method(h, j, "media_player.speech", "media-source://tts"))
+    except ValueError as err:
+        assert "Cancelled" in str(err)
+    else:
+        raise AssertionError("Expected cancellation after provider call")
+    assert h.stopped == ["media_player.speech"]
+    assert h._hub_playing_players_by_job == {"racing": set()}
+
+
+def test_snapcast_stop_mutes_selected_targets_and_drains_before_restoring_route():
+    segment = SOURCE.split("    async def _async_play_server_round(", 1)[1]
+    segment = segment.split("    async def _async_available_tts_engines(", 1)[0]
+    assert 'job.job_id in getattr(self, "_cancel_requested", set())' in segment
+    assert 'entity_id: True for entity_id in route_targets' in segment
+    assert 'await asyncio.sleep(_SNAPCAST_TAIL_DRAIN_SECONDS)' in segment
+    assert segment.index("await self._async_set_mute_states({") < (
+        segment.index("await self._async_restore_snapcast(route_snapshot)")
+    )
