@@ -126,6 +126,10 @@ class WorkerHarness(Scheduler):
     def _notify_update(self):
         pass
 
+    def _fill_ai_slots(self):
+        # The delivery-only worker fixture has no AI preprocessing tasks.
+        pass
+
     async def _async_restore_held_snapcast_route(self):
         self._held_snapcast_snapshot = None
         self._route_restores += 1
