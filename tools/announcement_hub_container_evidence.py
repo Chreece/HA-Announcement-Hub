@@ -158,6 +158,28 @@ def latest_states(database: Path, ids: list[str], *, count: int = 5) -> tuple[di
     finally:
         connection.close()
 
+def recorder_column_layout(database: Path) -> dict[str, list[str]]:
+    """Expose schema column NAMES only, never private DB rows."""
+    if not database.is_file():
+        return {}
+    try:
+        conn = sqlite3.connect(f"file:{database}?mode=ro", uri=True, timeout=3)
+    except (sqlite3.Error, OSError):
+        return {}
+    try:
+        conn.execute("PRAGMA query_only=ON")
+        return {
+            table: [
+                str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})")
+            ]
+            for table in ("states", "states_meta", "state_attributes")
+        }
+    except sqlite3.Error:
+        return {}
+    finally:
+        conn.close()
+
+
 def queue_backlog_metrics(jobs: list[Any], ai_history: list[Any]) -> dict[str, Any]:
     """Summarize ALL jobs without exporting job IDs, prompts, or generated text."""
     now = datetime.now(timezone.utc)
@@ -362,8 +384,11 @@ def read_evidence(config: Path = Path("/config")) -> dict[str, Any]:
     ids = list(dict.fromkeys(ids))[:2 + MAX_OUTPUTS]
     # Default SQLite recorder; MariaDB/filtered/excluded entities may have
     # no rows. Never describe recorder data as current HA state.
-    history, db_status = latest_states(config / "home-assistant_v2.db", ids)
+    database = config / "home-assistant_v2.db"
+    history, db_status = latest_states(database, ids)
     report["recorder_status"] = db_status
+    if db_status == "recorder_schema_unsupported":
+        report["recorder_columns"] = recorder_column_layout(database)
     report["sources"] = {}
     for label, (entity_id, attribute) in source_spec.items():
         if not entity_id:
