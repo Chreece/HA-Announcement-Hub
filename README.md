@@ -424,6 +424,17 @@ Assistant. The Hub intentionally does not impose an arbitrary timeout on
 cold-loading local AI providers; assess their backend health before clearing
 saved jobs or restarting the integration.
 
+For a suspected stalled local AI Task provider such as
+`ai_task.qwen3_8_task`, run the read-only
+`tools/announcement_hub_ai_provider_health.py` script on your Docker host.
+It identifies the HA config-entry integration backing the AI Task entity,
+records HA/Ollama container uptime and current loaded Ollama models, and
+counts common AI/generation/GPU error patterns without exporting raw logs,
+prompts or tokens. Results are saved as a JSON and a small TAR archive in
+`~/projects/announcement_hub/logs`. This diagnostic never calls
+`ai_task.generate_data`, sends an announcement, clears the queue or restarts
+containers.
+
 For a door/welcome automation, always give `wait_template` a finite
 `timeout` when using `continue_on_timeout`: without one, waiting for
 both a closed entrance door and a non-zero entrance people-counter can block
