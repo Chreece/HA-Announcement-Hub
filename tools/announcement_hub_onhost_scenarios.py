@@ -429,8 +429,40 @@ def main():
             report["potential_blockers"].append(
                 "Persisted undelivered queue is non-empty"
             )
-        if any(item.get("ai_pending") for item in report["persisted_queue"]):
-            report["potential_blockers"].append("One or more AI generations remain pending")
+        backlog_stats = report.get("container_probe", {}).get(
+            "queue_store", {}
+        ).get("backlog_metrics", {})
+        waiting_ai = backlog_stats.get("count_by_ai_state", {}).get(
+            "waiting_for_ai"
+        )
+        if isinstance(waiting_ai, int):
+            if waiting_ai >= 20:
+                report["potential_blockers"].append(
+                    f"Large AI generation backlog: {waiting_ai} jobs awaiting AI"
+                )
+            elif waiting_ai:
+                report["potential_blockers"].append(
+                    f"AI generation pending: {waiting_ai} jobs"
+                )
+            if backlog_stats.get("oldest_AI_wait_minutes") is not None:
+                age = backlog_stats["oldest_AI_wait_minutes"]
+                if age >= 120:
+                    report["potential_blockers"].append(
+                        f"Oldest pending AI job has waited {age:g} minutes"
+                    )
+            if backlog_stats.get("duplicate_AI_jobs_avoidable_by_reuse", 0) >= 10:
+                report["potential_blockers"].append(
+                    "Repeated identical AI prompt groups are accumulating"
+                )
+        elif any(item.get("ai_pending") for item in report["persisted_queue"]):
+            report["potential_blockers"].append(
+                "One or more AI generations remain pending"
+            )
+        observation = report.get("AI_queue_observation", {})
+        if observation.get("status") == "no_progress_in_window":
+            report["potential_blockers"].append(
+                "No AI completion observed in the bounded second snapshot; not proof of a deadlock"
+            )
         snapshots = report.get("container_probe", {}).get("sources", {})
         for label in ("occupied_rooms", "sleeping_rooms"):
             source_report = snapshots.get(label, {})
