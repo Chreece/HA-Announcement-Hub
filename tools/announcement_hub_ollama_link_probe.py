@@ -228,8 +228,8 @@ def probe():
             "model_processor_status":[
                 {"name":line.split()[0],
                  "processor": (
-                     re.search(r"(?:\\d+%/\\d+%|\\d+%)\\s+(?:CPU/GPU|GPU|CPU)", line).group(0)
-                     if re.search(r"(?:\\d+%/\\d+%|\\d+%)\\s+(?:CPU/GPU|GPU|CPU)", line)
+                     re.search(r"(?:\d+%/\d+%|\d+%)\s+(?:CPU/GPU|GPU|CPU)", line).group(0)
+                     if re.search(r"(?:\d+%/\d+%|\d+%)\s+(?:CPU/GPU|GPU|CPU)", line)
                      else "unavailable"
                  ),
                  "context":next((v for v in line.split() if v.isdigit() and int(v)>1024),"unknown")}
