@@ -5213,7 +5213,9 @@ class AnnouncementManager:
             f"{DOMAIN} AI {job.job_id}",
         )
         self._ai_tasks[job.job_id] = task
-        self._ai_task_started[job.job_id] = time.monotonic()
+        started_tasks = getattr(self, "_ai_task_started", None)
+        if started_tasks is not None:
+            started_tasks[job.job_id] = time.monotonic()
 
         def _done(done_task: asyncio.Task[None]) -> None:
             if self._ai_tasks.get(job.job_id) is done_task:
