@@ -8,13 +8,15 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.10.0b28"
+VERSION: Final = "0.10.0b29"
 PLATFORMS: Final = [Platform.SENSOR, Platform.SWITCH]
 
 SERVICE_SEND: Final = "send"
 NOTIFY_SERVICE_ANNOUNCEMENT_HUB: Final = "announcement_hub"
 SERVICE_CLEAR_QUEUE: Final = "clear_queue"
 SERVICE_CANCEL: Final = "cancel"
+SERVICE_LIST_QUEUE: Final = "list_queue"
+SERVICE_REORDER_QUEUE: Final = "reorder_queue"
 
 ATTR_TEXT: Final = "text"
 ATTR_TEXT_TTS: Final = "text_tts"

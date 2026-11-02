@@ -182,6 +182,9 @@ class AnnouncementJob:
     successful_channels: list[str] = field(default_factory=list)
     delivered_physical: list[str] = field(default_factory=list)
     status: str = "pending"
+    # Mutable delivery priority in the durable queue, independent of the
+    # creation timestamp used for sleep and diagnostic age calculations.
+    queue_order: int | None = None
     started_at: str | None = None
     finished_at: str | None = None
     error: str | None = None
@@ -379,6 +382,7 @@ class AnnouncementJob:
         payload.setdefault("tts_options", {})
         payload.setdefault("tts_cache", True)
         payload.setdefault("status", "pending")
+        payload.setdefault("queue_order", None)
         payload.setdefault("started_at", None)
         payload.setdefault("finished_at", None)
         payload.setdefault("error", None)

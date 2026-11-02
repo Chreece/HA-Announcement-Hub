@@ -18,7 +18,7 @@ klass = next(
     node for node in tree.body
     if isinstance(node, ast.ClassDef) and node.name == "AnnouncementManager"
 )
-methods = ("_requeue_undelivered_job", "_next_runnable_job")
+methods = ("_requeue_undelivered_job", "_next_runnable_job", "_queue_order_key")
 
 
 class Harness:

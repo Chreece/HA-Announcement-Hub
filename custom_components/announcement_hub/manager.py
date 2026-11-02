@@ -273,6 +273,7 @@ class AnnouncementManager:
             private=True,
         )
         self._queue: deque[AnnouncementJob] = deque()
+        self._next_queue_order = 0
         self._current: AnnouncementJob | None = None
         self._active_jobs: dict[str, AnnouncementJob] = {}
         self._delivery_tasks: dict[str, asyncio.Task[None]] = {}
@@ -336,6 +337,104 @@ class AnnouncementManager:
 
     def pending_jobs(self) -> list[AnnouncementJob]:
         return list(self._queue)
+
+    @staticmethod
+    def _queue_order_key(job: AnnouncementJob) -> tuple[int, int | str, str]:
+        """Stable user-defined order; legacy test/queue records use their timestamp."""
+        order = getattr(job, "queue_order", None)
+        if isinstance(order, int) and order >= 0:
+            return (0, order, str(getattr(job, "job_id", "")))
+        return (1, str(getattr(job, "created_at", "")), str(getattr(job, "job_id", "")))
+
+    def _normalise_queue_orders(self) -> None:
+        """Migrate previous queues without touching original creation times."""
+        queued = list(self._queue)
+        ranks = [getattr(job, "queue_order", None) for job in queued]
+        if any(not isinstance(rank, int) or rank < 0 for rank in ranks) or len(set(ranks)) != len(ranks):
+            # The store was serialized in FIFO order by older releases.
+            for index, job in enumerate(queued):
+                job.queue_order = index
+            self._queue = type(self._queue)(queued)
+        else:
+            self._queue = type(self._queue)(sorted(queued, key=self._queue_order_key))
+        self._next_queue_order = max(
+            getattr(self, "_next_queue_order", 0),
+            1 + max((job.queue_order for job in self._queue), default=-1),
+        )
+
+    def queue_view(self) -> dict[str, Any]:
+        """Full message bodies ONLY in an authenticated on-demand response.
+
+        Never put message text into sensor state, event payloads or logs.
+        Waiting jobs can be reordered; active deliveries are view-only here.
+        """
+        def describe(job: AnnouncementJob, *, active: bool) -> dict[str, Any]:
+            return {
+                "job_id": job.job_id,
+                "created_at": job.created_at,
+                "queue_order": getattr(job, "queue_order", None),
+                "title": job.title,
+                "level": job.level,
+                "status": job.status,
+                "text_tts": job.text_tts,
+                "text_notify": job.text_notify,
+                "ai_mode": job.ai.get("requested_mode", job.ai.get("mode")),
+                "ai_pending": bool(job.ai.get("pending_preprocessing")),
+                "routing_stage": job.routing_stage,
+                "related_job_ids": list(job.related_job_ids),
+                "active": active,
+            }
+
+        return {
+            "jobs": [describe(job, active=False) for job in self._queue],
+            "active": [describe(job, active=True) for job in self._active_jobs.values()],
+            "queue_size": len(self._queue),
+            "active_count": len(self._active_jobs),
+        }
+
+    async def async_reorder_queue(
+        self,
+        job_id: str,
+        direction: str,
+        *,
+        neighbor_job_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Move exactly one waiting job, with stale-view protection.
+
+        Never reorder active output. This changes the FIFO lane intentionally,
+        without changing message creation time or physical recipient rules.
+        """
+        if direction not in {"up", "down"}:
+            raise ServiceValidationError("direction must be up or down")
+        if job_id in self._active_jobs:
+            raise ServiceValidationError("Cannot reorder an active announcement")
+        jobs = list(self._queue)
+        index = next((i for i, job in enumerate(jobs) if job.job_id == job_id), -1)
+        if index < 0:
+            raise ServiceValidationError("Announcement is no longer waiting")
+        target = index - 1 if direction == "up" else index + 1
+        if target < 0 or target >= len(jobs):
+            return {"moved": False, "job_id": job_id, "queue_size": len(jobs)}
+        if neighbor_job_id is not None and jobs[target].job_id != neighbor_job_id:
+            raise ServiceValidationError("Queue changed; refresh before moving")
+        # Old stored messages are normalized before the first mutation.
+        self._normalise_queue_orders()
+        jobs = list(self._queue)
+        index = next(i for i, job in enumerate(jobs) if job.job_id == job_id)
+        target = index - 1 if direction == "up" else index + 1
+        if neighbor_job_id is not None and jobs[target].job_id != neighbor_job_id:
+            raise ServiceValidationError("Queue changed; refresh before moving")
+        jobs[index].queue_order, jobs[target].queue_order = (
+            jobs[target].queue_order, jobs[index].queue_order
+        )
+        jobs[index], jobs[target] = jobs[target], jobs[index]
+        self._queue = type(self._queue)(jobs)
+        # A result must not acknowledge a move that has not survived storage.
+        async with self._save_lock:
+            await self._store.async_save(self._serialize())
+        self._wake.set()
+        self._notify_update()
+        return {"moved": True, "job_id": job_id, "queue_size": len(jobs)}
 
     def status_dict(self) -> dict[str, Any]:
         return {
@@ -472,6 +571,7 @@ class AnnouncementManager:
             job.finished_at = None
             job.error = None
             self._queue.append(job)
+        self._normalise_queue_orders()
         if raw_last := stored.get("last"):
             with suppress(TypeError, ValueError, KeyError):
                 self._last = AnnouncementJob.from_dict(raw_last)
@@ -614,7 +714,7 @@ class AnnouncementManager:
             self._hub_playing_players_by_job.clear()
 
             self._queue = type(self._queue)(sorted(
-                self._queue, key=lambda item: (getattr(item, "created_at", ""), item.job_id)
+                self._queue, key=self._queue_order_key
             ))
 
             async with self._save_lock:
@@ -2168,6 +2268,8 @@ class AnnouncementManager:
         job.group_id = _group_token
         if room_fallback_routing:
             self._prepare_staged_route(job)
+        job.queue_order = self._next_queue_order
+        self._next_queue_order += 1
         self._queue.append(job)
         if not job.ai.get("pending_preprocessing") and hasattr(self, "_ai_history"):
             # Include jobs where AI is off so owners can distinguish a
@@ -2687,7 +2789,7 @@ class AnnouncementManager:
         self._queue.append(job)
         self._queue = type(self._queue)(sorted(
             self._queue,
-            key=lambda item: (getattr(item, "created_at", ""), item.job_id),
+            key=self._queue_order_key,
         ))
         self._wake.set()
 
@@ -3259,7 +3361,7 @@ class AnnouncementManager:
         job.channel_errors.clear()
         self._queue.appendleft(job)
         self._queue = type(self._queue)(sorted(
-            self._queue, key=lambda item: (getattr(item, "created_at", ""), item.job_id)
+            self._queue, key=self._queue_order_key
         ))
 
     def _requeue_undelivered_job(
@@ -3286,7 +3388,7 @@ class AnnouncementManager:
             job.channel_errors.clear()
             self._queue.append(job)
         self._queue = type(self._queue)(sorted(
-            self._queue, key=lambda item: (getattr(item, "created_at", ""), item.job_id)
+            self._queue, key=self._queue_order_key
         ))
         self._wake.set()
 
@@ -5941,7 +6043,11 @@ class AnnouncementManager:
         jobs.extend(job.to_dict() for job in self._active_jobs.values()
                     if job.status not in _TERMINAL_JOB_STATES
                     and job.job_id not in self._cancel_requested)
-        jobs.sort(key=lambda item: (item["created_at"], item["job_id"]))
+        jobs.sort(key=lambda item: (
+            (0, item["queue_order"], item["job_id"])
+            if isinstance(item.get("queue_order"), int)
+            else (1, item["created_at"], item["job_id"])
+        ))
         return {
             "jobs": jobs,
             "last": self._last.to_dict() if self._last else None,

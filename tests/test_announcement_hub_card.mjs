@@ -46,7 +46,13 @@ function harness() {
   fields.send = { disabled: false };
   fields["send-label"] = { textContent: "" };
   fields["queue-number"] = { textContent: "" };
-  fields["queue-pill"] = { title: "", hidden: false };
+  fields["queue-pill"] = { title: "", hidden: false, setAttribute(key, value) { this[key] = value; } };
+  fields["queue-panel"] = { hidden: true };
+  fields["queue-list"] = { replaceChildren() {} };
+  fields["queue-refresh"] = { disabled: false };
+  fields["queue-close"] = { disabled: false };
+  fields["queue-total"] = { textContent: "" };
+  fields["queue-feedback"] = { textContent: "", hidden: true };
   fields["stop-clear-confirm"] = { hidden: true };
   fields["stop-clear"] = { disabled: false, setAttribute(k, v) { this[k] = v; } };
   fields["confirm-stop-clear"] = { disabled: false, focus() {} };
@@ -67,6 +73,7 @@ test("card registers in Lovelace picker and exposes a graphical editor", () => {
   assert.equal(typeof Editor, "function");
   assert.equal(Card.getConfigElement().tagName, "announcement-hub-card-editor");
   assert.equal(Card.getStubConfig().show_ai, true);
+  assert.equal(new Card().getCardSize(), 4);
   assert.equal(window.customCards.filter((c) => c.type === "announcement-hub-card").length, 1);
 });
 
@@ -77,6 +84,7 @@ test("bundled HTML/CSS support a modern card with safe input controls", () => {
     "area-options", "integration-options", "device-options", "entity-options",
     "level", "channels", "ai-choices", "send", "critical-confirm",
     "stop-clear", "stop-clear-confirm", "confirm-stop-clear", "cancel-stop-clear",
+    "queue-pill", "queue-panel", "queue-list", "queue-refresh", "queue-close",
   ]) {
     const actual = id === "level" ? "levels" : id;
     assert.match(html, new RegExp("id=" + JSON.stringify(actual)));
@@ -282,6 +290,109 @@ test("Stop & Clear cannot race a pending send on this card", async () => {
   card._hass = { callService: async () => { throw new Error("should not call service"); } };
   await card._stopAndClear();
   assert.equal(notices.length, 0);
+});
+
+
+test("compact card keeps message/title/icon priority visible and folds all other sections", () => {
+  const html = readFileSync(HTML_PATH, "utf8");
+  const css = readFileSync(CSS_PATH, "utf8");
+  assert.match(html, /id="message"/);
+  assert.match(html, /id="message-title"/);
+  assert.match(html, /id="levels" class="choices priority-pills"/);
+  assert.match(html, /<details class="section folded-section" id="recipients-section">/);
+  assert.match(html, /<details class="section folded-section" id="delivery-section">/);
+  assert.doesNotMatch(html, /id="recipients-section" open/);
+  assert.doesNotMatch(html, /id="delivery-section" open/);
+  assert.doesNotMatch(html, /class="kicker"/);
+  assert.match(css, /h2\{[^}]*white-space:nowrap/);
+  const js = readFileSync(CARD_PATH, "utf8");
+  for (const severity of ["info", "success", "warning", "error", "critical", "debug"]) {
+    assert.match(js, new RegExp(severity + ': "mdi:'));
+  }
+  assert.match(js, /symbol\.setAttribute\("icon", LEVEL_ICONS\[level\]\)/);
+});
+
+test("tapping the queue badge loads all message bodies only through authenticated service", async () => {
+  const { card, fields } = harness();
+  const requests = [];
+  card._renderQueue = () => {};
+  card._hass = { callService: async (...args) => {
+    requests.push(args);
+    return { jobs: [
+      { job_id: "j1", title: "Open door", text_notify: "PRIVATE_MESSAGE_ONE",
+        text_tts: null, level: "info", status: "pending", active: false },
+      { job_id: "j2", title: "Wash", text_tts: "PRIVATE_MESSAGE_TWO",
+        text_notify: null, level: "warning", status: "pending", active: false },
+    ], active: [], queue_size: 2 };
+  }};
+  card._toggleQueue(true);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(fields["queue-panel"].hidden, false);
+  assert.equal(fields["queue-pill"]["aria-expanded"], "true");
+  assert.equal(card._queueJobs.length, 2);
+  assert.equal(card._queueJobs[0].text_notify, "PRIVATE_MESSAGE_ONE");
+  assert.equal(card._queueJobs[1].text_tts, "PRIVATE_MESSAGE_TWO");
+  assert.deepEqual(requests[0], [
+    "announcement_hub", "list_queue", {}, undefined, false, true,
+  ]);
+  card._toggleQueue(false);
+  assert.equal(card._queueJobs.length, 0, "private text is cleared when panel closes");
+  assert.equal(fields["queue-panel"].hidden, true);
+});
+
+test("queue move is durable and sends the expected adjacent job guard", async () => {
+  const { card } = harness();
+  const requests = [];
+  card._queueOpen = true;
+  card._renderQueue = () => {};
+  card._queueJobs = [
+    { job_id: "j1" }, { job_id: "j2" }, { job_id: "j3" },
+  ];
+  card._hass = { callService: async (...args) => {
+    requests.push(args);
+    return { moved: true, job_id: "j3", queue_size: 3 };
+  }};
+  card._fetchQueue = async () => {};
+  await card._queueAction("up", "j3");
+  assert.equal(requests.length, 1);
+  assert.deepEqual(requests[0], [
+    "announcement_hub", "reorder_queue",
+    { job_id: "j3", direction: "up", neighbor_job_id: "j2" },
+    undefined, false, true,
+  ]);
+  assert.equal(card._queueBusy, false);
+});
+
+test("remove requires a second click and never repeats a failed cancellation", async () => {
+  const { card } = harness();
+  const requests = [];
+  card._queueOpen = true;
+  card._renderQueue = () => {};
+  card._queueJobs = [{ job_id: "j1" }];
+  card._hass = { callService: async (...args) => {
+    requests.push(args);
+    throw new Error("Device offline");
+  }};
+  card._fetchQueue = async () => {};
+  await card._queueAction("remove", "j1");
+  assert.equal(requests.length, 0);
+  assert.equal(card._queueRemoveId, "j1");
+  await card._queueAction("confirm-remove", "j1");
+  assert.equal(requests.length, 1);
+  assert.deepEqual(requests[0], [
+    "announcement_hub", "cancel", { job_id: "j1" }, undefined, false, true,
+  ]);
+  assert.match(card._queueError, /Could not change queue/);
+  await card._queueAction("keep", "j1");
+  assert.equal(card._queueRemoveId, null);
+});
+
+test("queue renders dynamic messages as text, never untrusted HTML", () => {
+  const js = readFileSync(CARD_PATH, "utf8");
+  const block = js.split("    _renderQueue() {", 2)[1].split("    async _queueAction(", 1)[0];
+  assert.match(block, /value\.textContent = content/);
+  assert.match(block, /title\.textContent = item\.title/);
+  assert.doesNotMatch(block, /innerHTML|insertAdjacentHTML|eval\(/);
 });
 
 test("module does not embed external JS/CSS dependencies or unsafe user markup", () => {

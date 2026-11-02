@@ -954,6 +954,28 @@
           "description": "announcement_hub.send가 반환한 작업 ID입니다."
         }
       }
+    },
+    "list_queue": {
+      "name": "안내 목록",
+      "description": "인증된 사용자에게 대기 중이거나 진행 중인 모든 안내의 전체 내용을 표시합니다."
+    },
+    "reorder_queue": {
+      "name": "안내 순서 바꾸기",
+      "description": "대기 중인 안내를 위아래로 이동하며 재시작 후에도 순서를 유지합니다.",
+      "fields": {
+        "job_id": {
+          "name": "안내 ID",
+          "description": "이동할 대기 안내의 ID입니다."
+        },
+        "direction": {
+          "name": "방향",
+          "description": "대기열에서 위아래로 이동합니다."
+        },
+        "neighbor_job_id": {
+          "name": "예상 인접 안내 ID",
+          "description": "열람 이후 대기열 변경을 확인하는 선택 항목입니다."
+        }
+      }
     }
   }
 }

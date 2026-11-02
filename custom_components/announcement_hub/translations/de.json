@@ -954,6 +954,28 @@
           "description": "Die von announcement_hub.send zurückgegebene Auftrags-ID."
         }
       }
+    },
+    "list_queue": {
+      "name": "Durchsagen auflisten",
+      "description": "Vollständige Texte aller wartenden und aktiven Durchsagen nur an den authentifizierten Aufrufer zurückgeben."
+    },
+    "reorder_queue": {
+      "name": "Durchsagen umsortieren",
+      "description": "Eine wartende Durchsage nach oben oder unten verschieben; die Reihenfolge bleibt nach Neustarts erhalten.",
+      "fields": {
+        "job_id": {
+          "name": "Durchsagen-ID",
+          "description": "ID der zu verschiebenden wartenden Durchsage."
+        },
+        "direction": {
+          "name": "Richtung",
+          "description": "In der Warteschlange nach oben oder unten verschieben."
+        },
+        "neighbor_job_id": {
+          "name": "Erwartete benachbarte ID",
+          "description": "Optionale Prüfung, ob sich die Warteschlange inzwischen geändert hat."
+        }
+      }
     }
   }
 }

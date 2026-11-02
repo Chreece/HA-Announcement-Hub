@@ -159,3 +159,26 @@ cancel:
       required: true
       selector:
         text:
+
+list_queue:
+  description: List the full waiting queue and active announcements, including their text, for authenticated dashboard queue management. Message bodies are never exposed in sensor state.
+  fields: {}
+
+reorder_queue:
+  description: Move one waiting announcement up or down, preserving its new order across Home Assistant restarts. Active announcements cannot be moved.
+  fields:
+    job_id:
+      required: true
+      selector:
+        text:
+    direction:
+      required: true
+      selector:
+        select:
+          options:
+            - up
+            - down
+    neighbor_job_id:
+      description: Optional adjacent job ID for stale-view protection.
+      selector:
+        text:

@@ -954,6 +954,28 @@
           "description": "Identificador del trabajo devuelto por announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "Listar anuncios",
+      "description": "Devolver el texto íntegro de todos los anuncios en espera y activos al usuario autenticado."
+    },
+    "reorder_queue": {
+      "name": "Reordenar anuncios",
+      "description": "Subir o bajar un anuncio en espera y guardar el orden tras reinicios.",
+      "fields": {
+        "job_id": {
+          "name": "ID del anuncio",
+          "description": "ID del anuncio en espera que se moverá."
+        },
+        "direction": {
+          "name": "Dirección",
+          "description": "Subir o bajar en la cola."
+        },
+        "neighbor_job_id": {
+          "name": "ID vecina esperada",
+          "description": "Comprobación opcional de cambios desde la última vista de la cola."
+        }
+      }
     }
   }
 }

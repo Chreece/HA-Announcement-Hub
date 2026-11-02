@@ -5,16 +5,26 @@
       <div class="identity">
         <div class="identity-icon"><ha-icon icon="mdi:bullhorn-outline"></ha-icon></div>
         <div>
-          <span class="kicker">HOME ASSISTANT · MESSAGING</span>
           <h2 id="card-heading">Announcement Hub</h2>
-          <p class="intro">Compose once. Deliver to the right place.</p>
         </div>
       </div>
       <div class="top-actions">
-        <div id="queue-pill" class="queue-pill" aria-label="Waiting queue jobs"><ha-icon icon="mdi:playlist-check"></ha-icon><span id="queue-number">–</span><span class="queue-word">waiting</span></div>
+        <button type="button" id="queue-pill" class="queue-pill" aria-label="View all queued announcements" aria-expanded="false" aria-controls="queue-panel"><ha-icon icon="mdi:playlist-check"></ha-icon><span id="queue-number">–</span><span class="queue-word">waiting</span></button>
         <button type="button" id="stop-clear" class="stop-clear-button" aria-expanded="false" aria-controls="stop-clear-confirm" aria-label="Stop active Hub playback and clear the queue"><ha-icon icon="mdi:stop-circle-outline"></ha-icon><span>Stop &amp; Clear</span></button>
       </div>
     </header>
+    <section id="queue-panel" class="queue-panel" aria-label="Manage queued announcements" hidden>
+      <div class="queue-panel-top">
+        <div><strong>Announcement queue</strong><span id="queue-total">Waiting jobs</span></div>
+        <div class="queue-panel-actions">
+          <button type="button" id="queue-refresh" aria-label="Refresh queue" title="Refresh queue"><ha-icon icon="mdi:refresh"></ha-icon></button>
+          <button type="button" id="queue-close" aria-label="Close queue" title="Close queue"><ha-icon icon="mdi:close"></ha-icon></button>
+        </div>
+      </div>
+      <p class="queue-hint">Move waiting messages up or down, or remove them. Active announcements cannot be reordered.</p>
+      <div id="queue-feedback" class="queue-feedback" role="status" aria-live="polite" hidden></div>
+      <div id="queue-list" class="queue-list" role="list"></div>
+    </section>
     <div id="stop-clear-confirm" class="stop-clear-confirm" role="group" aria-label="Confirm stop and clear" hidden>
       <ha-icon icon="mdi:alert-octagon-outline"></ha-icon>
       <div><strong>Stop all Hub announcements?</strong><span>Interrupt active Hub audio and clear waiting jobs. Already delivered notifications cannot be recalled.</span></div>
@@ -24,10 +34,10 @@
     <div class="sections">
       <section class="section" aria-labelledby="message-heading">
         <div class="section-top"><div class="section-name"><span class="index">01</span><h3 id="message-heading">The message</h3></div><span class="muted micro">Your words, your tone</span></div>
-        <label class="field"><span>Announcement</span><textarea id="message" rows="3" maxlength="20000" placeholder="What should people know?"></textarea></label>
-        <div class="columns">
-          <label class="field"><span>Title <small>optional</small></span><input id="message-title" maxlength="200" autocomplete="off" placeholder="Optional title"></label>
-          <div class="field"><span>Importance</span><div id="levels" class="choices" role="group" aria-label="Announcement importance"></div></div>
+        <label class="field"><span>Announcement</span><textarea id="message" rows="2" maxlength="20000" placeholder="What should people know?"></textarea></label>
+        <div class="compose-details">
+          <label class="field compact-title"><span>Title <small>optional</small></span><input id="message-title" maxlength="200" autocomplete="off" placeholder="Optional title"></label>
+          <div class="field compact-priority"><span>Priority</span><div id="levels" class="choices priority-pills" role="group" aria-label="Announcement importance"></div></div>
         </div>
         <details class="disclosure" id="variants">
           <summary><ha-icon icon="mdi:tune-variant"></ha-icon><strong>Custom wording for each channel</strong><small>Optional</small></summary>
@@ -38,8 +48,9 @@
           </div>
         </details>
       </section>
-      <section class="section" aria-labelledby="recipient-heading">
-        <div class="section-top"><div class="section-name"><span class="index">02</span><h3 id="recipient-heading">Who receives it?</h3></div><span class="muted micro">Room-first or exact</span></div>
+      <details class="section folded-section" id="recipients-section">
+        <summary class="folded-heading"><ha-icon icon="mdi:account-multiple-outline"></ha-icon><span id="recipient-heading">Who receives it?</span><small>Automatic routing or exact recipients</small><ha-icon class="fold-chevron" icon="mdi:chevron-down"></ha-icon></summary>
+        <div class="folded-body">
         <div id="target-mode" class="segmented" role="group" aria-label="Recipient selection">
           <button type="button" data-mode="automatic">Automatic routing</button>
           <button type="button" data-mode="targeted">Choose recipients</button>
@@ -99,9 +110,11 @@
             </div>
           </details>
         </div>
-      </section>
-      <section class="section" aria-labelledby="channel-heading">
-        <div class="section-top"><div class="section-name"><span class="index">03</span><h3 id="channel-heading">How to deliver</h3></div></div>
+        </div>
+      </details>
+      <details class="section folded-section" id="delivery-section">
+        <summary class="folded-heading"><ha-icon icon="mdi:tune-variant"></ha-icon><span id="channel-heading">How to deliver</span><small>Channels, AI and advanced options</small><ha-icon class="fold-chevron" icon="mdi:chevron-down"></ha-icon></summary>
+        <div class="folded-body">
         <span class="field-caption">Delivery service</span><div id="channels" class="choices spacious" role="group" aria-label="Delivery service"></div>
         <div id="ai-block"><span class="field-caption ai-label"><ha-icon icon="mdi:creation-outline"></ha-icon> AI wording</span><div id="ai-choices" class="choices spacious" role="group" aria-label="AI wording mode"></div><p id="ai-explanation" class="hint">Use Announcement Hub's configured AI setting.</p></div>
         <details class="disclosure" id="advanced">
@@ -115,7 +128,8 @@
           <span class="field-caption">Direct-room pre-announcement chime</span><div id="pre-chime" class="choices" role="group" aria-label="Pre-announcement chime"></div>
           <p class="hint">Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.</p>
         </details>
-      </section>
+        </div>
+      </details>
     </div>
     <footer class="footer">
       <div class="summary"><ha-icon icon="mdi:shield-check-outline"></ha-icon><span id="summary">Automatic recipients · Hub channels</span></div>

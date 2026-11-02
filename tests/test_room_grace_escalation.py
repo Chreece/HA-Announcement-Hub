@@ -255,6 +255,7 @@ METHODS = (
     "_staged_route_ready",
     "_routing_stage_age",
     "_requeue_undelivered_stage",
+    "_queue_order_key",
 )
 tree = ast.parse(SRC)
 klass = next(

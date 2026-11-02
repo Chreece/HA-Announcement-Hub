@@ -954,6 +954,28 @@
           "description": "announcement_hub.send tarafından döndürülen iş kimliği."
         }
       }
+    },
+    "list_queue": {
+      "name": "Duyuruları listele",
+      "description": "Bekleyen ve etkin tüm duyuruların tam metnini yalnızca kimliği doğrulanmış kullanıcıya göster."
+    },
+    "reorder_queue": {
+      "name": "Duyuru sırasını değiştir",
+      "description": "Bekleyen duyuruyu yukarı veya aşağı taşı; sıra yeniden başlatmadan sonra korunur.",
+      "fields": {
+        "job_id": {
+          "name": "Duyuru kimliği",
+          "description": "Taşınacak bekleyen duyurunun kimliği."
+        },
+        "direction": {
+          "name": "Yön",
+          "description": "Kuyrukta yukarı veya aşağı taşı."
+        },
+        "neighbor_job_id": {
+          "name": "Beklenen komşu kimlik",
+          "description": "Kuyruk görüntülendikten sonra değiştiyse isteğe bağlı koruma."
+        }
+      }
     }
   }
 }

@@ -954,6 +954,28 @@
           "description": "L'ID del lavoro restituito da announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "Elenca annunci",
+      "description": "Restituisce i testi completi degli annunci in attesa e attivi all’utente autenticato."
+    },
+    "reorder_queue": {
+      "name": "Riordina annunci",
+      "description": "Sposta un annuncio in coda in alto o in basso mantenendo l’ordine dopo il riavvio.",
+      "fields": {
+        "job_id": {
+          "name": "ID annuncio",
+          "description": "ID dell’annuncio in attesa da spostare."
+        },
+        "direction": {
+          "name": "Direzione",
+          "description": "Sposta in alto o in basso."
+        },
+        "neighbor_job_id": {
+          "name": "ID adiacente atteso",
+          "description": "Verifica facoltativa che la coda non sia cambiata."
+        }
+      }
     }
   }
 }

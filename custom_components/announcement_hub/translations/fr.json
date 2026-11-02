@@ -954,6 +954,28 @@
           "description": "Identifiant de tâche renvoyé par announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "Lister les annonces",
+      "description": "Afficher les textes intégraux des annonces en attente et actives à l’utilisateur authentifié."
+    },
+    "reorder_queue": {
+      "name": "Réordonner les annonces",
+      "description": "Déplacer une annonce en attente vers le haut ou le bas, de façon persistante.",
+      "fields": {
+        "job_id": {
+          "name": "ID de l’annonce",
+          "description": "ID de l’annonce en attente à déplacer."
+        },
+        "direction": {
+          "name": "Direction",
+          "description": "Monter ou descendre dans la file."
+        },
+        "neighbor_job_id": {
+          "name": "ID voisine attendue",
+          "description": "Contrôle facultatif d’une modification de la file depuis l’affichage."
+        }
+      }
     }
   }
 }

@@ -954,6 +954,28 @@
           "description": "ID úlohy vrácené službou announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "Seznam hlášení",
+      "description": "Zobrazí úplné texty čekajících a aktivních hlášení pouze ověřenému uživateli."
+    },
+    "reorder_queue": {
+      "name": "Změnit pořadí hlášení",
+      "description": "Přesune čekající hlášení nahoru či dolů a zachová pořadí po restartu.",
+      "fields": {
+        "job_id": {
+          "name": "ID hlášení",
+          "description": "ID čekajícího hlášení, které se má přesunout."
+        },
+        "direction": {
+          "name": "Směr",
+          "description": "Posunout v seznamu nahoru nebo dolů."
+        },
+        "neighbor_job_id": {
+          "name": "Očekávané sousední ID",
+          "description": "Volitelná ochrana před změnou fronty od jejího zobrazení."
+        }
+      }
     }
   }
 }

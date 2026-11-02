@@ -13,6 +13,12 @@
     },
     "cancel": {
       "service": "mdi:cancel"
+    },
+    "list_queue": {
+      "service": "mdi:format-list-numbered"
+    },
+    "reorder_queue": {
+      "service": "mdi:sort-variant"
     }
   },
   "entity": {

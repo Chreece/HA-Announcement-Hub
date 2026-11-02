@@ -99,6 +99,8 @@ from .const import (
     PLATFORMS,
     SERVICE_CANCEL,
     SERVICE_CLEAR_QUEUE,
+    SERVICE_LIST_QUEUE,
+    SERVICE_REORDER_QUEUE,
     SERVICE_SEND,
     VERSION,
     TARGET_ENTITY_PREFIX,
@@ -230,6 +232,11 @@ CLEAR_QUEUE_SCHEMA = probatio.Schema(
     {probatio.Optional(ATTR_INCLUDE_CURRENT, default=False): bool}
 )
 CANCEL_SCHEMA = probatio.Schema({probatio.Required(ATTR_JOB_ID): cv.string})
+REORDER_QUEUE_SCHEMA = probatio.Schema({
+    probatio.Required(ATTR_JOB_ID): cv.string,
+    probatio.Required("direction"): probatio.In(("up", "down")),
+    probatio.Optional("neighbor_job_id"): cv.string,
+})
 
 
 def _get_manager(hass: HomeAssistant) -> AnnouncementManager:
@@ -643,6 +650,21 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
         }
         return response if call.return_response else None
 
+    async def async_list_queue(call: ServiceCall) -> ServiceResponse:
+        # Full messages are available only on this authenticated action,
+        # NEVER in queue sensor attributes, logs or the public event bus.
+        response: ServiceResponse = _get_manager(hass).queue_view()
+        return response if call.return_response else None
+
+    async def async_reorder_queue(call: ServiceCall) -> ServiceResponse:
+        manager = _get_manager(hass)
+        response: ServiceResponse = await manager.async_reorder_queue(
+            call.data[ATTR_JOB_ID],
+            call.data["direction"],
+            neighbor_job_id=call.data.get("neighbor_job_id"),
+        )
+        return response if call.return_response else None
+
     if hass.services.has_service(
         NOTIFY_DOMAIN, NOTIFY_SERVICE_ANNOUNCEMENT_HUB
     ):
@@ -694,6 +716,24 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             SERVICE_CANCEL,
             async_cancel,
             schema=CANCEL_SCHEMA,
+            supports_response=SupportsResponse.OPTIONAL,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_LIST_QUEUE):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_LIST_QUEUE,
+            async_list_queue,
+            schema=probatio.Schema({}),
+            supports_response=SupportsResponse.OPTIONAL,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_REORDER_QUEUE):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_REORDER_QUEUE,
+            async_reorder_queue,
+            schema=REORDER_QUEUE_SCHEMA,
             supports_response=SupportsResponse.OPTIONAL,
         )
 
