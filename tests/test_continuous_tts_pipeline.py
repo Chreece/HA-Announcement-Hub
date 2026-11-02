@@ -25,7 +25,8 @@ def test_prefetch_marks_media_ready_only_after_render_finishes() -> None:
     start = source.index("async def _async_prefetch")
     end = source.index("def _prefetch_ready_for_job", start)
     block = source[start:end]
-    render = block.index("await tts.async_get_media_source_audio")
+    render = block.index("tts.async_get_media_source_audio")
+    assert "await asyncio.wait_for(" in block
     ready = block.index("job.media_source_ids[engine] = media_source_id")
     assert render < ready
 

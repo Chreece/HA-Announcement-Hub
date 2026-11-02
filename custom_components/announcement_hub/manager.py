@@ -2498,7 +2498,7 @@ class AnnouncementManager:
         ).strip()
         return bool(attribute and attribute not in state.attributes)
 
-    def _raw_sleep_area_ids(self) -> frozenset[str]:
+    def _sleep_area_ids(self) -> frozenset[str]:
         """Read the CURRENT sleeping-room list from an entity state/attribute.
 
         The live source replaces the legacy fixed-area list as soon as it is
@@ -2539,11 +2539,11 @@ class AnnouncementManager:
             _LOGGER.debug("Legacy sleeping-room selection contains an unknown area")
             return frozenset()
 
-    def _sleep_area_ids(self) -> frozenset[str]:
+    def _observe_sleep_areas(self) -> frozenset[str]:
         """Observe sleep transitions; a restart must not reset a grace timer."""
         if self._sleep_rooms_source_unavailable():
-            return self._raw_sleep_area_ids()
-        current = self._raw_sleep_area_ids()
+            return self._sleep_area_ids()
+        current = self._sleep_area_ids()
         previous = getattr(self, "_sleep_last_observed", None)
         if previous is None:
             # Initial observation: existing sleeping rooms are NOT new entries.
@@ -2581,7 +2581,7 @@ class AnnouncementManager:
         )))
         if seconds <= 0:
             return frozenset()
-        rooms = self._sleep_area_ids()
+        rooms = self._observe_sleep_areas()
         try:
             submitted = datetime.fromisoformat(job.created_at)
             if submitted.tzinfo is None:

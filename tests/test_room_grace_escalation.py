@@ -231,6 +231,11 @@ class FakeManager:
     def _schedule_save(self):
         self.writes += 1
 
+    @staticmethod
+    def _sleep_grace_areas(job=None):
+        # Legacy routing fixtures have no new live sleep transition.
+        return frozenset()
+
     def _notify_update(self):
         pass
 
@@ -993,7 +998,7 @@ def test_sleeping_target_cannot_authorize_fallback_even_with_open_door(monkeypat
 
 
 def test_sleep_guard_applies_even_to_normal_jobs_and_before_chime():
-    assert "if self._sleep_tts_muted_now():" in SRC[
+    assert "if self._sleep_tts_muted_now(job):" in SRC[
         SRC.index("    async def _async_send_tts("):
         SRC.index("    async def _async_restore_volume(")
     ]

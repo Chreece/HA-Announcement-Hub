@@ -88,7 +88,7 @@ def test_generate_timeout_and_rewrite_circuit_breaker():
         service = Services()
         manager = Manager()
         manager.hass = SimpleNamespace(services=service)
-        manager.settings = {}
+        manager.settings = {"ai_provider_timeout": 0.02}
         manager._running = True
         manager._ai_provider_cooldowns = {}
         manager._queue = []

@@ -164,7 +164,7 @@ def test_active_audio_ownership_is_removed_after_playback_error():
         def _raise_if_cancelled(self, job):
             pass
 
-        def _sleep_tts_muted_now(self):
+        def _sleep_tts_muted_now(self, _job=None):
             return False
 
         async def _wait_for(self, *args, **kwargs):
@@ -233,7 +233,7 @@ def test_stop_racing_with_media_start_is_stopped_after_provider_ack():
             self.hass = SimpleNamespace(services=service)
             self.stopped = []
 
-        def _sleep_tts_muted_now(self):
+        def _sleep_tts_muted_now(self, _job=None):
             return False
 
         def _raise_if_cancelled(self, job):

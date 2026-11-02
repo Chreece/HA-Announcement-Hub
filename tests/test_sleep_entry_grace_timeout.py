@@ -28,7 +28,7 @@ def _method(name):
 
 
 class Harness:
-    _sleep_area_ids = _method("_sleep_area_ids")
+    _observe_sleep_areas = _method("_observe_sleep_areas")
     _sleep_grace_areas = _method("_sleep_grace_areas")
     _sleep_tts_muted_now = _method("_sleep_tts_muted_now")
     _all_occupied_rooms_sleeping = _method("_all_occupied_rooms_sleeping")
@@ -48,7 +48,7 @@ class Harness:
         self.events = []
         self._wake = SimpleNamespace(set=lambda: self.events.append("woke"))
 
-    def _raw_sleep_area_ids(self):
+    def _sleep_area_ids(self):
         return self.sleep
 
     def _sleep_rooms_source_unavailable(self):
@@ -67,11 +67,11 @@ def _job(created):
 
 def test_sleep_entry_grace_only_applies_to_preexisting_jobs():
     h = Harness()
-    assert h._sleep_area_ids() == frozenset()  # Initialize awake baseline.
+    assert h._observe_sleep_areas() == frozenset()  # Initialize awake baseline.
     before = _job(h.now - timedelta(seconds=20))
     after = _job(h.now)
     h.sleep = frozenset({"kitchen"})
-    assert h._sleep_area_ids() == frozenset({"kitchen"})
+    assert h._observe_sleep_areas() == frozenset({"kitchen"})
     assert "saved" in h.events
     assert h._sleep_grace_areas(before) == frozenset({"kitchen"})
     assert h._sleep_tts_muted_now(before) is False
@@ -83,10 +83,10 @@ def test_sleep_entry_grace_only_applies_to_preexisting_jobs():
 
 def test_sleep_grace_expires_and_unavailable_source_fails_closed():
     h = Harness()
-    h._sleep_area_ids()
+    h._observe_sleep_areas()
     h.sleep = frozenset({"kitchen"})
     old = _job(h.now - timedelta(seconds=20))
-    h._sleep_area_ids()
+    h._observe_sleep_areas()
     h._sleep_entered_at["kitchen"] = (h.now - timedelta(seconds=75)).isoformat()
     assert h._sleep_tts_muted_now(old) is True
     h._sleep_entered_at["kitchen"] = (h.now - timedelta(seconds=5)).isoformat()
@@ -99,7 +99,7 @@ def test_existing_sleep_state_on_first_read_does_not_create_new_grace():
     h = Harness()
     h.sleep = frozenset({"kitchen"})
     before = _job(h.now - timedelta(minutes=5))
-    assert h._sleep_area_ids() == h.sleep
+    assert h._observe_sleep_areas() == h.sleep
     assert h._sleep_tts_muted_now(before) is True
     assert h._sleep_entered_at == {}
 
