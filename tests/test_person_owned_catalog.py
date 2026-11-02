@@ -121,3 +121,24 @@ def test_person_target_list_exposes_no_global_output_fallback():
     assert "for entity_id in assigned" in source
     assert "credentials" in source
     assert not hasattr(module, "expand_integration")
+
+
+def test_explicit_person_integration_or_device_excludes_room_even_if_defaulted():
+    normalise = module.without_room_when_owned
+    assert normalise(["room"], integrations=["mobile_app"]) == ()
+    assert normalise(["room"], devices=["alex_phone_id"]) == ()
+    assert normalise(["room", "mobile"], integrations=["mobile_app"]) == ("mobile",)
+    assert normalise(["room", "watch"], devices=["alex_phone_id"]) == ("watch",)
+    assert normalise(["room"], integrations=(), devices=()) == ("room",)
+    assert normalise(["room", "mobile", "room"]) == ("room", "mobile")
+
+
+def test_automations_with_legacy_person_destinations_still_keep_room_semantics():
+    person = {"destinations": {"mobile": ["notify.alex_phone"]}}
+    assert module.without_room_when_owned(["room", "mobile"]) == ("room", "mobile")
+    # Explicit personal device route can never accidentally inherit the schema default.
+    assert module.without_room_when_owned(["room"], devices=["alex_phone_id"]) == ()
+    service = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
+    assert "destinations = without_room_when_owned(" in service
+    assert "devices=wanted_person_devices" in service
+    assert 'if "room" in destinations:' in service

@@ -29,7 +29,7 @@ INTERPOLATION = re.compile(r"\{[a-z]+\}")
 def test_destination_chips_translated_into_every_dashboard_locale():
     locales = json.loads(LOCALE_FILE.read_text(encoding="utf-8"))
     assert len(locales) == 19
-    assert all(len(messages) == 204 for messages in locales.values())
+    assert all(len(messages) == 208 for messages in locales.values())
     for language, messages in locales.items():
         for english in LABELS:
             assert english in messages, (language, english)
@@ -61,4 +61,4 @@ def test_card_label_changes_cannot_change_api_targets_or_examples():
     assert 'this.$("person-destinations-selected").textContent' in source
     assert 'button.appendChild(symbol)' in source
     assert 'this._drawPersonOwnedTargets()' in source
-    assert "payload.person_destination = [...this._personDestinations]" in source
+    assert "payload.person_destination = exactPersonTargets ? [] : [...this._personDestinations]" in source

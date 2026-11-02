@@ -117,7 +117,7 @@ from .manager import AnnouncementManager
 from .message_text import resolve_channel_texts
 from .outputs import area_name, tts_engine_options, entity_integration
 from .provider_catalog import build_provider_catalog
-from .person_catalog import owned_person_catalog, resolve_owned_person_outputs
+from .person_catalog import owned_person_catalog, resolve_owned_person_outputs, without_room_when_owned
 from .person_delivery import personalized_text, person_is_enabled, allowed_person_ai
 from .person_targeting import (
     PersonTargetError, resolve_person_rooms, resolve_person_ids,
@@ -475,6 +475,13 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             value.strip() for value in call.data.get(ATTR_PERSON_DEVICE, ())
             if value.strip()
         ))
+        # Explicitly owned targets replace Room even when the schema supplies
+        # its default ["room"]. This avoids requiring current location and
+        # prevents nearby room outputs from receiving an exact person send.
+        destinations = without_room_when_owned(
+            destinations, integrations=wanted_person_integrations,
+            devices=wanted_person_devices,
+        )
         if people is None:
             if (destinations != ("room",) or ATTR_PERSON_TRANSLATE in call.data
                     or wanted_person_integrations or wanted_person_devices):

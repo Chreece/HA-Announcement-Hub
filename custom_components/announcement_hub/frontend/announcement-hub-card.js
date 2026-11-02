@@ -8,7 +8,7 @@
   const ROOT = "/announcement_hub/";
   // Keep this aligned with the beta manifest. Version each companion asset so
   // an old JS module cannot silently mix with a newer HTML/CSS card.
-  const FRONTEND_VERSION = "0.10.0b35";
+  const FRONTEND_VERSION = "0.10.0b36";
   const assetUrl = (name) => ROOT + name + "?v=" + encodeURIComponent(FRONTEND_VERSION);
   const DOC_URL = "https://github.com/Chreece/HA-Announcement-Hub#dashboard-card";
   const LEVELS = [
@@ -160,6 +160,7 @@
       this._selected = Object.fromEntries([...KINDS, "person"].map((kind) => [kind, new Set()]));
       this._personDestinations = new Set(["room"]);
       this._personOwned = { integration: new Set(), device: new Set() };
+      this._personOwnedOpen = { integration: false, device: false };
       this._personOwnedCatalog = {};
       this._personOwnedLoaded = false;
       this._personOwnedLoading = false;
@@ -309,24 +310,36 @@
         this.$("manual-" + kind).addEventListener("input", () => this._updateSummary());
       }
       this.$("person-search").addEventListener("input", () => this._drawOptions("person"));
+      // Each group is a searchable, in-card multi-select. Options stay open
+      // while ticking several items and selected values remain removable.
       for (const kind of ["integration", "device"]) {
-        this.$("person-" + kind + "-search").addEventListener("input", () => this._drawPersonOwnedTargets());
+        const search = this.$("person-" + kind + "-search");
+        search.addEventListener("focus", () => this._showPersonOwnedOptions(kind));
+        search.addEventListener("input", () => this._showPersonOwnedOptions(kind));
+        search.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            this._personOwnedOpen[kind] = false;
+            this._drawPersonOwnedTargets();
+          }
+        });
       }
       this.$("person-owned-targets").addEventListener("click", (event) => {
         const button = event.target.closest("button[data-person-kind][data-value]");
         if (!button) return;
-        const selected = this._personOwned[button.dataset.personKind];
-        if (!selected) return;
-        const value = button.dataset.value;
-        if (selected.has(value)) selected.delete(value); else selected.add(value);
-        this._drawPersonOwnedTargets();
+        this._selectPersonOwned(button.dataset.personKind, button.dataset.value);
+      });
+      this.$("person-owned-targets").addEventListener("focusout", (event) => {
+        // Replacing a checked option node can emit focusout with a null
+        // relatedTarget. Do not close the menu while ticking several options.
+        if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) {
+          this._personOwnedOpen = { integration: false, device: false };
+          this._drawPersonOwnedTargets();
+        }
       });
       this.$("person-destinations").addEventListener("click", (event) => {
-        const selected = event.target.closest("button[data-destination]")?.dataset.destination;
-        if (!selected) return;
-        if (this._personDestinations.has(selected)) this._personDestinations.delete(selected);
-        else this._personDestinations.add(selected);
-        this._sync();
+        if (event.target.closest("button[data-destination=room]")) {
+          this._selectPersonRoom();
+        }
       });
       this.$("message-title").addEventListener("input", () => this._updateAIHint());
       // Provider choices expand in the card's document flow, never as a native
@@ -629,6 +642,39 @@
       if (this._mounted) this._drawOptions("person");
     }
 
+    _showPersonOwnedOptions(kind) {
+      this._personOwnedOpen = {
+        integration: kind === "integration",
+        device: kind === "device",
+      };
+      this._drawPersonOwnedTargets();
+    }
+
+    _selectPersonRoom() {
+      // Explicit personal device/integration targets and Room are exclusive.
+      this._personOwned.integration.clear();
+      this._personOwned.device.clear();
+      this._personDestinations.clear();
+      this._personDestinations.add("room");
+      this._drawPersonOwnedTargets();
+    }
+
+    _selectPersonOwned(kind, value) {
+      const selected = this._personOwned[kind];
+      if (!selected || !this._personOwnedLoaded || !this._selected.person.size) return;
+      if (!this._personOwnedOptions(kind).some((item) => item.value === value)) return;
+      if (selected.has(value)) selected.delete(value);
+      else selected.add(value);
+      if (this._personOwned.integration.size || this._personOwned.device.size) {
+        // Never send a room leg together with person-owned exact recipients.
+        this._personDestinations.delete("room");
+      } else {
+        // Emptying the multi-select restores the safe, explicit Room default.
+        this._personDestinations.add("room");
+      }
+      this._drawPersonOwnedTargets();
+    }
+
     _availablePersonDestinations() {
       // Personal integrations/devices are selected by exact owned IDs below.
       return ["room"];
@@ -707,47 +753,111 @@
 
     _drawPersonOwnedTargets() {
       if (!this._mounted) return;
-      const chosen = this.$("person-owned-chosen");
-      chosen.replaceChildren();
+      const status = this.$("person-owned-status");
+      const hasPerson = !!this._selected.person.size;
+      const hasAssignedOutputs = ["integration", "device"].some(
+        (kind) => this._personOwnedOptions(kind).length
+      );
+      status.textContent = !hasPerson
+        ? this._t("Choose at least one person.")
+        : this._personOwnedLoading
+          ? this._t("Discovering...")
+          : !this._personOwnedLoaded
+            ? this._t("Person device list unavailable. Check Announcement Hub.")
+            : !hasAssignedOutputs
+              ? this._t("No assigned outputs for this person. Configure them in Announcement Hub.")
+              : "";
+      status.hidden = !status.textContent;
+      let removedStale = false;
       for (const kind of ["integration", "device"]) {
         const holder = this.$("person-" + kind + "-options");
+        const chosen = this.$("person-" + kind + "-chosen");
+        const search = this.$("person-" + kind + "-search");
+        const counter = this.$("person-" + kind + "-count");
         holder.replaceChildren();
+        chosen.replaceChildren();
         const options = this._personOwnedOptions(kind);
         const permitted = new Set(options.map((item) => item.value));
         if (this._personOwnedLoaded) {
           for (const value of this._personOwned[kind]) {
-            if (!permitted.has(value)) this._personOwned[kind].delete(value);
+            if (!permitted.has(value)) {
+              this._personOwned[kind].delete(value);
+              removedStale = true;
+            }
           }
         }
-        const query = this.$("person-" + kind + "-search").value.trim().toLocaleLowerCase();
+        const query = search.value.trim().toLocaleLowerCase();
         const filtered = options.filter((item) =>
           !query || item.value.toLocaleLowerCase().includes(query) ||
             item.label.toLocaleLowerCase().includes(query)
         );
         for (const item of filtered.slice(0, 36)) {
           const button = document.createElement("button");
+          const active = this._personOwned[kind].has(item.value);
           button.type = "button";
-          button.className = "option";
+          button.className = "person-multi-option";
           button.dataset.personKind = kind;
           button.dataset.value = item.value;
-          button.textContent = clipped(item.label, 62);
           button.title = item.label;
-          button.setAttribute("aria-pressed", String(this._personOwned[kind].has(item.value)));
+          button.setAttribute("role", "option");
+          button.setAttribute("aria-selected", String(active));
+          button.setAttribute("aria-pressed", String(active));
+          const icon = document.createElement("ha-icon");
+          icon.setAttribute("icon", active ? "mdi:checkbox-marked" : "mdi:checkbox-blank-outline");
+          const name = document.createElement("span");
+          name.textContent = item.label;
+          button.appendChild(icon);
+          button.appendChild(name);
           holder.appendChild(button);
         }
+        if (filtered.length > 36) {
+          const notice = document.createElement("span");
+          notice.className = "person-multi-empty";
+          notice.textContent = this._t("Showing {shown} of {total}. Search for more.", {
+            shown: 36, total: filtered.length,
+          });
+          holder.appendChild(notice);
+        } else if (!filtered.length) {
+          const notice = document.createElement("span");
+          notice.className = "person-multi-empty";
+          notice.textContent = !this._selected.person.size
+            ? this._t("Choose at least one person.")
+            : this._personOwnedLoading
+              ? this._t("Discovering...")
+              : !this._personOwnedLoaded
+                ? this._t("Person device list unavailable. Check Announcement Hub.")
+                : !options.length
+                  ? this._t("No assigned outputs for this person. Configure them in Announcement Hub.")
+                  : this._t("No matching items.");
+          holder.appendChild(notice);
+        }
+        // The dropdown is in the card's flow, not a viewport-sized native menu.
+        holder.hidden = !this._personOwnedOpen[kind];
+        search.setAttribute("aria-expanded", String(this._personOwnedOpen[kind]));
+        counter.textContent = this._personOwned[kind].size
+          ? "(" + this._personOwned[kind].size + ")" : "";
         for (const value of this._personOwned[kind]) {
           const button = document.createElement("button");
+          const item = options.find((option) => option.value === value);
           button.type = "button";
+          button.className = "person-multi-chip";
           button.dataset.personKind = kind;
           button.dataset.value = value;
-          button.textContent = this._t(titleCase(kind)) + ": " +
-            clipped(options.find((item) => item.value === value)?.label || value, 42);
+          button.textContent = clipped(item?.label || value, 48) + " ×";
+          button.title = item?.label || value;
           button.setAttribute("aria-label", this._t("Remove {kind} {value}", {
-            kind: this._t(titleCase(kind)), value,
+            kind: this._t(titleCase(kind)), value: item?.label || value,
           }));
           chosen.appendChild(button);
         }
       }
+      if (this._personOwned.integration.size || this._personOwned.device.size) {
+        this._personDestinations.delete("room");
+      } else if (removedStale && !this._personDestinations.size) {
+        this._personDestinations.add("room");
+      }
+      this._drawPersonDestinations();
+      this._updateSummary();
     }
 
     _drawOptions(kind) {
@@ -842,7 +952,9 @@
       if (this._targetMode === "targeted") payload.manual_targets = true;
       if (this._targetMode === "person") {
         payload.target_person = [...this._selected.person];
-        payload.person_destination = [...this._personDestinations];
+        // Fail safe even if stale frontend state still contains "room".
+        const exactPersonTargets = this._personOwned.integration.size || this._personOwned.device.size;
+        payload.person_destination = exactPersonTargets ? [] : [...this._personDestinations];
         if (this._personOwned.integration.size) payload.person_integration = [...this._personOwned.integration];
         if (this._personOwned.device.size) payload.person_device = [...this._personOwned.device];
         if (this._personTranslation !== "inherit") payload.person_translate = this._personTranslation === "on";

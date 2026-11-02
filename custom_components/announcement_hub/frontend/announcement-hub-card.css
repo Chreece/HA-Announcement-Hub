@@ -379,3 +379,72 @@ ha-card { container-name: announcement-hub-card; container-type: inline-size; }
 @container announcement-hub-card (max-width:430px){
   #advanced .provider-picker>summary,#advanced .provider-option{font-size:11px}
 }
+
+/* b36: Profile-owned integration/device searchable multi-selects. Keep all
+   dropdown results inside the card; selected chips stay visible and removable. */
+#person-owned-targets .person-multi{min-width:0;width:100%}
+#person-owned-targets .person-multi-heading{flex:1;min-width:0}
+#person-owned-targets .person-multi-count{
+  color:var(--primary-color,#8ba6ff);font-size:11px;font-weight:700;
+  flex:none;margin-inline-start:auto
+}
+#person-owned-targets .person-multi .search{
+  width:100%;max-width:100%;box-sizing:border-box
+}
+#person-owned-targets .person-multi .search[aria-expanded=true]{
+  border-color:var(--primary-color,#718aff);
+  border-end-start-radius:6px;border-end-end-radius:6px
+}
+#person-owned-targets .person-multi-options{
+  display:flex;flex-direction:column;align-items:stretch;
+  flex-wrap:nowrap;gap:2px;box-sizing:border-box;max-height:165px;
+  max-width:100%;padding:5px;margin-top:3px;
+  overflow:auto;overscroll-behavior:contain;
+  background:var(--secondary-background-color,rgba(124,141,169,.08));
+  border:1px solid var(--divider-color,rgba(134,159,179,.22));
+  border-radius:10px
+}
+#person-owned-targets .person-multi-options[hidden]{display:none!important}
+#person-owned-targets .person-multi-option{
+  display:flex;align-items:center;gap:9px;min-height:34px;
+  width:100%;max-width:100%;box-sizing:border-box;margin:0;padding:8px 9px;
+  border:1px solid transparent;border-radius:8px;
+  background:transparent;color:var(--primary-text-color,#edf4fb);
+  font:inherit;font-size:11px;text-align:start;line-height:1.35;
+  cursor:pointer
+}
+#person-owned-targets .person-multi-option>ha-icon{
+  --mdc-icon-size:17px;flex:none;color:var(--secondary-text-color,#aab6c8)
+}
+#person-owned-targets .person-multi-option>span{
+  flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere
+}
+#person-owned-targets .person-multi-option:hover,
+#person-owned-targets .person-multi-option:focus-visible{
+  background:var(--secondary-background-color,rgba(140,157,181,.2));
+  border-color:var(--divider-color,rgba(134,159,179,.32))
+}
+#person-owned-targets .person-multi-option[aria-selected=true]{
+  border-color:color-mix(in srgb,var(--primary-color,#708aff) 36%,transparent);
+  background:color-mix(in srgb,var(--primary-color,#708aff) 12%,transparent)
+}
+#person-owned-targets .person-multi-option[aria-selected=true]>ha-icon{
+  color:var(--primary-color,#8ca1ff)
+}
+#person-owned-targets .person-multi-empty{
+  display:block;padding:9px;color:var(--secondary-text-color,#aab6c8);
+  font-size:11px;line-height:1.4;overflow-wrap:anywhere
+}
+#person-owned-targets .person-multi-chosen{
+  display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;
+}
+#person-owned-targets .person-multi-chosen:empty{display:none}
+#person-owned-targets .person-multi-chip{
+  max-width:100%;white-space:normal;text-align:start;overflow-wrap:anywhere;
+  padding:7px 9px;font-size:11px
+}
+#person-owned-status[hidden]{display:none!important}
+@container announcement-hub-card (max-width:430px){
+  #person-owned-targets .person-multi-options{max-height:145px}
+  #person-owned-targets .person-multi-option{font-size:11px}
+}

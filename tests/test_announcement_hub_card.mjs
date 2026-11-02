@@ -56,6 +56,7 @@ function harness() {
   }
   fields.send = { disabled: false };
   fields["send-label"] = { textContent: "" };
+  fields["summary"] = { textContent: "" };
   fields["priority-selected"] = { textContent: "" };
   const group = () => ({
     nodes: [],
@@ -64,10 +65,15 @@ function harness() {
   });
   fields.levels = group();
   fields["person-owned-targets"] = group();
-  fields["person-owned-chosen"] = group();
+  fields["person-owned-status"] = { textContent: "", hidden: false };
   for (const kind of ["integration", "device"]) {
-    fields["person-" + kind + "-search"] = { value: "" };
+    fields["person-" + kind + "-search"] = {
+      value: "", attributes: {},
+      setAttribute(k, v) { this.attributes[k] = v; },
+    };
     fields["person-" + kind + "-options"] = group();
+    fields["person-" + kind + "-chosen"] = group();
+    fields["person-" + kind + "-count"] = { textContent: "" };
   }
   for (const id of ["ai-agent", "tts-engine"]) {
     fields[id + "-options"] = group();
@@ -612,8 +618,8 @@ test("bundled frontend assets and exact Lovelace module URL have versioned cache
   const js = readFileSync(CARD_PATH, "utf8");
   const manifest = JSON.parse(readFileSync(new URL(
     "../custom_components/announcement_hub/manifest.json", import.meta.url), "utf8"));
-  assert.equal(manifest.version, "0.10.0b35");
-  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b35"/);
+  assert.equal(manifest.version, "0.10.0b36");
+  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b36"/);
   assert.match(js, /const assetUrl = \(name\) => ROOT \+ name \+ "\?v=" /);
   assert.match(js, /fetch\(assetUrl\("announcement-hub-locales.json"\)/);
   assert.match(js, /fetch\(assetUrl\(name\)/);
@@ -831,7 +837,7 @@ test("Greek, German and regional languages use correct card translations", async
   const path = new URL("../custom_components/announcement_hub/frontend/announcement-hub-locales.json", import.meta.url);
   const payload = JSON.parse(readFileSync(path, "utf8"));
   globalThis.fetch = async (url) => {
-    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b35");
+    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b36");
     return { ok: true, json: async () => payload };
   };
   const card = new Card();
@@ -873,7 +879,7 @@ test("person mode selects scoped integration/device targets, not global recipien
   assert.deepEqual(card._buildPayload(), {
     level: "info", occupied_only: true,
     target_person: ["person.alex", "person.maria"],
-    person_destination: ["room"],
+    person_destination: [],
     person_integration: ["mobile_app"], person_device: ["device123"],
     text: "Η πόρτα είναι ανοιχτή.",
   });
@@ -976,9 +982,108 @@ test("unavailable person inventory never turns into HA-wide device selection", a
   card._hass = { callService: async () => { throw new Error("unavailable"); } };
   await card._refreshPersonOwned();
   assert.equal(card._personOwnedLoaded, false);
-  assert.equal(fields["person-integration-options"].nodes.length, 0);
-  assert.equal(fields["person-device-options"].nodes.length, 0);
+  assert.equal(fields["person-integration-options"].nodes.filter(n => n.dataset?.value).length, 0);
+  assert.equal(fields["person-device-options"].nodes.filter(n => n.dataset?.value).length, 0);
+  assert.match(fields["person-owned-status"].textContent, /unavailable/);
   card._personDestinations.clear();
   assert.throws(() => card._buildPayload(), /Choose at least one person destination/);
 });
 
+
+test("person integration/device selections are real searchable multiselects and replace Room", () => {
+  const { card, fields } = harness();
+  card._selected.person.add("person.alex");
+  card._personOwnedLoaded = true;
+  card._personOwnedCatalog = {
+    "person.alex": {
+      integrations: [
+        { value: "mobile_app", label: "Mobile App" },
+        { value: "nfandroidtv", label: "Android TV" },
+      ],
+      devices: [
+        { value: "pixel", label: "Pixel phone" },
+        { value: "watch", label: "Pixel watch" },
+      ],
+    },
+  };
+  fields.message.value = "Hi";
+  card._targetMode = "person";
+  assert.deepEqual(card._buildPayload().person_destination, ["room"]);
+
+  card._showPersonOwnedOptions("integration");
+  assert.equal(fields["person-integration-options"].hidden, false);
+  assert.equal(fields["person-device-options"].hidden, true);
+  assert.equal(fields["person-integration-search"].attributes["aria-expanded"], "true");
+  fields["person-integration-search"].value = "MOBILE";
+  card._drawPersonOwnedTargets();
+  assert.deepEqual(
+    fields["person-integration-options"].nodes.filter(n => n.dataset?.value).map(n => n.dataset.value),
+    ["mobile_app"], "case-insensitive search must filter integration choices"
+  );
+
+  card._selectPersonOwned("integration", "mobile_app");
+  assert.equal(card._personDestinations.has("room"), false);
+  assert.equal(fields["person-destinations-selected"].textContent, "—");
+  assert.equal(fields["person-integration-count"].textContent, "(1)");
+  assert.equal(fields["person-integration-chosen"].nodes.length, 1);
+  assert.equal(fields["person-integration-options"].nodes[0].attributes["aria-selected"], "true");
+  assert.deepEqual(card._buildPayload().person_destination, []);
+  assert.deepEqual(card._buildPayload().person_integration, ["mobile_app"]);
+
+  card._selectPersonOwned("integration", "nfandroidtv");
+  assert.equal(fields["person-integration-count"].textContent, "(2)");
+  assert.deepEqual(card._buildPayload().person_integration, ["mobile_app", "nfandroidtv"]);
+  card._selectPersonOwned("device", "pixel");
+  assert.deepEqual(card._buildPayload().person_device, ["pixel"]);
+  assert.deepEqual(card._buildPayload().person_destination, []);
+
+  card._selectPersonOwned("integration", "mobile_app");
+  card._selectPersonOwned("integration", "nfandroidtv");
+  assert.equal(card._personDestinations.has("room"), false, "device still selected");
+  card._selectPersonOwned("device", "pixel");
+  assert.equal(card._personDestinations.has("room"), true, "last explicit target removed restores Room");
+
+  card._selectPersonOwned("device", "watch");
+  card._selectPersonRoom();
+  assert.equal(card._personDestinations.has("room"), true);
+  assert.equal(card._personOwned.integration.size, 0);
+  assert.equal(card._personOwned.device.size, 0);
+  assert.deepEqual(card._buildPayload().person_destination, ["room"]);
+  assert.equal(card._buildPayload().person_integration, undefined);
+  assert.equal(card._buildPayload().person_device, undefined);
+});
+
+test("person ownership selection never accepts another person's device ID", () => {
+  const { card, fields } = harness();
+  card._selected.person.add("person.alex");
+  card._personOwnedLoaded = true;
+  card._personOwnedCatalog = {
+    "person.alex": { integrations: [{value:"mobile_app",label:"Mobile App"}],
+      devices: [{value:"alex-phone",label:"Alex Phone"}] },
+    "person.bob": { integrations: [], devices: [{value:"bob-phone",label:"Bob Phone"}] },
+  };
+  card._selectPersonOwned("device", "bob-phone");
+  assert.equal(card._personOwned.device.size, 0);
+  assert.equal(card._personDestinations.has("room"), true);
+  fields.message.value = "Private";
+  card._targetMode = "person";
+  assert.equal(card._buildPayload().person_device, undefined);
+  card._selectPersonOwned("device", "alex-phone");
+  assert.deepEqual(card._buildPayload().person_device, ["alex-phone"]);
+  assert.deepEqual(card._buildPayload().person_destination, []);
+});
+
+test("person target UI is explicitly accessible and never overlays the rest of card", () => {
+  const html = readFileSync(HTML_PATH, "utf8");
+  const css = readFileSync(CSS_PATH, "utf8");
+  for (const kind of ["integration", "device"]) {
+    assert.match(html, new RegExp('id="person-' + kind + '-search"[^>]*role="combobox"'));
+    assert.match(html, new RegExp('id="person-' + kind + '-options"[^>]*role="listbox" aria-multiselectable="true"'));
+    assert.match(html, new RegExp('id="person-' + kind + '-chosen" class="picked person-multi-chosen"'));
+    assert.match(html, new RegExp('id="person-' + kind + '-count"'));
+  }
+  assert.match(css, /#person-owned-targets \.person-multi-options\[hidden\]\{display:none!important\}/);
+  assert.match(css, /#person-owned-targets \.person-multi-option\[aria-selected=true\]/);
+  assert.match(css, /max-height:165px/);
+  assert.match(html, /id="person-owned-status" aria-live="polite"/);
+});
