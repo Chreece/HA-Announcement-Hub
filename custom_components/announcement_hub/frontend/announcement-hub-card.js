@@ -302,20 +302,7 @@
       for (const container of ["targets", "person-targets"]) this.$(container).addEventListener("click", (event) => {
         const button = event.target.closest("button[data-kind][data-value]");
         if (!button) return;
-        const kind = button.dataset.kind;
-        const value = button.dataset.value;
-        if (!this._selected[kind]) return;
-        if (this._selected[kind].has(value)) this._selected[kind].delete(value);
-        else this._selected[kind].add(value);
-        if (kind === "person") {
-          // Person chips are directly selectable on the first click/tap.
-          // Show all owned results now instead of requiring another click
-          // to focus each integration/device search field.
-          const show = this._selected.person.size > 0;
-          this._personOwnedOpen = { integration: show, device: show };
-        }
-        this._drawOptions(kind);
-        this._drawChosen();
+        this._toggleTargetSelection(button.dataset.kind, button.dataset.value);
       });
       for (const kind of KINDS) {
         this.$(kind + "-search").addEventListener("input", () => this._drawOptions(kind));
@@ -641,6 +628,20 @@
           this._drawChosen();
         }
       }
+    }
+
+    _toggleTargetSelection(kind, value) {
+      if (!this._selected[kind]) return;
+      // A single click/tap handles the entire transition; there is no
+      // separate "activate" step before selecting an actual person.
+      if (this._selected[kind].has(value)) this._selected[kind].delete(value);
+      else this._selected[kind].add(value);
+      if (kind === "person") {
+        const show = this._selected.person.size > 0;
+        this._personOwnedOpen = { integration: show, device: show };
+      }
+      this._drawOptions(kind);
+      this._drawChosen();
     }
 
     _refreshPeople() {
