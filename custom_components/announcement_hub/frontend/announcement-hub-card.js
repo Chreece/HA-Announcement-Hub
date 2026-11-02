@@ -8,7 +8,7 @@
   const ROOT = "/announcement_hub/";
   // Keep this aligned with the beta manifest. Version each companion asset so
   // an old JS module cannot silently mix with a newer HTML/CSS card.
-  const FRONTEND_VERSION = "0.10.0b34";
+  const FRONTEND_VERSION = "0.10.0b35";
   const assetUrl = (name) => ROOT + name + "?v=" + encodeURIComponent(FRONTEND_VERSION);
   const DOC_URL = "https://github.com/Chreece/HA-Announcement-Hub#dashboard-card";
   const LEVELS = [
@@ -34,7 +34,7 @@
   const KINDS = ["area", "integration", "device", "entity"];
   const PERSON_TRANSLATION = [["inherit", "Person setting"], ["on", "Translate"], ["off", "Original language"]];
   const PERSON_SWITCH = [["inherit", "Person setting"], ["on", "Yes"], ["off", "No"]];
-  const PERSON_DESTINATIONS = [["room", "Room"], ["mobile", "Mobile"], ["watch", "Watch"], ["tablet", "Tablet"], ["other", "Other"]];
+  const PERSON_DESTINATIONS = [["room", "Room"]];
   const TARGET_MODES = [
     ["automatic", "Automatic routing"], ["targeted", "Choose recipients"], ["person", "People"],
   ];
@@ -64,8 +64,7 @@
       inherit: "mdi:cog-outline", on: "mdi:bell-outline", off: "mdi:bell-off-outline",
     },
     "person-destinations": {
-      room: "mdi:home-outline", mobile: "mdi:cellphone",
-      watch: "mdi:watch-variant", tablet: "mdi:tablet", other: "mdi:devices",
+      room: "mdi:home-outline",
     },
   };
   const getLanguage = (hass) => {
@@ -160,6 +159,11 @@
       this._config = AnnouncementHubCard.getStubConfig();
       this._selected = Object.fromEntries([...KINDS, "person"].map((kind) => [kind, new Set()]));
       this._personDestinations = new Set(["room"]);
+      this._personOwned = { integration: new Set(), device: new Set() };
+      this._personOwnedCatalog = {};
+      this._personOwnedLoaded = false;
+      this._personOwnedLoading = false;
+      this._personOwnedLastFetch = 0;
       this._personTranslation = "inherit";
       this._personGreeting = "inherit";
       this._preChime = "inherit";
@@ -205,6 +209,7 @@
       if (this._mounted) {
         localize(this.shadowRoot, this._translations, this._originalNodes);
         this._localeRendered = true;
+        this._providerSignatures = {};
         this._sync();
         for (const kind of [...KINDS, "person"]) this._drawOptions(kind);
         if (this._queueOpen) this._renderQueue();
@@ -224,6 +229,7 @@
       if (this._mounted) {
         this._updateQueue();
         this._refreshPeople();
+        if (this._targetMode === "person") void this._refreshPersonOwned();
         this._renderProviderSelectors();
         if (!this._loaded && !this._loading) void this._loadRegistry();
       }
@@ -251,6 +257,7 @@
         this._sync();
         if (this._hass) {
           void this._refreshProviders();
+          if (this._targetMode === "person") void this._refreshPersonOwned();
           await this._loadRegistry();
         }
       } catch (error) {
@@ -284,6 +291,7 @@
         this._confirming = false;
         this.$("critical-confirm").hidden = true;
         this._sync();
+        if (mode === "person") void this._refreshPersonOwned();
       });
       for (const container of ["targets", "person-targets"]) this.$(container).addEventListener("click", (event) => {
         const button = event.target.closest("button[data-kind][data-value]");
@@ -301,6 +309,18 @@
         this.$("manual-" + kind).addEventListener("input", () => this._updateSummary());
       }
       this.$("person-search").addEventListener("input", () => this._drawOptions("person"));
+      for (const kind of ["integration", "device"]) {
+        this.$("person-" + kind + "-search").addEventListener("input", () => this._drawPersonOwnedTargets());
+      }
+      this.$("person-owned-targets").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-person-kind][data-value]");
+        if (!button) return;
+        const selected = this._personOwned[button.dataset.personKind];
+        if (!selected) return;
+        const value = button.dataset.value;
+        if (selected.has(value)) selected.delete(value); else selected.add(value);
+        this._drawPersonOwnedTargets();
+      });
       this.$("person-destinations").addEventListener("click", (event) => {
         const selected = event.target.closest("button[data-destination]")?.dataset.destination;
         if (!selected) return;
@@ -411,11 +431,14 @@
       this.$("routing-explanation").textContent = this._targetMode === "automatic"
         ? this._t("Announcement Hub chooses configured recipients using occupancy and fallback rules.")
         : this._targetMode === "person"
-          ? this._t("Choose people, then select Room, Mobile, Watch or other destinations assigned in their Hub settings.")
+          ? this._t("People") + " → " + [
+              this._t("Room"), this._t("Integrations"), this._t("Devices"),
+            ].join(" · ")
           : this._t("Select recipients bypasses the default output lists: only chosen rooms and exact integrations/devices/entities are eligible.");
       this._updateAIHint();
       this._drawChosen();
       this._drawPersonDestinations();
+      this._drawPersonOwnedTargets();
       this._renderProviderSelectors();
       this._updateQueue();
     }
@@ -571,31 +594,18 @@
     }
 
     _availablePersonDestinations() {
-      const chosen = [...this._selected.person];
-      if (!chosen.length) return ["room"];
-      const states = Object.values(this._hass?.states || {});
-      const registry = states.find((state) =>
-        state.entity_id?.startsWith("sensor.") &&
-        state.attributes?.person_destinations
-      )?.attributes?.person_destinations || {};
-      return PERSON_DESTINATIONS.map(([key]) => key).filter((key) =>
-        chosen.every((person) => key === "room" ||
-          Array.isArray(registry[person]) && registry[person].includes(key))
-      );
+      // Personal integrations/devices are selected by exact owned IDs below.
+      return ["room"];
     }
 
     _drawPersonDestinations() {
       if (!this._mounted) return;
       const holder = this.$("person-destinations");
       holder.replaceChildren();
-      const allowed = new Set(this._availablePersonDestinations());
       const chosen = PERSON_DESTINATIONS.filter(([value]) => this._personDestinations.has(value));
-      // Preserve and display all selected destinations, even if an assigned
-      // device temporarily becomes unavailable in the Home Assistant registry.
       this.$("person-destinations-selected").textContent =
         chosen.map(([, name]) => this._t(name)).join(" · ") || "—";
       for (const [value, name] of PERSON_DESTINATIONS) {
-        if (!allowed.has(value)) continue;
         const button = document.createElement("button");
         button.type = "button";
         button.dataset.destination = value;
@@ -606,6 +616,99 @@
         symbol.setAttribute("icon", CHOICE_ICONS["person-destinations"][value]);
         button.appendChild(symbol);
         holder.appendChild(button);
+      }
+    }
+
+    async _refreshPersonOwned(force = false) {
+      if (!this._mounted || !this._hass?.callService || this._personOwnedLoading) return;
+      const now = Date.now();
+      if (!force && now - this._personOwnedLastFetch < 120000) return;
+      this._personOwnedLoading = true;
+      this._personOwnedLastFetch = now;
+      try {
+        const response = servicePayload(await this._hass.callService(
+          "announcement_hub", "list_person_targets", {}, undefined, false, true
+        ));
+        if (!response?.people || typeof response.people !== "object" || Array.isArray(response.people)) {
+          throw new Error("Person target inventory unavailable");
+        }
+        this._personOwnedCatalog = response.people;
+        this._personOwnedLoaded = true;
+      } catch (error) {
+        // An older Hub version must not turn person targeting into an HA-wide
+        // integration/device broadcast. No owned choices are shown on failure.
+        this._personOwnedCatalog = {};
+        this._personOwnedLoaded = false;
+        this._personOwnedLastFetch = 0;
+      } finally {
+        this._personOwnedLoading = false;
+        this._drawPersonOwnedTargets();
+      }
+    }
+
+    _personOwnedOptions(kind) {
+      const group = kind === "integration" ? "integrations" : "devices";
+      const combined = new Map();
+      for (const person of this._selected.person) {
+        const options = this._personOwnedCatalog[person]?.[group] || [];
+        const personName = this._registry.person.find((item) => item.value === person)?.label || person;
+        for (const option of options) {
+          const value = String(option?.value || "");
+          if (!value) continue;
+          if (!combined.has(value)) combined.set(value, {
+            value, name: String(option.label || value), owners: new Set(),
+          });
+          combined.get(value).owners.add(personName);
+        }
+      }
+      return [...combined.values()].map((item) => ({
+        value: item.value,
+        label: item.name + " · " + [...item.owners].join(", "),
+      })).sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    _drawPersonOwnedTargets() {
+      if (!this._mounted) return;
+      const chosen = this.$("person-owned-chosen");
+      chosen.replaceChildren();
+      for (const kind of ["integration", "device"]) {
+        const holder = this.$("person-" + kind + "-options");
+        holder.replaceChildren();
+        const options = this._personOwnedOptions(kind);
+        const permitted = new Set(options.map((item) => item.value));
+        if (this._personOwnedLoaded) {
+          for (const value of this._personOwned[kind]) {
+            if (!permitted.has(value)) this._personOwned[kind].delete(value);
+          }
+        }
+        const query = this.$("person-" + kind + "-search").value.trim().toLocaleLowerCase();
+        const filtered = options.filter((item) =>
+          !query || item.value.toLocaleLowerCase().includes(query) ||
+            item.label.toLocaleLowerCase().includes(query)
+        );
+        for (const item of filtered.slice(0, 36)) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "option";
+          button.dataset.personKind = kind;
+          button.dataset.value = item.value;
+          button.textContent = clipped(item.label, 62);
+          button.title = item.label;
+          button.setAttribute("aria-pressed", String(this._personOwned[kind].has(item.value)));
+          holder.appendChild(button);
+        }
+        for (const value of this._personOwned[kind]) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.dataset.personKind = kind;
+          button.dataset.value = value;
+          button.textContent = this._t(titleCase(kind)) + ": " +
+            clipped(options.find((item) => item.value === value)?.label || value, 42);
+          button.setAttribute("aria-label", this._t("Remove {kind} {value}", {
+            kind: this._t(titleCase(kind)), value,
+          }));
+          chosen.appendChild(button);
+        }
       }
     }
 
@@ -664,6 +767,7 @@
         people.appendChild(button);
       }
       this._drawPersonDestinations();
+      this._drawPersonOwnedTargets();
       this._updateSummary();
     }
 
@@ -686,7 +790,8 @@
       if (this._targetMode === "person" && !this._selected.person.size) {
         throw new Error(this._t("Choose at least one person."));
       }
-      if (this._targetMode === "person" && !this._personDestinations.size) {
+      if (this._targetMode === "person" && !this._personDestinations.size &&
+          !this._personOwned.integration.size && !this._personOwned.device.size) {
         throw new Error(this._t("Choose at least one person destination."));
       }
       if (this._targetMode === "targeted" && !Object.keys(recipients).length) {
@@ -700,6 +805,8 @@
       if (this._targetMode === "person") {
         payload.target_person = [...this._selected.person];
         payload.person_destination = [...this._personDestinations];
+        if (this._personOwned.integration.size) payload.person_integration = [...this._personOwned.integration];
+        if (this._personOwned.device.size) payload.person_device = [...this._personOwned.device];
         if (this._personTranslation !== "inherit") payload.person_translate = this._personTranslation === "on";
         if (this._personGreeting !== "inherit") payload.person_greeting = this._personGreeting === "on";
       }
