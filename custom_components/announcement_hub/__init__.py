@@ -475,6 +475,11 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             value.strip() for value in call.data.get(ATTR_PERSON_DEVICE, ())
             if value.strip()
         ))
+        if wanted_person_integrations or wanted_person_devices:
+            # Explicitly owned integration/device targets take precedence over
+            # Room, including the schema's default room destination. Avoid
+            # requiring live location or broadcasting to nearby room outputs.
+            destinations = tuple(slot for slot in destinations if slot != "room")
         if people is None:
             if (destinations != ("room",) or ATTR_PERSON_TRANSLATE in call.data
                     or wanted_person_integrations or wanted_person_devices):
