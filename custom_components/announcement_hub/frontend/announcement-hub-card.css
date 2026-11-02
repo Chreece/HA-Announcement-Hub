@@ -202,3 +202,38 @@ textarea{padding:9px 11px}
   .queue-panel{padding:10px 12px}
   .stop-clear-confirm{margin:8px 12px 0}
 }
+
+
+/* b30: Header and priority controls must fit the CARD, not merely the viewport. */
+ha-card { container-name: announcement-hub-card; container-type: inline-size; }
+.top { display:grid; grid-template-columns:minmax(0,1fr) max-content; align-items:center; min-width:0; }
+.top .identity { min-width:0; overflow:hidden; }
+.top .identity>div:last-child { flex:1; min-width:0; }
+#card-heading { display:block; width:100%; max-width:100%; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.top-actions { min-width:0; width:auto; justify-self:end; justify-content:flex-end; flex-wrap:nowrap; }
+.compose-details { min-width:0; }
+.compose-details>.field { min-width:0; }
+.compact-title input { min-width:0; max-width:100%; }
+.compact-priority { min-width:0; }
+.priority-pills { width:100%; min-width:0; max-width:100%; justify-content:flex-start; align-items:center; }
+.priority-pills button { box-sizing:border-box; flex-shrink:0; }
+.priority-pills button ha-icon { display:block; margin-inline:auto; }
+/* Even a desktop dashboard can have a narrow card: measure its own width. */
+@container announcement-hub-card (max-width:430px) {
+  .stop-clear-button span,.queue-word { display:none; }
+  .compose-details { grid-template-columns:minmax(0,1fr); row-gap:8px; }
+  .compact-title,.compact-priority { width:100%; min-width:0; }
+  .priority-pills { flex-wrap:wrap; overflow:visible; justify-content:flex-start; gap:4px; }
+  .priority-pills button { flex:0 0 30px; width:30px; min-width:30px; padding:0; }
+}
+@container announcement-hub-card (max-width:300px) {
+  .top { grid-template-columns:minmax(0,1fr); row-gap:5px; }
+  .top-actions { width:100%; justify-self:stretch; justify-content:flex-end; }
+}
+/* Viewport-based fallback for older WebViews lacking container-query support. */
+@media(max-width:550px) {
+  .compose-details { grid-template-columns:minmax(0,1fr); row-gap:8px; }
+  .compact-title,.compact-priority { width:100%; min-width:0; }
+  .priority-pills { flex-wrap:wrap; overflow:visible; justify-content:flex-start; gap:4px; }
+  .priority-pills button { flex:0 0 30px; width:30px; min-width:30px; padding:0; }
+}

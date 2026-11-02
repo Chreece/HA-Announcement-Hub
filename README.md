@@ -141,7 +141,10 @@ The visual editor controls the card heading, initial importance, queue
 counter, AI controls and whether the message fields clear after a successful
 send. The compact composer keeps the message, single-line title and six
 icon-based priority choices visible; recipient, delivery and advanced
-sections start collapsed and can be expanded separately.
+sections start collapsed and can be expanded separately. On narrow mobile
+cards, the title and the left-aligned priority icons use separate rows,
+so they never overlap. The card header truncates long titles gracefully
+and keeps queue and Stop & Clear controls reachable.
 
 **Tap the queue counter** to open the authenticated queue manager, including
 all waiting and currently active messages (with complete spoken/written
