@@ -75,13 +75,24 @@ def test_auto_registration_is_idempotent_across_restart():
     assert len(resources.creates) == 1
 
 
-def test_existing_manually_registered_resource_is_not_replaced_or_duplicated():
+def test_exact_bundled_unversioned_resource_is_updated_without_duplication():
     original = {"id": 17, "res_type": "module", "url": mod.CARD_RESOURCE_PATH}
     resources = Collection([original], loaded=False)
     assert run(hass(resources))
     assert resources.creates == []
+    assert resources.updates == [
+        (17, {"res_type": "module", "url": mod.CARD_RESOURCE_PATH + "?v=0.9.40"})
+    ]
+    assert resources.async_items()[0]["id"] == 17
+
+
+def test_custom_query_resource_is_preserved_without_replacement():
+    custom_url = mod.CARD_RESOURCE_PATH + "?cache=manual"
+    resources = Collection([{"id": 18, "res_type": "module", "url": custom_url}])
+    assert run(hass(resources))
     assert resources.updates == []
-    assert resources.async_items()[0] == original
+    assert resources.creates == []
+    assert resources.async_items()[0]["url"] == custom_url
 
 
 def test_auto_versioned_resource_updates_with_no_duplicate():

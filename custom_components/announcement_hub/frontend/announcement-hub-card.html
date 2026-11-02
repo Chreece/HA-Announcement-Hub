@@ -37,7 +37,7 @@
         <label class="field"><span>Announcement</span><textarea id="message" rows="2" maxlength="20000" placeholder="What should people know?"></textarea></label>
         <div class="compose-details">
           <label class="field compact-title"><span>Title <small>optional</small></span><input id="message-title" maxlength="200" autocomplete="off" placeholder="Optional title"></label>
-          <div class="field compact-priority"><span class="priority-caption"><span>Priority</span><output id="priority-selected" aria-live="polite">Info</output></span><div id="levels" class="choices priority-pills" role="group" aria-label="Announcement importance"></div></div>
+          <div class="field compact-priority"><span class="priority-caption"><span>Priority<span class="title-colon" aria-hidden="true">:</span></span><output id="priority-selected" aria-live="polite">Info</output></span><div id="levels" class="choices priority-pills" role="group" aria-label="Announcement importance"></div></div>
         </div>
         <details class="disclosure" id="variants">
           <summary><ha-icon icon="mdi:tune-variant"></ha-icon><strong>Custom wording for each channel</strong><small>Optional</small></summary>
@@ -49,7 +49,7 @@
         </details>
       </section>
       <details class="section folded-section" id="recipients-section">
-        <summary class="folded-heading"><ha-icon icon="mdi:account-multiple-outline"></ha-icon><span id="recipient-heading">Who receives it?</span><output id="target-mode-selected" class="selection-value" aria-live="polite">Automatic routing</output><ha-icon class="fold-chevron" icon="mdi:chevron-down"></ha-icon></summary>
+        <summary class="folded-heading"><ha-icon icon="mdi:account-multiple-outline"></ha-icon><span id="recipient-heading">Who receives it?<span class="title-colon" aria-hidden="true">:</span></span><output id="target-mode-selected" class="selection-value" aria-live="polite">Automatic routing</output><ha-icon class="fold-chevron" icon="mdi:chevron-down"></ha-icon></summary>
         <div class="folded-body">
         <div id="target-mode" class="choices icon-choices" role="group" aria-label="Recipient selection"></div>
         <p id="routing-explanation" class="hint">Announcement Hub chooses configured outputs using room and fallback rules.</p>
@@ -61,11 +61,11 @@
             <div id="person-chosen" class="picked" aria-live="polite"></div>
           </div>
           <div class="target-group">
-            <div class="target-label"><ha-icon icon="mdi:devices"></ha-icon><div class="selection-heading"><div class="choice-caption"><strong>Person destinations</strong><output id="person-destinations-selected" class="selection-value" aria-live="polite">Room</output></div><small>Assigned in integration setup</small></div></div>
+            <div class="target-label"><ha-icon icon="mdi:devices"></ha-icon><div class="selection-heading"><div class="choice-caption"><strong>Person destinations<span class="title-colon" aria-hidden="true">:</span></strong><output id="person-destinations-selected" class="selection-value" aria-live="polite">Room</output></div><small>Assigned in integration setup</small></div></div>
             <div id="person-destinations" class="choices icon-choices" role="group" aria-label="Person destinations"></div>
-            <span class="field-caption choice-caption"><span>Translate into person's language</span><output id="person-translation-selected" class="selection-value" aria-live="polite">Person setting</output></span>
+            <span class="field-caption choice-caption"><span>Translate into person's language<span class="title-colon" aria-hidden="true">:</span></span><output id="person-translation-selected" class="selection-value" aria-live="polite">Person setting</output></span>
             <div id="person-translation" class="choices icon-choices" role="group" aria-label="Person translation"></div>
-            <span class="field-caption choice-caption"><span>Personal greeting</span><output id="person-greeting-selected" class="selection-value" aria-live="polite">Person setting</output></span><div id="person-greeting" class="choices icon-choices" role="group" aria-label="Personal greeting"></div>
+            <span class="field-caption choice-caption"><span>Personal greeting<span class="title-colon" aria-hidden="true">:</span></span><output id="person-greeting-selected" class="selection-value" aria-live="polite">Person setting</output></span><div id="person-greeting" class="choices icon-choices" role="group" aria-label="Personal greeting"></div>
             <p class="hint">Room uses location tracking. Mobile, Watch, Tablet and Other target only that person's assigned output devices.</p>
           </div>
         </div>
@@ -109,10 +109,10 @@
         </div>
       </details>
       <details class="section folded-section" id="delivery-section">
-        <summary class="folded-heading"><ha-icon icon="mdi:tune-variant"></ha-icon><span id="channel-heading">How to deliver</span><small>Channels, AI and advanced options</small><ha-icon class="fold-chevron" icon="mdi:chevron-down"></ha-icon></summary>
+        <summary class="folded-heading"><ha-icon icon="mdi:tune-variant"></ha-icon><span id="channel-heading">How to deliver<span class="title-colon" aria-hidden="true">:</span></span><output id="delivery-section-selected" class="selection-value" aria-live="polite">Automatic</output><ha-icon class="fold-chevron" icon="mdi:chevron-down"></ha-icon></summary>
         <div class="folded-body">
-        <span class="field-caption choice-caption"><span>Delivery service</span><output id="channels-selected" class="selection-value" aria-live="polite">Automatic</output></span><div id="channels" class="choices icon-choices" role="group" aria-label="Delivery service"></div>
-        <div id="ai-block"><span class="field-caption ai-label choice-caption"><ha-icon icon="mdi:creation-outline"></ha-icon><span>AI wording</span><output id="ai-choices-selected" class="selection-value" aria-live="polite">Hub default</output></span><div id="ai-choices" class="choices icon-choices" role="group" aria-label="AI wording mode"></div><p id="ai-explanation" class="hint">Use Announcement Hub's configured AI setting.</p></div>
+        <span class="field-caption choice-caption"><span>Delivery service<span class="title-colon" aria-hidden="true">:</span></span><output id="channels-selected" class="selection-value" aria-live="polite">Automatic</output></span><div id="channels" class="choices icon-choices" role="group" aria-label="Delivery service"></div>
+        <div id="ai-block"><span class="field-caption ai-label choice-caption"><ha-icon icon="mdi:creation-outline"></ha-icon><span>AI wording<span class="title-colon" aria-hidden="true">:</span></span><output id="ai-choices-selected" class="selection-value" aria-live="polite">Hub default</output></span><div id="ai-choices" class="choices icon-choices" role="group" aria-label="AI wording mode"></div><p id="ai-explanation" class="hint">Use Announcement Hub's configured AI setting.</p></div>
         <details class="disclosure" id="advanced">
           <summary><ha-icon icon="mdi:cog-outline"></ha-icon><strong>Advanced options</strong><small>Presence · agent · tap action</small></summary>
           <div class="columns">
@@ -121,7 +121,7 @@
             <label class="field"><span>Notification tap destination <small>optional</small></span><input id="click-action" placeholder="/lovelace/cameras"></label>
           </div>
           <label class="checkbox-line"><input type="checkbox" id="occupied-only" checked><span>Try occupied rooms during area fallback</span></label>
-          <span class="field-caption choice-caption"><span>Direct-room pre-announcement chime</span><output id="pre-chime-selected" class="selection-value" aria-live="polite">Person setting</output></span><div id="pre-chime" class="choices icon-choices" role="group" aria-label="Pre-announcement chime"></div>
+          <span class="field-caption choice-caption"><span>Direct-room pre-announcement chime<span class="title-colon" aria-hidden="true">:</span></span><output id="pre-chime-selected" class="selection-value" aria-live="polite">Person setting</output></span><div id="pre-chime" class="choices icon-choices" role="group" aria-label="Pre-announcement chime"></div>
           <p class="hint">Only selected recipients are eligible in manual mode; missing endpoints cannot cause a broadcast.</p>
         </details>
         </div>

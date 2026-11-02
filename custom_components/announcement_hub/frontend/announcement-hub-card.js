@@ -6,6 +6,10 @@
   "use strict";
   const TYPE = "announcement-hub-card";
   const ROOT = "/announcement_hub/";
+  // Keep this aligned with the beta manifest. Version each companion asset so
+  // an old JS module cannot silently mix with a newer HTML/CSS card.
+  const FRONTEND_VERSION = "0.10.0b33";
+  const assetUrl = (name) => ROOT + name + "?v=" + encodeURIComponent(FRONTEND_VERSION);
   const DOC_URL = "https://github.com/Chreece/HA-Announcement-Hub#dashboard-card";
   const LEVELS = [
     ["info", "Info"], ["success", "Success"], ["warning", "Warning"],
@@ -73,7 +77,7 @@
   };
   let localeCache = null;
   function loadLocales() {
-    if (!localeCache) localeCache = fetch(ROOT + "announcement-hub-locales.json", { credentials: "same-origin" })
+    if (!localeCache) localeCache = fetch(assetUrl("announcement-hub-locales.json"), { credentials: "same-origin", cache: "no-store" })
       .then((r) => r.ok ? r.json() : {}).catch(() => ({}));
     return localeCache;
   }
@@ -113,7 +117,7 @@
     if (!assetPromise) {
       assetPromise = Promise.all(
         ["announcement-hub-card.html", "announcement-hub-card.css"].map(async (name) => {
-          const response = await fetch(ROOT + name, { credentials: "same-origin" });
+          const response = await fetch(assetUrl(name), { credentials: "same-origin", cache: "no-store" });
           if (!response.ok) throw new Error("Unable to load " + name + " (" + response.status + ").");
           return response.text();
         })
@@ -341,7 +345,9 @@
     _renderButtons(id, choices, selected, dataKey = "value") {
       const target = this.$(id);
       const chosen = choices.find(([value]) => value === selected);
-      this.$(id + "-selected").textContent = this._t(chosen?.[1] || choices[0]?.[1] || "");
+      const selectedLabel = this._t(chosen?.[1] || choices[0]?.[1] || "");
+      this.$(id + "-selected").textContent = selectedLabel;
+      if (id === "channels") this.$("delivery-section-selected").textContent = selectedLabel;
       target.replaceChildren();
       for (const [value, name] of choices) {
         const button = document.createElement("button");

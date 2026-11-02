@@ -61,6 +61,7 @@ function harness() {
     fields[id] = group();
     fields[id + "-selected"] = { textContent: "" };
   }
+  fields["delivery-section-selected"] = { textContent: "" };
   fields["queue-number"] = { textContent: "" };
   fields["queue-pill"] = { title: "", hidden: false, setAttribute(key, value) { this[key] = value; } };
   fields["queue-panel"] = { hidden: true };
@@ -541,6 +542,54 @@ test("all seven icon groups preserve the existing announcement payload semantics
   assert.equal(payload.use_ai, false);
 });
 
+
+test("every selected option is shown as Title: Value, with translated title and a visible gap", () => {
+  const html = readFileSync(HTML_PATH, "utf8");
+  const css = readFileSync(CSS_PATH, "utf8");
+  for (const [title, id] of [
+    ["Priority", "priority-selected"],
+    ["Who receives it?", "target-mode-selected"],
+    ["Person destinations", "person-destinations-selected"],
+    ["Translate into person's language", "person-translation-selected"],
+    ["Personal greeting", "person-greeting-selected"],
+    ["How to deliver", "delivery-section-selected"],
+    ["Delivery service", "channels-selected"],
+    ["AI wording", "ai-choices-selected"],
+    ["Direct-room pre-announcement chime", "pre-chime-selected"],
+  ]) {
+    const index = html.indexOf(title + '<span class="title-colon" aria-hidden="true">:</span>');
+    assert.ok(index !== -1, title + " must contain a literal colon in the label");
+    assert.ok(html.indexOf('id="' + id + '"', index) > index,
+      id + " should follow the matching colon label");
+  }
+  assert.match(css, /\.choice-caption,\.priority-caption\{column-gap:8px/);
+  assert.match(css, /\.folded-heading \.selection-value\{\s*margin:0;/);
+  assert.match(css, /\.folded-heading \.fold-chevron\{\s*margin-left:auto;/);
+  const { card, fields } = harness();
+  card._translations = { "Warning": "Προειδοποίηση", "Written": "Γραπτά" };
+  card._level = "warning";
+  card._renderPriority();
+  assert.equal(fields["priority-selected"].textContent, "Προειδοποίηση");
+  card._renderButtons("channels", [["auto", "Automatic"], ["notification", "Written"]], "notification");
+  assert.equal(fields["channels-selected"].textContent, "Γραπτά");
+  assert.equal(fields["delivery-section-selected"].textContent, "Γραπτά");
+  assert.equal(fields.channels.nodes[1].children.length, 1);
+  assert.equal(fields.channels.nodes[1].children[0].tagName, "ha-icon");
+  assert.equal(fields.channels.nodes[1].textContent || "", "");
+});
+
+test("bundled frontend assets and exact Lovelace module URL have versioned cache keys", () => {
+  const js = readFileSync(CARD_PATH, "utf8");
+  const manifest = JSON.parse(readFileSync(new URL(
+    "../custom_components/announcement_hub/manifest.json", import.meta.url), "utf8"));
+  assert.equal(manifest.version, "0.10.0b33");
+  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b33"/);
+  assert.match(js, /const assetUrl = \(name\) => ROOT \+ name \+ "\?v=" /);
+  assert.match(js, /fetch\(assetUrl\("announcement-hub-locales.json"\)/);
+  assert.match(js, /fetch\(assetUrl\(name\)/);
+  assert.doesNotMatch(js, /fetch\(ROOT \+ name/);
+});
+
 test("tapping the queue badge loads all message bodies only through authenticated service", async () => {
   const { card, fields } = harness();
   const requests = [];
@@ -642,7 +691,7 @@ test("Greek, German and regional languages use correct card translations", async
   const path = new URL("../custom_components/announcement_hub/frontend/announcement-hub-locales.json", import.meta.url);
   const payload = JSON.parse(readFileSync(path, "utf8"));
   globalThis.fetch = async (url) => {
-    assert.equal(url, "/announcement_hub/announcement-hub-locales.json");
+    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b33");
     return { ok: true, json: async () => payload };
   };
   const card = new Card();

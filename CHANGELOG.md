@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.10.0b33 - 2026-11-02
+
+**Beta — clear `Title: Selected` labels and eliminate mixed-version icon buttons.**
+
+- Add a **literal colon**, followed by consistent visual spacing, between
+  each localized selection heading and its active value:
+  `Priority: Info`, `Delivery service: Automatic`, `AI wording: Hub default`,
+  selected people/destinations, translation, greeting and chime settings.
+  Expanded/collapsed delivery and recipient headings also show the live value.
+- Keep all seven selection groups **icon-only** with native translated tooltips
+  and accessible labels. Named recipients and explicit action buttons retain
+  their readable labels for safety.
+- Prevent outdated cards from mixing text-button JavaScript with new HTML/CSS:
+  version the bundled HTML, CSS and language fetches and bypass their cache.
+- Update the exact bundled Lovelace module URL from unversioned to
+  `?v=0.10.0b33` in storage-managed dashboards, preserving the resource ID,
+  custom query URLs, YAML resources and other custom cards.
+- Add tests for the nine colon headings, selected value spacing, dynamic
+  collapsed delivery label, real icon children, cache-version consistency,
+  and Lovelace resource auto-upgrades.
+- No changes to stored announcements, output routing or AI handling.
+
 ## 0.10.0b32 - 2026-11-02
 
 **Beta — compact icon-only titled choice groups, with visible selection text.**

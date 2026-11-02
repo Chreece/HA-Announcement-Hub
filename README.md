@@ -135,7 +135,14 @@ installations where automatic registration is unavailable, add
 `/announcement_hub/announcement-hub-card.js` as a **JavaScript module** and
 refresh the browser. The integration serves the JS, CSS, and HTML files itself.
 The card's exact type is `custom:announcement-hub-card`; its picker name is
-**Announcement Hub**.
+**Announcement Hub**. Storage-managed Lovelace module resources pointing to
+the exact bundled JS path are automatically versioned on integration startup,
+including older unversioned resources, to avoid stale icon/text UI mixing.
+Each card build also requests its matching versioned HTML, CSS and language
+files. Custom query URLs and YAML-managed resources remain untouched; if
+using a YAML/manual resource, set its URL to
+`/announcement_hub/announcement-hub-card.js?v=0.10.0b33` and refresh the
+browser after upgrading.
 
 The visual editor controls the card heading, initial importance, queue
 counter, AI controls and whether the message fields clear after a successful
@@ -144,9 +151,11 @@ icon-based priority choices visible, **with the selected priority name
 displayed beside the Priority label** in the chosen card language.
 Recipient selection, delivery method, AI wording, person destinations,
 translation, personal greeting and pre-announcement chime use the same
-**icon-only controls**, with the selected value(s) shown beside the
-corresponding section title. Every icon has a localized tooltip and an
-accessible name, and all selected values update immediately. Named
+**icon-only controls**, with a clear **`Title: Selected value`** display
+beside the corresponding localized section title. Even the collapsed
+recipients/delivery headings show their current selection. Every icon has
+a localized tooltip and an accessible name, and all selected values update
+immediately. Named
 people, areas and devices continue to display their actual names so
 recipient selection is unambiguous. Recipient, delivery and advanced
 sections start collapsed and can be expanded separately. On narrow mobile
