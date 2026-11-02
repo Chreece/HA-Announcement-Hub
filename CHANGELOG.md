@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.10.0b30 - 2026-11-02
+
+**Beta — prevent mobile title and priority-icon overlap in compact cards.**
+
+- Use the card's actual width to adapt the title/priority layout, including
+  dashboards with narrow columns on wider browser windows.
+- Stack the title input and left-aligned, wrapping priority icons on narrow
+  cards; all six priority actions stay accessible instead of overflowing.
+- Constrain the one-line header title with ellipsis, reserve space for
+  queue/Stop & Clear actions, and move those actions to a separate row on
+  extremely narrow cards.
+- Retain the compact desktop layout and add a viewport-based fallback for
+  mobile WebViews without CSS container-query support.
+- Add card layout regression assertions; no queue or delivery logic changed.
+
 ## 0.10.0b29 - 2026-11-02
 
 **Beta — compact composer with authenticated full queue management.**

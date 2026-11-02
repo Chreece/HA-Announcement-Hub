@@ -312,6 +312,32 @@ test("compact card keeps message/title/icon priority visible and folds all other
   assert.match(js, /symbol\.setAttribute\("icon", LEVEL_ICONS\[level\]\)/);
 });
 
+test("mobile card keeps title and priority icons separate even inside narrow dashboard columns", () => {
+  const css = readFileSync(CSS_PATH, "utf8");
+  const html = readFileSync(HTML_PATH, "utf8");
+  // A responsive dashboard grid can be narrow on a WIDE viewport,
+  // so use the card's own size in addition to the viewport fallback.
+  assert.match(css, /ha-card\s*\{[^}]*container-name:\s*announcement-hub-card/);
+  assert.match(css, /ha-card\s*\{[^}]*container-type:\s*inline-size/);
+  const narrow = css.split("@container announcement-hub-card (max-width:430px) {")[1];
+  assert.ok(narrow, "narrow-card container query missing");
+  const inner = narrow.split("@container announcement-hub-card (max-width:300px) {")[0];
+  assert.match(inner, /\.compose-details\s*\{\s*grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(inner, /\.priority-pills\s*\{\s*flex-wrap:wrap;\s*overflow:visible;\s*justify-content:flex-start/);
+  assert.match(inner, /\.priority-pills button\s*\{\s*flex:0 0 30px/);
+  const header = css.split("@container announcement-hub-card (max-width:300px) {")[1];
+  assert.match(header, /\.top\s*\{\s*grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(header, /\.top-actions\s*\{\s*width:100%/);
+  // Older mobile WebViews still get the stacked title/priority layout.
+  const fallback = css.slice(css.lastIndexOf("@media(max-width:550px)"));
+  assert.match(fallback, /\.compose-details\s*\{\s*grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(fallback, /\.priority-pills\s*\{\s*flex-wrap:wrap/);
+  assert.match(css, /#card-heading\s*\{[^}]*text-overflow:ellipsis/);
+  assert.match(html, /class="compose-details"/);
+  assert.match(html, /class="field compact-title"/);
+  assert.match(html, /class="field compact-priority"/);
+});
+
 test("tapping the queue badge loads all message bodies only through authenticated service", async () => {
   const { card, fields } = harness();
   const requests = [];
