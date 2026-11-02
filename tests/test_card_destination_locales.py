@@ -1,7 +1,8 @@
 """All localized card person-destination labels must be human-readable.
 
 The output keys in PERSON_DESTINATIONS are stable API values and must not
-be translated. Their visible labels are translated by _t(name).
+be translated. Their selected labels, icon tooltips and aria-labels are
+translated by _t(name), while recipient identifiers remain unchanged.
 """
 
 from __future__ import annotations
@@ -57,5 +58,8 @@ def test_card_label_changes_cannot_change_api_targets_or_examples():
     assert '["watch", "Watch"]' in source
     assert '["tablet", "Tablet"]' in source
     assert '["other", "Other"]' in source
-    assert 'button.textContent = this._t(name)' in source
+    assert 'button.title = this._t(name)' in source
+    assert 'button.setAttribute("aria-label", this._t(name))' in source
+    assert 'this.$("person-destinations-selected").textContent' in source
+    assert 'button.appendChild(symbol)' in source
     assert "payload.person_destination = [...this._personDestinations]" in source
