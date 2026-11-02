@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.10.0b34"
+VERSION: Final = "0.10.0b35"
 PLATFORMS: Final = [Platform.SENSOR, Platform.SWITCH]
 
 SERVICE_SEND: Final = "send"
@@ -18,6 +18,7 @@ SERVICE_CANCEL: Final = "cancel"
 SERVICE_LIST_QUEUE: Final = "list_queue"
 SERVICE_REORDER_QUEUE: Final = "reorder_queue"
 SERVICE_LIST_PROVIDERS: Final = "list_providers"
+SERVICE_LIST_PERSON_TARGETS: Final = "list_person_targets"
 
 ATTR_TEXT: Final = "text"
 ATTR_TEXT_TTS: Final = "text_tts"
@@ -26,6 +27,8 @@ ATTR_OUTPUT: Final = "output"  # Hidden legacy alias; use area for new actions.
 ATTR_AREA: Final = "area"
 ATTR_TARGET_PERSON: Final = "target_person"
 ATTR_PERSON_DESTINATION: Final = "person_destination"
+ATTR_PERSON_INTEGRATION: Final = "person_integration"
+ATTR_PERSON_DEVICE: Final = "person_device"
 ATTR_PERSON_TRANSLATE: Final = "person_translate"
 ATTR_PERSON_GREETING: Final = "person_greeting"
 ATTR_PRE_ANNOUNCE_SOUND: Final = "pre_announce_sound"
