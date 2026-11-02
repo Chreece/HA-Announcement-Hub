@@ -141,7 +141,7 @@ including older unversioned resources, to avoid stale icon/text UI mixing.
 Each card build also requests its matching versioned HTML, CSS and language
 files. Custom query URLs and YAML-managed resources remain untouched; if
 using a YAML/manual resource, set its URL to
-`/announcement_hub/announcement-hub-card.js?v=0.10.0b36` and refresh the
+`/announcement_hub/announcement-hub-card.js?v=0.10.0b37` and refresh the
 browser after upgrading.
 
 The visual editor controls the card heading, initial importance, queue
@@ -149,6 +149,9 @@ counter, AI controls and whether the message fields clear after a successful
 send. The compact composer keeps the message, single-line title and six
 icon-based priority choices visible, **with the selected priority name
 displayed beside the Priority label** in the chosen card language.
+The card header also includes a compact **Settings** cog that directly opens
+**Settings → Devices & services → Announcement Hub**, using this Home
+Assistant instance's integration detail page (no external website).
 Recipient selection, delivery method, AI wording, person destinations,
 translation, personal greeting and pre-announcement chime use the same
 **icon-only controls**, with a clear **`Title: Selected value`** display
@@ -596,9 +599,12 @@ the lists are filtered to enabled notify/media-player endpoints explicitly
 assigned in those people's Hub profiles. When no person or assigned output
 is available, the card explains why. Only integration names and owned
 device names are displayed, never an unrestricted whole-integration route.
-Selecting an integration or device automatically **deselects Room**; removing
-the last explicit selection restores Room. Choosing Room again clears both
-multi-selects.
+Selecting a person chip needs **one click/tap**; the assigned integration
+and device choices appear immediately without first clicking or focusing
+the search fields. Routine HA state updates no longer replace the person
+buttons while a tap is in progress. Selecting an integration or device
+automatically **deselects Room**; removing the last explicit selection
+restores Room. Choosing Room again clears both multi-selects.
 The card also offers the existing per-send translation preference (Person
 setting, Translate, Original language). Missing or disabled owned
 endpoints are not replaced with someone else's devices.
