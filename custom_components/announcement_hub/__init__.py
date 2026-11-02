@@ -11,6 +11,7 @@ from typing import Any
 
 import probatio
 
+from homeassistant.components.conversation.agent_manager import get_agent_manager
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.components.notify.const import DOMAIN as NOTIFY_DOMAIN
 from homeassistant.config_entries import ConfigEntry
@@ -101,6 +102,7 @@ from .const import (
     SERVICE_CLEAR_QUEUE,
     SERVICE_LIST_QUEUE,
     SERVICE_REORDER_QUEUE,
+    SERVICE_LIST_PROVIDERS,
     SERVICE_SEND,
     VERSION,
     TARGET_ENTITY_PREFIX,
@@ -109,7 +111,8 @@ from .const import (
 from .dashboard_resource import async_ensure_card_resource
 from .manager import AnnouncementManager
 from .message_text import resolve_channel_texts
-from .outputs import area_name
+from .outputs import area_name, tts_engine_options
+from .provider_catalog import build_provider_catalog
 from .person_delivery import personalized_text, person_is_enabled, allowed_person_ai
 from .person_targeting import (
     PersonTargetError, resolve_person_rooms, resolve_person_ids,
@@ -665,6 +668,27 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
         )
         return response if call.return_response else None
 
+    async def async_list_providers(call: ServiceCall) -> ServiceResponse:
+        """List installed provider identities without exposing any credentials."""
+        _get_manager(hass)
+        try:
+            registered_agents = get_agent_manager(hass).async_get_agent_info()
+        except (AttributeError, KeyError, RuntimeError) as err:
+            _LOGGER.debug("Conversation agent inventory temporarily unavailable: %s", err)
+            registered_agents = ()
+        try:
+            tts_options = tts_engine_options(hass)
+        except (AttributeError, KeyError, RuntimeError) as err:
+            _LOGGER.debug("TTS provider inventory temporarily unavailable: %s", err)
+            tts_options = ()
+        response: ServiceResponse = build_provider_catalog(
+            hass.states.async_all("conversation"),
+            hass.states.async_all("ai_task"),
+            registered_agents,
+            tts_options,
+        )
+        return response if call.return_response else None
+
     if hass.services.has_service(
         NOTIFY_DOMAIN, NOTIFY_SERVICE_ANNOUNCEMENT_HUB
     ):
@@ -734,6 +758,15 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             SERVICE_REORDER_QUEUE,
             async_reorder_queue,
             schema=REORDER_QUEUE_SCHEMA,
+            supports_response=SupportsResponse.OPTIONAL,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_LIST_PROVIDERS):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_LIST_PROVIDERS,
+            async_list_providers,
+            schema=probatio.Schema({}),
             supports_response=SupportsResponse.OPTIONAL,
         )
 

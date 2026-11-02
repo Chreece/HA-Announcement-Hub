@@ -976,6 +976,10 @@
           "description": "Optionale Prüfung, ob sich die Warteschlange inzwischen geändert hat."
         }
       }
+    },
+    "list_providers": {
+      "name": "Verfügbare Anbieter auflisten",
+      "description": "Zeigt Konversationsagenten, AI-Task-Entitäten und aktivierte TTS-Engines für die Auswahl im Announcement Hub."
     }
   }
 }

@@ -8,7 +8,7 @@
   const ROOT = "/announcement_hub/";
   // Keep this aligned with the beta manifest. Version each companion asset so
   // an old JS module cannot silently mix with a newer HTML/CSS card.
-  const FRONTEND_VERSION = "0.10.0b33";
+  const FRONTEND_VERSION = "0.10.0b34";
   const assetUrl = (name) => ROOT + name + "?v=" + encodeURIComponent(FRONTEND_VERSION);
   const DOC_URL = "https://github.com/Chreece/HA-Announcement-Hub#dashboard-card";
   const LEVELS = [
@@ -164,6 +164,10 @@
       this._personGreeting = "inherit";
       this._preChime = "inherit";
       this._registry = { area: [], integration: [], device: [], entity: [], person: [] };
+      this._providerCatalog = { ai_agents: [], tts_engines: [] };
+      this._providerSignatures = {};
+      this._providerLoading = false;
+      this._providerLastFetch = 0;
       this._level = "info";
       this._channel = "auto";
       this._ai = "inherit";
@@ -220,6 +224,7 @@
       if (this._mounted) {
         this._updateQueue();
         this._refreshPeople();
+        this._renderProviderSelectors();
         if (!this._loaded && !this._loading) void this._loadRegistry();
       }
     }
@@ -244,7 +249,10 @@
         this._bind();
         await this._applyLocale();
         this._sync();
-        if (this._hass) await this._loadRegistry();
+        if (this._hass) {
+          void this._refreshProviders();
+          await this._loadRegistry();
+        }
       } catch (error) {
         const notice = document.createElement("ha-card");
         notice.textContent = "Announcement Hub card couldn't load its assets. Check the resource URL and integration installation: " + error.message;
@@ -301,6 +309,9 @@
         this._sync();
       });
       this.$("message-title").addEventListener("input", () => this._updateAIHint());
+      this.$("advanced").addEventListener("toggle", () => {
+        if (this.$("advanced").open) void this._refreshProviders(true);
+      });
       this.$("message").addEventListener("input", () => this._clearNotice());
       this.$("send").addEventListener("click", () => {
         if (this._sending) return;
@@ -405,7 +416,98 @@
       this._updateAIHint();
       this._drawChosen();
       this._drawPersonDestinations();
+      this._renderProviderSelectors();
       this._updateQueue();
+    }
+
+    _renderProviderSelectors() {
+      if (!this._mounted) return;
+      const stateChoices = (domain) => Object.entries(this._hass?.states || {})
+        .filter(([id]) => id.startsWith(domain + "."))
+        .map(([id, state]) => ({
+          value: id,
+          label: String(state?.attributes?.friendly_name || id) + " · " + id,
+        }));
+      const groups = [
+        ["ai-agent", "ai_agents", [
+          { value: "default", label: this._t("Home Assistant preferred agent") },
+          ...stateChoices("conversation"), ...stateChoices("ai_task"),
+        ]],
+        ["tts-engine", "tts_engines", stateChoices("tts")],
+      ];
+      for (const [id, catalogKey, discovered] of groups) {
+        const select = this.$(id);
+        if (!select) continue;
+        const selected = String(select.value || "");
+        const choices = new Map();
+        // Backend's registered providers can include agents without entities;
+        // the local HA states bridge short gaps during a service upgrade.
+        for (const candidate of [...(this._providerCatalog[catalogKey] || []), ...discovered]) {
+          const value = String(candidate?.value || "");
+          if (!value || choices.has(value)) continue;
+          if (id === "tts-engine" && !value.startsWith("tts.")) continue;
+          choices.set(value, String(candidate.label || value));
+        }
+        const options = [
+          { value: "", label: this._t("Hub default"), disabled: false },
+          ...[...choices.entries()].sort((a, b) => (
+            a[0] === "default" ? -1 : b[0] === "default" ? 1 :
+              a[1].localeCompare(b[1])
+          )).map(([value, label]) => ({ value, label, disabled: false })),
+        ];
+        if (selected && !choices.has(selected)) {
+          // Don't silently change the user's override if a provider disappears.
+          options.push({
+            value: selected,
+            label: this._t("Unavailable provider: {id}", { id: selected }),
+            disabled: false,
+          });
+        }
+        if (options.length === 1) {
+          options.push({
+            value: "__no_provider__", label: this._t("No providers available"),
+            disabled: true,
+          });
+        }
+        const signature = JSON.stringify(options);
+        if (this._providerSignatures[id] === signature) continue;
+        this._providerSignatures[id] = signature;
+        select.replaceChildren();
+        for (const choice of options) {
+          const element = document.createElement("option");
+          element.value = choice.value;
+          element.textContent = choice.label;
+          element.disabled = choice.disabled;
+          select.appendChild(element);
+        }
+        select.value = selected;
+      }
+    }
+
+    async _refreshProviders(force = false) {
+      if (!this._mounted || !this._hass?.callService || this._providerLoading) return;
+      const now = Date.now();
+      if (!force && now - this._providerLastFetch < 120000) return;
+      this._providerLoading = true;
+      this._providerLastFetch = now;
+      try {
+        // Service returns both entity-backed providers and Conversation
+        // agents that Home Assistant has registered without an entity.
+        const response = servicePayload(await this._hass.callService(
+          "announcement_hub", "list_providers", {}, undefined, false, true
+        ));
+        if (!Array.isArray(response?.ai_agents) || !Array.isArray(response?.tts_engines)) {
+          throw new Error("Provider inventory unavailable");
+        }
+        this._providerCatalog = response;
+      } catch (error) {
+        // On an older integration version, continue with the local HA entity
+        // inventory; never erase a previously selected override or message.
+        this._providerLastFetch = 0;
+      } finally {
+        this._providerLoading = false;
+        this._renderProviderSelectors();
+      }
     }
 
     _updateAIHint() {

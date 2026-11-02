@@ -61,7 +61,7 @@ def read(lang):
 
 def test_person_legacy_english_not_present_after_source_rewrites():
     en = read("en")
-    assert len(en) == 669
+    assert len(en) == 671
     for lang in LANGUAGES:
         translated = read(lang)
         assert set(en) == set(translated), lang
@@ -103,7 +103,7 @@ def test_greek_and_german_queue_explanations_have_no_untranslated_prose():
 def test_card_person_destination_help_matches_rendered_chip_labels():
     languages = json.loads(CARD_LOCALES.read_text(encoding="utf-8"))
     assert set(languages) == set(LANGUAGES)
-    assert all(len(messages) == 201 for messages in languages.values())
+    assert all(len(messages) == 204 for messages in languages.values())
     for lang, messages in languages.items():
         hint = messages[CARD_HINT].casefold()
         for name in ("Room", "Mobile", "Watch", "Tablet", "Other"):

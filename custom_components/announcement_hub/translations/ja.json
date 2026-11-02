@@ -976,6 +976,10 @@
           "description": "表示後のキュー変更を検出する任意の確認項目です。"
         }
       }
+    },
+    "list_providers": {
+      "name": "利用可能なプロバイダーを一覧表示",
+      "description": "Announcement Hub 用の会話エージェント、AI Task エンティティ、有効な TTS エンジンを一覧表示します。"
     }
   }
 }

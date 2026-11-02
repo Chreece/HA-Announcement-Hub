@@ -182,3 +182,7 @@ reorder_queue:
       description: Optional adjacent job ID for stale-view protection.
       selector:
         text:
+
+list_providers:
+  description: Show the available Conversation/AI Task agents and enabled TTS engines for the Announcement Hub card's dropdown selectors. No credentials or message contents are returned.
+  fields: {}

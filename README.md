@@ -157,8 +157,16 @@ recipients/delivery headings show their current selection. Every icon has
 a localized tooltip and an accessible name, and all selected values update
 immediately. Named
 people, areas and devices continue to display their actual names so
-recipient selection is unambiguous. Recipient, delivery and advanced
-sections start collapsed and can be expanded separately. On narrow mobile
+recipient selection is unambiguous. In **Advanced options**, **AI provider**
+and **TTS engine** are now dropdowns listing available Home Assistant
+Conversation agents, AI Task entities, and configured TTS engines. Choose
+**Hub default** to inherit the integration's configured provider; selecting
+an explicit provider sends its exact ID for that announcement. Providers
+registered only as Conversation agents (without an entity) are included.
+If a provider becomes unavailable, the previously chosen value stays visible
+until you change it. The dropdowns refresh when Advanced options opens.
+Recipient, delivery and advanced sections start collapsed and can be
+expanded separately. On narrow mobile
 cards, the title and the left-aligned priority icons use separate rows,
 so they never overlap. The card header truncates long titles gracefully
 and keeps queue and Stop & Clear controls reachable.
@@ -1294,6 +1302,20 @@ after queue acceptance.
 returned successfully. It **does not guarantee device-side reception**.
 If you need receipt guarantees, use a recipient/provider that exposes
 acknowledgements beyond the Home Assistant notification action.
+
+### Inspect available AI and TTS providers
+
+The read-only `announcement_hub.list_providers` action returns two arrays:
+`ai_agents` (Home Assistant's preferred agent, Conversation agents and
+AI Task entities) and `tts_engines` (configured/enabled TTS entities).
+Each entry contains `value` (the exact provider ID) and `label`
+(a friendly description). The action returns no API keys, message text or
+other secrets and supports an authenticated service response.
+
+The card uses the action automatically and can also discover provider
+entities from its locally available Home Assistant states if the installed
+backend does not yet provide this service. Dropdowns keep an unavailable
+selected provider visible rather than silently changing the announcement.
 
 ### Inspect and reorder the waiting queue
 

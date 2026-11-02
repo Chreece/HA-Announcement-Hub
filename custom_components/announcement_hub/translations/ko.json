@@ -976,6 +976,10 @@
           "description": "열람 이후 대기열 변경을 확인하는 선택 항목입니다."
         }
       }
+    },
+    "list_providers": {
+      "name": "사용 가능한 제공자 목록",
+      "description": "Announcement Hub용 대화 에이전트, AI Task 엔터티 및 활성 TTS 엔진을 표시합니다."
     }
   }
 }

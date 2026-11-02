@@ -976,6 +976,10 @@
           "description": "Verificação opcional de alterações na fila."
         }
       }
+    },
+    "list_providers": {
+      "name": "Listar fornecedores disponíveis",
+      "description": "Lista agentes de conversação, entidades AI Task e motores TTS ativos para Announcement Hub."
     }
   }
 }

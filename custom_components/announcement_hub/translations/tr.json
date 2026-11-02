@@ -976,6 +976,10 @@
           "description": "Kuyruk görüntülendikten sonra değiştiyse isteğe bağlı koruma."
         }
       }
+    },
+    "list_providers": {
+      "name": "Kullanılabilir sağlayıcıları listele",
+      "description": "Announcement Hub için konuşma aracılarını, AI Task varlıklarını ve etkin TTS motorlarını listeler."
     }
   }
 }

@@ -976,6 +976,10 @@
           "description": "Optional guard against changes since the queue was viewed."
         }
       }
+    },
+    "list_providers": {
+      "name": "List available providers",
+      "description": "List configured Conversation agents, AI Task entities and enabled TTS engines for Announcement Hub's provider selectors."
     }
   }
 }

@@ -19,6 +19,9 @@
     },
     "reorder_queue": {
       "service": "mdi:sort-variant"
+    },
+    "list_providers": {
+      "service": "mdi:format-list-bulleted-type"
     }
   },
   "entity": {
