@@ -207,7 +207,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Η επιλογή ενσωματώσεων ή συσκευών αντικαθιστά το Δωμάτιο. Μπορείς να επιλέξεις περισσότερες από μία.",
     "Person device list unavailable. Check Announcement Hub.": "Η λίστα συσκευών του ατόμου δεν είναι διαθέσιμη. Έλεγξε το Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Δεν έχουν αντιστοιχιστεί έξοδοι σε αυτό το άτομο. Ρύθμισέ τες στο Announcement Hub.",
-    "No matching items.": "Δεν βρέθηκαν αντιστοιχίες."
+    "No matching items.": "Δεν βρέθηκαν αντιστοιχίες.",
+    "Open Announcement Hub settings": "Άνοιγμα ρυθμίσεων Announcement Hub"
   },
   "de": {
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · NACHRICHTEN",
@@ -417,7 +418,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Wenn du Integrationen oder Geräte auswählst, wird Raum deaktiviert. Mehrfachauswahl ist möglich.",
     "Person device list unavailable. Check Announcement Hub.": "Die Geräteliste der Person ist nicht verfügbar. Prüfe Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Dieser Person sind keine Ausgaben zugewiesen. Weise sie in Announcement Hub zu.",
-    "No matching items.": "Keine passenden Einträge."
+    "No matching items.": "Keine passenden Einträge.",
+    "Open Announcement Hub settings": "Announcement-Hub-Einstellungen öffnen"
   },
   "fr": {
     "The message": "Le message",
@@ -627,7 +629,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Choisir des intégrations ou appareils remplace Pièce. Vous pouvez en sélectionner plusieurs.",
     "Person device list unavailable. Check Announcement Hub.": "La liste des appareils de cette personne est indisponible. Vérifiez Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Aucune sortie n'est attribuée à cette personne. Configurez-les dans Announcement Hub.",
-    "No matching items.": "Aucun élément correspondant."
+    "No matching items.": "Aucun élément correspondant.",
+    "Open Announcement Hub settings": "Ouvrir les paramètres d’Announcement Hub"
   },
   "es": {
     "The message": "El mensaje",
@@ -837,7 +840,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Al seleccionar integraciones o dispositivos se desactiva Habitación. Puedes seleccionar varios.",
     "Person device list unavailable. Check Announcement Hub.": "La lista de dispositivos de la persona no está disponible. Revisa Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Esta persona no tiene salidas asignadas. Configúralas en Announcement Hub.",
-    "No matching items.": "No hay elementos coincidentes."
+    "No matching items.": "No hay elementos coincidentes.",
+    "Open Announcement Hub settings": "Abrir los ajustes de Announcement Hub"
   },
   "it": {
     "The message": "Il messaggio",
@@ -1047,7 +1051,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "La selezione di integrazioni o dispositivi sostituisce Stanza. Puoi selezionarne più di uno.",
     "Person device list unavailable. Check Announcement Hub.": "L'elenco dei dispositivi della persona non è disponibile. Controlla Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Nessuna uscita assegnata a questa persona. Configurale in Announcement Hub.",
-    "No matching items.": "Nessun elemento corrispondente."
+    "No matching items.": "Nessun elemento corrispondente.",
+    "Open Announcement Hub settings": "Apri le impostazioni di Announcement Hub"
   },
   "pt": {
     "The message": "A mensagem",
@@ -1257,7 +1262,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Selecionar integrações ou dispositivos substitui Divisão. Pode selecionar vários.",
     "Person device list unavailable. Check Announcement Hub.": "A lista de dispositivos da pessoa está indisponível. Verifique o Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Não existem saídas atribuídas a esta pessoa. Configure-as no Announcement Hub.",
-    "No matching items.": "Nenhum item correspondente."
+    "No matching items.": "Nenhum item correspondente.",
+    "Open Announcement Hub settings": "Abrir definições do Announcement Hub"
   },
   "nl": {
     "The message": "Het bericht",
@@ -1467,7 +1473,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Als je integraties of apparaten selecteert, vervalt Kamer. Meerdere keuzes zijn mogelijk.",
     "Person device list unavailable. Check Announcement Hub.": "De apparatenlijst van deze persoon is niet beschikbaar. Controleer Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Er zijn geen uitgangen aan deze persoon toegewezen. Stel ze in via Announcement Hub.",
-    "No matching items.": "Geen overeenkomende items."
+    "No matching items.": "Geen overeenkomende items.",
+    "Open Announcement Hub settings": "Announcement Hub-instellingen openen"
   },
   "pl": {
     "The message": "Wiadomość",
@@ -1677,7 +1684,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Wybór integracji lub urządzeń wyłącza Pokój. Możesz wybrać kilka elementów.",
     "Person device list unavailable. Check Announcement Hub.": "Lista urządzeń tej osoby jest niedostępna. Sprawdź Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Do tej osoby nie przypisano żadnych wyjść. Skonfiguruj je w Announcement Hub.",
-    "No matching items.": "Brak pasujących elementów."
+    "No matching items.": "Brak pasujących elementów.",
+    "Open Announcement Hub settings": "Otwórz ustawienia Announcement Hub"
   },
   "pt-BR": {
     "The message": "A mensagem",
@@ -1887,7 +1895,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Selecionar integrações ou dispositivos substitui Cômodo. Você pode selecionar vários.",
     "Person device list unavailable. Check Announcement Hub.": "A lista de dispositivos da pessoa está indisponível. Verifique o Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Não há saídas atribuídas a esta pessoa. Configure-as no Announcement Hub.",
-    "No matching items.": "Nenhum item correspondente."
+    "No matching items.": "Nenhum item correspondente.",
+    "Open Announcement Hub settings": "Abrir configurações do Announcement Hub"
   },
   "ru": {
     "The message": "Сообщение",
@@ -2097,7 +2106,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "При выборе интеграций или устройств «Комната» отключается. Можно выбрать несколько вариантов.",
     "Person device list unavailable. Check Announcement Hub.": "Список устройств этого человека недоступен. Проверьте Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Для этого человека не назначены выходы. Настройте их в Announcement Hub.",
-    "No matching items.": "Совпадений не найдено."
+    "No matching items.": "Совпадений не найдено.",
+    "Open Announcement Hub settings": "Открыть настройки Announcement Hub"
   },
   "tr": {
     "The message": "Mesaj",
@@ -2307,7 +2317,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Entegrasyon veya cihaz seçildiğinde Oda seçimi kaldırılır. Birden fazla seçim yapabilirsiniz.",
     "Person device list unavailable. Check Announcement Hub.": "Kişinin cihaz listesine ulaşılamıyor. Announcement Hub'ı kontrol edin.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Bu kişiye atanmış çıkış yok. Announcement Hub'da yapılandırın.",
-    "No matching items.": "Eşleşen öğe yok."
+    "No matching items.": "Eşleşen öğe yok.",
+    "Open Announcement Hub settings": "Announcement Hub ayarlarını aç"
   },
   "uk": {
     "The message": "Повідомлення",
@@ -2517,7 +2528,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Вибір інтеграцій або пристроїв вимикає Кімнату. Можна вибрати кілька елементів.",
     "Person device list unavailable. Check Announcement Hub.": "Список пристроїв цієї особи недоступний. Перевірте Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Для цієї особи не призначено виходів. Налаштуйте їх в Announcement Hub.",
-    "No matching items.": "Відповідних елементів не знайдено."
+    "No matching items.": "Відповідних елементів не знайдено.",
+    "Open Announcement Hub settings": "Відкрити налаштування Announcement Hub"
   },
   "ar": {
     "The message": "الرسالة",
@@ -2727,7 +2739,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "يؤدي اختيار عمليات التكامل أو الأجهزة إلى إلغاء اختيار الغرفة. يمكنك اختيار عدة عناصر.",
     "Person device list unavailable. Check Announcement Hub.": "قائمة أجهزة هذا الشخص غير متاحة. تحقق من Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "لا توجد مخرجات مخصصة لهذا الشخص. قم بتكوينها في Announcement Hub.",
-    "No matching items.": "لا توجد عناصر مطابقة."
+    "No matching items.": "لا توجد عناصر مطابقة.",
+    "Open Announcement Hub settings": "فتح إعدادات Announcement Hub"
   },
   "zh-Hans": {
     "The message": "消息",
@@ -2937,7 +2950,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "选择集成或设备后将取消选择房间。可以多选。",
     "Person device list unavailable. Check Announcement Hub.": "无法获取此人的设备列表。请检查 Announcement Hub。",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "此人尚未分配输出设备。请在 Announcement Hub 中配置。",
-    "No matching items.": "没有匹配项。"
+    "No matching items.": "没有匹配项。",
+    "Open Announcement Hub settings": "打开 Announcement Hub 设置"
   },
   "ja": {
     "The message": "メッセージ",
@@ -3147,7 +3161,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "連携またはデバイスを選択すると「部屋」の選択が解除されます。複数選択できます。",
     "Person device list unavailable. Check Announcement Hub.": "この人物のデバイス一覧を取得できません。Announcement Hub を確認してください。",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "この人物に割り当てられた出力はありません。Announcement Hub で設定してください。",
-    "No matching items.": "一致する項目がありません。"
+    "No matching items.": "一致する項目がありません。",
+    "Open Announcement Hub settings": "Announcement Hub の設定を開く"
   },
   "ko": {
     "The message": "메시지",
@@ -3357,7 +3372,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "통합 또는 기기를 선택하면 방 선택이 해제됩니다. 여러 항목을 선택할 수 있습니다.",
     "Person device list unavailable. Check Announcement Hub.": "이 사람의 기기 목록을 사용할 수 없습니다. Announcement Hub를 확인하세요.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "이 사람에게 할당된 출력이 없습니다. Announcement Hub에서 설정하세요.",
-    "No matching items.": "일치하는 항목이 없습니다."
+    "No matching items.": "일치하는 항목이 없습니다.",
+    "Open Announcement Hub settings": "Announcement Hub 설정 열기"
   },
   "sv": {
     "The message": "Meddelandet",
@@ -3567,7 +3583,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "När du väljer integrationer eller enheter ersätts Rum. Du kan välja flera.",
     "Person device list unavailable. Check Announcement Hub.": "Personens enhetslista är inte tillgänglig. Kontrollera Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Inga utgångar har tilldelats den här personen. Konfigurera dem i Announcement Hub.",
-    "No matching items.": "Inga matchande objekt."
+    "No matching items.": "Inga matchande objekt.",
+    "Open Announcement Hub settings": "Öppna inställningar för Announcement Hub"
   },
   "cs": {
     "The message": "Zpráva",
@@ -3777,7 +3794,8 @@
     "Choosing integrations or devices replaces Room. You can select several.": "Výběr integrací nebo zařízení nahradí Místnost. Můžete vybrat více položek.",
     "Person device list unavailable. Check Announcement Hub.": "Seznam zařízení osoby není dostupný. Zkontrolujte Announcement Hub.",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "Této osobě nejsou přiřazeny žádné výstupy. Nastavte je v Announcement Hub.",
-    "No matching items.": "Žádné odpovídající položky."
+    "No matching items.": "Žádné odpovídající položky.",
+    "Open Announcement Hub settings": "Otevřít nastavení Announcement Hub"
   },
   "zh-Hant": {
     "The message": "訊息",
@@ -3987,6 +4005,7 @@
     "Choosing integrations or devices replaces Room. You can select several.": "選擇整合或裝置後將取消選擇房間。可以多選。",
     "Person device list unavailable. Check Announcement Hub.": "無法取得此人的裝置清單。請檢查 Announcement Hub。",
     "No assigned outputs for this person. Configure them in Announcement Hub.": "此人尚未分配輸出裝置。請在 Announcement Hub 中設定。",
-    "No matching items.": "沒有符合的項目。"
+    "No matching items.": "沒有符合的項目。",
+    "Open Announcement Hub settings": "開啟 Announcement Hub 設定"
   }
 }
