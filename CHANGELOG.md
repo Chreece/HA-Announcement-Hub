@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b36 - 2026-11-02
+
+**Beta — searchable person-owned multi-selects, with Room-exclusive routing.**
+
+- Replace plain person integration/device search fields with compact
+  multi-select pickers: filter by chosen person, search case-insensitively,
+  select multiple checkbox rows, display selection counts and removable chips,
+  and explain empty/unconfigured profile choices in the current HA language.
+- Selecting at least one integration or device immediately deselects
+  **Room**. Removing the last exact target restores Room; selecting Room
+  again clears the two exact-target selections. Keep selected targets scoped
+  to enabled outputs assigned in the chosen Hub person profiles.
+- Enforce the same rule at the service boundary, including
+  `person_destination: [room]` and the implicit default: explicit
+  `person_integration` or `person_device` targets do not produce room
+  announcements or require a room tracker. Unchanged legacy named
+  Mobile/Watch/Tablet/Other destinations keep their historical behavior.
+- Version the card assets, localize new hints and empty states in all 19
+  dashboard languages and extend routing/UI regression tests.
+
+
 ## 0.10.0b35 - 2026-11-02
 
 **Beta — person-owned device/integration delivery and in-card AI/TTS menus.**
