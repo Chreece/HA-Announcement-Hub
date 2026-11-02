@@ -25,6 +25,7 @@ from homeassistant.core import (
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.service import async_set_service_schema
 from homeassistant.helpers.start import async_at_started
 from homeassistant.util.yaml import load_yaml_dict
@@ -45,6 +46,8 @@ from .const import (
     ATTR_AREA,
     ATTR_TARGET_PERSON,
     ATTR_PERSON_DESTINATION,
+    ATTR_PERSON_INTEGRATION,
+    ATTR_PERSON_DEVICE,
     ATTR_PERSON_TRANSLATE,
     ATTR_PERSON_GREETING,
     ATTR_PRE_ANNOUNCE_SOUND,
@@ -103,6 +106,7 @@ from .const import (
     SERVICE_LIST_QUEUE,
     SERVICE_REORDER_QUEUE,
     SERVICE_LIST_PROVIDERS,
+    SERVICE_LIST_PERSON_TARGETS,
     SERVICE_SEND,
     VERSION,
     TARGET_ENTITY_PREFIX,
@@ -111,8 +115,9 @@ from .const import (
 from .dashboard_resource import async_ensure_card_resource
 from .manager import AnnouncementManager
 from .message_text import resolve_channel_texts
-from .outputs import area_name, tts_engine_options
+from .outputs import area_name, tts_engine_options, entity_integration
 from .provider_catalog import build_provider_catalog
+from .person_catalog import owned_person_catalog, resolve_owned_person_outputs
 from .person_delivery import personalized_text, person_is_enabled, allowed_person_ai
 from .person_targeting import (
     PersonTargetError, resolve_person_rooms, resolve_person_ids,
@@ -123,6 +128,46 @@ from .person_targeting import (
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+
+def _person_owned_metadata(hass: HomeAssistant, profiles: dict[str, Any]) -> dict[str, dict[str, dict[str, str]]]:
+    """Read enabled HA registry objects for outputs assigned to each Hub person.
+
+    The profile mappings, never HA-wide integration membership, define ownership.
+    """
+    entities = er.async_get(hass)
+    devices = dr.async_get(hass)
+    records: dict[str, dict[str, dict[str, str]]] = {}
+    for person_id, profile in profiles.items():
+        if not isinstance(profile, dict) or not profile.get("enabled", True):
+            continue
+        slots = profile.get("destinations") or {}
+        if not isinstance(slots, dict):
+            continue
+        owned: dict[str, dict[str, str]] = {}
+        for slot, references in slots.items():
+            if slot not in ("mobile", "watch", "tablet", "other") or not isinstance(references, (list, tuple)):
+                continue
+            for entity_id in references:
+                if not isinstance(entity_id, str) or not entity_id.startswith(("notify.", "media_player.")):
+                    continue
+                entry = entities.async_get(entity_id)
+                if entry is None or entry.disabled_by is not None:
+                    continue
+                device_id = str(getattr(entry, "device_id", "") or "")
+                device = devices.async_get(device_id) if device_id else None
+                integration = entity_integration(hass, entity_id) or getattr(entry, "platform", None) or ""
+                owned[entity_id] = {
+                    "integration": str(integration),
+                    "device": device_id,
+                    "device_label": str(
+                        (getattr(device, "name_by_user", None) or getattr(device, "name", None))
+                        or getattr(hass.states.get(entity_id), "name", None)
+                        or device_id
+                    ),
+                }
+        records[person_id] = owned
+    return records
 
 
 def _notify_action_description() -> dict[str, Any]:
@@ -194,6 +239,13 @@ SEND_SCHEMA = probatio.All(
             ),
             probatio.Optional(ATTR_PERSON_DESTINATION, default=["room"]): probatio.All(
                 probatio.EnsureList(), [probatio.In(PERSON_DESTINATIONS)]
+            ),
+            # Strictly profile-owned targets; never interpreted as global integration/device routes.
+            probatio.Optional(ATTR_PERSON_INTEGRATION): probatio.All(
+                probatio.EnsureList(), [cv.string]
+            ),
+            probatio.Optional(ATTR_PERSON_DEVICE): probatio.All(
+                probatio.EnsureList(), [cv.string]
             ),
             probatio.Optional(ATTR_PERSON_TRANSLATE): bool,
             probatio.Optional(ATTR_PERSON_GREETING): bool,
@@ -415,8 +467,17 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
 
         people = call.data.get(ATTR_TARGET_PERSON)
         destinations = tuple(dict.fromkeys(call.data[ATTR_PERSON_DESTINATION]))
+        wanted_person_integrations = tuple(dict.fromkeys(
+            value.strip() for value in call.data.get(ATTR_PERSON_INTEGRATION, ())
+            if value.strip()
+        ))
+        wanted_person_devices = tuple(dict.fromkeys(
+            value.strip() for value in call.data.get(ATTR_PERSON_DEVICE, ())
+            if value.strip()
+        ))
         if people is None:
-            if destinations != ("room",) or ATTR_PERSON_TRANSLATE in call.data:
+            if (destinations != ("room",) or ATTR_PERSON_TRANSLATE in call.data
+                    or wanted_person_integrations or wanted_person_devices):
                 raise ServiceValidationError(
                     "person_destination and person_translate require target_person"
                 )
@@ -436,6 +497,10 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                 profiles = {}
             try:
                 people_ids = resolve_person_ids(hass, people)
+                if not destinations and not wanted_person_integrations and not wanted_person_devices:
+                    raise PersonTargetError("Choose at least one person destination")
+                owned_metadata = _person_owned_metadata(hass, profiles)
+                matched_owned: set[str] = set()
                 # Validate *all* requested named destinations before queueing
                 # any job. Never infer a watch from its name or broadcast to an
                 # entire mobile_app integration when a slot is missing.
@@ -446,7 +511,16 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                     profile = profile if isinstance(profile, dict) else {}
                     if not person_is_enabled(profile):
                         raise PersonTargetError(f"Announcements disabled for {person_id}")
-                    slots = selected_person_destinations(profile, destinations)
+                    slots = selected_person_destinations(profile, destinations) if destinations else {}
+                    owned_slots = resolve_owned_person_outputs(
+                        profile, owned_metadata.get(person_id, {}),
+                        integrations=wanted_person_integrations,
+                        devices=wanted_person_devices,
+                    )
+                    matched_owned.update(
+                        slot for slot, entity_ids in owned_slots.items() if entity_ids
+                    )
+                    slots.update(owned_slots)
                     for slot, entity_ids in slots.items():
                         if slot == "room":
                             continue
@@ -458,6 +532,15 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
                                     f"{person_id} is missing or disabled"
                                 )
                     assigned[person_id] = slots
+                requested_owned = {
+                    *(f"integration:{value}" for value in wanted_person_integrations),
+                    *(f"device:{value}" for value in wanted_person_devices),
+                }
+                if requested_owned - matched_owned:
+                    raise PersonTargetError(
+                        "Requested integration/device is not assigned to the selected person profiles: "
+                        + ", ".join(sorted(requested_owned - matched_owned))
+                    )
                 rooms: dict[str, list[str]] = {}
                 if "room" in destinations:
                     locations = resolve_person_rooms(hass, people_ids, profiles)
@@ -668,6 +751,16 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
         )
         return response if call.return_response else None
 
+    async def async_list_person_targets(call: ServiceCall) -> ServiceResponse:
+        """Discover only devices/integrations assigned in configured person profiles."""
+        manager = _get_manager(hass)
+        profiles = manager.settings.get(CONF_PERSON_PROFILES, {}) or {}
+        profiles = profiles if isinstance(profiles, dict) else {}
+        response: ServiceResponse = {
+            "people": owned_person_catalog(profiles, _person_owned_metadata(hass, profiles)),
+        }
+        return response if call.return_response else None
+
     async def async_list_providers(call: ServiceCall) -> ServiceResponse:
         """List installed provider identities without exposing any credentials."""
         _get_manager(hass)
@@ -758,6 +851,15 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             SERVICE_REORDER_QUEUE,
             async_reorder_queue,
             schema=REORDER_QUEUE_SCHEMA,
+            supports_response=SupportsResponse.OPTIONAL,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_LIST_PERSON_TARGETS):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_LIST_PERSON_TARGETS,
+            async_list_person_targets,
+            schema=probatio.Schema({}),
             supports_response=SupportsResponse.OPTIONAL,
         )
 
