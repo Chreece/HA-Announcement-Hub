@@ -954,6 +954,28 @@
           "description": "由 announcement_hub.send 返回的任務 ID。"
         }
       }
+    },
+    "list_queue": {
+      "name": "列出公告",
+      "description": "只向已驗證使用者傳回排隊中及執行中公告的完整文字。"
+    },
+    "reorder_queue": {
+      "name": "重新排序公告",
+      "description": "將排隊中的公告上移或下移，重新啟動後保留順序。",
+      "fields": {
+        "job_id": {
+          "name": "公告 ID",
+          "description": "要移動的排隊公告 ID。"
+        },
+        "direction": {
+          "name": "方向",
+          "description": "在佇列中上移或下移。"
+        },
+        "neighbor_job_id": {
+          "name": "預期相鄰公告 ID",
+          "description": "選用：檢查顯示佇列後是否有變更。"
+        }
+      }
     }
   }
 }

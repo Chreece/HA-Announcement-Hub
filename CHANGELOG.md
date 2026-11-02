@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.10.0b29 - 2026-11-02
+
+**Beta — compact composer with authenticated full queue management.**
+
+- Keep announcement message, one-line optional title, and six accessible
+  icon-based priority choices visible in a compact, single-row card header.
+  Collapse recipient and delivery sections by default, preserving all existing
+  targeting, channel, AI and advanced options.
+- Make the queue badge a button that opens a scrollable queue manager showing
+  **every waiting announcement's full spoken/written text**, title, priority,
+  status and position; show active announcements separately.
+- Add per-job up/down and confirmed remove actions. Show active jobs as
+  non-reorderable; allow their explicit cancellation. Do not automatically
+  retry uncertain removal or move requests.
+- Add authenticated, response-based `list_queue` and `reorder_queue`
+  services. Never expose private queued message contents via sensors, HA
+  events, JavaScript configuration or logs.
+- Persist independent `queue_order` ranks in stored job records so manual
+  order survives crashes, restarts, AI processing and room/device retries,
+  without altering the original timestamp used for sleep policy and age.
+  Protect against stale reorder requests with an expected adjacent job ID.
+- Refresh the queue after actions or queue-count changes, maintain existing
+  Stop & Clear safety confirmation, and localize new card controls across
+  all 19 dashboard languages and service actions in 20 native catalogs.
+- Add Python/Node regressions for persistence, cancellation, stale moves,
+  compact sections, icon priorities, complete queue reads and HTML escaping.
+
 ## 0.10.0b28 - 2026-11-02
 
 **Beta — sleep-entry grace, fail-open AI editing, exhaust eligible delivery paths and bound provider waits.**

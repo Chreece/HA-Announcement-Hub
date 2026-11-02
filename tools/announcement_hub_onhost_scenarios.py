@@ -127,7 +127,7 @@ def scenarios(path):
         }
         for name in ("_staged_areas", "_room_route_moved", "_assert_live_room_route",
                      "_requeue_after_room_move", "_staged_route_ready",
-                     "_sleep_tts_muted_now"):
+                     "_sleep_tts_muted_now", "_queue_order_key"):
             m = ast.fix_missing_locations(ast.Module(body=[methods[name]], type_ignores=[]))
             exec(compile(m, str(path), "exec"), ns)
             setattr(ScenarioHost, name, ns[name])

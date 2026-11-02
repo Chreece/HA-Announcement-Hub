@@ -954,6 +954,28 @@
           "description": "ID zadania zwrócone przez announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "Pokaż komunikaty",
+      "description": "Zwróć pełną treść wszystkich oczekujących i aktywnych komunikatów zalogowanemu użytkownikowi."
+    },
+    "reorder_queue": {
+      "name": "Zmień kolejność",
+      "description": "Przesuń komunikat w kolejce w górę lub w dół, zachowując kolejność po restarcie.",
+      "fields": {
+        "job_id": {
+          "name": "ID komunikatu",
+          "description": "ID oczekującego komunikatu do przesunięcia."
+        },
+        "direction": {
+          "name": "Kierunek",
+          "description": "Przesuń w górę lub w dół."
+        },
+        "neighbor_job_id": {
+          "name": "Oczekiwane ID sąsiada",
+          "description": "Opcjonalne sprawdzenie zmian kolejki od ostatniego podglądu."
+        }
+      }
     }
   }
 }

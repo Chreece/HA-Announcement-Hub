@@ -19,6 +19,11 @@ REQUIRED = {
     "A queued request is not a device-side delivery receipt.",
     "Queued #{id}{related}. Delivery will follow Hub routing.",
     "Could not submit: {error}. Check the queue before retrying.",
+    "View all queued announcements", "Manage queued announcements",
+    "Announcement queue", "Refresh queue", "Close queue",
+    "Priority", "Move up", "Move down",
+    "Confirm remove", "Remove queued announcement",
+    "Queue order saved.",
 }
 TECHNICAL_EXAMPLES = {
     "mobile_app, nfandroidtv", "notify.phone, media_player.speaker",

@@ -954,6 +954,28 @@
           "description": "De taak-ID die announcement_hub.send heeft teruggegeven."
         }
       }
+    },
+    "list_queue": {
+      "name": "Berichten tonen",
+      "description": "De volledige tekst van alle wachtende en actieve meldingen tonen aan de aangemelde gebruiker."
+    },
+    "reorder_queue": {
+      "name": "Berichten herschikken",
+      "description": "Een wachtend bericht omhoog of omlaag verplaatsen; de volgorde blijft na herstart bestaan.",
+      "fields": {
+        "job_id": {
+          "name": "Bericht-ID",
+          "description": "ID van het te verplaatsen bericht."
+        },
+        "direction": {
+          "name": "Richting",
+          "description": "Omhoog of omlaag in de wachtrij."
+        },
+        "neighbor_job_id": {
+          "name": "Verwachte buur-ID",
+          "description": "Optionele controle of de wachtrij intussen is veranderd."
+        }
+      }
     }
   }
 }

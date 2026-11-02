@@ -139,7 +139,26 @@ The card's exact type is `custom:announcement-hub-card`; its picker name is
 
 The visual editor controls the card heading, initial importance, queue
 counter, AI controls and whether the message fields clear after a successful
-send. The card's **Stop & Clear** button is always available, even when the
+send. The compact composer keeps the message, single-line title and six
+icon-based priority choices visible; recipient, delivery and advanced
+sections start collapsed and can be expanded separately.
+
+**Tap the queue counter** to open the authenticated queue manager, including
+all waiting and currently active messages (with complete spoken/written
+text). Use **↑/↓** to move waiting messages one position at a time, or
+**Remove** with confirmation to cancel one job. Active deliveries may be
+stopped but cannot be moved. Queue-order changes survive retries and Home
+Assistant restarts without altering original creation time, room conditions,
+or explicit recipient restrictions. If another dashboard changed the
+adjacent job, the move is rejected until the list is refreshed.
+
+Full message text is returned only through the authenticated
+`announcement_hub.list_queue` service and displayed temporarily in the
+open card. It is never placed in the queue sensor, public events or Lovelace
+configuration. Closing the queue panel clears its text from the card. The
+queue counter is a provider state summary, not proof of delivery.
+
+The card's **Stop & Clear** button is always available, even when the
 waiting count is zero because audio may already be playing. It requires an
 explicit second confirmation and calls `announcement_hub.clear_queue` with
 `include_current: true`. This clears waiting jobs, cancels all active
@@ -1253,6 +1272,29 @@ after queue acceptance.
 returned successfully. It **does not guarantee device-side reception**.
 If you need receipt guarantees, use a recipient/provider that exposes
 acknowledgements beyond the Home Assistant notification action.
+
+### Inspect and reorder the waiting queue
+
+The **list_queue** action exposes the complete waiting queue and active
+announcements to authorized Home Assistant callers. Request a **service
+response** to receive the message bodies (do not forward the result to
+untrusted dashboards or logs). The card displays the list automatically
+when its queue counter is tapped.
+
+To move a *waiting* job up or down by one position:
+
+```yaml
+action: announcement_hub.reorder_queue
+data:
+  job_id: "WAITING_JOB_ID"
+  direction: up
+  neighbor_job_id: "EXPECTED_PREVIOUS_JOB_ID"
+```
+
+The optional `neighbor_job_id` guards against moving a different neighbor
+when a dashboard is stale. Reordering cannot interrupt an active job or
+change room occupancy, sleep muting, the AI request, or its intended devices.
+Automatic retry and restart recovery preserve the chosen order.
 
 ### Cancel or clear announcements
 

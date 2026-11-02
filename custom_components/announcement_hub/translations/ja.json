@@ -954,6 +954,28 @@
           "description": "announcement_hub.send が返したタスク ID です。"
         }
       }
+    },
+    "list_queue": {
+      "name": "通知一覧",
+      "description": "認証済みユーザーに待機中・実行中の通知の全文を返します。"
+    },
+    "reorder_queue": {
+      "name": "通知の並べ替え",
+      "description": "待機中の通知を上下に移動し、再起動後も順序を保持します。",
+      "fields": {
+        "job_id": {
+          "name": "通知 ID",
+          "description": "移動する待機中の通知 ID。"
+        },
+        "direction": {
+          "name": "方向",
+          "description": "キュー内で上または下へ移動します。"
+        },
+        "neighbor_job_id": {
+          "name": "隣接通知の想定 ID",
+          "description": "表示後のキュー変更を検出する任意の確認項目です。"
+        }
+      }
     }
   }
 }

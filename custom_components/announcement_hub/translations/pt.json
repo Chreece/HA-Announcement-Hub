@@ -954,6 +954,28 @@
           "description": "O ID de trabalho devolvido por announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "Listar anúncios",
+      "description": "Apresenta o texto completo dos anúncios em espera e ativos ao utilizador autenticado."
+    },
+    "reorder_queue": {
+      "name": "Reordenar anúncios",
+      "description": "Mover um anúncio na fila para cima ou para baixo, mantendo a ordem após reinícios.",
+      "fields": {
+        "job_id": {
+          "name": "ID do anúncio",
+          "description": "ID do anúncio em espera a mover."
+        },
+        "direction": {
+          "name": "Direção",
+          "description": "Mover para cima ou para baixo."
+        },
+        "neighbor_job_id": {
+          "name": "ID adjacente esperado",
+          "description": "Verificação opcional de alterações na fila."
+        }
+      }
     }
   }
 }

@@ -954,6 +954,28 @@
           "description": "Jobb-ID som returnerades av announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "Lista meddelanden",
+      "description": "Visa hela texten för väntande och aktiva meddelanden endast för inloggade användare."
+    },
+    "reorder_queue": {
+      "name": "Ändra ordning",
+      "description": "Flytta ett väntande meddelande uppåt eller nedåt och behåll ordningen efter omstart.",
+      "fields": {
+        "job_id": {
+          "name": "Meddelande-ID",
+          "description": "ID för meddelandet som ska flyttas."
+        },
+        "direction": {
+          "name": "Riktning",
+          "description": "Flytta uppåt eller nedåt i kön."
+        },
+        "neighbor_job_id": {
+          "name": "Förväntat grann-ID",
+          "description": "Valfri kontroll om kön har ändrats sedan den visades."
+        }
+      }
     }
   }
 }

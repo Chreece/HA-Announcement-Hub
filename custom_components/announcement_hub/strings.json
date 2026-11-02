@@ -954,6 +954,28 @@
           "description": "The job ID returned by announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "List announcements",
+      "description": "Return full message text for every waiting and active Hub announcement to the authenticated caller."
+    },
+    "reorder_queue": {
+      "name": "Reorder announcements",
+      "description": "Move a waiting announcement up or down; the new order survives retries and restarts.",
+      "fields": {
+        "job_id": {
+          "name": "Announcement ID",
+          "description": "ID of the waiting job to move."
+        },
+        "direction": {
+          "name": "Direction",
+          "description": "Move up or down in the waiting list."
+        },
+        "neighbor_job_id": {
+          "name": "Expected adjacent announcement ID",
+          "description": "Optional guard against changes since the queue was viewed."
+        }
+      }
     }
   }
 }

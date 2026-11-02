@@ -954,6 +954,28 @@
           "description": "O ID de trabalho retornado por announcement_hub.send."
         }
       }
+    },
+    "list_queue": {
+      "name": "Listar avisos",
+      "description": "Retorna o texto completo de todos os avisos na fila e ativos ao usuário autenticado."
+    },
+    "reorder_queue": {
+      "name": "Reordenar avisos",
+      "description": "Move um aviso na fila para cima ou para baixo e preserva a ordem após reiniciar.",
+      "fields": {
+        "job_id": {
+          "name": "ID do aviso",
+          "description": "ID do aviso em espera que será movido."
+        },
+        "direction": {
+          "name": "Direção",
+          "description": "Subir ou descer na fila."
+        },
+        "neighbor_job_id": {
+          "name": "ID vizinho esperado",
+          "description": "Verificação opcional de alterações na fila desde a última visualização."
+        }
+      }
     }
   }
 }
