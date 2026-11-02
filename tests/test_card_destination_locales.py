@@ -61,4 +61,4 @@ def test_card_label_changes_cannot_change_api_targets_or_examples():
     assert 'this.$("person-destinations-selected").textContent' in source
     assert 'button.appendChild(symbol)' in source
     assert 'this._drawPersonOwnedTargets()' in source
-    assert "payload.person_destination = [...this._personDestinations]" in source
+    assert "payload.person_destination = exactPersonTargets ? [] : [...this._personDestinations]" in source
