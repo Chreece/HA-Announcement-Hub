@@ -25,6 +25,23 @@ def _assigned_entities(profile: Mapping[str, Any]) -> tuple[str, ...]:
     ))
 
 
+def without_room_when_owned(
+    destinations: Sequence[str],
+    *,
+    integrations: Sequence[str] = (),
+    devices: Sequence[str] = (),
+) -> tuple[str, ...]:
+    """Exact person-owned selections replace room routing (including defaults).
+
+    Legacy named destination aliases stay intact when no new owned selection
+    is requested, so existing automations keep their original behavior.
+    """
+    names = tuple(dict.fromkeys(destinations))
+    return tuple(name for name in names if name != "room") if (
+        integrations or devices
+    ) else names
+
+
 def owned_person_catalog(
     profiles: Mapping[str, Any],
     metadata: Mapping[str, Mapping[str, Mapping[str, str]]],
