@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.10.0b27"
+VERSION: Final = "0.10.0b28"
 PLATFORMS: Final = [Platform.SENSOR, Platform.SWITCH]
 
 SERVICE_SEND: Final = "send"
@@ -127,6 +127,7 @@ CONF_SLEEP_ROOMS_ATTRIBUTE: Final = "sleep_rooms_attribute"
 CONF_SLEEP_MUTE_TTS: Final = "sleep_mute_tts"
 CONF_SLEEP_FALLBACK_WRITTEN: Final = "sleep_fallback_written"
 CONF_SLEEP_FALLBACK_OUTPUTS: Final = "sleep_fallback_outputs"
+CONF_SLEEP_ENTRY_GRACE_SECONDS: Final = "sleep_entry_grace_seconds"
 CONF_FALLBACK_ROOM: Final = "fallback_room"
 CONF_PERSON_PROFILES: Final = "person_profiles"
 CONF_PERSON_GROUP_LANGUAGE: Final = "person_group_language"
@@ -205,6 +206,10 @@ CONF_IDLE_TIMEOUT: Final = "idle_timeout"
 CONF_START_TIMEOUT: Final = "start_timeout"
 CONF_PLAYBACK_TIMEOUT: Final = "playback_timeout"
 CONF_POST_PLAY_DELAY: Final = "post_play_delay"
+CONF_AI_PROVIDER_TIMEOUT: Final = "ai_provider_timeout"
+CONF_SERVICE_CALL_TIMEOUT: Final = "service_call_timeout"
+CONF_TTS_RENDER_TIMEOUT: Final = "tts_render_timeout"
+CONF_DELIVERY_ATTEMPT_TIMEOUT: Final = "delivery_attempt_timeout"
 
 DISPATCH_NOTIFY_THEN_TTS: Final = "notify_then_tts"
 DISPATCH_TTS_THEN_NOTIFY: Final = "tts_then_notify"
@@ -249,6 +254,7 @@ DEFAULT_OCCUPIED_ONLY: Final = True
 # Existing v0.10.0b23 behavior remains active on upgrade.
 DEFAULT_SLEEP_MUTE_TTS: Final = True
 DEFAULT_SLEEP_FALLBACK_WRITTEN: Final = True
+DEFAULT_SLEEP_ENTRY_GRACE_SECONDS: Final = 60.0
 DEFAULT_FALLBACK_CHECK_DOOR: Final = True
 DEFAULT_NOTIFY_MAX_LENGTH: Final = 0
 DEFAULT_NFANDROIDTV_MAX_LENGTH: Final = 193
@@ -292,6 +298,10 @@ DEFAULT_IDLE_TIMEOUT: Final = 180.0
 DEFAULT_START_TIMEOUT: Final = 10.0
 DEFAULT_PLAYBACK_TIMEOUT: Final = 300.0
 DEFAULT_POST_PLAY_DELAY: Final = 0.15
+DEFAULT_AI_PROVIDER_TIMEOUT: Final = 120.0
+DEFAULT_SERVICE_CALL_TIMEOUT: Final = 30.0
+DEFAULT_TTS_RENDER_TIMEOUT: Final = 120.0
+DEFAULT_DELIVERY_ATTEMPT_TIMEOUT: Final = 420.0
 
 # Legacy 0.1 keys retained only for config-entry migration.
 LEGACY_CONF_ALLOWED_TTS: Final = "allowed_tts_entities"

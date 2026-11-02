@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "当前睡眠房间取值",
           "sleep_mute_tts": "所有人睡觉时静音 TTS",
           "sleep_fallback_written": "睡眠期间改发文字通知",
-          "sleep_fallback_outputs": "睡眠期间文字通知接收方"
+          "sleep_fallback_outputs": "睡眠期间文字通知接收方",
+          "sleep_entry_grace_seconds": "入睡后宽限时间（秒）",
+          "ai_provider_timeout": "AI 提供方超时（秒）",
+          "service_call_timeout": "服务调用超时（秒）",
+          "tts_render_timeout": "TTS 生成超时（秒）",
+          "delivery_attempt_timeout": "投递尝试超时（秒）"
         },
         "data_description": {
           "queue_max": "允许同时处于等待或活动状态的公告任务最大数量。达到上限时将拒绝新的发送请求。",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "选择实体状态或某个属性。支持区域 ID、名称、别名、列表或逗号分隔的文本。未知房间将被忽略；若来源不可用但已知有人在家，则禁止语音播报。",
           "sleep_mute_tts": "当所有有人房间都被报告为当前睡眠房间时，禁止任何语音播报和提示音，包括严重级别、Snapcast 和 Companion App TTS。如果睡眠数据源不可用，但已知房间有人，也会谨慎静音。关闭此项可保留正常语音。",
           "sleep_fallback_written": "睡眠静音 TTS 生效时，仅向下方所选接收方发送文字通知。仅有 TTS 文本的公告会将朗读文本作为文字发送。关闭后，自动公告会留在队列中等待。若关闭睡眠静音，本选项无效。",
-          "sleep_fallback_outputs": "可多选：先选择一个集成以包含其所有已配置通知设备，或者在下方选择单独设备。只允许已在 Announcement Hub 中启用的通知输出。空选项不会发送任何内容。现有安装默认选择所有已配置的 Companion App 设备。"
+          "sleep_fallback_outputs": "可多选：先选择一个集成以包含其所有已配置通知设备，或者在下方选择单独设备。只允许已在 Announcement Hub 中启用的通知输出。空选项不会发送任何内容。现有安装默认选择所有已配置的 Companion App 设备。",
+          "sleep_entry_grace_seconds": "进入睡眠前已排队的公告仍可在宽限期内播报。新公告立即静音；0 表示禁用。睡眠传感器不可用时立即静音。",
+          "ai_provider_timeout": "每次 AI 尝试的上限。失败时改写和翻译使用原文；生成任务等待重试，不朗读指令。",
+          "service_call_timeout": "通知或音频调用的上限。失败后尝试其他已设置且获准的设备。",
+          "tts_render_timeout": "生成语音的上限。到期释放任务供其他许可路径继续。",
+          "delivery_attempt_timeout": "单次尝试的总上限。未送达公告继续排队，不扩大指定收件人范围。"
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "当前睡眠房间取值",
           "sleep_mute_tts": "所有人睡觉时静音 TTS",
           "sleep_fallback_written": "睡眠期间改发文字通知",
-          "sleep_fallback_outputs": "睡眠期间文字通知接收方"
+          "sleep_fallback_outputs": "睡眠期间文字通知接收方",
+          "sleep_entry_grace_seconds": "入睡后宽限时间（秒）",
+          "ai_provider_timeout": "AI 提供方超时（秒）",
+          "service_call_timeout": "服务调用超时（秒）",
+          "tts_render_timeout": "TTS 生成超时（秒）",
+          "delivery_attempt_timeout": "投递尝试超时（秒）"
         },
         "data_description": {
           "queue_max": "允许同时处于等待或活动状态的公告任务最大数量。达到上限时将拒绝新的发送请求。",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "选择实体状态或某个属性。支持区域 ID、名称、别名、列表或逗号分隔的文本。未知房间将被忽略；若来源不可用但已知有人在家，则禁止语音播报。",
           "sleep_mute_tts": "当所有有人房间都被报告为当前睡眠房间时，禁止任何语音播报和提示音，包括严重级别、Snapcast 和 Companion App TTS。如果睡眠数据源不可用，但已知房间有人，也会谨慎静音。关闭此项可保留正常语音。",
           "sleep_fallback_written": "睡眠静音 TTS 生效时，仅向下方所选接收方发送文字通知。仅有 TTS 文本的公告会将朗读文本作为文字发送。关闭后，自动公告会留在队列中等待。若关闭睡眠静音，本选项无效。",
-          "sleep_fallback_outputs": "可多选：先选择一个集成以包含其所有已配置通知设备，或者在下方选择单独设备。只允许已在 Announcement Hub 中启用的通知输出。空选项不会发送任何内容。现有安装默认选择所有已配置的 Companion App 设备。"
+          "sleep_fallback_outputs": "可多选：先选择一个集成以包含其所有已配置通知设备，或者在下方选择单独设备。只允许已在 Announcement Hub 中启用的通知输出。空选项不会发送任何内容。现有安装默认选择所有已配置的 Companion App 设备。",
+          "sleep_entry_grace_seconds": "进入睡眠前已排队的公告仍可在宽限期内播报。新公告立即静音；0 表示禁用。睡眠传感器不可用时立即静音。",
+          "ai_provider_timeout": "每次 AI 尝试的上限。失败时改写和翻译使用原文；生成任务等待重试，不朗读指令。",
+          "service_call_timeout": "通知或音频调用的上限。失败后尝试其他已设置且获准的设备。",
+          "tts_render_timeout": "生成语音的上限。到期释放任务供其他许可路径继续。",
+          "delivery_attempt_timeout": "单次尝试的总上限。未送达公告继续排队，不扩大指定收件人范围。"
         }
       },
       "init": {

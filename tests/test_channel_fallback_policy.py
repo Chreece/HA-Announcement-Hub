@@ -306,3 +306,34 @@ def test_directional_fallback_does_not_speak_in_stale_room_after_a_move():
     # the durable room-move handler will replan both channels instead.
     assert h.calls == ["visual"]
     assert not j.successful_channels
+
+
+def test_timeout_on_first_provider_tries_next_authorized_method():
+    """A real provider timeout should fall through to the other allowed method."""
+    class TimedOutVisual(DeliveryHarness):
+        async def _async_send_notifications(self, announcement):
+            self.calls.append("visual")
+            raise TimeoutError("notify call exceeded its configured timeout")
+
+    runner = TimedOutVisual("visual_then_tts")
+    original = job()
+    asyncio.run(_async_process_job(runner, original))
+    assert runner.calls == ["visual", "tts"]
+    assert original.successful_channels == ["speaker"]
+    assert original.notify_text == "Notice"
+    assert original.tts_text == "Spoken"
+
+
+def test_timeout_does_not_expand_missing_channels_or_recipients():
+    class TimedOutVisual(DeliveryHarness):
+        async def _async_send_notifications(self, announcement):
+            self.calls.append("visual")
+            raise TimeoutError("notify timeout")
+
+    runner = TimedOutVisual("visual_then_tts")
+    original = job(visual=True, tts=False)
+    with pytest.raises(TimeoutError):
+        asyncio.run(_async_process_job(runner, original))
+    assert runner.calls == ["visual"]
+    assert original.notify_outputs == ("entity:notify.tv",)
+    assert original.room_tts_players == ()

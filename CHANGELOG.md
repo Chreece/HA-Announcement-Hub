@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.10.0b28 - 2026-11-02
+
+**Beta — sleep-entry grace, fail-open AI editing, exhaust eligible delivery paths and bound provider waits.**
+
+- Add configurable 0–600-second per-room **sleep-entry grace** (default
+  60 seconds), only for announcements queued before a room joins the live
+  sleeping-room list. New announcements mute immediately; already-started
+  speech may finish. Persist transition timestamps across HA restarts;
+  missing/unavailable sleep data continues to fail closed for audio.
+- Make the existing **AI provider timeout** configurable (default 120 s).
+  Rewrite/translation errors or provider timeouts use the untouched message;
+  AI-generation prompts remain queued for safe retry, never spoken as text.
+- Introduce configurable **service-call timeout** (30 s), **TTS render
+  timeout** (120 s) and whole **delivery-attempt timeout** (420 s), alongside
+  existing availability, idle, playback and Snapcast limits. Cancel blocked
+  waits so workers can proceed to eligible configured outputs.
+- Keep undelivered jobs durable and retry all allowed room/device/channel
+  tiers according to existing fallback policies; no new recipients are added
+  to strict service/device/person requests. A confirmed service
+  acknowledgment counts as a delivery attempt receipt, not guaranteed
+  device-side playback.
+- Mark partly acknowledged deliveries as completed-with-errors instead of
+  replaying them as failed messages after a later output timeout.
+- Add executable timeout, sleep-transition and fallthrough regression cases,
+  Home Assistant selector help and all 20 native General-setting translations.
+
 ## 0.10.0b27 - 2026-10-31
 
 **Beta — dashboard Stop & Clear with confirmation and safer active-output cancellation.**

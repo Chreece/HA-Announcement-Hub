@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "現在寝ている部屋の値",
           "sleep_mute_tts": "全員が寝ている間は TTS をミュート",
           "sleep_fallback_written": "睡眠中は文字通知に切り替える",
-          "sleep_fallback_outputs": "睡眠中の文字通知の送信先"
+          "sleep_fallback_outputs": "睡眠中の文字通知の送信先",
+          "sleep_entry_grace_seconds": "入眠時の猶予（秒）",
+          "ai_provider_timeout": "AI のタイムアウト（秒）",
+          "service_call_timeout": "サービス呼び出しの制限（秒）",
+          "tts_render_timeout": "TTS 生成の制限（秒）",
+          "delivery_attempt_timeout": "配信試行の制限（秒）"
         },
         "data_description": {
           "queue_max": "受け付け可能な待機中または実行中のアナウンスタスクの最大数です。この上限に達すると新しい送信を拒否します。",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "状態またはエンティティの属性を選択します。エリア ID、名前、別名、リスト、カンマ区切りの文字列を使えます。不明な部屋は無視され、情報源が利用できない場合は在室状況が分かっている間は音声を停止します。",
           "sleep_mute_tts": "在室者全員の部屋が現在の睡眠中の部屋として報告された場合、重要度が重大でも、Snapcast や Companion App TTS を含むすべての読み上げと通知音を停止します。睡眠情報が取得できず在室が判明している場合も安全のため停止します。無効にすると通常の読み上げに戻ります。",
           "sleep_fallback_written": "睡眠による TTS ミュートが有効なとき、下で選んだ宛先のみに文字通知を送信します。TTS テキストだけの通知は、そのテキストを文字メッセージとして使います。無効にすると自動通知はキューに残ります。睡眠ミュートを無効にしている場合は作用しません。",
-          "sleep_fallback_outputs": "複数選択できます。最初に連携を選ぶと、その連携で設定済みの通知端末をすべて指定できます。または下の一覧から個々の端末を選びます。Announcement Hub で有効な通知出力のみ使用し、未選択なら送信しません。既存環境では設定済み Companion App 端末すべてが初期値です。"
+          "sleep_fallback_outputs": "複数選択できます。最初に連携を選ぶと、その連携で設定済みの通知端末をすべて指定できます。または下の一覧から個々の端末を選びます。Announcement Hub で有効な通知出力のみ使用し、未選択なら送信しません。既存環境では設定済み Companion App 端末すべてが初期値です。",
+          "sleep_entry_grace_seconds": "入眠前にキューに入った通知は猶予中に読み上げられます。新規は直ちに消音。0 で無効。センサー利用不可でも直ちに消音。",
+          "ai_provider_timeout": "AI 試行の上限です。失敗時は書き換え・翻訳に原文を使用し、生成は指示を読まずに再試行を待ちます。",
+          "service_call_timeout": "通知や音声サービスの上限です。失敗時は設定済みの許可された別の出力先を試します。",
+          "tts_render_timeout": "音声生成の上限です。期限切れで処理枠を他の経路に解放します。",
+          "delivery_attempt_timeout": "一度の試行の総上限です。未配信の通知はキューに残り、指定された受信者は増やしません。"
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "現在寝ている部屋の値",
           "sleep_mute_tts": "全員が寝ている間は TTS をミュート",
           "sleep_fallback_written": "睡眠中は文字通知に切り替える",
-          "sleep_fallback_outputs": "睡眠中の文字通知の送信先"
+          "sleep_fallback_outputs": "睡眠中の文字通知の送信先",
+          "sleep_entry_grace_seconds": "入眠時の猶予（秒）",
+          "ai_provider_timeout": "AI のタイムアウト（秒）",
+          "service_call_timeout": "サービス呼び出しの制限（秒）",
+          "tts_render_timeout": "TTS 生成の制限（秒）",
+          "delivery_attempt_timeout": "配信試行の制限（秒）"
         },
         "data_description": {
           "queue_max": "受け付け可能な待機中または実行中のアナウンスタスクの最大数です。この上限に達すると新しい送信を拒否します。",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "状態またはエンティティの属性を選択します。エリア ID、名前、別名、リスト、カンマ区切りの文字列を使えます。不明な部屋は無視され、情報源が利用できない場合は在室状況が分かっている間は音声を停止します。",
           "sleep_mute_tts": "在室者全員の部屋が現在の睡眠中の部屋として報告された場合、重要度が重大でも、Snapcast や Companion App TTS を含むすべての読み上げと通知音を停止します。睡眠情報が取得できず在室が判明している場合も安全のため停止します。無効にすると通常の読み上げに戻ります。",
           "sleep_fallback_written": "睡眠による TTS ミュートが有効なとき、下で選んだ宛先のみに文字通知を送信します。TTS テキストだけの通知は、そのテキストを文字メッセージとして使います。無効にすると自動通知はキューに残ります。睡眠ミュートを無効にしている場合は作用しません。",
-          "sleep_fallback_outputs": "複数選択できます。最初に連携を選ぶと、その連携で設定済みの通知端末をすべて指定できます。または下の一覧から個々の端末を選びます。Announcement Hub で有効な通知出力のみ使用し、未選択なら送信しません。既存環境では設定済み Companion App 端末すべてが初期値です。"
+          "sleep_fallback_outputs": "複数選択できます。最初に連携を選ぶと、その連携で設定済みの通知端末をすべて指定できます。または下の一覧から個々の端末を選びます。Announcement Hub で有効な通知出力のみ使用し、未選択なら送信しません。既存環境では設定済み Companion App 端末すべてが初期値です。",
+          "sleep_entry_grace_seconds": "入眠前にキューに入った通知は猶予中に読み上げられます。新規は直ちに消音。0 で無効。センサー利用不可でも直ちに消音。",
+          "ai_provider_timeout": "AI 試行の上限です。失敗時は書き換え・翻訳に原文を使用し、生成は指示を読まずに再試行を待ちます。",
+          "service_call_timeout": "通知や音声サービスの上限です。失敗時は設定済みの許可された別の出力先を試します。",
+          "tts_render_timeout": "音声生成の上限です。期限切れで処理枠を他の経路に解放します。",
+          "delivery_attempt_timeout": "一度の試行の総上限です。未配信の通知はキューに残り、指定された受信者は増やしません。"
         }
       },
       "init": {

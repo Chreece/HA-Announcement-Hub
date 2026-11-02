@@ -379,9 +379,17 @@ audio is suppressed while room occupancy is known.
 The three sleep-policy controls under **General options** are independent
 settings:
 
-- **Mute TTS while everyone is sleeping** (default **On**): prevents all
+- **Mute TTS while everyone is sleeping** (default **On**): prevents
   speech and pre-announcement chimes, including Critical and Companion App
-  audio. Turn Off to use ordinary speech routing even if everyone sleeps.
+  audio, after the entry grace period expires. New announcements are muted
+  immediately upon sleep entry. Turn Off to use ordinary speech routing.
+- **Sleep-entry grace** (default **60 seconds**, configurable **0–600**):
+  announcements queued **before** a room enters the live sleeping-room list
+  can begin/continue permitted speech during this window. Jobs created after
+  the transition are silent from the start, and jobs already playing are not
+  abruptly interrupted when the grace expires. The transition time is kept
+  with the durable queue across Home Assistant restarts. Unknown or unavailable
+  sleep data still mutes immediately; **0 seconds** disables grace.
 - **Written fallback while sleeping** (default **On**): only when TTS sleep
   mute is active, redirect automatic room announcements to the explicitly
   selected written outputs. A TTS-only message uses its original text. Turn
@@ -1157,8 +1165,9 @@ data:
 
 Generated speech and visual output remain separate. This is a *content
 generation* feature only, not permission for the agent to execute actions.
-If both AI agents fail, the original instructions remain the final text
-fallback; for urgent safety alerts, use direct factual content instead.
+If both AI agents fail, **AI generation never speaks its instructions**.
+Generation jobs remain queued until a valid result is available. For urgent
+safety alerts, send a factual message directly rather than a generation prompt.
 
 ## AI rewriting
 
@@ -1182,8 +1191,8 @@ uses the rewritten text or the original if AI fails. Interrupted
 preprocessing can be retried from the saved original after Home Assistant
 restarts.
 
-Each AI provider attempt has a **120-second timeout**, including compatibility
-and formatting retries. Hub logs a slow-response warning after 60 seconds.
+Each AI provider attempt has a **configurable timeout** (default **120 seconds**),
+including compatibility and formatting retries. Hub logs a slow-response warning after 60 seconds.
 After a timeout, that provider enters a **five-minute cooldown**; rewrite
 and translation announcements may use their saved original immediately,
 while a separately configured healthy backup provider can still be used.
@@ -1270,8 +1279,14 @@ already-delivered device notifications, or prevent new announcements. The
 `Stop & Clear` dashboard button provides this action with confirmation.
 
 An accepted announcement with no currently usable output remains
-persisted and may be retried as availability, room occupancy and
-configuration permit. Unavailable jobs do not prevent newer runnable
+persisted and is retried as availability, room occupancy and
+configuration permit. For automatic room routing, Hub attempts configured
+eligible speech, written, and Companion App outputs in the selected order,
+then the occupied-room and authorized fallback tiers until a permitted
+provider acknowledges it. A timeout is a failed attempt, **not** proof of
+delivery. A successful Home Assistant service call is an acknowledgment, not
+a physical read/play receipt; no software can guarantee delivery when all
+permitted devices are offline. Unavailable jobs do not prevent newer runnable
 messages from progressing. An explicit integration/device/entity selection
 is never widened to another recipient. A mixed area-plus-explicit call
 tracks the area and explicit-recipient jobs independently.
@@ -1340,6 +1355,30 @@ what happened during actual processing.
 
 Announcement Hub supports Home Assistant **AI Task** entities alongside conversation agents. In the integration's general AI settings, choose an `ai_task.*` entity as the primary or backup provider. For a specific announcement, set `ai_agent: ai_task.your_entity` with `use_ai: true`. The Hub calls `ai_task.generate_data` with the announcement instructions and validates its JSON response using the same factual, speech and visual safeguards as conversation agents. If the AI Task fails or returns invalid content, the configured backup provider is tried. Rewrite/translation jobs may fall back to the original announcement; generation jobs remain queued for retry rather than displaying or speaking the writing prompt. AI preprocessing continues within the existing durable announcement queue.
 
+
+### Configurable timeout safety
+
+In **General settings**, five new duration controls supplement the existing
+output-availability, idle-player, playback-start, playback-duration and
+Snapcast verification limits:
+
+| Setting | Default | Purpose |
+| --- | ---: | --- |
+| Sleep-entry grace | 60 s | Let pre-sleep announcements begin/continue in a newly sleeping room |
+| AI provider timeout | 120 s | Bound each primary, backup and formatting AI request |
+| Service-call timeout | 30 s | Bound notify, TTS player, Snapcast and Android-TV provider calls |
+| TTS rendering timeout | 120 s | Release a stalled TTS pre-rendering worker |
+| Delivery attempt timeout | 420 s | Bound one whole delivery attempt before rescheduling the undelivered job |
+
+Timed-out calls are recorded as failures, so configured eligible alternatives
+can be attempted without silently expanding exact integration/device/person
+recipient restrictions. Rewriting and translation fall back to the
+**unchanged original** if both AI providers fail. AI **generation** source
+text is a writing instruction, not an announcement; it remains queued for a
+later AI retry instead of being spoken. Written sleep-time fallback uses only
+recipients explicitly selected in the General sleep settings, never a
+broadcast. New announcements are accepted after a failed attempt even while
+older ones wait for recovery.
 
 ### Concurrent delivery and queue ordering
 

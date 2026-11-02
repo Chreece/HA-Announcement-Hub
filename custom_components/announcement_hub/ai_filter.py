@@ -532,6 +532,7 @@ async def async_filter_announcement(
     title_result: dict[str, str] | None = None,
     target_language: str | None = None,
     prompt_templates: Mapping[str, str] | None = None,
+    provider_timeout_seconds: float | None = None,
 ) -> tuple[str | None, str | None]:
     """Try the configured AI, optional backup AI, then untouched originals.
 
@@ -540,6 +541,12 @@ async def async_filter_announcement(
     agent for compatibility with direct helper callers; the manager no longer
     passes None when the default dropdown is selected.
     """
+    provider_timeout = float(
+        AI_FILTER_PROVIDER_TIMEOUT_SECONDS
+        if provider_timeout_seconds is None else provider_timeout_seconds
+    )
+    if provider_timeout <= 0:
+        raise ValueError("AI provider timeout must be positive")
     if mode not in {"rewrite", "generate", "translate"}:
         raise ValueError("AI mode must be rewrite, generate or translate")
     if target_language is not None:
@@ -666,7 +673,7 @@ async def async_filter_announcement(
             "provider timeout is %.0f seconds",
             agent_label,
             AI_FILTER_SLOW_REQUEST_SECONDS,
-            AI_FILTER_PROVIDER_TIMEOUT_SECONDS,
+            provider_timeout,
         )
         try:
             response = await asyncio.wait_for(
@@ -677,7 +684,7 @@ async def async_filter_announcement(
                     blocking=True,
                     return_response=True,
                 ),
-                timeout=AI_FILTER_PROVIDER_TIMEOUT_SECONDS,
+                timeout=provider_timeout,
             )
         except Exception as error:
             # The HA service supports structure, but individual AI Task
@@ -705,7 +712,7 @@ async def async_filter_announcement(
                             "ai_task", "generate_data", unstructured_payload,
                             blocking=True, return_response=True,
                         ),
-                        timeout=AI_FILTER_PROVIDER_TIMEOUT_SECONDS,
+                        timeout=provider_timeout,
                     )
                 except Exception as retry_error:
                     error = retry_error
@@ -807,7 +814,7 @@ async def async_filter_announcement(
                             blocking=True,
                             return_response=True,
                         ),
-                        timeout=AI_FILTER_PROVIDER_TIMEOUT_SECONDS,
+                        timeout=provider_timeout,
                     )
                 except Exception as retry_error:
                     retry_error_reason = (

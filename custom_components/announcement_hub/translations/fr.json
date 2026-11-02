@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Valeur des pièces endormies",
           "sleep_mute_tts": "Couper le TTS lorsque tout le monde dort",
           "sleep_fallback_written": "Notification écrite de secours pendant le sommeil",
-          "sleep_fallback_outputs": "Destinataires écrits pendant le sommeil"
+          "sleep_fallback_outputs": "Destinataires écrits pendant le sommeil",
+          "sleep_entry_grace_seconds": "Délai de grâce au sommeil (s)",
+          "ai_provider_timeout": "Délai de l’IA (s)",
+          "service_call_timeout": "Délai des services (s)",
+          "tts_render_timeout": "Délai de synthèse vocale (s)",
+          "delivery_attempt_timeout": "Délai de tentative d’envoi (s)"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue.",
           "sleep_mute_tts": "Si toutes les pièces occupées sont signalées comme endormies, couper toutes les annonces vocales et sonneries, même Critique, Snapcast et TTS Companion App. Si la source de sommeil est indisponible mais que l'occupation est connue, garder le silence par précaution. Désactiver pour conserver la parole normale.",
           "sleep_fallback_written": "Quand le TTS est coupé en raison du sommeil, envoyer plutôt une notification écrite uniquement aux destinataires choisis ci-dessous. Un message TTS seul utilise son texte oral comme texte écrit. La désactivation garde l'annonce automatique en attente. Cette option est sans effet si la coupure du TTS est désactivée.",
-          "sleep_fallback_outputs": "Sélectionnez plusieurs destinations : d'abord une intégration pour tous ses appareils de notification déjà configurés, ou des appareils individuels ci-dessous. Seules les sorties activées dans Announcement Hub sont autorisées. Une sélection vide n'envoie rien. Par défaut, les installations existantes utilisent tous les appareils Companion App configurés."
+          "sleep_fallback_outputs": "Sélectionnez plusieurs destinations : d'abord une intégration pour tous ses appareils de notification déjà configurés, ou des appareils individuels ci-dessous. Seules les sorties activées dans Announcement Hub sont autorisées. Une sélection vide n'envoie rien. Par défaut, les installations existantes utilisent tous les appareils Companion App configurés.",
+          "sleep_entry_grace_seconds": "Les annonces déjà en attente peuvent être prononcées durant ce délai après le passage en sommeil. Les nouvelles sont muettes ; 0 désactive la grâce. Capteur indisponible : silence immédiat.",
+          "ai_provider_timeout": "Limite par tentative IA. En cas d’échec, la reformulation et la traduction utilisent le texte original ; la génération attend sans lire la consigne.",
+          "service_call_timeout": "Limite de chaque appel de notification ou audio. En cas d’échec, les autres sorties configurées et autorisées sont essayées.",
+          "tts_render_timeout": "Limite de génération de l’audio parlé. Un dépassement libère la tâche pour les autres voies autorisées.",
+          "delivery_attempt_timeout": "Limite totale d’une tentative. Les annonces non livrées restent en attente pour les voies autorisées, sans élargir les destinataires."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Valeur des pièces endormies",
           "sleep_mute_tts": "Couper le TTS lorsque tout le monde dort",
           "sleep_fallback_written": "Notification écrite de secours pendant le sommeil",
-          "sleep_fallback_outputs": "Destinataires écrits pendant le sommeil"
+          "sleep_fallback_outputs": "Destinataires écrits pendant le sommeil",
+          "sleep_entry_grace_seconds": "Délai de grâce au sommeil (s)",
+          "ai_provider_timeout": "Délai de l’IA (s)",
+          "service_call_timeout": "Délai des services (s)",
+          "tts_render_timeout": "Délai de synthèse vocale (s)",
+          "delivery_attempt_timeout": "Délai de tentative d’envoi (s)"
         },
         "data_description": {
           "queue_max": "Nombre maximal de tâches d'annonce en attente ou actives. Les nouveaux envois sont refusés lorsque cette limite est atteinte.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Choisissez État ou un attribut de l’entité. Les identifiants, noms, alias, listes et chaînes séparées par des virgules sont acceptés. Les pièces inconnues sont ignorées ; si la source est indisponible, la voix reste coupée lorsque l’occupation est connue.",
           "sleep_mute_tts": "Si toutes les pièces occupées sont signalées comme endormies, couper toutes les annonces vocales et sonneries, même Critique, Snapcast et TTS Companion App. Si la source de sommeil est indisponible mais que l'occupation est connue, garder le silence par précaution. Désactiver pour conserver la parole normale.",
           "sleep_fallback_written": "Quand le TTS est coupé en raison du sommeil, envoyer plutôt une notification écrite uniquement aux destinataires choisis ci-dessous. Un message TTS seul utilise son texte oral comme texte écrit. La désactivation garde l'annonce automatique en attente. Cette option est sans effet si la coupure du TTS est désactivée.",
-          "sleep_fallback_outputs": "Sélectionnez plusieurs destinations : d'abord une intégration pour tous ses appareils de notification déjà configurés, ou des appareils individuels ci-dessous. Seules les sorties activées dans Announcement Hub sont autorisées. Une sélection vide n'envoie rien. Par défaut, les installations existantes utilisent tous les appareils Companion App configurés."
+          "sleep_fallback_outputs": "Sélectionnez plusieurs destinations : d'abord une intégration pour tous ses appareils de notification déjà configurés, ou des appareils individuels ci-dessous. Seules les sorties activées dans Announcement Hub sont autorisées. Une sélection vide n'envoie rien. Par défaut, les installations existantes utilisent tous les appareils Companion App configurés.",
+          "sleep_entry_grace_seconds": "Les annonces déjà en attente peuvent être prononcées durant ce délai après le passage en sommeil. Les nouvelles sont muettes ; 0 désactive la grâce. Capteur indisponible : silence immédiat.",
+          "ai_provider_timeout": "Limite par tentative IA. En cas d’échec, la reformulation et la traduction utilisent le texte original ; la génération attend sans lire la consigne.",
+          "service_call_timeout": "Limite de chaque appel de notification ou audio. En cas d’échec, les autres sorties configurées et autorisées sont essayées.",
+          "tts_render_timeout": "Limite de génération de l’audio parlé. Un dépassement libère la tâche pour les autres voies autorisées.",
+          "delivery_attempt_timeout": "Limite totale d’une tentative. Les annonces non livrées restent en attente pour les voies autorisées, sans élargir les destinataires."
         }
       },
       "init": {

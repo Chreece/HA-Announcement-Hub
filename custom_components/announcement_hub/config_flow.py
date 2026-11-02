@@ -45,6 +45,7 @@ from .const import (
     CONF_SLEEP_MUTE_TTS,
     CONF_SLEEP_FALLBACK_WRITTEN,
     CONF_SLEEP_FALLBACK_OUTPUTS,
+    CONF_SLEEP_ENTRY_GRACE_SECONDS,
     CONF_PERSON_PROFILES,
     CONF_PERSON_GROUP_LANGUAGE,
     CONF_PERSON_GROUP_VOICE,
@@ -56,6 +57,10 @@ from .const import (
     CONF_PERSON_GROUP_GREETING,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
+    CONF_AI_PROVIDER_TIMEOUT,
+    CONF_SERVICE_CALL_TIMEOUT,
+    CONF_TTS_RENDER_TIMEOUT,
+    CONF_DELIVERY_ATTEMPT_TIMEOUT,
     CONF_POST_PLAY_DELAY,
     CONF_QUEUE_MAX,
     CONF_SNAPCAST_ONLY_SOURCE,
@@ -87,10 +92,15 @@ from .const import (
     DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_SLEEP_MUTE_TTS,
     DEFAULT_SLEEP_FALLBACK_WRITTEN,
+    DEFAULT_SLEEP_ENTRY_GRACE_SECONDS,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_NOTIFY_MIN_LEVEL,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
     DEFAULT_PLAYBACK_TIMEOUT,
+    DEFAULT_AI_PROVIDER_TIMEOUT,
+    DEFAULT_SERVICE_CALL_TIMEOUT,
+    DEFAULT_TTS_RENDER_TIMEOUT,
+    DEFAULT_DELIVERY_ATTEMPT_TIMEOUT,
     DEFAULT_POST_PLAY_DELAY,
     DEFAULT_QUEUE_MAX,
     DEFAULT_SNAPCAST_ONLY_SOURCE,
@@ -1876,6 +1886,7 @@ class _AnnouncementFlowMixin:
                 (CONF_SLEEP_ROOMS_ENTITY, None),
                 (CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS),
                 (CONF_SLEEP_FALLBACK_WRITTEN, DEFAULT_SLEEP_FALLBACK_WRITTEN),
+                (CONF_SLEEP_ENTRY_GRACE_SECONDS, DEFAULT_SLEEP_ENTRY_GRACE_SECONDS),
                 (CONF_FALLBACK_ROOM, None),
                 (CONF_FALLBACK_CHECK_DOOR, DEFAULT_FALLBACK_CHECK_DOOR),
                 (CONF_FALLBACK_DOOR_LABEL, None),
@@ -1885,6 +1896,10 @@ class _AnnouncementFlowMixin:
                 (CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT),
                 (CONF_START_TIMEOUT, DEFAULT_START_TIMEOUT),
                 (CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT),
+                (CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT),
+                (CONF_SERVICE_CALL_TIMEOUT, DEFAULT_SERVICE_CALL_TIMEOUT),
+                (CONF_TTS_RENDER_TIMEOUT, DEFAULT_TTS_RENDER_TIMEOUT),
+                (CONF_DELIVERY_ATTEMPT_TIMEOUT, DEFAULT_DELIVERY_ATTEMPT_TIMEOUT),
                 (CONF_POST_PLAY_DELAY, DEFAULT_POST_PLAY_DELAY),
             ):
                 self._working[key] = user_input.get(key, default)
@@ -2065,6 +2080,12 @@ class _AnnouncementFlowMixin:
                     CONF_SLEEP_FALLBACK_OUTPUTS,
                     default=sleep_target_defaults,
                 ): _known_multi_select(sleep_target_options),
+                probatio.Required(
+                    CONF_SLEEP_ENTRY_GRACE_SECONDS,
+                    default=self._value(CONF_SLEEP_ENTRY_GRACE_SECONDS, DEFAULT_SLEEP_ENTRY_GRACE_SECONDS),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(min=0, max=600, step=5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
+                ),
                 _optional_marker(
                     CONF_FALLBACK_ROOM,
                     self._value(CONF_FALLBACK_ROOM, None),
@@ -2121,6 +2142,30 @@ class _AnnouncementFlowMixin:
                     default=self._value(CONF_PLAYBACK_TIMEOUT, DEFAULT_PLAYBACK_TIMEOUT),
                 ): selector.NumberSelector(
                     selector.NumberSelectorConfig(min=5, max=3600, step=5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
+                ),
+                probatio.Required(
+                    CONF_AI_PROVIDER_TIMEOUT,
+                    default=self._value(CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(min=5, max=900, step=5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
+                ),
+                probatio.Required(
+                    CONF_SERVICE_CALL_TIMEOUT,
+                    default=self._value(CONF_SERVICE_CALL_TIMEOUT, DEFAULT_SERVICE_CALL_TIMEOUT),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(min=1, max=300, step=1, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
+                ),
+                probatio.Required(
+                    CONF_TTS_RENDER_TIMEOUT,
+                    default=self._value(CONF_TTS_RENDER_TIMEOUT, DEFAULT_TTS_RENDER_TIMEOUT),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(min=5, max=900, step=5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
+                ),
+                probatio.Required(
+                    CONF_DELIVERY_ATTEMPT_TIMEOUT,
+                    default=self._value(CONF_DELIVERY_ATTEMPT_TIMEOUT, DEFAULT_DELIVERY_ATTEMPT_TIMEOUT),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(min=30, max=3600, step=10, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
                 ),
                 probatio.Required(
                     CONF_POST_PLAY_DELAY,
