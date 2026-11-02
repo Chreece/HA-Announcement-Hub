@@ -64,17 +64,24 @@
             <div class="target-label"><ha-icon icon="mdi:devices"></ha-icon><div class="selection-heading"><div class="choice-caption"><strong>Person destinations<span class="title-colon" aria-hidden="true">:</span></strong><output id="person-destinations-selected" class="selection-value" aria-live="polite">Room</output></div><small>Assigned in integration setup</small></div></div>
             <div id="person-destinations" class="choices icon-choices" role="group" aria-label="Person destinations"></div>
             <div id="person-owned-targets">
+              <p class="hint" id="person-owned-help">Choosing integrations or devices replaces Room. You can select several.</p>
+              <p class="hint" id="person-owned-status" aria-live="polite">Choose at least one person.</p>
               <div class="target-group">
-                <div class="target-label"><ha-icon icon="mdi:puzzle-outline"></ha-icon><div><strong>Integrations</strong><small>Assigned in integration setup</small></div></div>
-                <input id="person-integration-search" class="search" placeholder="Search integrations..." aria-label="Search integrations" autocomplete="off">
-                <div id="person-integration-options" class="options" aria-label="Owned integrations"></div>
+                <div class="target-label"><ha-icon icon="mdi:puzzle-outline"></ha-icon><div class="person-multi-heading"><strong>Integrations</strong><small>Assigned in integration setup</small></div><output class="person-multi-count" id="person-integration-count" aria-live="polite"></output></div>
+                <div class="person-multi">
+                  <input id="person-integration-search" class="search" placeholder="Search integrations..." aria-label="Search integrations" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="person-integration-options" autocomplete="off">
+                  <div id="person-integration-options" class="options person-multi-options" role="listbox" aria-multiselectable="true" aria-label="Owned integrations" hidden></div>
+                  <div id="person-integration-chosen" class="picked person-multi-chosen" aria-live="polite"></div>
+                </div>
               </div>
               <div class="target-group">
-                <div class="target-label"><ha-icon icon="mdi:cellphone-link"></ha-icon><div><strong>Devices</strong><small>Assigned in integration setup</small></div></div>
-                <input id="person-device-search" class="search" placeholder="Search devices..." aria-label="Search devices" autocomplete="off">
-                <div id="person-device-options" class="options" aria-label="Owned devices"></div>
+                <div class="target-label"><ha-icon icon="mdi:cellphone-link"></ha-icon><div class="person-multi-heading"><strong>Devices</strong><small>Assigned in integration setup</small></div><output class="person-multi-count" id="person-device-count" aria-live="polite"></output></div>
+                <div class="person-multi">
+                  <input id="person-device-search" class="search" placeholder="Search devices..." aria-label="Search devices" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="person-device-options" autocomplete="off">
+                  <div id="person-device-options" class="options person-multi-options" role="listbox" aria-multiselectable="true" aria-label="Owned devices" hidden></div>
+                  <div id="person-device-chosen" class="picked person-multi-chosen" aria-live="polite"></div>
+                </div>
               </div>
-              <div id="person-owned-chosen" class="picked" aria-live="polite"></div>
             </div>
             <span class="field-caption choice-caption"><span>Translate into person's language<span class="title-colon" aria-hidden="true">:</span></span><output id="person-translation-selected" class="selection-value" aria-live="polite">Person setting</output></span>
             <div id="person-translation" class="choices icon-choices" role="group" aria-label="Person translation"></div>
