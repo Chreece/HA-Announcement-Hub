@@ -140,8 +140,9 @@ The card's exact type is `custom:announcement-hub-card`; its picker name is
 The visual editor controls the card heading, initial importance, queue
 counter, AI controls and whether the message fields clear after a successful
 send. The compact composer keeps the message, single-line title and six
-icon-based priority choices visible; recipient, delivery and advanced
-sections start collapsed and can be expanded separately. On narrow mobile
+icon-based priority choices visible, **with the selected priority name
+displayed beside the Priority label** in the chosen card language. Recipient,
+delivery and advanced sections start collapsed and can be expanded separately. On narrow mobile
 cards, the title and the left-aligned priority icons use separate rows,
 so they never overlap. The card header truncates long titles gracefully
 and keeps queue and Stop & Clear controls reachable.
@@ -157,7 +158,9 @@ adjacent job, the move is rejected until the list is refreshed.
 
 Full message text is returned only through the authenticated
 `announcement_hub.list_queue` service and displayed temporarily in the
-open card. It is never placed in the queue sensor, public events or Lovelace
+open card. The card unpacks Home Assistant's `hass.callService`
+`{context, response}` envelope before displaying jobs or acknowledging
+move/remove actions. It is never placed in the queue sensor, public events or Lovelace
 configuration. Closing the queue panel clears its text from the card. The
 queue counter is a provider state summary, not proof of delivery.
 

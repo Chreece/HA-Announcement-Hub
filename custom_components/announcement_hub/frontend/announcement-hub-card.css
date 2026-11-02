@@ -237,3 +237,7 @@ ha-card { container-name: announcement-hub-card; container-type: inline-size; }
   .priority-pills { flex-wrap:wrap; overflow:visible; justify-content:flex-start; gap:4px; }
   .priority-pills button { flex:0 0 30px; width:30px; min-width:30px; padding:0; }
 }
+
+/* b31: visible, localized name of the currently selected icon-only priority. */
+.priority-caption{display:flex!important;align-items:baseline;gap:7px;min-width:0;flex-wrap:wrap}
+.priority-caption output{display:inline;color:var(--primary-color,#8197fc);font-size:12px;font-weight:750;white-space:nowrap}

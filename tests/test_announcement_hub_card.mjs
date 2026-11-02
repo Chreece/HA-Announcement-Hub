@@ -25,7 +25,11 @@ globalThis.customElements = {
 };
 globalThis.window = { customCards: [] };
 globalThis.document = {
-  createElement: (name) => ({ tagName: name, setAttribute: () => {} }),
+  createElement: (name) => ({
+    tagName: name, dataset: {}, attributes: {}, children: [],
+    setAttribute(name, value) { this.attributes[name] = value; },
+    appendChild(child) { this.children.push(child); },
+  }),
 };
 await import(pathToFileURL(CARD_PATH.pathname).href);
 
@@ -45,6 +49,12 @@ function harness() {
   );
   fields.send = { disabled: false };
   fields["send-label"] = { textContent: "" };
+  fields["priority-selected"] = { textContent: "" };
+  fields.levels = {
+    nodes: [],
+    replaceChildren() { this.nodes = []; },
+    appendChild(node) { this.nodes.push(node); },
+  };
   fields["queue-number"] = { textContent: "" };
   fields["queue-pill"] = { title: "", hidden: false, setAttribute(key, value) { this[key] = value; } };
   fields["queue-panel"] = { hidden: true };
@@ -85,6 +95,7 @@ test("bundled HTML/CSS support a modern card with safe input controls", () => {
     "level", "channels", "ai-choices", "send", "critical-confirm",
     "stop-clear", "stop-clear-confirm", "confirm-stop-clear", "cancel-stop-clear",
     "queue-pill", "queue-panel", "queue-list", "queue-refresh", "queue-close",
+    "priority-selected",
   ]) {
     const actual = id === "level" ? "levels" : id;
     assert.match(html, new RegExp("id=" + JSON.stringify(actual)));
@@ -220,7 +231,9 @@ test("send calls the one supported Hub service with response flag, no duplicate 
     });
     assert.equal(args[5], true);
     assert.equal(fields.send.disabled, true);
-    return { accepted: true, job_id: "948f37d533f1486a997a4d44b7054ed1" };
+    return { context: { id: "test" }, response: {
+      accepted: true, job_id: "948f37d533f1486a997a4d44b7054ed1",
+    } };
   }};
   await Promise.all([card._send(), card._send()]);
   assert.equal(calls, 1);
@@ -254,7 +267,9 @@ test("Stop & Clear requires explicit confirmation and stops active jobs with the
       ]);
       assert.equal(fields["stop-clear"].disabled, true);
       assert.equal(fields.send.disabled, true);
-      return { cleared: 12, active_cancel_requested: 2, queue_size: 0 };
+      return { context: { id: "test" }, response: {
+        cleared: 12, active_cancel_requested: 2, queue_size: 0,
+      } };
     },
   };
   await card._stopAndClear();
@@ -338,18 +353,87 @@ test("mobile card keeps title and priority icons separate even inside narrow das
   assert.match(html, /class="field compact-priority"/);
 });
 
+
+test("priority label stays visible and follows the selected icon in Greek", () => {
+  const { card, fields } = harness();
+  const html = readFileSync(HTML_PATH, "utf8");
+  const css = readFileSync(CSS_PATH, "utf8");
+  assert.match(html, /<output id="priority-selected" aria-live="polite">Info<\/output>/);
+  assert.match(html, /class="priority-caption"/);
+  assert.match(css, /\.priority-caption output\{/);
+  card._translations = { "Warning": "Προειδοποίηση", "Critical": "Κρίσιμο" };
+  card._level = "warning";
+  card._renderPriority();
+  assert.equal(fields["priority-selected"].textContent, "Προειδοποίηση");
+  assert.equal(fields.levels.nodes.length, 6);
+  assert.equal(fields.levels.nodes.filter((node) =>
+    node.attributes["aria-pressed"] === "true").length, 1);
+  assert.equal(fields.levels.nodes.find((node) =>
+    node.attributes["aria-pressed"] === "true").dataset.value, "warning");
+  card._level = "critical";
+  card._renderPriority();
+  assert.equal(fields["priority-selected"].textContent, "Κρίσιμο");
+  assert.equal(fields.levels.nodes.find((node) =>
+    node.attributes["aria-pressed"] === "true").dataset.value, "critical");
+});
+
+test("empty wrapped queue payload reports a problem rather than inventing messages", async () => {
+  const { card } = harness();
+  card._queueOpen = true;
+  card._renderQueue = () => {};
+  card._hass = { callService: async () => ({
+    context: { id: "test" }, response: null,
+  }) };
+  await card._fetchQueue();
+  assert.match(card._queueError, /Invalid queue response/);
+  assert.equal(card._queueJobs.length, 0);
+});
+
+test("HA-wrapped cancellation confirms removal without a duplicate service call", async () => {
+  const { card } = harness();
+  const calls = [];
+  card._queueOpen = true;
+  card._renderQueue = () => {};
+  card._queueJobs = [{ job_id: "j1" }];
+  card._hass = { callService: async (...args) => {
+    calls.push(args);
+    return { context: { id: "test" }, response: { status: "cancelled", job_id: "j1" } };
+  }};
+  card._fetchQueue = async () => {};
+  await card._queueAction("remove", "j1");
+  assert.equal(calls.length, 0);
+  await card._queueAction("confirm-remove", "j1");
+  assert.equal(calls.length, 1);
+  assert.equal(card._queueError, "");
+  assert.equal(card._queueRemoveId, null);
+});
+
+test("legacy flat-shaped service response is still accepted", async () => {
+  const { card } = harness();
+  card._queueOpen = true;
+  card._renderQueue = () => {};
+  card._hass = { callService: async () => ({
+    jobs: [{ job_id: "flat", text_notify: "old", active: false }],
+    active: [],
+  }) };
+  await card._fetchQueue();
+  assert.equal(card._queueError, "");
+  assert.equal(card._queueJobs[0].job_id, "flat");
+});
+
 test("tapping the queue badge loads all message bodies only through authenticated service", async () => {
   const { card, fields } = harness();
   const requests = [];
   card._renderQueue = () => {};
   card._hass = { callService: async (...args) => {
     requests.push(args);
-    return { jobs: [
+    // Actual Home Assistant 2026 frontend return shape is {context,response}.
+    return { context: { id: "test" }, response: { jobs: [
       { job_id: "j1", title: "Open door", text_notify: "PRIVATE_MESSAGE_ONE",
         text_tts: null, level: "info", status: "pending", active: false },
       { job_id: "j2", title: "Wash", text_tts: "PRIVATE_MESSAGE_TWO",
         text_notify: null, level: "warning", status: "pending", active: false },
-    ], active: [], queue_size: 2 };
+    ], active: [], queue_size: 2 } };
   }};
   card._toggleQueue(true);
   await new Promise((resolve) => setImmediate(resolve));
@@ -376,7 +460,9 @@ test("queue move is durable and sends the expected adjacent job guard", async ()
   ];
   card._hass = { callService: async (...args) => {
     requests.push(args);
-    return { moved: true, job_id: "j3", queue_size: 3 };
+    return { context: { id: "test" }, response: {
+      moved: true, job_id: "j3", queue_size: 3,
+    } };
   }};
   card._fetchQueue = async () => {};
   await card._queueAction("up", "j3");

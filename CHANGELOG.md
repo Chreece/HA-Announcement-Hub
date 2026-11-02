@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.10.0b31 - 2026-11-02
+
+**Beta — queue viewer and action acknowledgment compatibility, visible priority label.**
+
+- Fix the Lovelace queue panel showing "Invalid queue response" despite a
+  successful list_queue action. Home Assistant's hass.callService returns
+  a transport envelope with a nested `response` object, not the message list
+  directly. Unwrap that response before checking the queue payload.
+- Fix the same envelope-handling defect for queue reorder, single-message
+  removal, Stop & Clear acknowledgments and send confirmations. Keep
+  support for older clients returning a direct payload; never repeat a
+  destructive action because an acknowledgment was misinterpreted.
+- Show the localized selected priority **beside Priority**, for example
+  `Προτεραιότητα: Προειδοποίηση`, while preserving the six icon buttons.
+  The label changes immediately when another icon is selected, including
+  on mobile cards.
+- Test actual Home Assistant `{context, response}` results for list, move,
+  cancel, stop and send; add missing/legacy payload and Greek priority tests.
+- No queued messages are removed, moved or retransmitted by upgrading.
+
 ## 0.10.0b30 - 2026-11-02
 
 **Beta — prevent mobile title and priority-icon overlap in compact cards.**
