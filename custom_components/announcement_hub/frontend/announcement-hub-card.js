@@ -48,6 +48,14 @@
     const value = dict?.[key] || key;
     return value.replace(/\{([a-z]+)\}/g, (_, k) => String(params[k] ?? ""));
   }
+  // Home Assistant's hass.callService resolves with { context, response }.
+  // Older mocks/clients may yield the direct service payload instead.
+  // Do not mistake the outer transport envelope for the response body.
+  function servicePayload(result) {
+    return result !== null && typeof result === "object" && "response" in result
+      ? result.response : result;
+  }
+
   function localize(root, dictionary, originals) {
     if (!root?.querySelectorAll) return;
     for (const el of root.querySelectorAll("*")) {
@@ -311,6 +319,8 @@
     }
 
     _renderPriority() {
+      const selected = LEVELS.find(([value]) => value === this._level);
+      this.$("priority-selected").textContent = this._t(selected?.[1] || "Info");
       const target = this.$("levels");
       target.replaceChildren();
       for (const [level, label] of LEVELS) {
@@ -599,9 +609,9 @@
       this._renderQueue();
       try {
         // Full message bodies are returned ONLY to this authenticated client.
-        const reply = await this._hass.callService(
+        const reply = servicePayload(await this._hass.callService(
           "announcement_hub", "list_queue", {}, undefined, false, true
-        );
+        ));
         if (!Array.isArray(reply?.jobs) || !Array.isArray(reply?.active)) {
           throw new Error(this._t("Invalid queue response."));
         }
@@ -749,19 +759,19 @@
       this._renderQueue();
       try {
         if (action === "confirm-remove") {
-          const response = await this._hass.callService(
+          const response = servicePayload(await this._hass.callService(
             "announcement_hub", "cancel", { job_id: id }, undefined, false, true
-          );
+          ));
           if (!["cancelled", "cancelling"].includes(response?.status)) {
             throw new Error(this._t("Remove was not acknowledged."));
           }
           this._queueStatus = this._t("Announcement removal requested.");
         } else {
-          const reply = await this._hass.callService(
+          const reply = servicePayload(await this._hass.callService(
             "announcement_hub", "reorder_queue", {
               job_id: id, direction: action, neighbor_job_id: neighbor.job_id,
             }, undefined, false, true
-          );
+          ));
           if (reply?.moved !== true) {
             throw new Error(this._t("Queue was not moved. Refresh and retry."));
           }
@@ -814,9 +824,9 @@
       try {
         // Do not use queue-only default: also request cancellation of
         // every active delivery and interruption of Hub-owned audio.
-        const reply = await this._hass.callService(
+        const reply = servicePayload(await this._hass.callService(
           "announcement_hub", "clear_queue", { include_current: true }, undefined, false, true
-        );
+        ));
         if (Number.isInteger(reply?.cleared) && reply.cleared >= 0) {
           this._notice(this._t("Cleared {count} queued jobs. Stop requested for active Hub outputs.", { count: reply.cleared }), true);
         } else {
@@ -868,9 +878,9 @@
       try {
         // Home Assistant's sixth argument requests a service response.
         // Never auto-retry: the backend may already have queued a request.
-        const reply = await this._hass.callService(
+        const reply = servicePayload(await this._hass.callService(
           "notify", "announcement_hub", payload, undefined, false, true
-        );
+        ));
         if (reply?.accepted === false) throw new Error(this._t("Announcement Hub rejected the request."));
         if (reply?.job_id) {
           const related = Array.isArray(reply.related_job_ids) && reply.related_job_ids.length
