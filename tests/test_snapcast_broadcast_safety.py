@@ -110,7 +110,7 @@ class FakeManager:
         return False
 
     @staticmethod
-    def _sleep_tts_muted_now():
+    def _sleep_tts_muted_now(_job=None):
         return False
 
     @staticmethod

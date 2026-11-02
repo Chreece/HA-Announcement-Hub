@@ -74,8 +74,13 @@ from .const import (
     CONF_SLEEP_MUTE_TTS,
     CONF_SLEEP_FALLBACK_WRITTEN,
     CONF_SLEEP_FALLBACK_OUTPUTS,
+    CONF_SLEEP_ENTRY_GRACE_SECONDS,
     CONF_OUTPUT_AVAILABILITY_TIMEOUT,
     CONF_PLAYBACK_TIMEOUT,
+    CONF_AI_PROVIDER_TIMEOUT,
+    CONF_SERVICE_CALL_TIMEOUT,
+    CONF_TTS_RENDER_TIMEOUT,
+    CONF_DELIVERY_ATTEMPT_TIMEOUT,
     CONF_POST_PLAY_DELAY,
     CONF_QUEUE_MAX,
     CONF_SNAPCAST_ONLY_SOURCE,
@@ -105,10 +110,15 @@ from .const import (
     DEFAULT_FALLBACK_CHECK_DOOR,
     DEFAULT_SLEEP_MUTE_TTS,
     DEFAULT_SLEEP_FALLBACK_WRITTEN,
+    DEFAULT_SLEEP_ENTRY_GRACE_SECONDS,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_NOTIFY_MIN_LEVEL,
     DEFAULT_OUTPUT_AVAILABILITY_TIMEOUT,
     DEFAULT_PLAYBACK_TIMEOUT,
+    DEFAULT_AI_PROVIDER_TIMEOUT,
+    DEFAULT_SERVICE_CALL_TIMEOUT,
+    DEFAULT_TTS_RENDER_TIMEOUT,
+    DEFAULT_DELIVERY_ATTEMPT_TIMEOUT,
     DEFAULT_POST_PLAY_DELAY,
     DEFAULT_QUEUE_MAX,
     DEFAULT_SNAPCAST_ONLY_SOURCE,
@@ -278,6 +288,8 @@ class AnnouncementManager:
         # A timed-out provider is temporarily skipped so it cannot
         # serially hold up every copyediting announcement in the queue.
         self._ai_provider_cooldowns: dict[str, datetime] = {}
+        self._sleep_last_observed: frozenset[str] | None = None
+        self._sleep_entered_at: dict[str, str] = {}
         # Keep outcome summaries for intermittent failures even after a
         # later successful notification overwrites the "last" sensor field.
         # No generated messages, source texts or model prompts are stored.
@@ -361,6 +373,17 @@ class AnnouncementManager:
         if self._running:
             return
         stored = await self._store.async_load() or {}
+        previous_rooms = stored.get("sleep_last_observed")
+        self._sleep_last_observed = (
+            frozenset(str(area) for area in previous_rooms)
+            if isinstance(previous_rooms, list) else None
+        )
+        recorded = stored.get("sleep_entered_at")
+        self._sleep_entered_at = {
+            str(area): str(entered)
+            for area, entered in recorded.items()
+            if isinstance(area, str) and isinstance(entered, str)
+        } if isinstance(recorded, dict) else {}
         self._volume_restore = {
             k: v for k, v in (stored.get("volume_restore", {}) or {}).items()
             if isinstance(k, str) and isinstance(v, dict)
@@ -2383,7 +2406,10 @@ class AnnouncementManager:
         requeued = False
         try:
             self._raise_if_cancelled(job)
-            await self._async_process_job(job)
+            await asyncio.wait_for(
+                self._async_process_job(job),
+                timeout=float(self.settings.get(CONF_DELIVERY_ATTEMPT_TIMEOUT, DEFAULT_DELIVERY_ATTEMPT_TIMEOUT)),
+            )
         except JobCancelled:
             job.status = "cancelled"
             terminal_event = EVENT_CANCELLED
@@ -2417,10 +2443,16 @@ class AnnouncementManager:
                 self._requeue_undelivered_job(job, "provider failure")
                 requeued = True
             else:
-                job.status = "failed"
+                # At least one authorized provider acknowledged delivery.
+                # A later device timeout must not mark that delivery failed
+                # or cause replay to another recipient.
+                job.status = "completed_with_errors"
                 job.error = str(err)
-                terminal_event = EVENT_FAILED
-                _LOGGER.exception("Announcement %s failed", job.job_id)
+                terminal_event = EVENT_FINISHED
+                _LOGGER.warning(
+                    "Announcement %s partly delivered; later output failed: %s",
+                    job.job_id, err,
+                )
         else:
             if not job.successful_channels:
                 self._requeue_undelivered_job(
@@ -2507,6 +2539,71 @@ class AnnouncementManager:
             _LOGGER.debug("Legacy sleeping-room selection contains an unknown area")
             return frozenset()
 
+    def _observe_sleep_areas(self) -> frozenset[str]:
+        """Observe sleep transitions; a restart must not reset a grace timer."""
+        if self._sleep_rooms_source_unavailable():
+            return self._sleep_area_ids()
+        current = self._sleep_area_ids()
+        previous = getattr(self, "_sleep_last_observed", None)
+        if previous is None:
+            # Initial observation: existing sleeping rooms are NOT new entries.
+            self._sleep_last_observed = current
+            return current
+        if current != previous:
+            entered = getattr(self, "_sleep_entered_at", {})
+            for room in tuple(entered):
+                if room not in current:
+                    entered.pop(room, None)
+            for room in current - previous:
+                # If the state changed before this poll, use its source
+                # timestamp. A message submitted AFTER entering sleep must
+                # never acquire grace because observation was delayed.
+                entered_at = datetime.now(UTC)
+                source_entity = str(self.settings.get(CONF_SLEEP_ROOMS_ENTITY, "") or "")
+                source_state = self.hass.states.get(source_entity) if source_entity else None
+                if source_state is not None:
+                    stamp = getattr(source_state, "last_updated", None)
+                    if isinstance(stamp, datetime) and stamp.tzinfo is not None:
+                        entered_at = min(entered_at, stamp)
+                entered[room] = entered_at.isoformat()
+            self._sleep_last_observed = current
+            if getattr(self, "_running", False):
+                self._schedule_save()
+                self._wake.set()
+        return current
+
+    def _sleep_grace_areas(self, job: AnnouncementJob | None) -> frozenset[str]:
+        """Pre-sleep queued jobs may use a newly sleeping room briefly."""
+        if job is None or self._sleep_rooms_source_unavailable():
+            return frozenset()
+        seconds = max(0.0, float(self.settings.get(
+            CONF_SLEEP_ENTRY_GRACE_SECONDS, DEFAULT_SLEEP_ENTRY_GRACE_SECONDS
+        )))
+        if seconds <= 0:
+            return frozenset()
+        rooms = self._observe_sleep_areas()
+        try:
+            submitted = datetime.fromisoformat(job.created_at)
+            if submitted.tzinfo is None:
+                submitted = submitted.replace(tzinfo=UTC)
+        except (ValueError, TypeError, AttributeError):
+            return frozenset()
+        now = datetime.now(UTC)
+        eligible: set[str] = set()
+        for room in rooms:
+            raw = getattr(self, "_sleep_entered_at", {}).get(room)
+            if not raw:
+                continue
+            try:
+                started = datetime.fromisoformat(raw)
+                if started.tzinfo is None:
+                    started = started.replace(tzinfo=UTC)
+                if submitted <= started and 0 <= (now - started).total_seconds() < seconds:
+                    eligible.add(room)
+            except (ValueError, TypeError):
+                continue
+        return frozenset(eligible)
+
     def _all_occupied_rooms_sleeping(self) -> bool:
         """Silence sound when everybody is sleeping or the live source fails."""
         occupied = self._occupied_area_ids()
@@ -2518,11 +2615,17 @@ class AnnouncementManager:
             return True
         return set(occupied).issubset(self._sleep_area_ids())
 
-    def _sleep_tts_muted_now(self) -> bool:
-        """Apply the user's global sleep-mute option to the live sleep state."""
-        return bool(
-            self.settings.get(CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS)
-        ) and self._all_occupied_rooms_sleeping()
+    def _sleep_tts_muted_now(self, job: AnnouncementJob | None = None) -> bool:
+        """Mute sleeping rooms except for qualifying pre-sleep announcements."""
+        if not self.settings.get(CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS):
+            return False
+        if not self._all_occupied_rooms_sleeping():
+            return False
+        if job is not None and not self._sleep_rooms_source_unavailable():
+            occupied = self._occupied_area_ids()
+            if occupied and set(occupied) & self._sleep_grace_areas(job):
+                return False
+        return True
 
     def _room_route_moved(
         self, job: AnnouncementJob, physical_areas: Sequence[str] = ()
@@ -2596,14 +2699,14 @@ class AnnouncementManager:
         reading = self._occupied_area_ids()
         occupied_now = tuple(reading or ())
         sleep_rooms = (
-            self._sleep_area_ids()
+            self._sleep_area_ids() - self._sleep_grace_areas(job)
             if self.settings.get(CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS)
             else frozenset()
         )
 
         # Suppress physical-room delivery when the user enables sleep mute.
         # Other occupied/awake rooms remain eligible in mixed households.
-        if self._sleep_tts_muted_now():
+        if self._sleep_tts_muted_now(job):
             return ()
 
         preferred = tuple(
@@ -2764,9 +2867,9 @@ class AnnouncementManager:
             # during the next polling cycle rather than broaden the selection.
             selected = ((), (), (), (), ())
 
-        sleeping_home = self._sleep_tts_muted_now()
+        sleeping_home = self._sleep_tts_muted_now(job)
         sleep_rooms = (
-            self._sleep_area_ids()
+            self._sleep_area_ids() - self._sleep_grace_areas(job)
             if self.settings.get(CONF_SLEEP_MUTE_TTS, DEFAULT_SLEEP_MUTE_TTS)
             else frozenset()
         )
@@ -3298,7 +3401,7 @@ class AnnouncementManager:
 
     def _job_runnable_now(self, job: AnnouncementJob) -> bool:
         """Return whether at least one frozen delivery channel can run now."""
-        if self._sleep_tts_muted_now():
+        if self._sleep_tts_muted_now(job):
             return self._job_has_ready_visual_output(job)
         return (
             self._job_has_ready_visual_output(job)
@@ -3703,8 +3806,11 @@ class AnnouncementManager:
                 data["title"] = title
             if provider_data:
                 data["data"] = provider_data
-            await self.hass.services.async_call(
-                "notify", "mobile_app", data, blocking=True
+            await asyncio.wait_for(
+                self.hass.services.async_call(
+                    "notify", "mobile_app", data, blocking=True
+                ),
+                timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
             )
             return
 
@@ -3716,8 +3822,11 @@ class AnnouncementManager:
         }
         if title:
             data["title"] = title
-        await self.hass.services.async_call(
-            "notify", "send_message", data, blocking=True
+        await asyncio.wait_for(
+            self.hass.services.async_call(
+                "notify", "send_message", data, blocking=True
+            ),
+            timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
         )
 
     async def _async_send_nfandroidtv_runtime(
@@ -3741,18 +3850,21 @@ class AnnouncementManager:
 
         duration_value = data.get("duration")
         duration = int(duration_value) if duration_value is not None else None
-        await self.hass.async_add_executor_job(
-            partial(
-                send,
-                message,
-                title=title,
-                duration=duration,
-                fontsize=data.get("fontsize"),
-                position=data.get("position"),
-                bkgcolor=data.get("bkgcolor", data.get("color")),
-                transparency=data.get("transparency"),
-                interrupt=bool(data.get("interrupt", False)),
-            )
+        await asyncio.wait_for(
+            self.hass.async_add_executor_job(
+                partial(
+                    send,
+                    message,
+                    title=title,
+                    duration=duration,
+                    fontsize=data.get("fontsize"),
+                    position=data.get("position"),
+                    bkgcolor=data.get("bkgcolor", data.get("color")),
+                    transparency=data.get("transparency"),
+                    interrupt=bool(data.get("interrupt", False)),
+                )
+            ),
+            timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
         )
         return True
 
@@ -3774,8 +3886,11 @@ class AnnouncementManager:
             payload["title"] = title
         if data:
             payload["data"] = deepcopy(dict(data))
-        await self.hass.services.async_call(
-            domain, service, payload, blocking=True
+        await asyncio.wait_for(
+            self.hass.services.async_call(
+                domain, service, payload, blocking=True
+            ),
+            timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
         )
 
     async def _async_reading_hold(
@@ -3866,7 +3981,7 @@ class AnnouncementManager:
 
     async def _async_send_tts(self, job: AnnouncementJob) -> None:
         """Launch independent audible output classes together."""
-        if self._sleep_tts_muted_now():
+        if self._sleep_tts_muted_now(job):
             _LOGGER.debug("Suppressed TTS: sleep-mute policy is active")
             return
         if (getattr(job, "person_ids", ()) or getattr(job, "presence_sensors", ())) and not self._person_authorized_now(job):
@@ -3932,10 +4047,13 @@ class AnnouncementManager:
                 and isinstance(prior, (int, float))
                 and abs(float(actual) - float(expected)) <= 0.03
             ):
-                await self.hass.services.async_call(
-                    MEDIA_PLAYER_DOMAIN, "volume_set",
-                    {ATTR_ENTITY_ID: player, "volume_level": float(prior)},
-                    blocking=True,
+                await asyncio.wait_for(
+                    self.hass.services.async_call(
+                        MEDIA_PLAYER_DOMAIN, "volume_set",
+                        {ATTR_ENTITY_ID: player, "volume_level": float(prior)},
+                        blocking=True,
+                    ),
+                    timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
                 )
             # An external/manual volume change wins; do not overwrite it.
         except Exception:
@@ -3985,10 +4103,13 @@ class AnnouncementManager:
         async with self._save_lock:
             await self._store.async_save(self._serialize())
         try:
-            await self.hass.services.async_call(
-                MEDIA_PLAYER_DOMAIN, "volume_set",
-                {ATTR_ENTITY_ID: player, "volume_level": ducked},
-                blocking=True,
+            await asyncio.wait_for(
+                self.hass.services.async_call(
+                    MEDIA_PLAYER_DOMAIN, "volume_set",
+                    {ATTR_ENTITY_ID: player, "volume_level": ducked},
+                    blocking=True,
+                ),
+                timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
             )
         except Exception:
             self._volume_restore.pop(player, None)
@@ -4000,7 +4121,7 @@ class AnnouncementManager:
         self, job: AnnouncementJob, player: str,
     ) -> None:
         """Only selected direct room speakers; never a shared Snapcast source."""
-        if self._sleep_tts_muted_now():
+        if self._sleep_tts_muted_now(job):
             return  # Sleep-mute also suppresses the chime.
         enabled = (
             job.pre_announce_sound
@@ -4031,15 +4152,18 @@ class AnnouncementManager:
             raise HomeAssistantError("No longer authorized to play chime in this room")
         self._hub_playing_players_by_job.setdefault(job.job_id, set()).add(player)
         try:
-            await self.hass.services.async_call(
-                MEDIA_PLAYER_DOMAIN, "play_media",
-                {
-                    ATTR_ENTITY_ID: player,
-                    ATTR_MEDIA_CONTENT_ID: url,
-                    ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
-                    ATTR_MEDIA_ANNOUNCE: True,
-                },
-                blocking=True,
+            await asyncio.wait_for(
+                self.hass.services.async_call(
+                    MEDIA_PLAYER_DOMAIN, "play_media",
+                    {
+                        ATTR_ENTITY_ID: player,
+                        ATTR_MEDIA_CONTENT_ID: url,
+                        ATTR_MEDIA_CONTENT_TYPE: MediaType.MUSIC,
+                        ATTR_MEDIA_ANNOUNCE: True,
+                    },
+                    blocking=True,
+                ),
+                timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
             )
             # A stop may have raced with the provider accepting play_media.
             if job.job_id in getattr(self, "_cancel_requested", set()):
@@ -4571,7 +4695,7 @@ class AnnouncementManager:
     ) -> None:
         channel = f"companion_tts:{output.entry_id}"
         self._raise_if_cancelled(job)
-        if self._sleep_tts_muted_now():
+        if self._sleep_tts_muted_now(job):
             return  # Recheck after availability waits, before phone TTS.
         if getattr(job, "person_ids", ()) and not self._person_authorized_now(job):
             raise HomeAssistantError("Person disabled during Companion TTS")
@@ -4593,8 +4717,11 @@ class AnnouncementManager:
             stream = job.companion_tts_media_stream
             if stream != COMPANION_STREAM_DEFAULT:
                 data["data"]["media_stream"] = stream
-            await self.hass.services.async_call(
-                "notify", "mobile_app", data, blocking=True
+            await asyncio.wait_for(
+                self.hass.services.async_call(
+                    "notify", "mobile_app", data, blocking=True
+                ),
+                timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
             )
             await self._async_reading_hold(
                 job,
@@ -4641,7 +4768,7 @@ class AnnouncementManager:
                     or entity_area_id(self.hass, player),
                 )
             ))
-        if self._sleep_tts_muted_now():
+        if self._sleep_tts_muted_now(job):
             raise HomeAssistantError(
                 "TTS suppressed by the enabled sleep-mute policy"
             )
@@ -4669,8 +4796,11 @@ class AnnouncementManager:
             payload[ATTR_MEDIA_ANNOUNCE] = True
         self._hub_playing_players_by_job.setdefault(job.job_id, set()).add(player)
         try:
-            await self.hass.services.async_call(
-                MEDIA_PLAYER_DOMAIN, "play_media", payload, blocking=True
+            await asyncio.wait_for(
+                self.hass.services.async_call(
+                    MEDIA_PLAYER_DOMAIN, "play_media", payload, blocking=True
+                ),
+                timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
             )
             # Ensure a late provider start cannot outlive a stop request
             # that arrived while the play_media service call was in flight.
@@ -5123,14 +5253,17 @@ class AnnouncementManager:
                 if current is not None and bool(current) == muted:
                     continue
                 try:
-                    await self.hass.services.async_call(
-                        MEDIA_PLAYER_DOMAIN,
-                        "volume_mute",
-                        {
-                            ATTR_ENTITY_ID: entity_id,
-                            "is_volume_muted": muted,
-                        },
-                        blocking=True,
+                    await asyncio.wait_for(
+                        self.hass.services.async_call(
+                            MEDIA_PLAYER_DOMAIN,
+                            "volume_mute",
+                            {
+                                ATTR_ENTITY_ID: entity_id,
+                                "is_volume_muted": muted,
+                            },
+                            blocking=True,
+                        ),
+                        timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
                     )
                 except asyncio.CancelledError:
                     raise
@@ -5204,11 +5337,14 @@ class AnnouncementManager:
 
     async def _async_stop_player(self, player: str) -> None:
         with suppress(asyncio.CancelledError, HomeAssistantError, Exception):
-            await self.hass.services.async_call(
-                MEDIA_PLAYER_DOMAIN,
-                "media_stop",
-                {ATTR_ENTITY_ID: player},
-                blocking=True,
+            await asyncio.wait_for(
+                self.hass.services.async_call(
+                    MEDIA_PLAYER_DOMAIN,
+                    "media_stop",
+                    {ATTR_ENTITY_ID: player},
+                    blocking=True,
+                ),
+                timeout=float(getattr(self, "settings", {}).get("service_call_timeout", 30.0)),
             )
 
     def _ai_provider_cooling(self, agent: str | None) -> bool:
@@ -5349,6 +5485,7 @@ class AnnouncementManager:
                     mode=ai.get("requested_mode", "rewrite"),
                     target_language=ai.get("requested_target_language"),
                     prompt_templates=getattr(self, "settings", {}).get("ai_prompt_templates", {}),
+                    provider_timeout_seconds=float(getattr(self, "settings", {}).get("ai_provider_timeout", 120.0)),
                     title_result=(
                         title_result if ai.get("requested_generate_title") else None
                     ),
@@ -5504,7 +5641,10 @@ class AnnouncementManager:
         async def prefetch_engine(engine: str) -> None:
             try:
                 media_source_id = self._build_media_source_id(job, engine)
-                await tts.async_get_media_source_audio(self.hass, media_source_id)
+                await asyncio.wait_for(
+                    tts.async_get_media_source_audio(self.hass, media_source_id),
+                    timeout=float(getattr(self, "settings", {}).get("tts_render_timeout", 120.0)),
+                )
                 # Presence in media_source_ids means the render actually
                 # finished, not merely that an ID was allocated.
                 job.media_source_ids[engine] = media_source_id
@@ -5807,6 +5947,11 @@ class AnnouncementManager:
             "last": self._last.to_dict() if self._last else None,
             "ai_history": list(self._ai_history),
             "volume_restore": dict(getattr(self, "_volume_restore", {})),
+            "sleep_last_observed": (
+                sorted(getattr(self, "_sleep_last_observed", None))
+                if getattr(self, "_sleep_last_observed", None) is not None else None
+            ),
+            "sleep_entered_at": dict(getattr(self, "_sleep_entered_at", {})),
         }
 
     def _schedule_save(self) -> None:

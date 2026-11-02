@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Valor das divisões com pessoas a dormir",
           "sleep_mute_tts": "Silenciar TTS quando todos dormem",
           "sleep_fallback_written": "Notificação escrita alternativa durante o sono",
-          "sleep_fallback_outputs": "Destinatários escritos durante o sono"
+          "sleep_fallback_outputs": "Destinatários escritos durante o sono",
+          "sleep_entry_grace_seconds": "Tolerância após início do sono (s)",
+          "ai_provider_timeout": "Limite de tempo da IA (s)",
+          "service_call_timeout": "Limite de chamadas de serviços (s)",
+          "tts_render_timeout": "Limite de geração TTS (s)",
+          "delivery_attempt_timeout": "Limite de tentativa de entrega (s)"
         },
         "data_description": {
           "queue_max": "Número máximo aceite de trabalhos de anúncio pendentes ou ativos. Os novos envios são rejeitados quando este limite é atingido.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Escolhe Estado ou um atributo da entidade. Aceita identificadores, nomes, nomes alternativos, listas e texto separado por vírgulas. Divisões desconhecidas são ignoradas; se a origem ficar indisponível, a voz é silenciada quando a ocupação é conhecida.",
           "sleep_mute_tts": "Quando todas as divisões ocupadas estão identificadas como adormecidas, silencia todas as mensagens de voz e avisos sonoros, incluindo Crítico, Snapcast e TTS da Companion App. Se a origem do sono falhar, mas a ocupação for conhecida, também silencia por precaução. Desativa para manter a voz normal.",
           "sleep_fallback_written": "Com o TTS silenciado por sono, envia apenas uma notificação escrita aos destinatários escolhidos abaixo. Mensagens apenas TTS usam o texto falado como texto escrito. Desativar mantém o anúncio automático em espera. Não se aplica se o silêncio por sono estiver desativado.",
-          "sleep_fallback_outputs": "Seleciona vários destinos: primeiro uma integração para todos os dispositivos de notificação já configurados ou dispositivos individuais abaixo. Só são permitidas saídas ativadas no Announcement Hub. Uma seleção vazia não envia nada. Instalações existentes usam por defeito todos os dispositivos Companion App configurados."
+          "sleep_fallback_outputs": "Seleciona vários destinos: primeiro uma integração para todos os dispositivos de notificação já configurados ou dispositivos individuais abaixo. Só são permitidas saídas ativadas no Announcement Hub. Uma seleção vazia não envia nada. Instalações existentes usam por defeito todos os dispositivos Companion App configurados.",
+          "sleep_entry_grace_seconds": "Anúncios colocados na fila antes de dormir ainda podem ser falados durante este período. Os novos ficam em silêncio; 0 desativa. Sensor indisponível silencia imediatamente.",
+          "ai_provider_timeout": "Limite por tentativa de IA. Numa falha, reformulação e tradução usam o original; a geração aguarda sem ler instruções.",
+          "service_call_timeout": "Limite por chamada de notificação ou áudio. Em caso de falha, tentam-se outras saídas autorizadas.",
+          "tts_render_timeout": "Limite para gerar voz. O fim do prazo liberta a tarefa para outros percursos.",
+          "delivery_attempt_timeout": "Limite total de cada tentativa. Anúncios não entregues permanecem na fila sem alargar destinatários."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Valor das divisões com pessoas a dormir",
           "sleep_mute_tts": "Silenciar TTS quando todos dormem",
           "sleep_fallback_written": "Notificação escrita alternativa durante o sono",
-          "sleep_fallback_outputs": "Destinatários escritos durante o sono"
+          "sleep_fallback_outputs": "Destinatários escritos durante o sono",
+          "sleep_entry_grace_seconds": "Tolerância após início do sono (s)",
+          "ai_provider_timeout": "Limite de tempo da IA (s)",
+          "service_call_timeout": "Limite de chamadas de serviços (s)",
+          "tts_render_timeout": "Limite de geração TTS (s)",
+          "delivery_attempt_timeout": "Limite de tentativa de entrega (s)"
         },
         "data_description": {
           "queue_max": "Número máximo aceite de trabalhos de anúncio pendentes ou ativos. Os novos envios são rejeitados quando este limite é atingido.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Escolhe Estado ou um atributo da entidade. Aceita identificadores, nomes, nomes alternativos, listas e texto separado por vírgulas. Divisões desconhecidas são ignoradas; se a origem ficar indisponível, a voz é silenciada quando a ocupação é conhecida.",
           "sleep_mute_tts": "Quando todas as divisões ocupadas estão identificadas como adormecidas, silencia todas as mensagens de voz e avisos sonoros, incluindo Crítico, Snapcast e TTS da Companion App. Se a origem do sono falhar, mas a ocupação for conhecida, também silencia por precaução. Desativa para manter a voz normal.",
           "sleep_fallback_written": "Com o TTS silenciado por sono, envia apenas uma notificação escrita aos destinatários escolhidos abaixo. Mensagens apenas TTS usam o texto falado como texto escrito. Desativar mantém o anúncio automático em espera. Não se aplica se o silêncio por sono estiver desativado.",
-          "sleep_fallback_outputs": "Seleciona vários destinos: primeiro uma integração para todos os dispositivos de notificação já configurados ou dispositivos individuais abaixo. Só são permitidas saídas ativadas no Announcement Hub. Uma seleção vazia não envia nada. Instalações existentes usam por defeito todos os dispositivos Companion App configurados."
+          "sleep_fallback_outputs": "Seleciona vários destinos: primeiro uma integração para todos os dispositivos de notificação já configurados ou dispositivos individuais abaixo. Só são permitidas saídas ativadas no Announcement Hub. Uma seleção vazia não envia nada. Instalações existentes usam por defeito todos os dispositivos Companion App configurados.",
+          "sleep_entry_grace_seconds": "Anúncios colocados na fila antes de dormir ainda podem ser falados durante este período. Os novos ficam em silêncio; 0 desativa. Sensor indisponível silencia imediatamente.",
+          "ai_provider_timeout": "Limite por tentativa de IA. Numa falha, reformulação e tradução usam o original; a geração aguarda sem ler instruções.",
+          "service_call_timeout": "Limite por chamada de notificação ou áudio. Em caso de falha, tentam-se outras saídas autorizadas.",
+          "tts_render_timeout": "Limite para gerar voz. O fim do prazo liberta a tarefa para outros percursos.",
+          "delivery_attempt_timeout": "Limite total de cada tentativa. Anúncios não entregues permanecem na fila sem alargar destinatários."
         }
       },
       "init": {

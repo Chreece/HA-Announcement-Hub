@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri",
           "sleep_mute_tts": "Herkes uyurken TTS sesini kapat",
           "sleep_fallback_written": "Uyku sırasında yazılı bildirim kullan",
-          "sleep_fallback_outputs": "Uyku sırasında yazılı bildirim alıcıları"
+          "sleep_fallback_outputs": "Uyku sırasında yazılı bildirim alıcıları",
+          "sleep_entry_grace_seconds": "Uykuya geçişte ek süre (sn)",
+          "ai_provider_timeout": "YZ sağlayıcı zaman aşımı (sn)",
+          "service_call_timeout": "Hizmet çağrısı zaman aşımı (sn)",
+          "tts_render_timeout": "TTS oluşturma zaman aşımı (sn)",
+          "delivery_attempt_timeout": "Teslim denemesi zaman aşımı (sn)"
         },
         "data_description": {
           "queue_max": "İzin verilen en fazla bekleyen veya etkin duyuru işi sayısı. Sınıra ulaşıldığında yeni gönderimler reddedilir.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur.",
           "sleep_mute_tts": "Dolu odaların tamamı uyuyanların bulunduğu odalar olarak bildiriliyorsa Kritik, Snapcast ve Companion App TTS dâhil tüm konuşmaları ve duyuru seslerini sustur. Uyku kaynağı kullanılamıyor ancak doluluk biliniyorsa önlem olarak yine sustur. Normal konuşma için kapat.",
           "sleep_fallback_written": "Uyku nedeniyle TTS susturulmuşsa bunun yerine yalnızca aşağıda seçilen alıcılara yazılı bildirim gönder. Yalnızca TTS içeren mesajlarda konuşma metnini kullan. Kapatılırsa otomatik duyuru kuyrukta bekler. Uyku susturma kapalıysa etkisi yoktur.",
-          "sleep_fallback_outputs": "Birden fazla hedef seç: önce entegrasyondaki tüm yapılandırılmış bildirim cihazlarını veya aşağıdaki tek tek cihazları seç. Yalnızca Announcement Hub içinde etkinleştirilmiş çıkışlara izin verilir. Boş seçim gönderim yapmaz. Mevcut kurulumlarda tüm yapılandırılmış Companion App cihazları varsayılandır."
+          "sleep_fallback_outputs": "Birden fazla hedef seç: önce entegrasyondaki tüm yapılandırılmış bildirim cihazlarını veya aşağıdaki tek tek cihazları seç. Yalnızca Announcement Hub içinde etkinleştirilmiş çıkışlara izin verilir. Boş seçim gönderim yapmaz. Mevcut kurulumlarda tüm yapılandırılmış Companion App cihazları varsayılandır.",
+          "sleep_entry_grace_seconds": "Uykudan önce sıraya alınan duyurular bu süre içinde konuşabilir. Yenileri hemen susturulur; 0 süreyi kapatır. Sensör yoksa hemen susturulur.",
+          "ai_provider_timeout": "YZ denemesi başına üst süre. Hata olursa yeniden yazma ve çeviri özgün metni kullanır; üretim yönergeyi okumadan bekler.",
+          "service_call_timeout": "Bildirim veya ses çağrısı üst süresi. Hata olursa diğer izinli çıkışlar denenir.",
+          "tts_render_timeout": "Ses üretme üst süresi. Süre dolunca diğer izinli yollar için görev serbest kalır.",
+          "delivery_attempt_timeout": "Deneme başına toplam süre. Teslim edilmeyen duyurular alıcıları genişletmeden sırada kalır."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Uyuyanların bulunduğu oda değeri",
           "sleep_mute_tts": "Herkes uyurken TTS sesini kapat",
           "sleep_fallback_written": "Uyku sırasında yazılı bildirim kullan",
-          "sleep_fallback_outputs": "Uyku sırasında yazılı bildirim alıcıları"
+          "sleep_fallback_outputs": "Uyku sırasında yazılı bildirim alıcıları",
+          "sleep_entry_grace_seconds": "Uykuya geçişte ek süre (sn)",
+          "ai_provider_timeout": "YZ sağlayıcı zaman aşımı (sn)",
+          "service_call_timeout": "Hizmet çağrısı zaman aşımı (sn)",
+          "tts_render_timeout": "TTS oluşturma zaman aşımı (sn)",
+          "delivery_attempt_timeout": "Teslim denemesi zaman aşımı (sn)"
         },
         "data_description": {
           "queue_max": "İzin verilen en fazla bekleyen veya etkin duyuru işi sayısı. Sınıra ulaşıldığında yeni gönderimler reddedilir.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Durum veya varlığın bir niteliğini seçin. Alan kimlikleri, adları, diğer adlar, listeler ve virgülle ayrılmış metinler kabul edilir. Bilinmeyen odalar yok sayılır; kaynak kullanılamazsa varlık biliniyorken sesli duyuru susturulur.",
           "sleep_mute_tts": "Dolu odaların tamamı uyuyanların bulunduğu odalar olarak bildiriliyorsa Kritik, Snapcast ve Companion App TTS dâhil tüm konuşmaları ve duyuru seslerini sustur. Uyku kaynağı kullanılamıyor ancak doluluk biliniyorsa önlem olarak yine sustur. Normal konuşma için kapat.",
           "sleep_fallback_written": "Uyku nedeniyle TTS susturulmuşsa bunun yerine yalnızca aşağıda seçilen alıcılara yazılı bildirim gönder. Yalnızca TTS içeren mesajlarda konuşma metnini kullan. Kapatılırsa otomatik duyuru kuyrukta bekler. Uyku susturma kapalıysa etkisi yoktur.",
-          "sleep_fallback_outputs": "Birden fazla hedef seç: önce entegrasyondaki tüm yapılandırılmış bildirim cihazlarını veya aşağıdaki tek tek cihazları seç. Yalnızca Announcement Hub içinde etkinleştirilmiş çıkışlara izin verilir. Boş seçim gönderim yapmaz. Mevcut kurulumlarda tüm yapılandırılmış Companion App cihazları varsayılandır."
+          "sleep_fallback_outputs": "Birden fazla hedef seç: önce entegrasyondaki tüm yapılandırılmış bildirim cihazlarını veya aşağıdaki tek tek cihazları seç. Yalnızca Announcement Hub içinde etkinleştirilmiş çıkışlara izin verilir. Boş seçim gönderim yapmaz. Mevcut kurulumlarda tüm yapılandırılmış Companion App cihazları varsayılandır.",
+          "sleep_entry_grace_seconds": "Uykudan önce sıraya alınan duyurular bu süre içinde konuşabilir. Yenileri hemen susturulur; 0 süreyi kapatır. Sensör yoksa hemen susturulur.",
+          "ai_provider_timeout": "YZ denemesi başına üst süre. Hata olursa yeniden yazma ve çeviri özgün metni kullanır; üretim yönergeyi okumadan bekler.",
+          "service_call_timeout": "Bildirim veya ses çağrısı üst süresi. Hata olursa diğer izinli çıkışlar denenir.",
+          "tts_render_timeout": "Ses üretme üst süresi. Süre dolunca diğer izinli yollar için görev serbest kalır.",
+          "delivery_attempt_timeout": "Deneme başına toplam süre. Teslim edilmeyen duyurular alıcıları genişletmeden sırada kalır."
         }
       },
       "init": {

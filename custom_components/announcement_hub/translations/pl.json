@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi",
           "sleep_mute_tts": "Wycisz TTS, gdy wszyscy śpią",
           "sleep_fallback_written": "Pisemne powiadomienie zastępcze podczas snu",
-          "sleep_fallback_outputs": "Odbiorcy pisemnych powiadomień podczas snu"
+          "sleep_fallback_outputs": "Odbiorcy pisemnych powiadomień podczas snu",
+          "sleep_entry_grace_seconds": "Okres ochronny po zaśnięciu (s)",
+          "ai_provider_timeout": "Limit czasu AI (s)",
+          "service_call_timeout": "Limit czasu usług (s)",
+          "tts_render_timeout": "Limit tworzenia TTS (s)",
+          "delivery_attempt_timeout": "Limit próby dostarczenia (s)"
         },
         "data_description": {
           "queue_max": "Maksymalna dopuszczalna liczba oczekujących lub aktywnych zadań ogłoszeń. Nowe wysyłki są odrzucane po osiągnięciu tego limitu.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana.",
           "sleep_mute_tts": "Gdy wszystkie zajęte pokoje są oznaczone jako pokoje ze śpiącymi, wycisz wszystkie komunikaty głosowe i dźwięki, również Krytyczne, Snapcast i TTS Companion App. Jeśli źródło snu jest niedostępne, ale obecność jest znana, wycisz także zapobiegawczo. Wyłączenie przywraca zwykłą mowę.",
           "sleep_fallback_written": "Gdy działa wyciszanie TTS podczas snu, wyślij zamiast niego pisemne powiadomienie tylko do odbiorców wybranych poniżej. Dla wiadomości wyłącznie TTS użyj tekstu mówionego. Wyłączenie pozostawia automatyczny komunikat w kolejce. Nie działa bez wyciszenia podczas snu.",
-          "sleep_fallback_outputs": "Wybierz wiele miejsc docelowych: najpierw integrację dla wszystkich skonfigurowanych w niej urządzeń powiadomień albo pojedyncze urządzenia poniżej. Dostępne są tylko wyjścia włączone w Announcement Hub. Pusty wybór nic nie wysyła. W dotychczasowych instalacjach domyślnie wybrane są urządzenia Companion App."
+          "sleep_fallback_outputs": "Wybierz wiele miejsc docelowych: najpierw integrację dla wszystkich skonfigurowanych w niej urządzeń powiadomień albo pojedyncze urządzenia poniżej. Dostępne są tylko wyjścia włączone w Announcement Hub. Pusty wybór nic nie wysyła. W dotychczasowych instalacjach domyślnie wybrane są urządzenia Companion App.",
+          "sleep_entry_grace_seconds": "Komunikaty dodane do kolejki przed snem mogą jeszcze zabrzmieć w tym czasie. Nowe są od razu wyciszone; 0 wyłącza okres. Niedostępny czujnik wycisza natychmiast.",
+          "ai_provider_timeout": "Limit na próbę AI. Przy błędzie przeredagowanie i tłumaczenie używają oryginału; generowanie czeka bez odczytania polecenia.",
+          "service_call_timeout": "Limit wywołania powiadomienia lub dźwięku. Przy błędzie próbowane są inne dozwolone wyjścia.",
+          "tts_render_timeout": "Limit generowania mowy. Po upływie zwalnia zadanie dla innych dróg.",
+          "delivery_attempt_timeout": "Całkowity limit na próbę. Niedostarczone komunikaty pozostają w kolejce bez rozszerzania odbiorców."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Wartość pomieszczeń z osobami śpiącymi",
           "sleep_mute_tts": "Wycisz TTS, gdy wszyscy śpią",
           "sleep_fallback_written": "Pisemne powiadomienie zastępcze podczas snu",
-          "sleep_fallback_outputs": "Odbiorcy pisemnych powiadomień podczas snu"
+          "sleep_fallback_outputs": "Odbiorcy pisemnych powiadomień podczas snu",
+          "sleep_entry_grace_seconds": "Okres ochronny po zaśnięciu (s)",
+          "ai_provider_timeout": "Limit czasu AI (s)",
+          "service_call_timeout": "Limit czasu usług (s)",
+          "tts_render_timeout": "Limit tworzenia TTS (s)",
+          "delivery_attempt_timeout": "Limit próby dostarczenia (s)"
         },
         "data_description": {
           "queue_max": "Maksymalna dopuszczalna liczba oczekujących lub aktywnych zadań ogłoszeń. Nowe wysyłki są odrzucane po osiągnięciu tego limitu.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Wybierz Stan lub atrybut encji. Obsługiwane są identyfikatory, nazwy, aliasy, listy i ciągi oddzielone przecinkami. Nieznane pomieszczenia są pomijane; jeśli źródło jest niedostępne, głos zostaje wyciszony, gdy obecność jest znana.",
           "sleep_mute_tts": "Gdy wszystkie zajęte pokoje są oznaczone jako pokoje ze śpiącymi, wycisz wszystkie komunikaty głosowe i dźwięki, również Krytyczne, Snapcast i TTS Companion App. Jeśli źródło snu jest niedostępne, ale obecność jest znana, wycisz także zapobiegawczo. Wyłączenie przywraca zwykłą mowę.",
           "sleep_fallback_written": "Gdy działa wyciszanie TTS podczas snu, wyślij zamiast niego pisemne powiadomienie tylko do odbiorców wybranych poniżej. Dla wiadomości wyłącznie TTS użyj tekstu mówionego. Wyłączenie pozostawia automatyczny komunikat w kolejce. Nie działa bez wyciszenia podczas snu.",
-          "sleep_fallback_outputs": "Wybierz wiele miejsc docelowych: najpierw integrację dla wszystkich skonfigurowanych w niej urządzeń powiadomień albo pojedyncze urządzenia poniżej. Dostępne są tylko wyjścia włączone w Announcement Hub. Pusty wybór nic nie wysyła. W dotychczasowych instalacjach domyślnie wybrane są urządzenia Companion App."
+          "sleep_fallback_outputs": "Wybierz wiele miejsc docelowych: najpierw integrację dla wszystkich skonfigurowanych w niej urządzeń powiadomień albo pojedyncze urządzenia poniżej. Dostępne są tylko wyjścia włączone w Announcement Hub. Pusty wybór nic nie wysyła. W dotychczasowych instalacjach domyślnie wybrane są urządzenia Companion App.",
+          "sleep_entry_grace_seconds": "Komunikaty dodane do kolejki przed snem mogą jeszcze zabrzmieć w tym czasie. Nowe są od razu wyciszone; 0 wyłącza okres. Niedostępny czujnik wycisza natychmiast.",
+          "ai_provider_timeout": "Limit na próbę AI. Przy błędzie przeredagowanie i tłumaczenie używają oryginału; generowanie czeka bez odczytania polecenia.",
+          "service_call_timeout": "Limit wywołania powiadomienia lub dźwięku. Przy błędzie próbowane są inne dozwolone wyjścia.",
+          "tts_render_timeout": "Limit generowania mowy. Po upływie zwalnia zadanie dla innych dróg.",
+          "delivery_attempt_timeout": "Całkowity limit na próbę. Niedostarczone komunikaty pozostają w kolejce bez rozszerzania odbiorców."
         }
       },
       "init": {

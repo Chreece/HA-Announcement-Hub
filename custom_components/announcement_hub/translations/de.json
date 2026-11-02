@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Wert der Schlafräume",
           "sleep_mute_tts": "TTS stummschalten, wenn alle schlafen",
           "sleep_fallback_written": "Im Schlaf schriftlich benachrichtigen",
-          "sleep_fallback_outputs": "Empfänger schriftlicher Schlaf-Benachrichtigungen"
+          "sleep_fallback_outputs": "Empfänger schriftlicher Schlaf-Benachrichtigungen",
+          "sleep_entry_grace_seconds": "Nachlauf nach Schlafbeginn (s)",
+          "ai_provider_timeout": "KI-Anbieter-Zeitlimit (s)",
+          "service_call_timeout": "Dienstaufruf-Zeitlimit (s)",
+          "tts_render_timeout": "TTS-Erzeugungs-Zeitlimit (s)",
+          "delivery_attempt_timeout": "Zustellversuch-Zeitlimit (s)"
         },
         "data_description": {
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm.",
           "sleep_mute_tts": "Wenn alle belegten Räume als schlafend gemeldet werden, bleiben sämtliche Sprachausgaben und Signaltöne aus, auch bei Kritisch, Snapcast und Companion-App-TTS. Ist die Schlafquelle nicht verfügbar, aber die Anwesenheit bekannt, wird vorsorglich ebenfalls stummgeschaltet. Deaktivieren, um normales Sprechen beizubehalten.",
           "sleep_fallback_written": "Wenn die Schlaf-Stummschaltung aktiv ist, wird stattdessen nur an die unten ausgewählten Empfänger eine schriftliche Benachrichtigung gesendet. Bei reinen TTS-Nachrichten dient der gesprochene Text als Nachricht. Deaktivieren hält die automatische Ankündigung in der Warteschlange. Ohne Schlaf-Stummschaltung hat diese Option keine Wirkung.",
-          "sleep_fallback_outputs": "Mehrere Ziele auswählbar: zuerst eine Integration für alle bereits konfigurierten Meldegeräte oder darunter einzelne Geräte. Nur in Announcement Hub aktivierte Ausgaben sind erlaubt. Eine leere Auswahl sendet nichts. Bestehende Installationen verwenden standardmäßig alle konfigurierten Companion-App-Geräte."
+          "sleep_fallback_outputs": "Mehrere Ziele auswählbar: zuerst eine Integration für alle bereits konfigurierten Meldegeräte oder darunter einzelne Geräte. Nur in Announcement Hub aktivierte Ausgaben sind erlaubt. Eine leere Auswahl sendet nichts. Bestehende Installationen verwenden standardmäßig alle konfigurierten Companion-App-Geräte.",
+          "sleep_entry_grace_seconds": "Vor dem Einschlafen eingereihte Nachrichten dürfen noch so lange gesprochen werden. Neue sind sofort stumm; 0 deaktiviert den Nachlauf. Ein ausgefallener Schlafsensor schaltet sofort stumm.",
+          "ai_provider_timeout": "Limit je KI-Versuch. Bei Fehlern wird für Umschreiben und Übersetzen der Originaltext verwendet; die Generierung wartet auf einen neuen Versuch und liest keine Anweisung vor.",
+          "service_call_timeout": "Limit je Benachrichtigungs- oder Audio-Dienstaufruf. Bei Fehlern werden andere konfigurierte und erlaubte Ausgänge versucht.",
+          "tts_render_timeout": "Limit zur Erzeugung von Sprachausgaben. Nach Ablauf wird der Platz für andere zulässige Wege frei.",
+          "delivery_attempt_timeout": "Gesamtlimit eines Zustellversuchs. Nicht zugestellte Nachrichten bleiben für zulässige Alternativen in der Warteschlange; ausdrückliche Empfänger werden nicht erweitert."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Wert der Schlafräume",
           "sleep_mute_tts": "TTS stummschalten, wenn alle schlafen",
           "sleep_fallback_written": "Im Schlaf schriftlich benachrichtigen",
-          "sleep_fallback_outputs": "Empfänger schriftlicher Schlaf-Benachrichtigungen"
+          "sleep_fallback_outputs": "Empfänger schriftlicher Schlaf-Benachrichtigungen",
+          "sleep_entry_grace_seconds": "Nachlauf nach Schlafbeginn (s)",
+          "ai_provider_timeout": "KI-Anbieter-Zeitlimit (s)",
+          "service_call_timeout": "Dienstaufruf-Zeitlimit (s)",
+          "tts_render_timeout": "TTS-Erzeugungs-Zeitlimit (s)",
+          "delivery_attempt_timeout": "Zustellversuch-Zeitlimit (s)"
         },
         "data_description": {
           "queue_max": "Maximale Zahl wartender/aktiver Jobs. Neue Sends werden abgewiesen, sobald dieses Limit erreicht ist.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Wähle Zustand oder ein Attribut der gewählten Entität. Unterstützt werden Bereichs-IDs, Namen, Aliasse, Listen und kommaseparierte Werte. Unbekannte Räume werden ignoriert; wenn die Quelle nicht verfügbar ist, bleibt Sprachausgabe bei bekannter Anwesenheit stumm.",
           "sleep_mute_tts": "Wenn alle belegten Räume als schlafend gemeldet werden, bleiben sämtliche Sprachausgaben und Signaltöne aus, auch bei Kritisch, Snapcast und Companion-App-TTS. Ist die Schlafquelle nicht verfügbar, aber die Anwesenheit bekannt, wird vorsorglich ebenfalls stummgeschaltet. Deaktivieren, um normales Sprechen beizubehalten.",
           "sleep_fallback_written": "Wenn die Schlaf-Stummschaltung aktiv ist, wird stattdessen nur an die unten ausgewählten Empfänger eine schriftliche Benachrichtigung gesendet. Bei reinen TTS-Nachrichten dient der gesprochene Text als Nachricht. Deaktivieren hält die automatische Ankündigung in der Warteschlange. Ohne Schlaf-Stummschaltung hat diese Option keine Wirkung.",
-          "sleep_fallback_outputs": "Mehrere Ziele auswählbar: zuerst eine Integration für alle bereits konfigurierten Meldegeräte oder darunter einzelne Geräte. Nur in Announcement Hub aktivierte Ausgaben sind erlaubt. Eine leere Auswahl sendet nichts. Bestehende Installationen verwenden standardmäßig alle konfigurierten Companion-App-Geräte."
+          "sleep_fallback_outputs": "Mehrere Ziele auswählbar: zuerst eine Integration für alle bereits konfigurierten Meldegeräte oder darunter einzelne Geräte. Nur in Announcement Hub aktivierte Ausgaben sind erlaubt. Eine leere Auswahl sendet nichts. Bestehende Installationen verwenden standardmäßig alle konfigurierten Companion-App-Geräte.",
+          "sleep_entry_grace_seconds": "Vor dem Einschlafen eingereihte Nachrichten dürfen noch so lange gesprochen werden. Neue sind sofort stumm; 0 deaktiviert den Nachlauf. Ein ausgefallener Schlafsensor schaltet sofort stumm.",
+          "ai_provider_timeout": "Limit je KI-Versuch. Bei Fehlern wird für Umschreiben und Übersetzen der Originaltext verwendet; die Generierung wartet auf einen neuen Versuch und liest keine Anweisung vor.",
+          "service_call_timeout": "Limit je Benachrichtigungs- oder Audio-Dienstaufruf. Bei Fehlern werden andere konfigurierte und erlaubte Ausgänge versucht.",
+          "tts_render_timeout": "Limit zur Erzeugung von Sprachausgaben. Nach Ablauf wird der Platz für andere zulässige Wege frei.",
+          "delivery_attempt_timeout": "Gesamtlimit eines Zustellversuchs. Nicht zugestellte Nachrichten bleiben für zulässige Alternativen in der Warteschlange; ausdrückliche Empfänger werden nicht erweitert."
         }
       },
       "init": {

@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Valore delle stanze con persone addormentate",
           "sleep_mute_tts": "Disattiva TTS quando tutti dormono",
           "sleep_fallback_written": "Notifica scritta alternativa durante il sonno",
-          "sleep_fallback_outputs": "Destinatari scritti durante il sonno"
+          "sleep_fallback_outputs": "Destinatari scritti durante il sonno",
+          "sleep_entry_grace_seconds": "Tolleranza all’inizio del sonno (s)",
+          "ai_provider_timeout": "Timeout IA (s)",
+          "service_call_timeout": "Timeout servizi (s)",
+          "tts_render_timeout": "Timeout generazione TTS (s)",
+          "delivery_attempt_timeout": "Timeout tentativo di consegna (s)"
         },
         "data_description": {
           "queue_max": "Numero massimo di lavori di annuncio in attesa o attivi che possono essere accettati. Le nuove richieste vengono rifiutate quando viene raggiunto questo limite.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Seleziona Stato o un attributo dell'entità. Sono supportati ID, nomi, alias, elenchi e stringhe separate da virgole. Le stanze sconosciute vengono ignorate; se la fonte non è disponibile, la voce viene silenziata quando l'occupazione è nota.",
           "sleep_mute_tts": "Quando tutte le stanze occupate risultano in stato di sonno, vengono silenziati ogni annuncio vocale e suono, anche Critico, Snapcast e TTS Companion App. Se la sorgente del sonno non è disponibile ma l'occupazione è nota, si applica comunque il silenzio. Disattiva per mantenere il parlato normale.",
           "sleep_fallback_written": "Quando TTS è silenziato per il sonno, invia invece una notifica scritta solo ai destinatari selezionati sotto. I messaggi solo TTS usano il testo parlato come testo scritto. Se disattivato, l'annuncio automatico rimane in coda. Non ha effetto con il silenzio TTS disattivato.",
-          "sleep_fallback_outputs": "Seleziona più destinazioni: prima un'integrazione per tutti i suoi dispositivi di notifica già configurati oppure i singoli dispositivi sotto. Sono ammesse solo uscite attive in Announcement Hub. Una selezione vuota non invia nulla. Le installazioni esistenti usano per impostazione predefinita i dispositivi Companion App configurati."
+          "sleep_fallback_outputs": "Seleziona più destinazioni: prima un'integrazione per tutti i suoi dispositivi di notifica già configurati oppure i singoli dispositivi sotto. Sono ammesse solo uscite attive in Announcement Hub. Una selezione vuota non invia nulla. Le installazioni esistenti usano per impostazione predefinita i dispositivi Companion App configurati.",
+          "sleep_entry_grace_seconds": "Gli annunci in coda prima del sonno possono ancora essere pronunciati durante questo intervallo. I nuovi sono subito silenziosi; 0 disattiva. Un sensore assente silenzia immediatamente.",
+          "ai_provider_timeout": "Limite per tentativo IA. Se fallisce, riscrittura e traduzione usano il testo originale; la generazione attende senza leggere istruzioni.",
+          "service_call_timeout": "Limite per ogni servizio di notifica o audio. In caso di errore si provano altre uscite autorizzate.",
+          "tts_render_timeout": "Limite di creazione della voce. Alla scadenza libera la risorsa per altri percorsi.",
+          "delivery_attempt_timeout": "Limite totale per tentativo. Gli annunci non consegnati restano in coda senza ampliare i destinatari."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Valore delle stanze con persone addormentate",
           "sleep_mute_tts": "Disattiva TTS quando tutti dormono",
           "sleep_fallback_written": "Notifica scritta alternativa durante il sonno",
-          "sleep_fallback_outputs": "Destinatari scritti durante il sonno"
+          "sleep_fallback_outputs": "Destinatari scritti durante il sonno",
+          "sleep_entry_grace_seconds": "Tolleranza all’inizio del sonno (s)",
+          "ai_provider_timeout": "Timeout IA (s)",
+          "service_call_timeout": "Timeout servizi (s)",
+          "tts_render_timeout": "Timeout generazione TTS (s)",
+          "delivery_attempt_timeout": "Timeout tentativo di consegna (s)"
         },
         "data_description": {
           "queue_max": "Numero massimo di lavori di annuncio in attesa o attivi che possono essere accettati. Le nuove richieste vengono rifiutate quando viene raggiunto questo limite.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Seleziona Stato o un attributo dell'entità. Sono supportati ID, nomi, alias, elenchi e stringhe separate da virgole. Le stanze sconosciute vengono ignorate; se la fonte non è disponibile, la voce viene silenziata quando l'occupazione è nota.",
           "sleep_mute_tts": "Quando tutte le stanze occupate risultano in stato di sonno, vengono silenziati ogni annuncio vocale e suono, anche Critico, Snapcast e TTS Companion App. Se la sorgente del sonno non è disponibile ma l'occupazione è nota, si applica comunque il silenzio. Disattiva per mantenere il parlato normale.",
           "sleep_fallback_written": "Quando TTS è silenziato per il sonno, invia invece una notifica scritta solo ai destinatari selezionati sotto. I messaggi solo TTS usano il testo parlato come testo scritto. Se disattivato, l'annuncio automatico rimane in coda. Non ha effetto con il silenzio TTS disattivato.",
-          "sleep_fallback_outputs": "Seleziona più destinazioni: prima un'integrazione per tutti i suoi dispositivi di notifica già configurati oppure i singoli dispositivi sotto. Sono ammesse solo uscite attive in Announcement Hub. Una selezione vuota non invia nulla. Le installazioni esistenti usano per impostazione predefinita i dispositivi Companion App configurati."
+          "sleep_fallback_outputs": "Seleziona più destinazioni: prima un'integrazione per tutti i suoi dispositivi di notifica già configurati oppure i singoli dispositivi sotto. Sono ammesse solo uscite attive in Announcement Hub. Una selezione vuota non invia nulla. Le installazioni esistenti usano per impostazione predefinita i dispositivi Companion App configurati.",
+          "sleep_entry_grace_seconds": "Gli annunci in coda prima del sonno possono ancora essere pronunciati durante questo intervallo. I nuovi sono subito silenziosi; 0 disattiva. Un sensore assente silenzia immediatamente.",
+          "ai_provider_timeout": "Limite per tentativo IA. Se fallisce, riscrittura e traduzione usano il testo originale; la generazione attende senza leggere istruzioni.",
+          "service_call_timeout": "Limite per ogni servizio di notifica o audio. In caso di errore si provano altre uscite autorizzate.",
+          "tts_render_timeout": "Limite di creazione della voce. Alla scadenza libera la risorsa per altri percorsi.",
+          "delivery_attempt_timeout": "Limite totale per tentativo. Gli annunci non consegnati restano in coda senza ampliare i destinatari."
         }
       },
       "init": {

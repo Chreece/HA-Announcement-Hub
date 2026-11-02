@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Sleeping-room value",
           "sleep_mute_tts": "Mute TTS while everyone is sleeping",
           "sleep_fallback_written": "Written fallback while sleeping",
-          "sleep_fallback_outputs": "Sleep-time written notification recipients"
+          "sleep_fallback_outputs": "Sleep-time written notification recipients",
+          "sleep_entry_grace_seconds": "Sleep-entry grace (seconds)",
+          "ai_provider_timeout": "AI provider timeout (seconds)",
+          "service_call_timeout": "Service-call timeout (seconds)",
+          "tts_render_timeout": "TTS rendering timeout (seconds)",
+          "delivery_attempt_timeout": "Delivery attempt timeout (seconds)"
         },
         "data_description": {
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known.",
           "sleep_mute_tts": "When all reported occupied rooms are currently sleeping, prevent ALL spoken announcements and chimes, including Critical, Snapcast and Companion App TTS. If the sleep source is unavailable but occupancy is known, also mute as a precaution. Disable to keep normal speech behavior.",
           "sleep_fallback_written": "When sleep TTS muting is active, deliver a written notification instead, using only the selected recipients below. For TTS-only messages, use the spoken text as written text. Disable to keep the announcement queued rather than automatically notify. Has no effect when sleep muting is off.",
-          "sleep_fallback_outputs": "Select one or more destinations: first choose an integration to reach all its configured notification devices, or choose individual devices listed below. Only outputs already enabled in Announcement Hub are eligible; unselected devices and integrations are never added. An empty selection delivers nothing. Existing installs default to all configured Companion App devices."
+          "sleep_fallback_outputs": "Select one or more destinations: first choose an integration to reach all its configured notification devices, or choose individual devices listed below. Only outputs already enabled in Announcement Hub are eligible; unselected devices and integrations are never added. An empty selection delivers nothing. Existing installs default to all configured Companion App devices.",
+          "sleep_entry_grace_seconds": "Previously queued announcements may speak for this many seconds after a room starts sleeping. New announcements mute immediately; 0 disables grace; unavailable sleep sensors mute immediately.",
+          "ai_provider_timeout": "Time limit per AI attempt. On failure, rewrite and translation use the original text; AI generation retries without announcing its instructions.",
+          "service_call_timeout": "Time limit for each notification, audio or companion service call. Failed outputs allow retries through other configured, permitted destinations.",
+          "tts_render_timeout": "Time limit for generating speech audio. Expired renders free their worker slots so other eligible routes can proceed.",
+          "delivery_attempt_timeout": "Total time limit for one delivery attempt. Undelivered messages remain queued for eligible fallback paths; explicit recipients are never broadened."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Sleeping-room value",
           "sleep_mute_tts": "Mute TTS while everyone is sleeping",
           "sleep_fallback_written": "Written fallback while sleeping",
-          "sleep_fallback_outputs": "Sleep-time written notification recipients"
+          "sleep_fallback_outputs": "Sleep-time written notification recipients",
+          "sleep_entry_grace_seconds": "Sleep-entry grace (seconds)",
+          "ai_provider_timeout": "AI provider timeout (seconds)",
+          "service_call_timeout": "Service-call timeout (seconds)",
+          "tts_render_timeout": "TTS rendering timeout (seconds)",
+          "delivery_attempt_timeout": "Delivery attempt timeout (seconds)"
         },
         "data_description": {
           "queue_max": "Maximum number of pending/active announcement jobs accepted. New sends are rejected when this limit is reached.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Choose State or an attribute of the selected entity. Values may be area IDs, names, aliases, lists or comma-separated strings. Unknown room names are ignored; an unavailable source mutes speech while occupancy is known.",
           "sleep_mute_tts": "When all reported occupied rooms are currently sleeping, prevent ALL spoken announcements and chimes, including Critical, Snapcast and Companion App TTS. If the sleep source is unavailable but occupancy is known, also mute as a precaution. Disable to keep normal speech behavior.",
           "sleep_fallback_written": "When sleep TTS muting is active, deliver a written notification instead, using only the selected recipients below. For TTS-only messages, use the spoken text as written text. Disable to keep the announcement queued rather than automatically notify. Has no effect when sleep muting is off.",
-          "sleep_fallback_outputs": "Select one or more destinations: first choose an integration to reach all its configured notification devices, or choose individual devices listed below. Only outputs already enabled in Announcement Hub are eligible; unselected devices and integrations are never added. An empty selection delivers nothing. Existing installs default to all configured Companion App devices."
+          "sleep_fallback_outputs": "Select one or more destinations: first choose an integration to reach all its configured notification devices, or choose individual devices listed below. Only outputs already enabled in Announcement Hub are eligible; unselected devices and integrations are never added. An empty selection delivers nothing. Existing installs default to all configured Companion App devices.",
+          "sleep_entry_grace_seconds": "Previously queued announcements may speak for this many seconds after a room starts sleeping. New announcements mute immediately; 0 disables grace; unavailable sleep sensors mute immediately.",
+          "ai_provider_timeout": "Time limit per AI attempt. On failure, rewrite and translation use the original text; AI generation retries without announcing its instructions.",
+          "service_call_timeout": "Time limit for each notification, audio or companion service call. Failed outputs allow retries through other configured, permitted destinations.",
+          "tts_render_timeout": "Time limit for generating speech audio. Expired renders free their worker slots so other eligible routes can proceed.",
+          "delivery_attempt_timeout": "Total time limit for one delivery attempt. Undelivered messages remain queued for eligible fallback paths; explicit recipients are never broadened."
         }
       },
       "init": {

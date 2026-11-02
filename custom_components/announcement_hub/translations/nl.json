@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Waarde van ruimten met slapende personen",
           "sleep_mute_tts": "TTS dempen wanneer iedereen slaapt",
           "sleep_fallback_written": "Schriftelijk terugvallen tijdens het slapen",
-          "sleep_fallback_outputs": "Ontvangers voor schriftelijke meldingen tijdens slaap"
+          "sleep_fallback_outputs": "Ontvangers voor schriftelijke meldingen tijdens slaap",
+          "sleep_entry_grace_seconds": "Respijt bij inslapen (s)",
+          "ai_provider_timeout": "Time-out AI-aanbieder (s)",
+          "service_call_timeout": "Time-out dienstaanroep (s)",
+          "tts_render_timeout": "Time-out TTS-aanmaak (s)",
+          "delivery_attempt_timeout": "Time-out bezorgpoging (s)"
         },
         "data_description": {
           "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is.",
           "sleep_mute_tts": "Als alle bezette ruimten als slapend worden gemeld, worden alle spraakberichten en geluidssignalen gedempt, ook Kritiek, Snapcast en Companion App-TTS. Als de slaapbron uitvalt maar aanwezigheid bekend is, wordt spraak uit voorzorg ook gedempt. Schakel uit voor normale spraak.",
           "sleep_fallback_written": "Als slaapdemping actief is, wordt in plaats daarvan alleen een schriftelijke melding naar de hieronder gekozen ontvangers gestuurd. Bij alleen TTS wordt de gesproken tekst als bericht gebruikt. Uitschakelen laat de automatische melding in de wachtrij. Zonder slaapdemping heeft deze instelling geen effect.",
-          "sleep_fallback_outputs": "Kies meerdere bestemmingen: eerst een integratie voor al haar ingestelde meldingsapparaten, daarna afzonderlijke apparaten. Alleen in Announcement Hub ingeschakelde uitgangen zijn toegestaan. Een lege selectie verstuurt niets. Bestaande installaties kiezen standaard alle ingestelde Companion App-apparaten."
+          "sleep_fallback_outputs": "Kies meerdere bestemmingen: eerst een integratie voor al haar ingestelde meldingsapparaten, daarna afzonderlijke apparaten. Alleen in Announcement Hub ingeschakelde uitgangen zijn toegestaan. Een lege selectie verstuurt niets. Bestaande installaties kiezen standaard alle ingestelde Companion App-apparaten.",
+          "sleep_entry_grace_seconds": "Berichten die vóór het slapen in de wachtrij stonden mogen nog binnen deze periode klinken. Nieuwe zijn direct stil; 0 schakelt uit. Ontbrekende sensor dempt direct.",
+          "ai_provider_timeout": "Limiet per AI-poging. Bij fouten gebruikt herschrijven en vertalen het origineel; genereren wacht zonder de opdracht voor te lezen.",
+          "service_call_timeout": "Limiet per melding- of audio-oproep. Bij fouten worden andere ingestelde toegestane uitgangen geprobeerd.",
+          "tts_render_timeout": "Limiet voor spraakaudio. Bij afloop komt de taak vrij voor andere toegestane routes.",
+          "delivery_attempt_timeout": "Totale limiet per poging. Niet bezorgde berichten blijven in de wachtrij zonder expliciete ontvangers uit te breiden."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Waarde van ruimten met slapende personen",
           "sleep_mute_tts": "TTS dempen wanneer iedereen slaapt",
           "sleep_fallback_written": "Schriftelijk terugvallen tijdens het slapen",
-          "sleep_fallback_outputs": "Ontvangers voor schriftelijke meldingen tijdens slaap"
+          "sleep_fallback_outputs": "Ontvangers voor schriftelijke meldingen tijdens slaap",
+          "sleep_entry_grace_seconds": "Respijt bij inslapen (s)",
+          "ai_provider_timeout": "Time-out AI-aanbieder (s)",
+          "service_call_timeout": "Time-out dienstaanroep (s)",
+          "tts_render_timeout": "Time-out TTS-aanmaak (s)",
+          "delivery_attempt_timeout": "Time-out bezorgpoging (s)"
         },
         "data_description": {
           "queue_max": "Maximumaantal toegestane wachtende of actieve aankondigingstaken. Als deze limiet is bereikt, worden nieuwe verzendingen geweigerd.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Kies Status of een kenmerk van de entiteit. Gebieds-ID's, namen, aliassen, lijsten en kommagescheiden teksten worden ondersteund. Onbekende ruimten worden genegeerd; bij een onbeschikbare bron blijft spraak gedempt als de aanwezigheid bekend is.",
           "sleep_mute_tts": "Als alle bezette ruimten als slapend worden gemeld, worden alle spraakberichten en geluidssignalen gedempt, ook Kritiek, Snapcast en Companion App-TTS. Als de slaapbron uitvalt maar aanwezigheid bekend is, wordt spraak uit voorzorg ook gedempt. Schakel uit voor normale spraak.",
           "sleep_fallback_written": "Als slaapdemping actief is, wordt in plaats daarvan alleen een schriftelijke melding naar de hieronder gekozen ontvangers gestuurd. Bij alleen TTS wordt de gesproken tekst als bericht gebruikt. Uitschakelen laat de automatische melding in de wachtrij. Zonder slaapdemping heeft deze instelling geen effect.",
-          "sleep_fallback_outputs": "Kies meerdere bestemmingen: eerst een integratie voor al haar ingestelde meldingsapparaten, daarna afzonderlijke apparaten. Alleen in Announcement Hub ingeschakelde uitgangen zijn toegestaan. Een lege selectie verstuurt niets. Bestaande installaties kiezen standaard alle ingestelde Companion App-apparaten."
+          "sleep_fallback_outputs": "Kies meerdere bestemmingen: eerst een integratie voor al haar ingestelde meldingsapparaten, daarna afzonderlijke apparaten. Alleen in Announcement Hub ingeschakelde uitgangen zijn toegestaan. Een lege selectie verstuurt niets. Bestaande installaties kiezen standaard alle ingestelde Companion App-apparaten.",
+          "sleep_entry_grace_seconds": "Berichten die vóór het slapen in de wachtrij stonden mogen nog binnen deze periode klinken. Nieuwe zijn direct stil; 0 schakelt uit. Ontbrekende sensor dempt direct.",
+          "ai_provider_timeout": "Limiet per AI-poging. Bij fouten gebruikt herschrijven en vertalen het origineel; genereren wacht zonder de opdracht voor te lezen.",
+          "service_call_timeout": "Limiet per melding- of audio-oproep. Bij fouten worden andere ingestelde toegestane uitgangen geprobeerd.",
+          "tts_render_timeout": "Limiet voor spraakaudio. Bij afloop komt de taak vrij voor andere toegestane routes.",
+          "delivery_attempt_timeout": "Totale limiet per poging. Niet bezorgde berichten blijven in de wachtrij zonder expliciete ontvangers uit te breiden."
         }
       },
       "init": {

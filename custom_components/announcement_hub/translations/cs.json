@@ -127,7 +127,12 @@
           "sleep_rooms_attribute": "Hodnota místností se spícími lidmi",
           "sleep_mute_tts": "Ztlumit TTS, když všichni spí",
           "sleep_fallback_written": "Písemné upozornění místo řeči během spánku",
-          "sleep_fallback_outputs": "Příjemci písemných upozornění během spánku"
+          "sleep_fallback_outputs": "Příjemci písemných upozornění během spánku",
+          "sleep_entry_grace_seconds": "Ochranná lhůta při usínání (s)",
+          "ai_provider_timeout": "Limit času AI (s)",
+          "service_call_timeout": "Limit volání služby (s)",
+          "tts_render_timeout": "Limit tvorby TTS (s)",
+          "delivery_attempt_timeout": "Limit doručení (s)"
         },
         "data_description": {
           "queue_max": "Nejvyšší povolený počet čekajících nebo aktivních úloh oznámení. Po dosažení limitu se nové požadavky na odeslání odmítají.",
@@ -151,7 +156,12 @@
           "sleep_rooms_attribute": "Vyberte Stav nebo atribut entity. Podporována jsou ID oblastí, názvy, přezdívky, seznamy a hodnoty oddělené čárkami. Neznámé místnosti se ignorují; při nedostupném zdroji se mluvení ztlumí, pokud je známá obsazenost.",
           "sleep_mute_tts": "Pokud jsou všechny obsazené místnosti hlášeny jako místnosti se spícími lidmi, ztlumí se všechna hlasová oznámení a zvuky včetně Kritických, Snapcast a TTS Companion App. Pokud zdroj spánku není dostupný, ale obsazenost je známá, zvuk se preventivně také ztlumí. Vypnutím obnovíte běžnou řeč.",
           "sleep_fallback_written": "Při ztlumení TTS kvůli spánku se odešle písemné upozornění pouze níže vybraným příjemcům. U zpráv pouze pro TTS se použije text řeči. Vypnutí ponechá automatické oznámení ve frontě. Bez ztlumení TTS při spánku nemá vliv.",
-          "sleep_fallback_outputs": "Vyberte více cílů: nejprve integraci pro všechna její již nastavená oznamovací zařízení nebo jednotlivá zařízení níže. Povoleny jsou pouze výstupy zapnuté v Announcement Hub. Prázdný výběr nic neodešle. U existujících instalací jsou ve výchozím stavu vybrána zařízení Companion App."
+          "sleep_fallback_outputs": "Vyberte více cílů: nejprve integraci pro všechna její již nastavená oznamovací zařízení nebo jednotlivá zařízení níže. Povoleny jsou pouze výstupy zapnuté v Announcement Hub. Prázdný výběr nic neodešle. U existujících instalací jsou ve výchozím stavu vybrána zařízení Companion App.",
+          "sleep_entry_grace_seconds": "Hlášení zařazená před usnutím mohou ještě zaznít po tuto dobu. Nová se ihned ztlumí; 0 vypne lhůtu. Nedostupný senzor ztlumí ihned.",
+          "ai_provider_timeout": "Limit pro pokus AI. Při chybě přepis a překlad použijí původní text; generování čeká bez čtení pokynu.",
+          "service_call_timeout": "Limit volání notifikační či zvukové služby. Při chybě se zkusí další povolené výstupy.",
+          "tts_render_timeout": "Limit generování hlasu. Po vypršení se úloha uvolní pro jiné cesty.",
+          "delivery_attempt_timeout": "Celkový limit pokusu. Nedoručené zprávy zůstávají ve frontě bez rozšiřování příjemců."
         }
       },
       "reconfigure": {
@@ -464,7 +474,12 @@
           "sleep_rooms_attribute": "Hodnota místností se spícími lidmi",
           "sleep_mute_tts": "Ztlumit TTS, když všichni spí",
           "sleep_fallback_written": "Písemné upozornění místo řeči během spánku",
-          "sleep_fallback_outputs": "Příjemci písemných upozornění během spánku"
+          "sleep_fallback_outputs": "Příjemci písemných upozornění během spánku",
+          "sleep_entry_grace_seconds": "Ochranná lhůta při usínání (s)",
+          "ai_provider_timeout": "Limit času AI (s)",
+          "service_call_timeout": "Limit volání služby (s)",
+          "tts_render_timeout": "Limit tvorby TTS (s)",
+          "delivery_attempt_timeout": "Limit doručení (s)"
         },
         "data_description": {
           "queue_max": "Nejvyšší povolený počet čekajících nebo aktivních úloh oznámení. Po dosažení limitu se nové požadavky na odeslání odmítají.",
@@ -488,7 +503,12 @@
           "sleep_rooms_attribute": "Vyberte Stav nebo atribut entity. Podporována jsou ID oblastí, názvy, přezdívky, seznamy a hodnoty oddělené čárkami. Neznámé místnosti se ignorují; při nedostupném zdroji se mluvení ztlumí, pokud je známá obsazenost.",
           "sleep_mute_tts": "Pokud jsou všechny obsazené místnosti hlášeny jako místnosti se spícími lidmi, ztlumí se všechna hlasová oznámení a zvuky včetně Kritických, Snapcast a TTS Companion App. Pokud zdroj spánku není dostupný, ale obsazenost je známá, zvuk se preventivně také ztlumí. Vypnutím obnovíte běžnou řeč.",
           "sleep_fallback_written": "Při ztlumení TTS kvůli spánku se odešle písemné upozornění pouze níže vybraným příjemcům. U zpráv pouze pro TTS se použije text řeči. Vypnutí ponechá automatické oznámení ve frontě. Bez ztlumení TTS při spánku nemá vliv.",
-          "sleep_fallback_outputs": "Vyberte více cílů: nejprve integraci pro všechna její již nastavená oznamovací zařízení nebo jednotlivá zařízení níže. Povoleny jsou pouze výstupy zapnuté v Announcement Hub. Prázdný výběr nic neodešle. U existujících instalací jsou ve výchozím stavu vybrána zařízení Companion App."
+          "sleep_fallback_outputs": "Vyberte více cílů: nejprve integraci pro všechna její již nastavená oznamovací zařízení nebo jednotlivá zařízení níže. Povoleny jsou pouze výstupy zapnuté v Announcement Hub. Prázdný výběr nic neodešle. U existujících instalací jsou ve výchozím stavu vybrána zařízení Companion App.",
+          "sleep_entry_grace_seconds": "Hlášení zařazená před usnutím mohou ještě zaznít po tuto dobu. Nová se ihned ztlumí; 0 vypne lhůtu. Nedostupný senzor ztlumí ihned.",
+          "ai_provider_timeout": "Limit pro pokus AI. Při chybě přepis a překlad použijí původní text; generování čeká bez čtení pokynu.",
+          "service_call_timeout": "Limit volání notifikační či zvukové služby. Při chybě se zkusí další povolené výstupy.",
+          "tts_render_timeout": "Limit generování hlasu. Po vypršení se úloha uvolní pro jiné cesty.",
+          "delivery_attempt_timeout": "Celkový limit pokusu. Nedoručené zprávy zůstávají ve frontě bez rozšiřování příjemců."
         }
       },
       "init": {

@@ -79,6 +79,8 @@ class ScenarioHost:
         self._availability_timeout = 5.
     def _occupied_area_ids(self): return self.occupied
     def _sleep_area_ids(self): return self.sleeping
+    def _sleep_grace_areas(self, _job=None): return frozenset()
+    def _sleep_rooms_source_unavailable(self): return False
     def _all_occupied_rooms_sleeping(self):
         return bool(self.occupied and set(self.occupied).issubset(self.sleeping))
     def _fallback_area_id(self): return "relay"
