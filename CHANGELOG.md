@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b32 - 2026-11-02
+
+**Beta — compact icon-only titled choice groups, with visible selection text.**
+
+- Apply the existing Priority pattern to **Recipient selection**, **Delivery
+  service**, **AI wording**, **Person destinations**, **Person translation**,
+  **Personal greeting**, and **Direct-room pre-announcement chime**.
+- All options in these groups use compact icon-only buttons with localized
+  tooltips, accessible labels and visible selected-state highlighting.
+  Display the translated active option beside each section title, including
+  multiple selected person destinations. Update labels immediately on taps
+  or a language change.
+- Preserve exact option IDs and existing targeting, channel, AI, greeting,
+  and chime semantics. Named people, room, device and integration choices
+  remain text-labeled to avoid ambiguous destinations. Queue, Remove,
+  Send and Stop & Clear buttons retain explicit action labels.
+- Wrap the icon buttons at narrow card widths instead of clipping them.
+  Support small mobile dashboards and right-to-left languages.
+- Add card regression tests for Greek selected-state labels, icon titles
+  and accessibility, multi-select destinations and unchanged send payloads.
+
 ## 0.10.0b31 - 2026-11-02
 
 **Beta — queue viewer and action acknowledgment compatibility, visible priority label.**
