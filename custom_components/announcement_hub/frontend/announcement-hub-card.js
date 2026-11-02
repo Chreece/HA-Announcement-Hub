@@ -291,7 +291,7 @@
         this._confirming = false;
         this.$("critical-confirm").hidden = true;
         this._sync();
-        if (mode === "person") void this._refreshPersonOwned();
+        if (mode === "person") void this._refreshPersonOwned(true);
       });
       for (const container of ["targets", "person-targets"]) this.$(container).addEventListener("click", (event) => {
         const button = event.target.closest("button[data-kind][data-value]");
@@ -675,7 +675,9 @@
         // integration/device broadcast. No owned choices are shown on failure.
         this._personOwnedCatalog = {};
         this._personOwnedLoaded = false;
-        this._personOwnedLastFetch = 0;
+        // A missing service on an older backend must not retry on every
+        // Home Assistant state refresh; retry when the person tab is reopened.
+        this._personOwnedLastFetch = now;
       } finally {
         this._personOwnedLoading = false;
         this._drawPersonOwnedTargets();
