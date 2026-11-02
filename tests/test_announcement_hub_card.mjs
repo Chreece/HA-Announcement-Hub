@@ -50,11 +50,17 @@ function harness() {
   fields.send = { disabled: false };
   fields["send-label"] = { textContent: "" };
   fields["priority-selected"] = { textContent: "" };
-  fields.levels = {
+  const group = () => ({
     nodes: [],
     replaceChildren() { this.nodes = []; },
     appendChild(node) { this.nodes.push(node); },
-  };
+  });
+  fields.levels = group();
+  for (const id of ["target-mode", "channels", "ai-choices",
+    "person-destinations", "person-translation", "person-greeting", "pre-chime"]) {
+    fields[id] = group();
+    fields[id + "-selected"] = { textContent: "" };
+  }
   fields["queue-number"] = { textContent: "" };
   fields["queue-pill"] = { title: "", hidden: false, setAttribute(key, value) { this[key] = value; } };
   fields["queue-panel"] = { hidden: true };
@@ -419,6 +425,120 @@ test("legacy flat-shaped service response is still accepted", async () => {
   await card._fetchQueue();
   assert.equal(card._queueError, "");
   assert.equal(card._queueJobs[0].job_id, "flat");
+});
+
+
+test("all titled choice groups use icons, with selected localized text beside the heading", () => {
+  const html = readFileSync(HTML_PATH, "utf8");
+  const css = readFileSync(CSS_PATH, "utf8");
+  const js = readFileSync(CARD_PATH, "utf8");
+  const captions = [
+    ["target-mode", "Automatic routing"],
+    ["channels", "Automatic"],
+    ["ai-choices", "Hub default"],
+    ["person-destinations", "Room"],
+    ["person-translation", "Person setting"],
+    ["person-greeting", "Person setting"],
+    ["pre-chime", "Person setting"],
+  ];
+  for (const [id, fallback] of captions) {
+    assert.match(html, new RegExp('id="' + id + '" class="choices icon-choices"'));
+    assert.match(html, new RegExp('id="' + id + '-selected"'));
+    assert.ok(html.includes(fallback), "initial selected text missing for " + id);
+  }
+  assert.match(css, /\.icon-choices button,/);
+  assert.match(css, /\.choice-caption/);
+  assert.match(js, /const CHOICE_ICONS =/);
+  assert.match(js, /button\.setAttribute\("aria-label", this\._t\(name\)\)/);
+  assert.match(js, /button\.title = this\._t\(name\)/);
+  assert.match(js, /button\.setAttribute\("aria-pressed", String\(value === selected\)\)/);
+  assert.match(js, /symbol\.setAttribute\("icon", CHOICE_ICONS\[id\]/);
+  // Leave named people, room and device selection chips as readable text.
+  assert.match(js, /button\.textContent = clipped\(item\.label, 62\)/);
+});
+
+test("every single-choice icon group shows the correct Greek label when selected", () => {
+  const { card, fields } = harness();
+  card._translations = {
+    "Automatic": "Αυτόματα", "Written": "Γραπτά",
+    "Rewrite": "Αναδιατύπωση", "Generate": "Δημιουργία",
+    "Automatic routing": "Αυτόματη δρομολόγηση",
+    "People": "Άτομα", "Person setting": "Ρύθμιση ατόμου",
+    "Translate": "Μετάφραση", "On": "Ενεργό",
+    "Yes": "Ναι", "No": "Όχι",
+  };
+  const groups = [
+    ["target-mode", [["automatic", "Automatic routing"], ["person", "People"]], "person", "mode", "Άτομα"],
+    ["channels", [["auto", "Automatic"], ["notification", "Written"]], "notification", "value", "Γραπτά"],
+    ["ai-choices", [["rewrite", "Rewrite"], ["generate", "Generate"]], "generate", "value", "Δημιουργία"],
+    ["person-translation", [["inherit", "Person setting"], ["on", "Translate"]], "on", "value", "Μετάφραση"],
+    ["person-greeting", [["inherit", "Person setting"], ["on", "Yes"]], "on", "value", "Ναι"],
+    ["pre-chime", [["inherit", "Person setting"], ["off", "No"]], "off", "value", "Όχι"],
+  ];
+  for (const [id, choices, selected, dataKey, expected] of groups) {
+    card._renderButtons(id, choices, selected, dataKey);
+    assert.equal(fields[id + "-selected"].textContent, expected, id);
+    assert.equal(fields[id].nodes.length, choices.length);
+    const [unselected, active] = fields[id].nodes;
+    assert.equal(active.dataset[dataKey], selected, id + " persisted identifier");
+    assert.equal(active.title, expected);
+    assert.equal(active.attributes["aria-label"], expected);
+    assert.equal(active.attributes["aria-pressed"], "true");
+    assert.equal(unselected.attributes["aria-pressed"], "false");
+    assert.equal(active.children[0].tagName, "ha-icon");
+    assert.match(active.children[0].attributes.icon, /^mdi:/);
+    assert.equal(active.textContent ?? "", "", "icon-only, not pill text");
+  }
+});
+
+test("person destination multi-select shows all chosen names and preserves available output restrictions", () => {
+  const { card, fields } = harness();
+  card._translations = {
+    Room: "Δωμάτιο", Mobile: "Κινητό", Watch: "Ρολόι",
+    Tablet: "Τάμπλετ", Other: "Άλλο",
+  };
+  card._selected.person.add("person.test");
+  card._personDestinations = new Set(["room", "mobile"]);
+  card._hass = { states: {
+    "sensor.destinations": {
+      entity_id: "sensor.destinations",
+      attributes: { person_destinations: { "person.test": ["room", "mobile", "watch"] } },
+    },
+  }};
+  card._drawPersonDestinations();
+  assert.equal(fields["person-destinations-selected"].textContent, "Δωμάτιο · Κινητό");
+  assert.deepEqual(fields["person-destinations"].nodes.map(button => button.dataset.destination),
+    ["room", "mobile", "watch"]);
+  assert.equal(fields["person-destinations"].nodes[1].attributes["aria-pressed"], "true");
+  assert.equal(fields["person-destinations"].nodes[1].title, "Κινητό");
+  assert.match(fields["person-destinations"].nodes[1].children[0].attributes.icon, /^mdi:/);
+  card._personDestinations.delete("room");
+  card._personDestinations.delete("mobile");
+  card._drawPersonDestinations();
+  assert.equal(fields["person-destinations-selected"].textContent, "—");
+  assert.equal(card._personDestinations.size, 0);
+});
+
+test("all seven icon groups preserve the existing announcement payload semantics", () => {
+  const { card, fields } = harness();
+  fields.message.value = "The kitchen window is open";
+  card._channel = "auto";
+  card._ai = "inherit";
+  card._renderButtons("channels", [["auto", "Automatic"], ["tts", "Speech"]], "auto");
+  card._renderButtons("ai-choices", [["inherit", "Hub default"], ["off", "Off"]], "inherit");
+  assert.deepEqual(card._buildPayload(), {
+    level: "info", occupied_only: true, text: "The kitchen window is open",
+  });
+  card._targetMode = "targeted";
+  card._selected.area.add("kitchen");
+  card._channel = "tts";
+  card._ai = "off";
+  card._renderButtons("channels", [["auto", "Automatic"], ["tts", "Speech"]], "tts");
+  card._renderButtons("ai-choices", [["inherit", "Hub default"], ["off", "Off"]], "off");
+  const payload = card._buildPayload();
+  assert.deepEqual(payload.service, ["tts"]);
+  assert.deepEqual(payload.area, ["kitchen"]);
+  assert.equal(payload.use_ai, false);
 });
 
 test("tapping the queue badge loads all message bodies only through authenticated service", async () => {

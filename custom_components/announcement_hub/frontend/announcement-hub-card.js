@@ -31,6 +31,39 @@
   const PERSON_TRANSLATION = [["inherit", "Person setting"], ["on", "Translate"], ["off", "Original language"]];
   const PERSON_SWITCH = [["inherit", "Person setting"], ["on", "Yes"], ["off", "No"]];
   const PERSON_DESTINATIONS = [["room", "Room"], ["mobile", "Mobile"], ["watch", "Watch"], ["tablet", "Tablet"], ["other", "Other"]];
+  const TARGET_MODES = [
+    ["automatic", "Automatic routing"], ["targeted", "Choose recipients"], ["person", "People"],
+  ];
+  // Icon-only selections: the full, localized choice is always displayed
+  // beside each group's heading and in the icon's title / accessible label.
+  const CHOICE_ICONS = {
+    "target-mode": {
+      automatic: "mdi:auto-fix", targeted: "mdi:target", person: "mdi:account-multiple-outline",
+    },
+    channels: {
+      auto: "mdi:auto-fix", notification: "mdi:message-text-outline",
+      tts: "mdi:volume-high", all: "mdi:layers-outline",
+      snapcast: "mdi:speaker-multiple", companion_tts: "mdi:cellphone-sound",
+    },
+    "ai-choices": {
+      inherit: "mdi:robot-outline", off: "mdi:robot-off-outline",
+      rewrite: "mdi:pencil-outline", generate: "mdi:creation-outline",
+    },
+    "person-translation": {
+      inherit: "mdi:account-cog-outline", on: "mdi:translate",
+      off: "mdi:translate-off",
+    },
+    "person-greeting": {
+      inherit: "mdi:cog-outline", on: "mdi:check-circle-outline", off: "mdi:close-circle-outline",
+    },
+    "pre-chime": {
+      inherit: "mdi:cog-outline", on: "mdi:bell-outline", off: "mdi:bell-off-outline",
+    },
+    "person-destinations": {
+      room: "mdi:home-outline", mobile: "mdi:cellphone",
+      watch: "mdi:watch-variant", tablet: "mdi:tablet", other: "mdi:devices",
+    },
+  };
   const getLanguage = (hass) => {
     const raw = String(hass?.locale?.language || hass?.language || "en").replace(/_/g, "-");
     if (/^zh-(tw|hk|hant)/i.test(raw)) return "zh-Hant";
@@ -305,15 +338,21 @@
       this.$("occupied-only").addEventListener("change", () => this._updateSummary());
     }
 
-    _renderButtons(id, choices, selected) {
+    _renderButtons(id, choices, selected, dataKey = "value") {
       const target = this.$(id);
+      const chosen = choices.find(([value]) => value === selected);
+      this.$(id + "-selected").textContent = this._t(chosen?.[1] || choices[0]?.[1] || "");
       target.replaceChildren();
       for (const [value, name] of choices) {
         const button = document.createElement("button");
         button.type = "button";
-        button.dataset.value = value;
-        button.textContent = this._t(name);
+        button.dataset[dataKey] = value;
+        button.title = this._t(name);
+        button.setAttribute("aria-label", this._t(name));
         button.setAttribute("aria-pressed", String(value === selected));
+        const symbol = document.createElement("ha-icon");
+        symbol.setAttribute("icon", CHOICE_ICONS[id]?.[value] || "mdi:circle-outline");
+        button.appendChild(symbol);
         target.appendChild(button);
       }
     }
@@ -344,6 +383,7 @@
       if (this._config.show_queue === false && this._queueOpen) this._toggleQueue(false);
       this.$("ai-block").hidden = this._config.show_ai === false;
       this._renderPriority();
+      this._renderButtons("target-mode", TARGET_MODES, this._targetMode, "mode");
       this._renderButtons("channels", CHANNELS, this._channel);
       this._renderButtons("ai-choices", AI_OPTIONS, this._ai);
       this._renderButtons("person-translation", PERSON_TRANSLATION, this._personTranslation);
@@ -351,9 +391,6 @@
       this._renderButtons("pre-chime", PERSON_SWITCH, this._preChime);
       this.$("targets").hidden = this._targetMode !== "targeted";
       this.$("person-targets").hidden = this._targetMode !== "person";
-      for (const button of this.$("target-mode").querySelectorAll("button[data-mode]")) {
-        button.setAttribute("aria-pressed", String(button.dataset.mode === this._targetMode));
-      }
       this.$("routing-explanation").textContent = this._targetMode === "automatic"
         ? this._t("Announcement Hub chooses configured recipients using occupancy and fallback rules.")
         : this._targetMode === "person"
@@ -444,13 +481,22 @@
       const holder = this.$("person-destinations");
       holder.replaceChildren();
       const allowed = new Set(this._availablePersonDestinations());
+      const chosen = PERSON_DESTINATIONS.filter(([value]) => this._personDestinations.has(value));
+      // Preserve and display all selected destinations, even if an assigned
+      // device temporarily becomes unavailable in the Home Assistant registry.
+      this.$("person-destinations-selected").textContent =
+        chosen.map(([, name]) => this._t(name)).join(" · ") || "—";
       for (const [value, name] of PERSON_DESTINATIONS) {
         if (!allowed.has(value)) continue;
         const button = document.createElement("button");
         button.type = "button";
         button.dataset.destination = value;
-        button.textContent = this._t(name);
+        button.title = this._t(name);
+        button.setAttribute("aria-label", this._t(name));
         button.setAttribute("aria-pressed", String(this._personDestinations.has(value)));
+        const symbol = document.createElement("ha-icon");
+        symbol.setAttribute("icon", CHOICE_ICONS["person-destinations"][value]);
+        button.appendChild(symbol);
         holder.appendChild(button);
       }
     }

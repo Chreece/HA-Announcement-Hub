@@ -141,8 +141,15 @@ The visual editor controls the card heading, initial importance, queue
 counter, AI controls and whether the message fields clear after a successful
 send. The compact composer keeps the message, single-line title and six
 icon-based priority choices visible, **with the selected priority name
-displayed beside the Priority label** in the chosen card language. Recipient,
-delivery and advanced sections start collapsed and can be expanded separately. On narrow mobile
+displayed beside the Priority label** in the chosen card language.
+Recipient selection, delivery method, AI wording, person destinations,
+translation, personal greeting and pre-announcement chime use the same
+**icon-only controls**, with the selected value(s) shown beside the
+corresponding section title. Every icon has a localized tooltip and an
+accessible name, and all selected values update immediately. Named
+people, areas and devices continue to display their actual names so
+recipient selection is unambiguous. Recipient, delivery and advanced
+sections start collapsed and can be expanded separately. On narrow mobile
 cards, the title and the left-aligned priority icons use separate rows,
 so they never overlap. The card header truncates long titles gracefully
 and keeps queue and Stop & Clear controls reachable.
