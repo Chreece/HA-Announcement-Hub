@@ -329,6 +329,24 @@
         this._sync();
       });
       this.$("message-title").addEventListener("input", () => this._updateAIHint());
+      // Provider choices expand in the card's document flow, never as a native
+      // browser menu that can escape Lovelace's narrow or mobile columns.
+      for (const id of ["ai-agent", "tts-engine"]) {
+        const picker = this.$(id + "-picker");
+        this.$(id + "-options").addEventListener("click", (event) => {
+          const button = event.target.closest("button[data-provider-value]");
+          if (!button || button.disabled) return;
+          this.$(id).value = button.dataset.providerValue;
+          picker.open = false;
+          this._providerSignatures[id] = "";
+          this._renderProviderSelectors();
+        });
+        picker.addEventListener("toggle", () => {
+          if (!picker.open) return;
+          const peer = id === "ai-agent" ? "tts-engine" : "ai-agent";
+          this.$(peer + "-picker").open = false;
+        });
+      }
       this.$("advanced").addEventListener("toggle", () => {
         if (this.$("advanced").open) void this._refreshProviders(true);
       });
@@ -449,7 +467,9 @@
         .filter(([id]) => id.startsWith(domain + "."))
         .map(([id, state]) => ({
           value: id,
-          label: String(state?.attributes?.friendly_name || id) + " · " + id,
+          label: domain === "tts"
+            ? "TTS – " + String(state?.attributes?.friendly_name || id.split(".")[1])
+            : String(state?.attributes?.friendly_name || id) + " · " + id,
         }));
       const groups = [
         ["ai-agent", "ai_agents", [
@@ -463,8 +483,8 @@
         if (!select) continue;
         const selected = String(select.value || "");
         const choices = new Map();
-        // Backend's registered providers can include agents without entities;
-        // the local HA states bridge short gaps during a service upgrade.
+        // Authenticated backend catalogue is authoritative for integration
+        // names. HA states provide a fallback during backend upgrades.
         for (const candidate of [...(this._providerCatalog[catalogKey] || []), ...discovered]) {
           const value = String(candidate?.value || "");
           if (!value || choices.has(value)) continue;
@@ -479,7 +499,6 @@
           )).map(([value, label]) => ({ value, label, disabled: false })),
         ];
         if (selected && !choices.has(selected)) {
-          // Don't silently change the user's override if a provider disappears.
           options.push({
             value: selected,
             label: this._t("Unavailable provider: {id}", { id: selected }),
@@ -492,18 +511,35 @@
             disabled: true,
           });
         }
-        const signature = JSON.stringify(options);
+        const signature = JSON.stringify(options) + "|" + selected + "|" + this._localeCode;
         if (this._providerSignatures[id] === signature) continue;
         this._providerSignatures[id] = signature;
+
+        // Retain a non-visible select as a stable value store for the sender
+        // and existing dashboards. The visible picker is owned by the card.
         select.replaceChildren();
+        const holder = this.$(id + "-options");
+        holder.replaceChildren();
         for (const choice of options) {
-          const element = document.createElement("option");
-          element.value = choice.value;
-          element.textContent = choice.label;
-          element.disabled = choice.disabled;
-          select.appendChild(element);
+          const nativeOption = document.createElement("option");
+          nativeOption.value = choice.value;
+          nativeOption.textContent = choice.label;
+          nativeOption.disabled = choice.disabled;
+          select.appendChild(nativeOption);
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "provider-option";
+          button.dataset.providerValue = choice.value;
+          button.textContent = choice.label;
+          button.title = choice.label;
+          button.disabled = choice.disabled;
+          button.setAttribute("aria-pressed", String(choice.value === selected));
+          holder.appendChild(button);
         }
         select.value = selected;
+        this.$(id + "-selected").textContent =
+          options.find((choice) => choice.value === selected)?.label || this._t("Hub default");
       }
     }
 
