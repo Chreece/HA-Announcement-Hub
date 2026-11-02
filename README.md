@@ -141,7 +141,7 @@ including older unversioned resources, to avoid stale icon/text UI mixing.
 Each card build also requests its matching versioned HTML, CSS and language
 files. Custom query URLs and YAML-managed resources remain untouched; if
 using a YAML/manual resource, set its URL to
-`/announcement_hub/announcement-hub-card.js?v=0.10.0b33` and refresh the
+`/announcement_hub/announcement-hub-card.js?v=0.10.0b35` and refresh the
 browser after upgrading.
 
 The visual editor controls the card heading, initial importance, queue
@@ -158,13 +158,16 @@ a localized tooltip and an accessible name, and all selected values update
 immediately. Named
 people, areas and devices continue to display their actual names so
 recipient selection is unambiguous. In **Advanced options**, **AI provider**
-and **TTS engine** are now dropdowns listing available Home Assistant
-Conversation agents, AI Task entities, and configured TTS engines. Choose
+and **TTS engine** use compact, scrollable menus that open **inside
+the card** (including narrow mobile layouts) instead of the browser's
+external native dropdown. They list available Home Assistant Conversation
+agents, AI Task entities, and configured TTS engines; TTS choices show only
+`Integration – TTS entity name` without long language lists. Choose
 **Hub default** to inherit the integration's configured provider; selecting
 an explicit provider sends its exact ID for that announcement. Providers
 registered only as Conversation agents (without an entity) are included.
 If a provider becomes unavailable, the previously chosen value stays visible
-until you change it. The dropdowns refresh when Advanced options opens.
+until you change it. The menus refresh when Advanced options opens.
 Recipient, delivery and advanced sections start collapsed and can be
 expanded separately. On narrow mobile
 cards, the title and the left-aligned priority icons use separate rows,
@@ -584,12 +587,15 @@ data:
   person_translate: true
 ```
 
-The action and Lovelace card display named choices (Room, Mobile, Watch,
-Tablet, Other), **not entity names**. The entity IDs are mapped in setup.
-The card offers only destinations assigned to all selected people and an
-optional per-send translation preference (Person setting, Translate,
-Original language). An unassigned or disabled output is rejected, not
-substituted with another person's device or an entire integration.
+The existing action aliases `room`, `mobile`, `watch`, `tablet` and `other`
+remain supported for automations. The **Lovelace People card** now offers
+**Room**, **Integrations**, and **Devices**. The two lists are dynamically
+restricted to enabled notify/media-player endpoints explicitly assigned
+in each selected person's Hub profile; only integration names and owned
+device names are displayed, never an unrestricted whole-integration route.
+The card also offers the existing per-send translation preference (Person
+setting, Translate, Original language). Missing or disabled owned
+endpoints are not replaced with someone else's devices.
 
 **Room** (default when `person_destination` is omitted) resolves the
 person's current room using Bermuda/ESPresense or another configured tracker,
@@ -600,6 +606,17 @@ outputs. **Mobile, Watch, Tablet and Other** use only the outputs assigned
 to that person and **do not require home status or room tracking**.
 
 You can select several destination names and several persons together.
+For card selections, a person-specific integration resolves only to **that
+person's assigned endpoints** of that integration; selecting an owned device
+resolves only to assigned endpoints on that exact HA device. With multiple
+persons, a selected integration applies independently to each eligible
+person and a device applies only to its matching person; unrelated devices
+are never included. Programmatic actions can use `person_integration`
+(a list of integration domains) and `person_device` (a list of Home
+Assistant device registry IDs) alongside `target_person`. Set
+`person_destination: []` to exclude Room, or include `room` to add
+location-based delivery. The service rejects unowned or stale targets
+before queueing any announcement.
 If selected people share a room, the Room leg sends **one** group announcement
 using the configured group language, voice and translation preference.
 Each person's Mobile/Watch/Tablet/Other leg uses their **own** language,
@@ -628,7 +645,9 @@ be tested on real hardware.
 **Safety:** `target_person` cannot be combined with the ordinary
 `area`, `integration`, `device`, or `entity` selectors. A requested
 person destination only uses its assigned outputs, never everyone else's
-Mobile App devices. For explicit device targeting without a person, use
+Mobile App devices. The scoped `person_integration` and `person_device`
+selectors are separate from the ordinary `integration` and `device`
+fields. For explicit device targeting without a person, use
 the existing manual recipient controls.
 
 

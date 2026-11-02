@@ -15,8 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 COMPONENT = ROOT / "custom_components" / "announcement_hub"
 LOCALE_FILE = COMPONENT / "frontend" / "announcement-hub-locales.json"
 CARD_JS = COMPONENT / "frontend" / "announcement-hub-card.js"
-LABELS = ("People", "Room", "Mobile", "Watch", "Tablet", "Other")
-MUST_LOCALIZE = ("People", "Room", "Mobile", "Watch", "Other")
+LABELS = ("People", "Room", "Integrations", "Devices")
+MUST_LOCALIZE = ("People", "Room", "Integrations", "Devices")
 TECHNICAL = (
     "tts.piper", "mobile_app, nfandroidtv",
     "notify.phone, media_player.speaker",
@@ -37,8 +37,8 @@ def test_destination_chips_translated_into_every_dashboard_locale():
             assert messages[english].strip(), (language, english)
         for english in MUST_LOCALIZE:
             assert messages[english] != english, (language, english)
-        assert messages["Room"] != messages["Other"], language
-        assert messages["Mobile"] != messages["Watch"], language
+        assert messages["Room"] != messages["Integrations"], language
+        assert messages["Integrations"] != messages["Devices"], language
 
 
 def test_card_label_changes_cannot_change_api_targets_or_examples():
@@ -54,12 +54,11 @@ def test_card_label_changes_cannot_change_api_targets_or_examples():
 
     source = CARD_JS.read_text(encoding="utf-8")
     assert '["room", "Room"]' in source
-    assert '["mobile", "Mobile"]' in source
-    assert '["watch", "Watch"]' in source
-    assert '["tablet", "Tablet"]' in source
-    assert '["other", "Other"]' in source
+    assert 'const PERSON_DESTINATIONS = [["room", "Room"]]' in source
+    assert 'this._personOwned = { integration: new Set(), device: new Set() }' in source
     assert 'button.title = this._t(name)' in source
     assert 'button.setAttribute("aria-label", this._t(name))' in source
     assert 'this.$("person-destinations-selected").textContent' in source
     assert 'button.appendChild(symbol)' in source
+    assert 'this._drawPersonOwnedTargets()' in source
     assert "payload.person_destination = [...this._personDestinations]" in source

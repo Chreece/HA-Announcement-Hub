@@ -49,7 +49,12 @@ def build_provider_catalog(
         entity_id = str(choice.get("value", "") or "")
         if not entity_id.startswith("tts."):
             continue
-        speech.setdefault(entity_id, str(choice.get("label") or entity_id))
+        # TTS entity options may include a long list of languages. The card
+        # needs only "Integration – TTS entity name" to remain compact.
+        raw_label = str(choice.get("label") or entity_id)
+        parts = raw_label.split(" · ")
+        short_label = " – ".join(parts[:2]) if len(parts) > 1 else "TTS – " + raw_label
+        speech.setdefault(entity_id, short_label)
 
     def sorted_choices(values: Mapping[str, str]) -> list[dict[str, str]]:
         return [

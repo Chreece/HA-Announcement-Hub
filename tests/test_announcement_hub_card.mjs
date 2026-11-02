@@ -63,6 +63,17 @@ function harness() {
     appendChild(node) { this.nodes.push(node); },
   });
   fields.levels = group();
+  fields["person-owned-targets"] = group();
+  fields["person-owned-chosen"] = group();
+  for (const kind of ["integration", "device"]) {
+    fields["person-" + kind + "-search"] = { value: "" };
+    fields["person-" + kind + "-options"] = group();
+  }
+  for (const id of ["ai-agent", "tts-engine"]) {
+    fields[id + "-options"] = group();
+    fields[id + "-selected"] = { textContent: "" };
+    fields[id + "-picker"] = { open: false };
+  }
   for (const id of ["target-mode", "channels", "ai-choices",
     "person-destinations", "person-translation", "person-greeting", "pre-chime"]) {
     fields[id] = group();
@@ -499,34 +510,46 @@ test("every single-choice icon group shows the correct Greek label when selected
   }
 });
 
-test("person destination multi-select shows all chosen names and preserves available output restrictions", () => {
+test("person destinations show Room plus integration and device choices owned by the chosen profile", () => {
   const { card, fields } = harness();
-  card._translations = {
-    Room: "Δωμάτιο", Mobile: "Κινητό", Watch: "Ρολόι",
-    Tablet: "Τάμπλετ", Other: "Άλλο",
-  };
+  card._translations = { Room: "Δωμάτιο", Integration: "Ενσωμάτωση", Device: "Συσκευή" };
   card._selected.person.add("person.test");
-  card._personDestinations = new Set(["room", "mobile"]);
-  card._hass = { states: {
-    "sensor.destinations": {
-      entity_id: "sensor.destinations",
-      attributes: { person_destinations: { "person.test": ["room", "mobile", "watch"] } },
+  card._personOwnedLoaded = true;
+  card._personOwnedCatalog = {
+    "person.test": {
+      integrations: [{ value: "mobile_app", label: "Mobile App" }],
+      devices: [{ value: "device123", label: "Pixel 9" }],
     },
-  }};
+    "person.other": {
+      integrations: [{ value: "nfandroidtv", label: "NF Android TV" }],
+      devices: [{ value: "other999", label: "Another person's TV" }],
+    },
+  };
   card._drawPersonDestinations();
-  assert.equal(fields["person-destinations-selected"].textContent, "Δωμάτιο · Κινητό");
-  assert.deepEqual(fields["person-destinations"].nodes.map(button => button.dataset.destination),
-    ["room", "mobile", "watch"]);
-  assert.equal(fields["person-destinations"].nodes[1].attributes["aria-pressed"], "true");
-  assert.equal(fields["person-destinations"].nodes[1].title, "Κινητό");
-  assert.match(fields["person-destinations"].nodes[1].children[0].attributes.icon, /^mdi:/);
+  assert.equal(fields["person-destinations-selected"].textContent, "Δωμάτιο");
+  assert.deepEqual(fields["person-destinations"].nodes.map(node => node.dataset.destination), ["room"]);
+  card._drawPersonOwnedTargets();
+  assert.deepEqual(fields["person-integration-options"].nodes.map(node => node.dataset.value), ["mobile_app"]);
+  assert.deepEqual(fields["person-device-options"].nodes.map(node => node.dataset.value), ["device123"]);
+  assert.ok(!fields["person-device-options"].nodes.some(node => node.dataset.value === "other999"));
   card._personDestinations.delete("room");
-  card._personDestinations.delete("mobile");
-  card._drawPersonDestinations();
-  assert.equal(fields["person-destinations-selected"].textContent, "—");
-  assert.equal(card._personDestinations.size, 0);
+  card._personOwned.integration.add("mobile_app");
+  card._personOwned.device.add("device123");
+  fields.message.value = "Welcome";
+  card._targetMode = "person";
+  assert.deepEqual(card._buildPayload(), {
+    level: "info", occupied_only: true, text: "Welcome",
+    target_person: ["person.test"], person_destination: [],
+    person_integration: ["mobile_app"], person_device: ["device123"],
+  });
+  // A person without an assigned device must not retain the old selection.
+  card._selected.person.clear();
+  card._selected.person.add("person.other");
+  card._drawPersonOwnedTargets();
+  assert.equal(card._personOwned.integration.size, 0);
+  assert.equal(card._personOwned.device.size, 0);
 });
-
+  
 test("all seven icon groups preserve the existing announcement payload semantics", () => {
   const { card, fields } = harness();
   fields.message.value = "The kitchen window is open";
@@ -589,8 +612,8 @@ test("bundled frontend assets and exact Lovelace module URL have versioned cache
   const js = readFileSync(CARD_PATH, "utf8");
   const manifest = JSON.parse(readFileSync(new URL(
     "../custom_components/announcement_hub/manifest.json", import.meta.url), "utf8"));
-  assert.equal(manifest.version, "0.10.0b34");
-  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b34"/);
+  assert.equal(manifest.version, "0.10.0b35");
+  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b35"/);
   assert.match(js, /const assetUrl = \(name\) => ROOT \+ name \+ "\?v=" /);
   assert.match(js, /fetch\(assetUrl\("announcement-hub-locales.json"\)/);
   assert.match(js, /fetch\(assetUrl\(name\)/);
@@ -598,15 +621,18 @@ test("bundled frontend assets and exact Lovelace module URL have versioned cache
 });
 
 
-test("AI and TTS overrides are native dropdowns inside advanced options", () => {
+test("AI and TTS pickers expand and scroll inside the card rather than native popup menus", () => {
   const html = readFileSync(HTML_PATH, "utf8");
   const css = readFileSync(CSS_PATH, "utf8");
-  assert.match(html, /<select id="ai-agent" aria-label="AI provider">/);
-  assert.match(html, /<select id="tts-engine" aria-label="TTS engine">/);
-  assert.doesNotMatch(html, /<input id="ai-agent"/);
-  assert.doesNotMatch(html, /<input id="tts-engine"/);
+  for (const id of ["ai-agent", "tts-engine"]) {
+    assert.match(html, new RegExp('id="' + id + '-picker" class="provider-picker"'));
+    assert.match(html, new RegExp('id="' + id + '-options" class="provider-options"'));
+    assert.match(html, new RegExp('id="' + id + '" class="provider-native"'));
+  }
   assert.match(html, /<details class="disclosure" id="advanced">/);
-  assert.match(css, /#advanced select\{/);
+  assert.match(css, /#advanced select\.provider-native\{display:none!important\}/);
+  assert.match(css, /#advanced \.provider-options\{[\s\S]*?max-height:168px/);
+  assert.match(css, /#advanced \.provider-picker>summary output\{/);
 });
 
 test("local HA entities populate provider dropdowns with stable actual IDs", () => {
@@ -625,9 +651,12 @@ test("local HA entities populate provider dropdowns with stable actual IDs", () 
   assert.deepEqual(fields["tts-engine"].options.map(x => x.value), ["", "tts.piper"]);
   assert.equal(fields["ai-agent"].options[0].textContent, "Προεπιλογή Hub");
   assert.equal(fields["ai-agent"].options[2].textContent, "Assist · conversation.assist");
-  assert.equal(fields["tts-engine"].options[1].textContent, "Piper · tts.piper");
+  assert.equal(fields["tts-engine"].options[1].textContent, "TTS – Piper");
+  assert.equal(fields["tts-engine-selected"].textContent, "Προεπιλογή Hub");
+  assert.equal(fields["tts-engine-options"].nodes.length, 2);
   card._renderProviderSelectors();
   assert.equal(fields["ai-agent"].options.length, 4);
+  assert.equal(fields["ai-agent-options"].nodes.length, 4);
 });
 
 test("authenticated provider service includes agent IDs without HA entities", async () => {
@@ -802,7 +831,7 @@ test("Greek, German and regional languages use correct card translations", async
   const path = new URL("../custom_components/announcement_hub/frontend/announcement-hub-locales.json", import.meta.url);
   const payload = JSON.parse(readFileSync(path, "utf8"));
   globalThis.fetch = async (url) => {
-    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b34");
+    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b35");
     return { ok: true, json: async () => payload };
   };
   const card = new Card();
@@ -832,20 +861,24 @@ test("Greek, German and regional languages use correct card translations", async
 });
 
 
-test("person mode selects named destinations, not device entity IDs", () => {
+test("person mode selects scoped integration/device targets, not global recipients", () => {
   const { card, fields } = harness();
   fields.message.value = "Η πόρτα είναι ανοιχτή.";
   card._targetMode = "person";
   card._selected.person.add("person.alex");
   card._selected.person.add("person.maria");
-  card._personDestinations = new Set(["mobile", "watch"]);
+  card._personDestinations = new Set(["room"]);
+  card._personOwned.integration.add("mobile_app");
+  card._personOwned.device.add("device123");
   assert.deepEqual(card._buildPayload(), {
     level: "info", occupied_only: true,
     target_person: ["person.alex", "person.maria"],
-    person_destination: ["mobile", "watch"],
+    person_destination: ["room"],
+    person_integration: ["mobile_app"], person_device: ["device123"],
     text: "Η πόρτα είναι ανοιχτή.",
   });
-  assert.ok(!Object.hasOwn(card._buildPayload(), "entity"));
+  assert.ok(!Object.hasOwn(card._buildPayload(), "integration"));
+  assert.ok(!Object.hasOwn(card._buildPayload(), "device"));
   assert.ok(!Object.hasOwn(card._buildPayload(), "manual_targets"));
 });
 
@@ -859,20 +892,23 @@ test("person mode rejects unselected people or empty destinations", () => {
   assert.throws(() => card._buildPayload(), /Choose at least one person destination/);
 });
 
-test("only room and destinations assigned for all selected people appear", () => {
+test("person room target remains available, and owned device choices are profile filtered", () => {
   const { card } = harness();
   card._selected.person.add("person.alex");
   card._selected.person.add("person.maria");
-  card._hass = { states: {
-    "sensor.announcement_hub_queue": {
-      entity_id: "sensor.announcement_hub_queue",
-      attributes: { person_destinations: {
-        "person.alex": ["room", "mobile", "watch"],
-        "person.maria": ["room", "mobile"],
-      }},
+  card._personOwnedCatalog = {
+    "person.alex": {
+      integrations: [{ value: "mobile_app", label: "Mobile App" }],
+      devices: [{ value: "alex123", label: "Alex phone" }],
     },
-  }};
-  assert.deepEqual(card._availablePersonDestinations(), ["room", "mobile"]);
+    "person.maria": {
+      integrations: [{ value: "mobile_app", label: "Mobile App" }],
+      devices: [{ value: "maria456", label: "Maria phone" }],
+    },
+  };
+  assert.deepEqual(card._availablePersonDestinations(), ["room"]);
+  assert.deepEqual(card._personOwnedOptions("integration").map(x=>x.value), ["mobile_app"]);
+  assert.deepEqual(card._personOwnedOptions("device").map(x=>x.value), ["alex123", "maria456"]);
 });
 
 test("person translation override is optional and maps to action boolean", () => {
@@ -903,3 +939,46 @@ test("person greeting and room chime are explicit tri-state overrides", () => {
   assert.equal(changed.pre_announce_sound, false);
   assert.equal(changed.tts_engine, "tts.piper");
 });
+
+test("authenticated person inventory populates only chosen person's owned targets", async () => {
+  const { card, fields } = harness();
+  card._selected.person.add("person.alex");
+  const calls = [];
+  card._hass = { callService: async (...args) => {
+    calls.push(args);
+    return { context: {}, response: {
+      people: {
+        "person.alex": {
+          integrations: [{ value: "mobile_app", label: "Mobile App" }],
+          devices: [{ value: "owned", label: "Alex's phone" }],
+        },
+        "person.bob": {
+          integrations: [{ value: "nfandroidtv", label: "NF Android TV" }],
+          devices: [{ value: "unowned", label: "Bob's TV" }],
+        },
+      },
+    } };
+  }};
+  await card._refreshPersonOwned();
+  assert.deepEqual(calls[0], [
+    "announcement_hub", "list_person_targets", {}, undefined, false, true,
+  ]);
+  assert.deepEqual(fields["person-device-options"].nodes.map(x => x.dataset.value), ["owned"]);
+  assert.deepEqual(fields["person-integration-options"].nodes.map(x => x.dataset.value), ["mobile_app"]);
+  assert.equal(card._personOwnedLoaded, true);
+});
+
+test("unavailable person inventory never turns into HA-wide device selection", async () => {
+  const { card, fields } = harness();
+  card._targetMode = "person";
+  card._selected.person.add("person.alex");
+  fields.message.value = "Test";
+  card._hass = { callService: async () => { throw new Error("unavailable"); } };
+  await card._refreshPersonOwned();
+  assert.equal(card._personOwnedLoaded, false);
+  assert.equal(fields["person-integration-options"].nodes.length, 0);
+  assert.equal(fields["person-device-options"].nodes.length, 0);
+  card._personDestinations.clear();
+  assert.throws(() => card._buildPayload(), /Choose at least one person destination/);
+});
+

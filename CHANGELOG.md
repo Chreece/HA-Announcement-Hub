@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.10.0b35 - 2026-11-02
+
+**Beta — person-owned device/integration delivery and in-card AI/TTS menus.**
+
+- In the Lovelace **People** recipient mode, keep Room and replace the
+  device-category chips with two searchable lists: **Integrations** and
+  **Devices**, populated only from enabled outputs mapped to the selected
+  person's Hub profile. Multi-person integration delivery remains scoped to
+  each person's own assigned endpoints.
+- Add strictly bounded `person_integration` and `person_device` service
+  filters, plus read-only `announcement_hub.list_person_targets` discovery.
+  Do not expand an integration into everyone else's outputs; reject unknown
+  and globally unowned selections before queueing. Preserve the legacy
+  Mobile/Watch/Tablet/Other aliases for existing automations.
+- Replace OS-native AI/TTS selectors with keyboard-accessible, scrollable,
+  in-card menus that fit Lovelace mobile columns and share card styling.
+  Keep the actual provider IDs and Hub-default behavior unchanged.
+- Abbreviate TTS choices to **integration – TTS entity name**, without long
+  language lists, while preserving backend AI-provider discovery and
+  disconnected provider selections.
+- Update versioned assets, documentation and person-targeting/card tests.
+
+
 ## 0.10.0b34 - 2026-11-02
 
 **Beta — discover actual AI and TTS providers in card dropdowns.**
