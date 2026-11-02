@@ -272,6 +272,9 @@ ha-card { container-name: announcement-hub-card; container-type: inline-size; }
   .icon-choices button{width:32px;height:32px;min-width:32px;min-height:32px;flex-basis:32px}
 }
 @media(max-width:550px){
+  /* Keep title and priority controls on separate rows in older WebViews. */
+  .compose-details{grid-template-columns:minmax(0,1fr);row-gap:8px}
+  .priority-pills{flex-wrap:wrap;overflow:visible;justify-content:flex-start;gap:4px}
   .icon-choices button,.icon-choices.spacious button{
     width:32px;height:32px;min-width:32px;min-height:32px;
     flex:0 0 32px;padding:0
