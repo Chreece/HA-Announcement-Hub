@@ -108,3 +108,97 @@ textarea::placeholder,input::placeholder{color:var(--secondary-text-color,#9ba9b
 button:focus-visible,summary:focus-visible{outline:2px solid var(--primary-color,#6f82fd);outline-offset:2px}
 @media(max-width:550px){.top{padding:19px 16px 17px;flex-wrap:wrap}.top-actions{justify-content:flex-start;width:100%}.stop-clear-confirm{margin:12px 16px 0}.identity-icon{width:44px;height:44px;flex-basis:44px;border-radius:13px}h2{font-size:20px}.intro{font-size:11px}.queue-word{display:none}.queue-pill{padding:6px}.sections{padding:2px 16px 0}.footer{padding:18px 16px}.columns{grid-template-columns:1fr;gap:11px;margin-top:10px}.section{padding:16px 0}.section-top{margin-bottom:12px}.micro{display:none}.choices button{padding:9px 10px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+/* Compact single-row header and always-visible composer essentials. */
+.top{padding:12px 14px;align-items:center;gap:8px;flex-wrap:nowrap}
+.identity{gap:9px;flex:1;min-width:0}
+.identity>div:last-child{min-width:0}
+.identity-icon{width:34px;height:34px;flex-basis:34px;border-radius:10px;box-shadow:none}
+.identity-icon ha-icon{--mdc-icon-size:19px}
+h2{font-size:16px;letter-spacing:-.25px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.top-actions{flex:none;gap:5px;flex-wrap:nowrap}
+.queue-pill{margin:0;cursor:pointer;padding:6px 8px;border-radius:9px;font-size:11px}
+.queue-pill[aria-expanded=true]{border-color:var(--primary-color,#6885ef);color:var(--primary-text-color)}
+.stop-clear-button{padding:6px 8px;border-radius:9px}
+.stop-clear-button span{display:none}
+.sections{padding:0 14px}
+.section{padding:12px 0}
+.section:first-child{padding-top:12px;padding-bottom:10px}
+.section-top{margin-bottom:8px}
+.section-name{gap:7px}
+.section-name .index{display:none}
+h3{font-size:13px}
+.micro{display:none}
+#message{min-height:62px;max-height:210px;font-size:13px}
+textarea{padding:9px 11px}
+.compose-details{display:grid;grid-template-columns:minmax(100px,1fr) max-content;gap:10px;margin-top:9px;align-items:end}
+.compose-details .field{gap:4px}
+.compose-details input{height:36px;font-size:12px;padding:7px 9px}
+.priority-pills{display:flex;flex-wrap:nowrap;min-height:36px;gap:3px;max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.priority-pills button{width:30px;height:36px;display:grid;place-items:center;flex:0 0 30px;padding:0;border-radius:9px}
+.priority-pills ha-icon{--mdc-icon-size:19px}
+.priority-pills button[data-value=success][aria-pressed=true]{color:#43bf91}
+.priority-pills button[data-value=warning][aria-pressed=true]{color:#f2bb55}
+.priority-pills button[data-value=error][aria-pressed=true],.priority-pills button[data-value=critical][aria-pressed=true]{color:var(--error-color,#f36b7d)}
+.disclosure{margin-top:9px}
+.disclosure summary{min-height:36px}
+.disclosure .columns{margin-top:8px}
+
+/* Other composer sections are collapsed by default. */
+.folded-section{border-bottom:1px solid var(--divider-color,rgba(136,154,183,.15));padding:0!important}
+.folded-heading{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;min-height:43px;font-size:12px;font-weight:700}
+.folded-heading::-webkit-details-marker{display:none}
+.folded-heading>ha-icon{--mdc-icon-size:17px;color:#8d9cec}
+.folded-heading>span{white-space:nowrap}
+.folded-heading>small{margin-left:auto;font-size:10px;font-weight:400;color:var(--secondary-text-color,#9bacc0);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.folded-heading .fold-chevron{margin-left:2px;transition:transform .15s}
+.folded-section[open] .fold-chevron{transform:rotate(180deg)}
+.folded-body{padding:0 0 12px}
+.folded-body .field-caption:first-child{margin-top:5px}
+.footer{padding:11px 14px 14px}
+.summary{margin-bottom:8px;font-size:10px}
+.send-button{padding:11px 12px;border-radius:10px;font-size:13px;box-shadow:none}
+.fineprint{margin-top:7px;font-size:9px}
+.stop-clear-confirm{margin:8px 14px 0;padding:10px}
+
+/* Authenticated, scrollable full queue manager. No message text in Lovelace config. */
+.queue-panel{padding:12px 14px;border-bottom:1px solid var(--divider-color,rgba(140,157,180,.21));background:color-mix(in srgb,var(--secondary-background-color,#7b8ca0) 6%,transparent)}
+.queue-panel-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.queue-panel-top>div:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.queue-panel-top strong{font-size:13px}
+.queue-panel-top span{font-size:10px;color:var(--secondary-text-color,#9bacbf)}
+.queue-panel-actions{display:flex;gap:5px}
+.queue-panel-actions button,.queue-actions button{display:inline-flex;align-items:center;justify-content:center;gap:3px;min-width:30px;min-height:30px;padding:5px 7px;border:1px solid var(--divider-color,rgba(130,151,175,.3));border-radius:8px;background:var(--secondary-background-color,rgba(123,143,164,.10));color:var(--primary-text-color,#e7f0fa);cursor:pointer}
+.queue-panel-actions ha-icon,.queue-actions ha-icon{--mdc-icon-size:17px}
+.queue-panel-actions button:disabled,.queue-actions button:disabled{opacity:.35;cursor:not-allowed}
+.queue-hint{font-size:10px;line-height:1.4;color:var(--secondary-text-color,#9cabbc);margin:5px 0 9px}
+.queue-feedback{margin:6px 0;padding:8px;border:1px solid var(--divider-color);border-radius:7px;color:var(--secondary-text-color);font-size:11px}
+.queue-list{max-height:min(58vh,680px);overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding-right:2px}
+.queue-item{padding:9px 10px;border:1px solid var(--divider-color,rgba(140,157,180,.2));background:var(--ha-card-background,var(--card-background-color,#142236));border-radius:10px;min-width:0}
+.queue-item.active{border-color:color-mix(in srgb,var(--primary-color,#768cf8) 43%,transparent)}
+.queue-item-head{display:flex;align-items:center;gap:7px;min-width:0}
+.queue-item-head ha-icon{--mdc-icon-size:18px;color:var(--primary-color,#8895f7);flex:none}
+.queue-item-title{font-size:11px;font-weight:720;overflow-wrap:anywhere;min-width:0;flex:1}
+.queue-item-meta{font-size:10px;color:var(--secondary-text-color,#99adc0);white-space:nowrap}
+.queue-item-body{margin:7px 0 8px;display:flex;flex-direction:column;gap:5px}
+.queue-item-body>div{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:180px;overflow-y:auto;line-height:1.45}
+.queue-item-body>div>small{display:block;font-size:9px;color:var(--secondary-text-color,#9aabbc);font-weight:700}
+.queue-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap}
+.queue-actions .remove{color:var(--error-color,#ef8191)}
+.queue-actions .confirm-remove{background:var(--error-color,#bd4159);color:#fff;border-color:transparent}
+.queue-empty{padding:17px 8px;text-align:center;font-size:12px;color:var(--secondary-text-color,#a3b1c3)}
+@media(min-width:620px){.stop-clear-button span{display:inline}}
+@media(max-width:550px){
+  .top{padding:10px 12px;flex-wrap:nowrap}
+  .identity-icon{width:30px;height:30px;flex-basis:30px;border-radius:9px}
+  h2{font-size:14px}
+  .stop-clear-button{padding:5px}
+  .queue-pill{padding:5px}
+  .sections{padding:0 12px}
+  .footer{padding:10px 12px 12px}
+  .compose-details{grid-template-columns:minmax(92px,1fr) max-content;gap:6px}
+  .priority-pills button{width:28px;flex-basis:28px;height:34px}
+  .priority-pills ha-icon{--mdc-icon-size:18px}
+  .folded-heading>small{display:none}
+  .queue-panel{padding:10px 12px}
+  .stop-clear-confirm{margin:8px 12px 0}
+}

@@ -11,6 +11,14 @@
     ["info", "Info"], ["success", "Success"], ["warning", "Warning"],
     ["error", "Error"], ["critical", "Critical"], ["debug", "Debug"],
   ];
+  const LEVEL_ICONS = {
+    info: "mdi:information-outline",
+    success: "mdi:check-circle-outline",
+    warning: "mdi:alert-outline",
+    error: "mdi:alert-circle-outline",
+    critical: "mdi:alert-octagon-outline",
+    debug: "mdi:bug-outline",
+  };
   const CHANNELS = [
     ["auto", "Automatic"], ["notification", "Written"], ["tts", "Speech"],
     ["all", "Both"], ["snapcast", "Snapcast"], ["companion_tts", "Phone speech"],
@@ -122,6 +130,15 @@
       this._sending = false;
       this._stopping = false;
       this._stopConfirming = false;
+      this._queueOpen = false;
+      this._queueLoading = false;
+      this._queueBusy = false;
+      this._queueJobs = [];
+      this._queueActive = [];
+      this._queueRemoveId = null;
+      this._queueError = "";
+      this._queueStatus = "";
+      this._queueObservedCount = null;
       this._confirming = false;
       this._localeCode = null;
       this._localeRendered = false;
@@ -141,6 +158,7 @@
         this._localeRendered = true;
         this._sync();
         for (const kind of [...KINDS, "person"]) this._drawOptions(kind);
+        if (this._queueOpen) this._renderQueue();
       }
     }
     setConfig(config) {
@@ -161,9 +179,9 @@
       }
     }
     connectedCallback() { void this._mount(); }
-    getCardSize() { return 8; }
+    getCardSize() { return 4; }
     getLayoutOptions() {
-      return { grid_columns: 6, grid_rows: 8, grid_min_columns: 3, grid_min_rows: 5 };
+      return { grid_columns: 6, grid_rows: 5, grid_min_columns: 3, grid_min_rows: 3 };
     }
     $(name) { return this.shadowRoot.getElementById(name); }
 
@@ -269,6 +287,13 @@
       });
       this.$("confirm-stop-clear").addEventListener("click", () => void this._stopAndClear());
       this.$("cancel-stop-clear").addEventListener("click", () => this._closeStopConfirmation());
+      this.$("queue-pill").addEventListener("click", () => this._toggleQueue());
+      this.$("queue-close").addEventListener("click", () => this._toggleQueue(false));
+      this.$("queue-refresh").addEventListener("click", () => void this._fetchQueue());
+      this.$("queue-list").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-queue-action]");
+        if (button) void this._queueAction(button.dataset.queueAction, button.dataset.queueId);
+      });
       this.$("occupied-only").addEventListener("change", () => this._updateSummary());
     }
 
@@ -285,12 +310,30 @@
       }
     }
 
+    _renderPriority() {
+      const target = this.$("levels");
+      target.replaceChildren();
+      for (const [level, label] of LEVELS) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.value = level;
+        button.title = this._t(label);
+        button.setAttribute("aria-label", this._t(label));
+        button.setAttribute("aria-pressed", String(level === this._level));
+        const symbol = document.createElement("ha-icon");
+        symbol.setAttribute("icon", LEVEL_ICONS[level]);
+        button.appendChild(symbol);
+        target.appendChild(button);
+      }
+    }
+
     _sync() {
       if (!this._mounted) return;
       this.$("card-heading").textContent = this._config.title || this._t("Announcement Hub");
       this.$("queue-pill").hidden = this._config.show_queue === false;
+      if (this._config.show_queue === false && this._queueOpen) this._toggleQueue(false);
       this.$("ai-block").hidden = this._config.show_ai === false;
-      this._renderButtons("levels", LEVELS, this._level);
+      this._renderPriority();
       this._renderButtons("channels", CHANNELS, this._channel);
       this._renderButtons("ai-choices", AI_OPTIONS, this._ai);
       this._renderButtons("person-translation", PERSON_TRANSLATION, this._personTranslation);
@@ -528,13 +571,226 @@
       this.$("summary").textContent = destination + " · " + (this._channel === "auto" ? this._t("Hub channels") : labelForChannel);
     }
 
+    _toggleQueue(force) {
+      if (!this._mounted) return;
+      this._queueOpen = typeof force === "boolean" ? force : !this._queueOpen;
+      this.$("queue-panel").hidden = !this._queueOpen;
+      this.$("queue-pill").setAttribute("aria-expanded", String(this._queueOpen));
+      if (this._queueOpen) {
+        void this._fetchQueue();
+      } else {
+        // Do not retain private message text in the hidden DOM or card state.
+        this._queueJobs = [];
+        this._queueActive = [];
+        this._queueRemoveId = null;
+        this.$("queue-list").replaceChildren();
+      }
+    }
+
+    async _fetchQueue() {
+      if (!this._queueOpen || this._queueLoading) return;
+      if (!this._hass?.callService) {
+        this._queueError = this._t("Home Assistant is not connected.");
+        this._renderQueue();
+        return;
+      }
+      this._queueLoading = true;
+      this._queueError = "";
+      this._renderQueue();
+      try {
+        // Full message bodies are returned ONLY to this authenticated client.
+        const reply = await this._hass.callService(
+          "announcement_hub", "list_queue", {}, undefined, false, true
+        );
+        if (!Array.isArray(reply?.jobs) || !Array.isArray(reply?.active)) {
+          throw new Error(this._t("Invalid queue response."));
+        }
+        if (!this._queueOpen) return;
+        this._queueJobs = reply.jobs;
+        this._queueActive = reply.active;
+        this._queueStatus = "";
+        if (this._queueRemoveId && ![...this._queueJobs, ...this._queueActive].some(
+          (job) => job.job_id === this._queueRemoveId
+        )) this._queueRemoveId = null;
+        this.$("queue-total").textContent = this._t("{count} waiting · {active} active", {
+          count: this._queueJobs.length, active: this._queueActive.length,
+        });
+      } catch (error) {
+        this._queueError = this._t("Could not load queue: {error}", {
+          error: error?.message || this._t("Unknown error"),
+        });
+      } finally {
+        this._queueLoading = false;
+        if (this._queueOpen) this._renderQueue();
+      }
+    }
+
+    _renderQueue() {
+      if (!this._mounted || !this._queueOpen) return;
+      const holder = this.$("queue-list");
+      const feedback = this.$("queue-feedback");
+      feedback.textContent = this._queueError || this._queueStatus || (
+        this._queueLoading ? this._t("Loading queue…") : ""
+      );
+      feedback.hidden = !feedback.textContent;
+      this.$("queue-refresh").disabled = this._queueLoading || this._queueBusy;
+      holder.replaceChildren();
+
+      const jobs = [...this._queueActive, ...this._queueJobs];
+      if (!jobs.length) {
+        const empty = document.createElement("div");
+        empty.className = "queue-empty";
+        empty.textContent = this._queueLoading ? this._t("Loading queue…")
+          : this._queueError ? this._t("Queue unavailable.")
+          : this._t("No announcements waiting.");
+        holder.appendChild(empty);
+        return;
+      }
+
+      const actionButton = (name, icon, label, id, disabled = false) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.queueAction = name;
+        button.dataset.queueId = id;
+        button.setAttribute("aria-label", this._t(label));
+        button.title = this._t(label);
+        button.disabled = this._queueBusy || disabled;
+        button.className = name;
+        if (icon) {
+          const symbol = document.createElement("ha-icon");
+          symbol.setAttribute("icon", icon);
+          button.appendChild(symbol);
+        }
+        if (!icon) button.textContent = this._t(label);
+        return button;
+      };
+
+      for (const item of jobs) {
+        const active = Boolean(item.active);
+        const index = active ? -1 : this._queueJobs.findIndex((job) => job.job_id === item.job_id);
+        const row = document.createElement("article");
+        row.className = "queue-item" + (active ? " active" : "");
+        row.setAttribute("role", "listitem");
+        const heading = document.createElement("div");
+        heading.className = "queue-item-head";
+        const icon = document.createElement("ha-icon");
+        icon.setAttribute("icon", LEVEL_ICONS[item.level] || LEVEL_ICONS.info);
+        const title = document.createElement("strong");
+        title.className = "queue-item-title";
+        title.textContent = item.title || this._t("Untitled announcement");
+        const status = document.createElement("span");
+        status.className = "queue-item-meta";
+        status.textContent = active ? this._t("Active") :
+          this._t("#{position} · Waiting", { position: index + 1 });
+        heading.append(icon, title, status);
+        row.appendChild(heading);
+
+        const body = document.createElement("div");
+        body.className = "queue-item-body";
+        const generatePrompt = item.ai_pending && item.ai_mode === "generate";
+        const spoken = String(item.text_tts || "");
+        const visual = String(item.text_notify || "");
+        const contents = [];
+        if (visual) contents.push([generatePrompt ? "AI prompt" : "Written", visual]);
+        if (spoken && spoken !== visual) contents.push([generatePrompt ? "AI prompt" : "Speech", spoken]);
+        if (!contents.length) contents.push(["Message", this._t("No message text available.")]);
+        for (const [channel, content] of contents) {
+          const text = document.createElement("div");
+          const label = document.createElement("small");
+          label.textContent = this._t(channel);
+          text.appendChild(label);
+          const value = document.createElement("span");
+          value.textContent = content;
+          text.appendChild(value);
+          body.appendChild(text);
+        }
+        row.appendChild(body);
+
+        const controls = document.createElement("div");
+        controls.className = "queue-actions";
+        if (!active) {
+          controls.appendChild(actionButton("up", "mdi:chevron-up", "Move up", item.job_id, index <= 0));
+          controls.appendChild(actionButton("down", "mdi:chevron-down", "Move down", item.job_id, index >= this._queueJobs.length - 1));
+        }
+        if (this._queueRemoveId === item.job_id) {
+          controls.appendChild(actionButton("confirm-remove", "", active ? "Confirm stop" : "Confirm remove", item.job_id));
+          controls.appendChild(actionButton("keep", "", "Keep", item.job_id));
+        } else {
+          controls.appendChild(actionButton("remove", "mdi:trash-can-outline", active ? "Stop active announcement" : "Remove queued announcement", item.job_id));
+        }
+        row.appendChild(controls);
+        holder.appendChild(row);
+      }
+    }
+
+    async _queueAction(action, id) {
+      if (!id || this._queueBusy || this._queueLoading || !this._hass?.callService) return;
+      if (action === "keep") {
+        this._queueRemoveId = null;
+        this._renderQueue();
+        return;
+      }
+      if (action === "remove") {
+        this._queueRemoveId = id;
+        this._renderQueue();
+        return;
+      }
+      const index = this._queueJobs.findIndex((job) => job.job_id === id);
+      if (action === "confirm-remove" && this._queueRemoveId !== id) return;
+      if (!["up", "down", "confirm-remove"].includes(action)) return;
+      if (action !== "confirm-remove" && index < 0) return;
+      const neighbor = action === "up" ? this._queueJobs[index - 1]
+        : action === "down" ? this._queueJobs[index + 1] : null;
+      if (action !== "confirm-remove" && !neighbor) return;
+
+      this._queueBusy = true;
+      this._queueError = "";
+      this._queueStatus = "";
+      this._renderQueue();
+      try {
+        if (action === "confirm-remove") {
+          const response = await this._hass.callService(
+            "announcement_hub", "cancel", { job_id: id }, undefined, false, true
+          );
+          if (!["cancelled", "cancelling"].includes(response?.status)) {
+            throw new Error(this._t("Remove was not acknowledged."));
+          }
+          this._queueStatus = this._t("Announcement removal requested.");
+        } else {
+          const reply = await this._hass.callService(
+            "announcement_hub", "reorder_queue", {
+              job_id: id, direction: action, neighbor_job_id: neighbor.job_id,
+            }, undefined, false, true
+          );
+          if (reply?.moved !== true) {
+            throw new Error(this._t("Queue was not moved. Refresh and retry."));
+          }
+          this._queueStatus = this._t("Queue order saved.");
+        }
+        this._queueRemoveId = null;
+        await this._fetchQueue();
+      } catch (error) {
+        this._queueError = this._t("Could not change queue: {error}", {
+          error: error?.message || this._t("Unknown error"),
+        });
+      } finally {
+        this._queueBusy = false;
+        this._renderQueue();
+      }
+    }
+
     _updateQueue() {
       if (!this._mounted || this._config.show_queue === false) return;
       const state = this._hass?.states?.["sensor.announcement_hub_queue"];
       const count = state && /^\d+$/.test(String(state.state)) ? String(state.state) : "–";
       this.$("queue-number").textContent = count;
       this.$("queue-pill").title = count === "–" ? this._t("Queue sensor unavailable") : this._t("{count} waiting announcements", { count });
+      if (this._queueOpen && this._queueObservedCount !== count) {
+        this._queueObservedCount = count;
+        void this._fetchQueue();
+      }
     }
+
 
     _closeStopConfirmation() {
       this._stopConfirming = false;
@@ -568,6 +824,7 @@
           this._notice(this._t("Stop request sent. Check the queue before retrying."), true);
         }
         this._updateQueue();
+        if (this._queueOpen) void this._fetchQueue();
       } catch (error) {
         // Never automatically repeat a destructive service call.
         this._notice(this._t("Could not stop or clear: {error}. Check the queue before retrying.", { error: error?.message || this._t("Unknown error") }), false);
@@ -622,6 +879,7 @@
         } else {
           this._notice(this._t("Request submitted. Check Announcement Hub's queue for status."), true);
         }
+        if (this._queueOpen) void this._fetchQueue();
         if (this._config.clear_after_send === true) {
           for (const id of ["message", "text-tts", "text-notify"]) this.$(id).value = "";
         }
