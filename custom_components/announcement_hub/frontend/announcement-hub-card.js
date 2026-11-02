@@ -751,6 +751,21 @@
 
     _drawPersonOwnedTargets() {
       if (!this._mounted) return;
+      const status = this.$("person-owned-status");
+      const hasPerson = !!this._selected.person.size;
+      const hasAssignedOutputs = ["integration", "device"].some(
+        (kind) => this._personOwnedOptions(kind).length
+      );
+      status.textContent = !hasPerson
+        ? this._t("Choose at least one person.")
+        : this._personOwnedLoading
+          ? this._t("Discovering...")
+          : !this._personOwnedLoaded
+            ? this._t("Person device list unavailable. Check Announcement Hub.")
+            : !hasAssignedOutputs
+              ? this._t("No assigned outputs for this person. Configure them in Announcement Hub.")
+              : "";
+      status.hidden = !status.textContent;
       let removedStale = false;
       for (const kind of ["integration", "device"]) {
         const holder = this.$("person-" + kind + "-options");
