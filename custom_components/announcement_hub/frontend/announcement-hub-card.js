@@ -329,7 +329,9 @@
         this._selectPersonOwned(button.dataset.personKind, button.dataset.value);
       });
       this.$("person-owned-targets").addEventListener("focusout", (event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) {
+        // Replacing a checked option node can emit focusout with a null
+        // relatedTarget. Do not close the menu while ticking several options.
+        if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) {
           this._personOwnedOpen = { integration: false, device: false };
           this._drawPersonOwnedTargets();
         }
