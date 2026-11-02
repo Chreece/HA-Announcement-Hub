@@ -63,10 +63,23 @@
           <div class="target-group">
             <div class="target-label"><ha-icon icon="mdi:devices"></ha-icon><div class="selection-heading"><div class="choice-caption"><strong>Person destinations<span class="title-colon" aria-hidden="true">:</span></strong><output id="person-destinations-selected" class="selection-value" aria-live="polite">Room</output></div><small>Assigned in integration setup</small></div></div>
             <div id="person-destinations" class="choices icon-choices" role="group" aria-label="Person destinations"></div>
+            <div id="person-owned-targets">
+              <div class="target-group">
+                <div class="target-label"><ha-icon icon="mdi:puzzle-outline"></ha-icon><div><strong>Integrations</strong><small>Assigned in integration setup</small></div></div>
+                <input id="person-integration-search" class="search" placeholder="Search integrations..." aria-label="Search integrations" autocomplete="off">
+                <div id="person-integration-options" class="options" aria-label="Owned integrations"></div>
+              </div>
+              <div class="target-group">
+                <div class="target-label"><ha-icon icon="mdi:cellphone-link"></ha-icon><div><strong>Devices</strong><small>Assigned in integration setup</small></div></div>
+                <input id="person-device-search" class="search" placeholder="Search devices..." aria-label="Search devices" autocomplete="off">
+                <div id="person-device-options" class="options" aria-label="Owned devices"></div>
+              </div>
+              <div id="person-owned-chosen" class="picked" aria-live="polite"></div>
+            </div>
             <span class="field-caption choice-caption"><span>Translate into person's language<span class="title-colon" aria-hidden="true">:</span></span><output id="person-translation-selected" class="selection-value" aria-live="polite">Person setting</output></span>
             <div id="person-translation" class="choices icon-choices" role="group" aria-label="Person translation"></div>
             <span class="field-caption choice-caption"><span>Personal greeting<span class="title-colon" aria-hidden="true">:</span></span><output id="person-greeting-selected" class="selection-value" aria-live="polite">Person setting</output></span><div id="person-greeting" class="choices icon-choices" role="group" aria-label="Personal greeting"></div>
-            <p class="hint">Room uses location tracking. Mobile, Watch, Tablet and Other target only that person's assigned output devices.</p>
+            <p class="hint">Explicit recipients are additional destinations; Hub never substitutes unrelated devices.</p>
           </div>
         </div>
         <div id="targets" hidden>
@@ -116,8 +129,22 @@
         <details class="disclosure" id="advanced">
           <summary><ha-icon icon="mdi:cog-outline"></ha-icon><strong>Advanced options</strong><small>Presence · agent · tap action</small></summary>
           <div class="columns">
-            <label class="field"><span>AI provider <small>optional</small></span><select id="ai-agent" aria-label="AI provider"><option value="">Hub default</option></select></label>
-            <label class="field"><span>TTS engine <small>optional</small></span><select id="tts-engine" aria-label="TTS engine"><option value="">Hub default</option></select></label>
+            <div class="field provider-field">
+              <span>AI provider <small>optional</small></span>
+              <details id="ai-agent-picker" class="provider-picker">
+                <summary aria-label="AI provider"><output id="ai-agent-selected">Hub default</output><ha-icon icon="mdi:chevron-down"></ha-icon></summary>
+                <div id="ai-agent-options" class="provider-options" role="group" aria-label="AI provider options"></div>
+              </details>
+              <select id="ai-agent" class="provider-native" aria-label="AI provider" tabindex="-1" hidden><option value="">Hub default</option></select>
+            </div>
+            <div class="field provider-field">
+              <span>TTS engine <small>optional</small></span>
+              <details id="tts-engine-picker" class="provider-picker">
+                <summary aria-label="TTS engine"><output id="tts-engine-selected">Hub default</output><ha-icon icon="mdi:chevron-down"></ha-icon></summary>
+                <div id="tts-engine-options" class="provider-options" role="group" aria-label="TTS engine options"></div>
+              </details>
+              <select id="tts-engine" class="provider-native" aria-label="TTS engine" tabindex="-1" hidden><option value="">Hub default</option></select>
+            </div>
             <label class="field"><span>Notification tap destination <small>optional</small></span><input id="click-action" placeholder="/lovelace/cameras"></label>
           </div>
           <label class="checkbox-line"><input type="checkbox" id="occupied-only" checked><span>Try occupied rooms during area fallback</span></label>
