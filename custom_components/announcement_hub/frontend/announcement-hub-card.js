@@ -8,7 +8,7 @@
   const ROOT = "/announcement_hub/";
   // Keep this aligned with the beta manifest. Version each companion asset so
   // an old JS module cannot silently mix with a newer HTML/CSS card.
-  const FRONTEND_VERSION = "0.10.0b36";
+  const FRONTEND_VERSION = "0.10.0b37";
   const assetUrl = (name) => ROOT + name + "?v=" + encodeURIComponent(FRONTEND_VERSION);
   const DOC_URL = "https://github.com/Chreece/HA-Announcement-Hub#dashboard-card";
   const LEVELS = [
@@ -289,6 +289,11 @@
         const mode = event.target.closest("button[data-mode]")?.dataset.mode;
         if (!mode) return;
         this._targetMode = mode;
+        if (mode === "person" && this._selected.person.size) {
+          // Show both sets of owned choices immediately. Clicking an already
+          // visible option must be enough to select it (no focus-first tap).
+          this._personOwnedOpen = { integration: true, device: true };
+        }
         this._confirming = false;
         this.$("critical-confirm").hidden = true;
         this._sync();
@@ -302,6 +307,13 @@
         if (!this._selected[kind]) return;
         if (this._selected[kind].has(value)) this._selected[kind].delete(value);
         else this._selected[kind].add(value);
+        if (kind === "person") {
+          // Person chips are directly selectable on the first click/tap.
+          // Show all owned results now instead of requiring another click
+          // to focus each integration/device search field.
+          const show = this._selected.person.size > 0;
+          this._personOwnedOpen = { integration: show, device: show };
+        }
         this._drawOptions(kind);
         this._drawChosen();
       });
@@ -637,16 +649,28 @@
         .filter(([key]) => key.startsWith("person."))
         .map(([value, state]) => ({
           value, label: state.attributes?.friendly_name || value,
-        }));
-      this._registry.person = persons.sort((a, b) => a.label.localeCompare(b.label));
-      if (this._mounted) this._drawOptions("person");
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+      // Home Assistant reassigns hass on every state update. Replacing all
+      // person buttons on every refresh can detach a pressed button between
+      // pointerdown and click, silently eating the first tap.
+      const previous = this._registry.person;
+      if (previous.length === persons.length &&
+          persons.every((item, i) =>
+            item.value === previous[i].value && item.label === previous[i].label
+          )) return;
+      this._registry.person = persons;
+      if (this._mounted) {
+        this._drawOptions("person");
+        this._drawChosen();
+      }
     }
 
     _showPersonOwnedOptions(kind) {
-      this._personOwnedOpen = {
-        integration: kind === "integration",
-        device: kind === "device",
-      };
+      if (this._personOwnedOpen[kind]) return;
+      // Focusing search never closes the other group's visible choices.
+      // List entries remain directly clickable even without using search.
+      this._personOwnedOpen[kind] = true;
       this._drawPersonOwnedTargets();
     }
 
