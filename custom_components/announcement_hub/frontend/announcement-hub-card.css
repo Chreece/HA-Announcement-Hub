@@ -288,3 +288,32 @@ ha-card { container-name: announcement-hub-card; container-type: inline-size; }
     line-height:1.25;flex:0 1 auto;max-width:48%
   }
 }
+
+
+/* b33 — localized labels use an actual ':' inside the title, plus a
+   measured space before the selected value on every card size and in RTL. */
+.title-colon{display:inline}
+.choice-caption,.priority-caption{column-gap:8px;row-gap:3px}
+.choice-caption>.selection-value,.priority-caption>output{margin-inline-start:0;flex:0 1 auto}
+.folded-heading .selection-value{
+  margin:0;
+  margin-inline-start:2px;
+  flex:0 1 auto;
+  text-align:start;
+  white-space:normal;
+  max-width:min(52%,220px);
+  overflow-wrap:anywhere;
+}
+.folded-heading .fold-chevron{
+  margin-left:auto;
+  margin-inline-start:auto;
+  flex:none;
+}
+@container announcement-hub-card (max-width:430px){
+  .folded-heading .selection-value{
+    margin-inline-start:0;
+    max-width:48%;
+    font-size:11px;
+    line-height:1.25;
+  }
+}

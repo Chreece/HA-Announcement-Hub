@@ -55,11 +55,14 @@ async def async_ensure_card_resource(hass: Any, version: str) -> bool:
                     "change it to module under Settings > Dashboards > Resources"
                 )
                 return False
-            if url == expected_url or "?" not in url:
-                # Do not overwrite an existing manual resource.
+            if url == expected_url:
                 return True
-            if url.startswith(CARD_RESOURCE_PATH + "?v="):
-                # Update only versioned resources that this integration manages.
+            if url == CARD_RESOURCE_PATH or url.startswith(CARD_RESOURCE_PATH + "?v="):
+                # The exact bundled module is ours, even when it was manually
+                # registered without a query string. Keep its resource ID;
+                # change ONLY its version parameter so HACS updates bust
+                # stale frontend module caches. Preserve custom query URLs,
+                # other modules, YAML resources and wrong-resource types.
                 await resources.async_update_item(
                     existing["id"],
                     {"res_type": "module", "url": expected_url},
