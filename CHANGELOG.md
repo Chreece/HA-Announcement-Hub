@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.10.0b37 - 2026-11-02
+
+**Beta — one-click person target selection and a direct integration Settings shortcut.**
+
+- Stop re-rendering person chips for every unrelated Home Assistant state update,
+  so a button remains mounted between pointerdown and click on desktop/mobile.
+  One tap selects or deselects a person; selected people's integration and device
+  options are visible immediately instead of requiring a first focus click.
+- Keep both owned option groups visible when focusing either search field and
+  retain existing multi-select checkboxes, selected chips, Room exclusivity,
+  person ownership validation, and strict routing behavior.
+- Add a compact gear icon in the card header that links directly to this Home
+  Assistant instance's `/config/integrations/integration/announcement_hub`
+  page. Native same-origin navigation works for mouse, touch, keyboard and
+  open-in-new-tab; translate its accessible tooltip in all 19 dashboard locales.
+- Add one-click, live-update and integration-link regression coverage. Bump
+  versioned JS/HTML/CSS/locales so cached cards load together.
+
+
 ## 0.10.0b36 - 2026-11-02
 
 **Beta — searchable person-owned multi-selects, with Room-exclusive routing.**

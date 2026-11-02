@@ -64,6 +64,10 @@ function harness() {
     appendChild(node) { this.nodes.push(node); },
   });
   fields.levels = group();
+  fields["person-search"] = { value: "" };
+  fields["person-options"] = group();
+  fields["person-chosen"] = group();
+  fields["chosen-targets"] = group();
   fields["person-owned-targets"] = group();
   fields["person-owned-status"] = { textContent: "", hidden: false };
   for (const kind of ["integration", "device"]) {
@@ -618,8 +622,8 @@ test("bundled frontend assets and exact Lovelace module URL have versioned cache
   const js = readFileSync(CARD_PATH, "utf8");
   const manifest = JSON.parse(readFileSync(new URL(
     "../custom_components/announcement_hub/manifest.json", import.meta.url), "utf8"));
-  assert.equal(manifest.version, "0.10.0b36");
-  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b36"/);
+  assert.equal(manifest.version, "0.10.0b37");
+  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b37"/);
   assert.match(js, /const assetUrl = \(name\) => ROOT \+ name \+ "\?v=" /);
   assert.match(js, /fetch\(assetUrl\("announcement-hub-locales.json"\)/);
   assert.match(js, /fetch\(assetUrl\(name\)/);
@@ -837,7 +841,7 @@ test("Greek, German and regional languages use correct card translations", async
   const path = new URL("../custom_components/announcement_hub/frontend/announcement-hub-locales.json", import.meta.url);
   const payload = JSON.parse(readFileSync(path, "utf8"));
   globalThis.fetch = async (url) => {
-    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b36");
+    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b37");
     return { ok: true, json: async () => payload };
   };
   const card = new Card();
@@ -1087,3 +1091,63 @@ test("person target UI is explicitly accessible and never overlays the rest of c
   assert.match(css, /max-height:165px/);
   assert.match(html, /id="person-owned-status" aria-live="polite"/);
 });
+
+
+test("person selection takes one click and exposes selectable targets without focus-first tap", () => {
+  const { card, fields } = harness();
+  const personState = { attributes: { friendly_name: "Alex" }, state: "home" };
+  card._hass = { states: {
+    "person.alex": personState,
+    "sensor.other": { state: "34" },
+  } };
+  card._refreshPeople();
+  assert.deepEqual(fields["person-options"].nodes.map(item => item.dataset.value), ["person.alex"]);
+  const stableChip = fields["person-options"].nodes[0];
+  // HA repeatedly delivers state updates unrelated to its person registry.
+  for (let i = 0; i < 25; i++) {
+    card._hass = { states: {
+      "person.alex": { ...personState },
+      "sensor.other": { state: String(i) },
+    } };
+    card._refreshPeople();
+    assert.strictEqual(fields["person-options"].nodes[0], stableChip,
+      "unrelated HA updates must not detach a pressed person button");
+  }
+
+  card._personOwnedLoaded = true;
+  card._personOwnedCatalog = {
+    "person.alex": {
+      integrations: [{ value: "mobile_app", label: "Mobile App" }],
+      devices: [{ value: "pixel", label: "Pixel Phone" }],
+    },
+  };
+  card._toggleTargetSelection("person", "person.alex"); // one delegated click
+  assert.deepEqual([...card._selected.person], ["person.alex"]);
+  assert.equal(fields["person-options"].nodes[0].attributes["aria-pressed"], "true");
+  assert.equal(fields["person-integration-options"].hidden, false);
+  assert.equal(fields["person-device-options"].hidden, false);
+  assert.equal(fields["person-integration-options"].nodes[0].dataset.value, "mobile_app");
+  assert.equal(fields["person-device-options"].nodes[0].dataset.value, "pixel");
+
+  card._selectPersonOwned("device", "pixel"); // one click, no search-focus prerequisite
+  assert.deepEqual([...card._personOwned.device], ["pixel"]);
+  assert.deepEqual(card._personDestinations.has("room"), false);
+  card._toggleTargetSelection("person", "person.alex"); // one click removes selection
+  assert.equal(card._selected.person.size, 0);
+  assert.equal(fields["person-integration-options"].hidden, true);
+  assert.equal(fields["person-device-options"].hidden, true);
+  assert.equal(card._personOwned.device.size, 0, "old person's device must not stay selected");
+});
+
+test("settings icon opens this Home Assistant instance's Announcement Hub integration page", () => {
+  const html = readFileSync(HTML_PATH, "utf8");
+  const css = readFileSync(CSS_PATH, "utf8");
+  const js = readFileSync(CARD_PATH, "utf8");
+  assert.match(html, /<a id="open-hub-settings" class="hub-settings-link" href="\/config\/integrations\/integration\/announcement_hub" aria-label="Open Announcement Hub settings" title="Open Announcement Hub settings">/);
+  assert.match(html, /id="open-hub-settings"[^>]*><ha-icon icon="mdi:cog-outline"><\/ha-icon><\/a>/);
+  assert.match(css, /\.top-actions \.hub-settings-link\{/);
+  assert.match(css, /\.top-actions \.hub-settings-link:focus-visible\{/);
+  assert.doesNotMatch(html, /<a id="open-hub-settings"[^>]*target="_blank"/);
+  assert.doesNotMatch(js, /open-hub-settings"\)\.addEventListener/, "native same-origin link needs no extra click handler");
+});
+

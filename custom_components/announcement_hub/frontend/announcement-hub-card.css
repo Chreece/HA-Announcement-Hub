@@ -448,3 +448,26 @@ ha-card { container-name: announcement-hub-card; container-type: inline-size; }
   #person-owned-targets .person-multi-options{max-height:145px}
   #person-owned-targets .person-multi-option{font-size:11px}
 }
+
+/* b37: Direct HA integration settings shortcut in the card header. */
+.top-actions .hub-settings-link{
+  display:grid;place-items:center;box-sizing:border-box;flex:none;
+  width:34px;height:34px;min-width:34px;border-radius:9px;
+  border:1px solid var(--divider-color,rgba(136,155,185,.24));
+  background:var(--secondary-background-color,rgba(128,145,167,.10));
+  color:var(--secondary-text-color,#b9c8d8);text-decoration:none;
+  cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+}
+.top-actions .hub-settings-link ha-icon{--mdc-icon-size:19px}
+.top-actions .hub-settings-link:hover{
+  color:var(--primary-text-color,#eef5ff);
+  border-color:var(--primary-color,#849bfa);
+  background:color-mix(in srgb,var(--primary-color,#849bfa) 12%,transparent)
+}
+.top-actions .hub-settings-link:focus-visible{
+  outline:2px solid var(--primary-color,#849bfa);outline-offset:2px
+}
+@container announcement-hub-card (max-width:430px){
+  .top-actions .hub-settings-link{width:30px;height:30px;min-width:30px}
+  .top-actions .hub-settings-link ha-icon{--mdc-icon-size:18px}
+}
