@@ -141,7 +141,7 @@ including older unversioned resources, to avoid stale icon/text UI mixing.
 Each card build also requests its matching versioned HTML, CSS and language
 files. Custom query URLs and YAML-managed resources remain untouched; if
 using a YAML/manual resource, set its URL to
-`/announcement_hub/announcement-hub-card.js?v=0.10.0b35` and refresh the
+`/announcement_hub/announcement-hub-card.js?v=0.10.0b36` and refresh the
 browser after upgrading.
 
 The visual editor controls the card heading, initial importance, queue
@@ -589,10 +589,16 @@ data:
 
 The existing action aliases `room`, `mobile`, `watch`, `tablet` and `other`
 remain supported for automations. The **Lovelace People card** now offers
-**Room**, **Integrations**, and **Devices**. The two lists are dynamically
-restricted to enabled notify/media-player endpoints explicitly assigned
-in each selected person's Hub profile; only integration names and owned
+**Room**, **Integrations**, and **Devices**. The latter two are true
+**searchable multi-selects** with checkbox results, selection counts and
+removable chips inside the compact card. Select one or more people first;
+the lists are filtered to enabled notify/media-player endpoints explicitly
+assigned in those people's Hub profiles. When no person or assigned output
+is available, the card explains why. Only integration names and owned
 device names are displayed, never an unrestricted whole-integration route.
+Selecting an integration or device automatically **deselects Room**; removing
+the last explicit selection restores Room. Choosing Room again clears both
+multi-selects.
 The card also offers the existing per-send translation preference (Person
 setting, Translate, Original language). Missing or disabled owned
 endpoints are not replaced with someone else's devices.
@@ -613,10 +619,14 @@ persons, a selected integration applies independently to each eligible
 person and a device applies only to its matching person; unrelated devices
 are never included. Programmatic actions can use `person_integration`
 (a list of integration domains) and `person_device` (a list of Home
-Assistant device registry IDs) alongside `target_person`. Set
-`person_destination: []` to exclude Room, or include `room` to add
-location-based delivery. The service rejects unowned or stale targets
-before queueing any announcement.
+Assistant device registry IDs) alongside `target_person`. With either
+of those new exact person filters, the service **always suppresses Room**
+even if `person_destination` contains `room` or is omitted and gets
+the default Room. This prevents an unintended extra room announcement or
+room-location requirement. To use Room instead, omit both exact person
+filters. Legacy Mobile/Watch/Tablet/Other automation destinations remain
+supported and keep their existing behavior. The service rejects unowned or
+stale targets before queueing any announcement.
 If selected people share a room, the Room leg sends **one** group announcement
 using the configured group language, voice and translation preference.
 Each person's Mobile/Watch/Tablet/Other leg uses their **own** language,
