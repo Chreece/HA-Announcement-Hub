@@ -831,7 +831,7 @@ test("Greek, German and regional languages use correct card translations", async
   const path = new URL("../custom_components/announcement_hub/frontend/announcement-hub-locales.json", import.meta.url);
   const payload = JSON.parse(readFileSync(path, "utf8"));
   globalThis.fetch = async (url) => {
-    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b34");
+    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b35");
     return { ok: true, json: async () => payload };
   };
   const card = new Card();
@@ -861,20 +861,24 @@ test("Greek, German and regional languages use correct card translations", async
 });
 
 
-test("person mode selects named destinations, not device entity IDs", () => {
+test("person mode selects scoped integration/device targets, not global recipients", () => {
   const { card, fields } = harness();
   fields.message.value = "Η πόρτα είναι ανοιχτή.";
   card._targetMode = "person";
   card._selected.person.add("person.alex");
   card._selected.person.add("person.maria");
-  card._personDestinations = new Set(["mobile", "watch"]);
+  card._personDestinations = new Set(["room"]);
+  card._personOwned.integration.add("mobile_app");
+  card._personOwned.device.add("device123");
   assert.deepEqual(card._buildPayload(), {
     level: "info", occupied_only: true,
     target_person: ["person.alex", "person.maria"],
-    person_destination: ["mobile", "watch"],
+    person_destination: ["room"],
+    person_integration: ["mobile_app"], person_device: ["device123"],
     text: "Η πόρτα είναι ανοιχτή.",
   });
-  assert.ok(!Object.hasOwn(card._buildPayload(), "entity"));
+  assert.ok(!Object.hasOwn(card._buildPayload(), "integration"));
+  assert.ok(!Object.hasOwn(card._buildPayload(), "device"));
   assert.ok(!Object.hasOwn(card._buildPayload(), "manual_targets"));
 });
 
@@ -888,20 +892,23 @@ test("person mode rejects unselected people or empty destinations", () => {
   assert.throws(() => card._buildPayload(), /Choose at least one person destination/);
 });
 
-test("only room and destinations assigned for all selected people appear", () => {
+test("person room target remains available, and owned device choices are profile filtered", () => {
   const { card } = harness();
   card._selected.person.add("person.alex");
   card._selected.person.add("person.maria");
-  card._hass = { states: {
-    "sensor.announcement_hub_queue": {
-      entity_id: "sensor.announcement_hub_queue",
-      attributes: { person_destinations: {
-        "person.alex": ["room", "mobile", "watch"],
-        "person.maria": ["room", "mobile"],
-      }},
+  card._personOwnedCatalog = {
+    "person.alex": {
+      integrations: [{ value: "mobile_app", label: "Mobile App" }],
+      devices: [{ value: "alex123", label: "Alex phone" }],
     },
-  }};
-  assert.deepEqual(card._availablePersonDestinations(), ["room", "mobile"]);
+    "person.maria": {
+      integrations: [{ value: "mobile_app", label: "Mobile App" }],
+      devices: [{ value: "maria456", label: "Maria phone" }],
+    },
+  };
+  assert.deepEqual(card._availablePersonDestinations(), ["room"]);
+  assert.deepEqual(card._personOwnedOptions("integration").map(x=>x.value), ["mobile_app"]);
+  assert.deepEqual(card._personOwnedOptions("device").map(x=>x.value), ["alex123", "maria456"]);
 });
 
 test("person translation override is optional and maps to action boolean", () => {
