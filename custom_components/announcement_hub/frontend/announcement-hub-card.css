@@ -319,21 +319,63 @@ ha-card { container-name: announcement-hub-card; container-type: inline-size; }
 }
 
 
-/* b34: Native, accessible provider selectors. Constrain to the compact card. */
-#advanced select{
-  display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;
-  height:43px;padding:9px 11px;border-radius:12px;
+/* b35: Provider menus expand INSIDE the card instead of launching a
+   system-wide native select popup. A short list scrolls within its field. */
+#advanced select.provider-native{display:none!important}
+#advanced .provider-field{min-width:0;max-width:100%}
+#advanced .provider-picker{
+  box-sizing:border-box;display:block;width:100%;min-width:0;max-width:100%;
+  overflow:hidden;border-radius:12px;
   border:1px solid var(--divider-color,rgba(140,157,181,.24));
   background:var(--secondary-background-color,rgba(128,148,170,.10));
-  color:var(--primary-text-color,#e8f0f8);font:inherit;font-size:12px;
-  outline:none;cursor:pointer;
+  color:var(--primary-text-color,#e8f0f8)
 }
-#advanced select:focus-visible{
+#advanced .provider-picker>summary{
+  box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;
+  gap:8px;width:100%;min-width:0;max-width:100%;height:43px;min-height:43px;
+  margin:0;padding:8px 10px;list-style:none;cursor:pointer;font-size:12px;
+}
+#advanced .provider-picker>summary::-webkit-details-marker{display:none}
+#advanced .provider-picker>summary::after{content:none!important}
+#advanced .provider-picker>summary output{
+  display:block;min-width:0;flex:1;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;color:var(--primary-text-color,#e8f0f8);
+  font-size:12px;text-align:start
+}
+#advanced .provider-picker>summary ha-icon{
+  flex:none;--mdc-icon-size:17px;color:var(--secondary-text-color,#aab6c4);
+  transition:transform .15s
+}
+#advanced .provider-picker[open]>summary ha-icon{transform:rotate(180deg)}
+#advanced .provider-picker:focus-within{
   border-color:var(--primary-color,#647cfd);
-  box-shadow:0 0 0 3px color-mix(in srgb,var(--primary-color,#647cfd) 17%,transparent)
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color,#647cfd) 15%,transparent)
 }
-#advanced select option{color:var(--primary-text-color,#e8f0f8);background:var(--ha-card-background,var(--card-background-color,#192637))}
-#advanced select option:disabled{color:var(--secondary-text-color,#aab6c4)}
+#advanced .provider-options{
+  display:flex;flex-direction:column;gap:3px;
+  box-sizing:border-box;max-width:100%;max-height:168px;
+  overflow-y:auto;overscroll-behavior:contain;padding:5px;
+  border-top:1px solid var(--divider-color,rgba(140,157,181,.19));
+}
+#advanced .provider-option{
+  display:block;box-sizing:border-box;width:100%;min-width:0;
+  padding:9px 10px;margin:0;border:1px solid transparent;border-radius:8px;
+  background:transparent;color:var(--primary-text-color,#e8f0f8);
+  font:inherit;font-size:11px;line-height:1.35;text-align:start;
+  white-space:normal;overflow-wrap:anywhere;cursor:pointer
+}
+#advanced .provider-option:hover,#advanced .provider-option:focus-visible{
+  background:var(--secondary-background-color,rgba(128,148,170,.18));
+  border-color:var(--divider-color,rgba(140,157,181,.3))
+}
+#advanced .provider-option[aria-pressed=true]{
+  background:color-mix(in srgb,var(--primary-color,#637aff) 17%,transparent);
+  color:var(--primary-text-color,#f5f7ff)
+}
+#advanced .provider-option:disabled{opacity:.48;cursor:default}
+#person-owned-targets{min-width:0}
+#person-owned-targets .target-group{margin-top:13px}
+#person-owned-targets .options{max-height:152px}
 @container announcement-hub-card (max-width:430px){
-  #advanced select{width:100%;font-size:12px}
+  #advanced .provider-picker>summary,#advanced .provider-option{font-size:11px}
 }
