@@ -976,6 +976,10 @@
           "description": "Valfri kontroll om kön har ändrats sedan den visades."
         }
       }
+    },
+    "list_providers": {
+      "name": "Lista tillgängliga leverantörer",
+      "description": "Listar konversationsagenter, AI Task-entiteter och aktiverade TTS-motorer för Announcement Hub."
     }
   }
 }

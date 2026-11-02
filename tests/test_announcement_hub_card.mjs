@@ -47,6 +47,13 @@ function harness() {
   const fields = Object.fromEntries(
     inputIds.map((name) => [name, { value: "", checked: name === "occupied-only" }])
   );
+  for (const id of ["ai-agent", "tts-engine"]) {
+    fields[id] = {
+      value: "", options: [],
+      replaceChildren() { this.options = []; },
+      appendChild(item) { this.options.push(item); },
+    };
+  }
   fields.send = { disabled: false };
   fields["send-label"] = { textContent: "" };
   fields["priority-selected"] = { textContent: "" };
@@ -582,12 +589,116 @@ test("bundled frontend assets and exact Lovelace module URL have versioned cache
   const js = readFileSync(CARD_PATH, "utf8");
   const manifest = JSON.parse(readFileSync(new URL(
     "../custom_components/announcement_hub/manifest.json", import.meta.url), "utf8"));
-  assert.equal(manifest.version, "0.10.0b33");
-  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b33"/);
+  assert.equal(manifest.version, "0.10.0b34");
+  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b34"/);
   assert.match(js, /const assetUrl = \(name\) => ROOT \+ name \+ "\?v=" /);
   assert.match(js, /fetch\(assetUrl\("announcement-hub-locales.json"\)/);
   assert.match(js, /fetch\(assetUrl\(name\)/);
   assert.doesNotMatch(js, /fetch\(ROOT \+ name/);
+});
+
+
+test("AI and TTS overrides are native dropdowns inside advanced options", () => {
+  const html = readFileSync(HTML_PATH, "utf8");
+  const css = readFileSync(CSS_PATH, "utf8");
+  assert.match(html, /<select id="ai-agent" aria-label="AI provider">/);
+  assert.match(html, /<select id="tts-engine" aria-label="TTS engine">/);
+  assert.doesNotMatch(html, /<input id="ai-agent"/);
+  assert.doesNotMatch(html, /<input id="tts-engine"/);
+  assert.match(html, /<details class="disclosure" id="advanced">/);
+  assert.match(css, /#advanced select\{/);
+});
+
+test("local HA entities populate provider dropdowns with stable actual IDs", () => {
+  const { card, fields } = harness();
+  card._translations = { "Hub default": "Προεπιλογή Hub" };
+  card._hass = { states: {
+    "conversation.assist": { attributes: { friendly_name: "Assist" } },
+    "ai_task.qwen": { attributes: { friendly_name: "Qwen" } },
+    "tts.piper": { attributes: { friendly_name: "Piper" } },
+    "sensor.other": { attributes: { friendly_name: "Not a provider" } },
+  }};
+  card._renderProviderSelectors();
+  assert.deepEqual(fields["ai-agent"].options.map(x => x.value), [
+    "", "default", "conversation.assist", "ai_task.qwen",
+  ]);
+  assert.deepEqual(fields["tts-engine"].options.map(x => x.value), ["", "tts.piper"]);
+  assert.equal(fields["ai-agent"].options[0].textContent, "Προεπιλογή Hub");
+  assert.equal(fields["ai-agent"].options[2].textContent, "Assist · conversation.assist");
+  assert.equal(fields["tts-engine"].options[1].textContent, "Piper · tts.piper");
+  card._renderProviderSelectors();
+  assert.equal(fields["ai-agent"].options.length, 4);
+});
+
+test("authenticated provider service includes agent IDs without HA entities", async () => {
+  const { card, fields } = harness();
+  const requests = [];
+  card._hass = {
+    states: {},
+    callService: async (...args) => {
+      requests.push(args);
+      return { context: { id: "test" }, response: {
+        ai_agents: [
+          { value: "default", label: "Home Assistant preferred agent" },
+          { value: "legacy_assist_agent", label: "Legacy agent · Conversation" },
+          { value: "ai_task.qwen", label: "Qwen task" },
+        ],
+        tts_engines: [{ value: "tts.piper", label: "Piper · Greek" }],
+      }};
+    },
+  };
+  await card._refreshProviders();
+  assert.deepEqual(requests, [
+    ["announcement_hub", "list_providers", {}, undefined, false, true],
+  ]);
+  assert.equal(fields["ai-agent"].options.find(x => x.value === "legacy_assist_agent").textContent,
+    "Legacy agent · Conversation");
+  assert.equal(fields["tts-engine"].options.find(x => x.value === "tts.piper").textContent,
+    "Piper · Greek");
+  fields["ai-agent"].value = "legacy_assist_agent";
+  fields["tts-engine"].value = "tts.piper";
+  fields.message.value = "Door open";
+  assert.deepEqual(card._buildPayload(), {
+    level: "info", occupied_only: true, text: "Door open",
+    tts_engine: "tts.piper", ai_agent: "legacy_assist_agent",
+  });
+});
+
+test("provider inventory failures preserve selected overrides and original message", async () => {
+  const { card, fields } = harness();
+  fields.message.value = "Check door";
+  fields["ai-agent"].value = "conversation.offline";
+  fields["tts-engine"].value = "tts.old";
+  card._hass = { states: {}, callService: async () => { throw new Error("Offline"); } };
+  await card._refreshProviders();
+  assert.equal(fields["ai-agent"].value, "conversation.offline");
+  assert.equal(fields["tts-engine"].value, "tts.old");
+  assert.ok(fields["ai-agent"].options.some(x => x.value === "conversation.offline"));
+  assert.ok(fields["tts-engine"].options.some(x => x.value === "tts.old"));
+  assert.equal(card._buildPayload().text, "Check door");
+  assert.equal(card._buildPayload().ai_agent, "conversation.offline");
+  card._ai = "off";
+  assert.equal(card._buildPayload().ai_agent, undefined);
+  fields["ai-agent"].value = "";
+  fields["tts-engine"].value = "";
+  assert.equal(card._buildPayload().tts_engine, undefined);
+});
+
+test("provider option labels are added as text rather than interpolated HTML", () => {
+  const { card, fields } = harness();
+  card._providerCatalog = {
+    ai_agents: [{ value: "conversation.safe", label: "<script>bad</script>" }],
+    tts_engines: [{ value: "tts.safe", label: "<img onerror=alert(1)>" }],
+  };
+  card._renderProviderSelectors();
+  assert.equal(fields["ai-agent"].options.find(x => x.value === "conversation.safe").textContent,
+    "<script>bad</script>");
+  assert.equal(fields["tts-engine"].options.find(x => x.value === "tts.safe").textContent,
+    "<img onerror=alert(1)>");
+  const source = readFileSync(CARD_PATH, "utf8");
+  const block = source.split("    _renderProviderSelectors() {")[1]
+    .split("    async _refreshProviders(", 1)[0];
+  assert.doesNotMatch(block, /innerHTML|insertAdjacentHTML|eval\(/);
 });
 
 test("tapping the queue badge loads all message bodies only through authenticated service", async () => {
@@ -691,7 +802,7 @@ test("Greek, German and regional languages use correct card translations", async
   const path = new URL("../custom_components/announcement_hub/frontend/announcement-hub-locales.json", import.meta.url);
   const payload = JSON.parse(readFileSync(path, "utf8"));
   globalThis.fetch = async (url) => {
-    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b33");
+    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b34");
     return { ok: true, json: async () => payload };
   };
   const card = new Card();

@@ -317,3 +317,23 @@ ha-card { container-name: announcement-hub-card; container-type: inline-size; }
     line-height:1.25;
   }
 }
+
+
+/* b34: Native, accessible provider selectors. Constrain to the compact card. */
+#advanced select{
+  display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;
+  height:43px;padding:9px 11px;border-radius:12px;
+  border:1px solid var(--divider-color,rgba(140,157,181,.24));
+  background:var(--secondary-background-color,rgba(128,148,170,.10));
+  color:var(--primary-text-color,#e8f0f8);font:inherit;font-size:12px;
+  outline:none;cursor:pointer;
+}
+#advanced select:focus-visible{
+  border-color:var(--primary-color,#647cfd);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--primary-color,#647cfd) 17%,transparent)
+}
+#advanced select option{color:var(--primary-text-color,#e8f0f8);background:var(--ha-card-background,var(--card-background-color,#192637))}
+#advanced select option:disabled{color:var(--secondary-text-color,#aab6c4)}
+@container announcement-hub-card (max-width:430px){
+  #advanced select{width:100%;font-size:12px}
+}

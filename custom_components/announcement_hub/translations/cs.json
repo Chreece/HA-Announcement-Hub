@@ -976,6 +976,10 @@
           "description": "Volitelná ochrana před změnou fronty od jejího zobrazení."
         }
       }
+    },
+    "list_providers": {
+      "name": "Vypsat dostupné poskytovatele",
+      "description": "Zobrazí konverzační agenty, entity AI Task a zapnuté TTS moduly pro Announcement Hub."
     }
   }
 }

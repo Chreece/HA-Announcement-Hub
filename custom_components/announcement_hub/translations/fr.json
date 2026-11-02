@@ -976,6 +976,10 @@
           "description": "Contrôle facultatif d’une modification de la file depuis l’affichage."
         }
       }
+    },
+    "list_providers": {
+      "name": "Lister les fournisseurs disponibles",
+      "description": "Liste les agents de conversation, les entités de tâches IA et les moteurs TTS activés pour Announcement Hub."
     }
   }
 }

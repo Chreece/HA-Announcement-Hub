@@ -976,6 +976,10 @@
           "description": "Verifica facoltativa che la coda non sia cambiata."
         }
       }
+    },
+    "list_providers": {
+      "name": "Elenca fornitori disponibili",
+      "description": "Elenca agenti di conversazione, entità AI Task e motori TTS abilitati per Announcement Hub."
     }
   }
 }

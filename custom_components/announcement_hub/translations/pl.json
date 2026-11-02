@@ -976,6 +976,10 @@
           "description": "Opcjonalne sprawdzenie zmian kolejki od ostatniego podglądu."
         }
       }
+    },
+    "list_providers": {
+      "name": "Pokaż dostępnych dostawców",
+      "description": "Pokazuje agentów rozmowy, jednostki AI Task i włączone silniki TTS dla Announcement Hub."
     }
   }
 }

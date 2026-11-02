@@ -976,6 +976,10 @@
           "description": "選用：檢查顯示佇列後是否有變更。"
         }
       }
+    },
+    "list_providers": {
+      "name": "列出可用供應商",
+      "description": "列出對話代理、AI Task 實體與啟用的 TTS 引擎，供 Announcement Hub 選擇。"
     }
   }
 }

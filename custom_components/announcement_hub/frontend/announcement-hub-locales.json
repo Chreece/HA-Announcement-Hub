@@ -200,7 +200,10 @@
     "Announcement removal requested.": "Ζητήθηκε αφαίρεση της ανακοίνωσης.",
     "Queue was not moved. Refresh and retry.": "Η σειρά δεν άλλαξε. Ανανέωσε και δοκίμασε ξανά.",
     "Queue order saved.": "Η σειρά της ουράς αποθηκεύτηκε.",
-    "Could not change queue: {error}": "Αδυναμία αλλαγής ουράς: {error}"
+    "Could not change queue: {error}": "Αδυναμία αλλαγής ουράς: {error}",
+    "Home Assistant preferred agent": "Προεπιλεγμένος πράκτορας Home Assistant",
+    "Unavailable provider: {id}": "Μη διαθέσιμος πάροχος: {id}",
+    "No providers available": "Δεν υπάρχουν διαθέσιμοι πάροχοι"
   },
   "de": {
     "HOME ASSISTANT · MESSAGING": "HOME ASSISTANT · NACHRICHTEN",
@@ -403,7 +406,10 @@
     "Announcement removal requested.": "Entfernen der Durchsage angefordert.",
     "Queue was not moved. Refresh and retry.": "Reihenfolge nicht geändert. Aktualisieren und erneut versuchen.",
     "Queue order saved.": "Reihenfolge gespeichert.",
-    "Could not change queue: {error}": "Warteschlange konnte nicht geändert werden: {error}"
+    "Could not change queue: {error}": "Warteschlange konnte nicht geändert werden: {error}",
+    "Home Assistant preferred agent": "Bevorzugter Home-Assistant-Agent",
+    "Unavailable provider: {id}": "Nicht verfügbarer Anbieter: {id}",
+    "No providers available": "Keine Anbieter verfügbar"
   },
   "fr": {
     "The message": "Le message",
@@ -606,7 +612,10 @@
     "Announcement removal requested.": "Suppression demandée.",
     "Queue was not moved. Refresh and retry.": "Ordre inchangé. Actualisez puis réessayez.",
     "Queue order saved.": "Ordre de la file enregistré.",
-    "Could not change queue: {error}": "Impossible de modifier la file : {error}"
+    "Could not change queue: {error}": "Impossible de modifier la file : {error}",
+    "Home Assistant preferred agent": "Agent favori de Home Assistant",
+    "Unavailable provider: {id}": "Fournisseur indisponible : {id}",
+    "No providers available": "Aucun fournisseur disponible"
   },
   "es": {
     "The message": "El mensaje",
@@ -809,7 +818,10 @@
     "Announcement removal requested.": "Se solicitó eliminar el anuncio.",
     "Queue was not moved. Refresh and retry.": "No se cambió el orden. Actualiza y reintenta.",
     "Queue order saved.": "Orden de cola guardado.",
-    "Could not change queue: {error}": "No se pudo modificar la cola: {error}"
+    "Could not change queue: {error}": "No se pudo modificar la cola: {error}",
+    "Home Assistant preferred agent": "Agente preferido de Home Assistant",
+    "Unavailable provider: {id}": "Proveedor no disponible: {id}",
+    "No providers available": "No hay proveedores disponibles"
   },
   "it": {
     "The message": "Il messaggio",
@@ -1012,7 +1024,10 @@
     "Announcement removal requested.": "Rimozione dell’annuncio richiesta.",
     "Queue was not moved. Refresh and retry.": "Ordine non cambiato. Aggiorna e riprova.",
     "Queue order saved.": "Ordine coda salvato.",
-    "Could not change queue: {error}": "Impossibile modificare la coda: {error}"
+    "Could not change queue: {error}": "Impossibile modificare la coda: {error}",
+    "Home Assistant preferred agent": "Agente predefinito di Home Assistant",
+    "Unavailable provider: {id}": "Fornitore non disponibile: {id}",
+    "No providers available": "Nessun fornitore disponibile"
   },
   "pt": {
     "The message": "A mensagem",
@@ -1215,7 +1230,10 @@
     "Announcement removal requested.": "Foi solicitada a remoção do anúncio.",
     "Queue was not moved. Refresh and retry.": "A ordem não mudou. Atualize e tente novamente.",
     "Queue order saved.": "Ordem da fila guardada.",
-    "Could not change queue: {error}": "Não foi possível alterar a fila: {error}"
+    "Could not change queue: {error}": "Não foi possível alterar a fila: {error}",
+    "Home Assistant preferred agent": "Agente preferido do Home Assistant",
+    "Unavailable provider: {id}": "Fornecedor indisponível: {id}",
+    "No providers available": "Não existem fornecedores disponíveis"
   },
   "nl": {
     "The message": "Het bericht",
@@ -1418,7 +1436,10 @@
     "Announcement removal requested.": "Verwijderen van melding aangevraagd.",
     "Queue was not moved. Refresh and retry.": "Volgorde niet aangepast. Vernieuw en probeer opnieuw.",
     "Queue order saved.": "Wachtrijvolgorde opgeslagen.",
-    "Could not change queue: {error}": "Wachtrij kon niet worden gewijzigd: {error}"
+    "Could not change queue: {error}": "Wachtrij kon niet worden gewijzigd: {error}",
+    "Home Assistant preferred agent": "Voorkeursagent van Home Assistant",
+    "Unavailable provider: {id}": "Niet-beschikbare aanbieder: {id}",
+    "No providers available": "Geen aanbieders beschikbaar"
   },
   "pl": {
     "The message": "Wiadomość",
@@ -1621,7 +1642,10 @@
     "Announcement removal requested.": "Zażądano usunięcia komunikatu.",
     "Queue was not moved. Refresh and retry.": "Nie zmieniono kolejności. Odśwież i ponów próbę.",
     "Queue order saved.": "Zapisano kolejność.",
-    "Could not change queue: {error}": "Nie można zmienić kolejki: {error}"
+    "Could not change queue: {error}": "Nie można zmienić kolejki: {error}",
+    "Home Assistant preferred agent": "Preferowany agent Home Assistant",
+    "Unavailable provider: {id}": "Niedostępny dostawca: {id}",
+    "No providers available": "Brak dostępnych dostawców"
   },
   "pt-BR": {
     "The message": "A mensagem",
@@ -1824,7 +1848,10 @@
     "Announcement removal requested.": "Remoção do aviso solicitada.",
     "Queue was not moved. Refresh and retry.": "Ordem inalterada. Atualize e tente de novo.",
     "Queue order saved.": "Ordem da fila salva.",
-    "Could not change queue: {error}": "Não foi possível alterar a fila: {error}"
+    "Could not change queue: {error}": "Não foi possível alterar a fila: {error}",
+    "Home Assistant preferred agent": "Agente preferido do Home Assistant",
+    "Unavailable provider: {id}": "Provedor indisponível: {id}",
+    "No providers available": "Não há provedores disponíveis"
   },
   "ru": {
     "The message": "Сообщение",
@@ -2027,7 +2054,10 @@
     "Announcement removal requested.": "Запрошено удаление объявления.",
     "Queue was not moved. Refresh and retry.": "Порядок не изменён. Обновите и повторите.",
     "Queue order saved.": "Порядок очереди сохранён.",
-    "Could not change queue: {error}": "Не удалось изменить очередь: {error}"
+    "Could not change queue: {error}": "Не удалось изменить очередь: {error}",
+    "Home Assistant preferred agent": "Предпочтительный агент Home Assistant",
+    "Unavailable provider: {id}": "Недоступный провайдер: {id}",
+    "No providers available": "Нет доступных провайдеров"
   },
   "tr": {
     "The message": "Mesaj",
@@ -2230,7 +2260,10 @@
     "Announcement removal requested.": "Duyuruyu kaldırma istendi.",
     "Queue was not moved. Refresh and retry.": "Sıra değişmedi. Yenileyip tekrar deneyin.",
     "Queue order saved.": "Kuyruk sırası kaydedildi.",
-    "Could not change queue: {error}": "Kuyruk değiştirilemedi: {error}"
+    "Could not change queue: {error}": "Kuyruk değiştirilemedi: {error}",
+    "Home Assistant preferred agent": "Home Assistant tercih edilen aracısı",
+    "Unavailable provider: {id}": "Kullanılamayan sağlayıcı: {id}",
+    "No providers available": "Kullanılabilir sağlayıcı yok"
   },
   "uk": {
     "The message": "Повідомлення",
@@ -2433,7 +2466,10 @@
     "Announcement removal requested.": "Надіслано запит на видалення оголошення.",
     "Queue was not moved. Refresh and retry.": "Порядок не змінено. Оновіть і повторіть.",
     "Queue order saved.": "Порядок черги збережено.",
-    "Could not change queue: {error}": "Не вдалося змінити чергу: {error}"
+    "Could not change queue: {error}": "Не вдалося змінити чергу: {error}",
+    "Home Assistant preferred agent": "Бажаний агент Home Assistant",
+    "Unavailable provider: {id}": "Недоступний провайдер: {id}",
+    "No providers available": "Немає доступних провайдерів"
   },
   "ar": {
     "The message": "الرسالة",
@@ -2636,7 +2672,10 @@
     "Announcement removal requested.": "طُلب حذف الإعلان.",
     "Queue was not moved. Refresh and retry.": "لم يتغير الترتيب. حدّث القائمة وحاول مجددًا.",
     "Queue order saved.": "تم حفظ ترتيب القائمة.",
-    "Could not change queue: {error}": "تعذر تعديل القائمة: {error}"
+    "Could not change queue: {error}": "تعذر تعديل القائمة: {error}",
+    "Home Assistant preferred agent": "الوكيل المفضّل في Home Assistant",
+    "Unavailable provider: {id}": "مزوّد غير متاح: {id}",
+    "No providers available": "لا يوجد مزوّدون متاحون"
   },
   "zh-Hans": {
     "The message": "消息",
@@ -2839,7 +2878,10 @@
     "Announcement removal requested.": "已请求删除公告。",
     "Queue was not moved. Refresh and retry.": "未移动队列。请刷新后重试。",
     "Queue order saved.": "队列顺序已保存。",
-    "Could not change queue: {error}": "无法更改队列：{error}"
+    "Could not change queue: {error}": "无法更改队列：{error}",
+    "Home Assistant preferred agent": "Home Assistant 首选代理",
+    "Unavailable provider: {id}": "不可用的提供方：{id}",
+    "No providers available": "没有可用的提供方"
   },
   "ja": {
     "The message": "メッセージ",
@@ -3042,7 +3084,10 @@
     "Announcement removal requested.": "通知の削除を要求しました。",
     "Queue was not moved. Refresh and retry.": "順序を変更できませんでした。更新して再試行してください。",
     "Queue order saved.": "キューの順序を保存しました。",
-    "Could not change queue: {error}": "キューを変更できません: {error}"
+    "Could not change queue: {error}": "キューを変更できません: {error}",
+    "Home Assistant preferred agent": "Home Assistant 優先エージェント",
+    "Unavailable provider: {id}": "利用できないプロバイダー: {id}",
+    "No providers available": "利用可能なプロバイダーがありません"
   },
   "ko": {
     "The message": "메시지",
@@ -3245,7 +3290,10 @@
     "Announcement removal requested.": "안내 삭제를 요청했습니다.",
     "Queue was not moved. Refresh and retry.": "순서를 변경하지 못했습니다. 새로고침 후 다시 시도하세요.",
     "Queue order saved.": "대기열 순서를 저장했습니다.",
-    "Could not change queue: {error}": "대기열을 변경할 수 없습니다: {error}"
+    "Could not change queue: {error}": "대기열을 변경할 수 없습니다: {error}",
+    "Home Assistant preferred agent": "Home Assistant 기본 에이전트",
+    "Unavailable provider: {id}": "사용할 수 없는 제공자: {id}",
+    "No providers available": "사용 가능한 제공자가 없습니다"
   },
   "sv": {
     "The message": "Meddelandet",
@@ -3448,7 +3496,10 @@
     "Announcement removal requested.": "Borttagning av meddelande begärd.",
     "Queue was not moved. Refresh and retry.": "Ordningen ändrades inte. Uppdatera och försök igen.",
     "Queue order saved.": "Köordningen sparades.",
-    "Could not change queue: {error}": "Kunde inte ändra kön: {error}"
+    "Could not change queue: {error}": "Kunde inte ändra kön: {error}",
+    "Home Assistant preferred agent": "Föredragen Home Assistant-agent",
+    "Unavailable provider: {id}": "Otillgänglig leverantör: {id}",
+    "No providers available": "Inga tillgängliga leverantörer"
   },
   "cs": {
     "The message": "Zpráva",
@@ -3651,7 +3702,10 @@
     "Announcement removal requested.": "Bylo požádáno o odebrání hlášení.",
     "Queue was not moved. Refresh and retry.": "Pořadí se nezměnilo. Obnovte frontu a zkuste to znovu.",
     "Queue order saved.": "Pořadí fronty uloženo.",
-    "Could not change queue: {error}": "Nelze změnit frontu: {error}"
+    "Could not change queue: {error}": "Nelze změnit frontu: {error}",
+    "Home Assistant preferred agent": "Preferovaný agent Home Assistant",
+    "Unavailable provider: {id}": "Nedostupný poskytovatel: {id}",
+    "No providers available": "Žádní dostupní poskytovatelé"
   },
   "zh-Hant": {
     "The message": "訊息",
@@ -3854,6 +3908,9 @@
     "Announcement removal requested.": "已要求刪除公告。",
     "Queue was not moved. Refresh and retry.": "佇列未移動。請重新整理後再試。",
     "Queue order saved.": "佇列順序已儲存。",
-    "Could not change queue: {error}": "無法變更佇列：{error}"
+    "Could not change queue: {error}": "無法變更佇列：{error}",
+    "Home Assistant preferred agent": "Home Assistant 首選代理",
+    "Unavailable provider: {id}": "無法使用的供應商：{id}",
+    "No providers available": "沒有可用的供應商"
   }
 }

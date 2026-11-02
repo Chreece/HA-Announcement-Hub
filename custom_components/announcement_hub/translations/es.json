@@ -976,6 +976,10 @@
           "description": "Comprobación opcional de cambios desde la última vista de la cola."
         }
       }
+    },
+    "list_providers": {
+      "name": "Listar proveedores disponibles",
+      "description": "Lista agentes de conversación, entidades de tareas de IA y motores TTS habilitados para Announcement Hub."
     }
   }
 }

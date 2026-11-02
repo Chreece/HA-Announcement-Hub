@@ -24,6 +24,8 @@ REQUIRED = {
     "Priority", "Move up", "Move down",
     "Confirm remove", "Remove queued announcement",
     "Queue order saved.",
+    "Home Assistant preferred agent", "Unavailable provider: {id}",
+    "No providers available",
 }
 TECHNICAL_EXAMPLES = {
     "mobile_app, nfandroidtv", "notify.phone, media_player.speaker",

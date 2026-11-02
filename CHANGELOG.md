@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.10.0b34 - 2026-11-02
+
+**Beta — discover actual AI and TTS providers in card dropdowns.**
+
+- Replace the advanced card's free-text **AI agent** and **TTS engine**
+  inputs with native, accessible dropdowns of configured providers.
+  A blank selection means **Hub default** and sends no explicit override.
+- Add the read-only `announcement_hub.list_providers` service to list
+  enabled TTS engines, Conversation agents and AI Task entities by friendly
+  name and exact ID. Include Conversation agents registered without an
+  entity, which would otherwise be missing from the frontend state list.
+- Merge the server catalogue with locally available Home Assistant entity
+  states for immediate rendering and when upgrading from an older backend;
+  refresh when Advanced options opens. Keep an explicitly chosen but
+  disconnected provider visible rather than silently resetting it.
+- Preserve selected AI/TTS overrides and existing send semantics (including
+  AI-off mode), and never return tokens, credentials or message content.
+- Localize provider discovery labels and service descriptions; add
+  Python/Node tests for inventories, offline preservation, dropdown
+  selection, frontend fallbacks and DOM escaping.
+- Update frontend versioned asset keys so browsers do not retain the
+  old text-entry fields. No queue or routing behavior changed.
+
 ## 0.10.0b33 - 2026-11-02
 
 **Beta — clear `Title: Selected` labels and eliminate mixed-version icon buttons.**
