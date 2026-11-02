@@ -103,11 +103,13 @@ def test_greek_and_german_queue_explanations_have_no_untranslated_prose():
 def test_card_person_destination_help_matches_rendered_chip_labels():
     languages = json.loads(CARD_LOCALES.read_text(encoding="utf-8"))
     assert set(languages) == set(LANGUAGES)
-    assert all(len(messages) == 204 for messages in languages.values())
+    assert all(len(messages) == 208 for messages in languages.values())
+    # Old Mobile/Watch aliases remain translated for existing automations,
+    # while the new People card uses Room + person-owned multi-selects.
+    current_hint = "Choosing integrations or devices replaces Room. You can select several."
     for lang, messages in languages.items():
-        hint = messages[CARD_HINT].casefold()
-        for name in ("Room", "Mobile", "Watch", "Tablet", "Other"):
-            assert messages[name].casefold() in hint, (lang, name)
+        assert messages[current_hint] != current_hint, lang
+        assert messages["No matching items."] != "No matching items.", lang
         for key, value in messages.items():
             assert sorted(re.findall(r"\{[a-z]+\}", key)) == sorted(
                 re.findall(r"\{[a-z]+\}", value)
