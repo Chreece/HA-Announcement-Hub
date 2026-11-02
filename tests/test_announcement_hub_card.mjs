@@ -56,6 +56,7 @@ function harness() {
   }
   fields.send = { disabled: false };
   fields["send-label"] = { textContent: "" };
+  fields["summary"] = { textContent: "" };
   fields["priority-selected"] = { textContent: "" };
   const group = () => ({
     nodes: [],
