@@ -123,7 +123,11 @@ def test_card_shows_named_person_destinations_without_exposing_entity_ids():
     html = (COMPONENT / "frontend" / "announcement-hub-card.html").read_text()
     assert 'payload.person_destination = [...this._personDestinations]' in js
     assert 'payload.target_person = [...this._selected.person]' in js
-    assert 'state.attributes?.person_destinations' in js
+    assert 'this._personOwnedCatalog' in js
+    assert 'payload.person_integration = [...this._personOwned.integration]' in js
+    assert 'payload.person_device = [...this._personOwned.device]' in js
+    assert 'id="person-integration-options"' in html
+    assert 'id="person-device-options"' in html
     assert 'id="person-destinations"' in html
 
 def test_person_room_never_selects_companion_app_without_named_assignment():
