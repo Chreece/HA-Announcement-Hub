@@ -156,6 +156,19 @@ def test_sleep_tracking_is_initialized_before_queue_and_handles_live_updates():
     assert h._sleep_tts_muted_now(trigger_job) is True
 
 
+def test_recovered_missing_sleep_attribute_cannot_create_a_new_grace():
+    h = Harness()
+    h.settings["sleep_rooms_attribute"] = "rooms"
+    h._bind_sleep_source(initial=True)
+    h.sleep = frozenset({"kitchen"})
+    h._on_sleep_source_changed(SimpleNamespace(data={
+        "old_state": SimpleNamespace(state="active", attributes={}),
+        "new_state": SimpleNamespace(state="active", attributes={"rooms": ["kitchen"]}),
+    }))
+    assert h._sleep_last_observed == frozenset({"kitchen"})
+    assert not h._sleep_entered_at
+
+
 def test_startup_restore_keeps_existing_sleep_timestamps_without_renewal():
     h = Harness()
     h.sleep = frozenset({"kitchen"})
