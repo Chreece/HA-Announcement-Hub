@@ -172,11 +172,11 @@
           "edit_tts": "2. Moduly TTS a zařízení",
           "edit_profiles": "3. Profily výstupů podle poskytovatele",
           "edit_general": "4. Obecná nastavení, přítomnost a AI",
-          "edit_all": "Upravit všechna nastavení (úplný průvodce)",
+          "edit_all": "9. Upravit všechna nastavení (úplný průvodce)",
           "edit_people": "5. Osoby a hlasy",
-          "edit_advanced_ai": "Pokročilé pokyny pro AI",
-          "edit_audio": "Zvuk, signál a ztlumení",
-          "edit_room_safety": "Ověření přítomnosti v místnosti"
+          "edit_advanced_ai": "6. Pokročilé pokyny pro AI",
+          "edit_audio": "7. Zvuk, signál a ztlumení",
+          "edit_room_safety": "8. Ověření přítomnosti v místnosti"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Vyberte oznamovací zařízení, jejich přiřazení k místnostem a minimální výstražné úrovně bez změny nastavení TTS nebo AI.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. Moduly TTS a zařízení",
           "edit_profiles": "3. Profily výstupů podle poskytovatele",
           "edit_general": "4. Obecná nastavení, přítomnost a AI",
-          "edit_all": "Upravit všechna nastavení (úplný průvodce)",
+          "edit_all": "9. Upravit všechna nastavení (úplný průvodce)",
           "edit_people": "5. Osoby a hlasy",
-          "edit_advanced_ai": "Pokročilé pokyny pro AI",
-          "edit_audio": "Zvuk, signál a ztlumení",
-          "edit_room_safety": "Ověření přítomnosti v místnosti"
+          "edit_advanced_ai": "6. Pokročilé pokyny pro AI",
+          "edit_audio": "7. Zvuk, signál a ztlumení",
+          "edit_room_safety": "8. Ověření přítomnosti v místnosti"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Vyberte oznamovací zařízení, jejich přiřazení k místnostem a minimální výstražné úrovně bez změny nastavení TTS nebo AI.",

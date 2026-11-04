@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS-Engines und Geräte",
           "edit_profiles": "3. Ausgabespezifische Profile",
           "edit_general": "4. Allgemein, Anwesenheit und KI",
-          "edit_all": "Alle Einstellungen bearbeiten (Assistent)",
+          "edit_all": "9. Alle Einstellungen bearbeiten (Assistent)",
           "edit_people": "5. Personen und Stimmen",
-          "edit_advanced_ai": "Erweiterte KI-Prompts",
-          "edit_audio": "Audio, Gong und Absenkung",
-          "edit_room_safety": "Anwesenheit pro Raum"
+          "edit_advanced_ai": "6. Erweiterte KI-Prompts",
+          "edit_audio": "7. Audio, Gong und Absenkung",
+          "edit_room_safety": "8. Anwesenheit pro Raum"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Benachrichtigungsgeräte, Raumzuordnung und Mindestprioritäten ändern, ohne TTS- oder KI-Einstellungen anzupassen.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS-Engines und Geräte",
           "edit_profiles": "3. Ausgabespezifische Profile",
           "edit_general": "4. Allgemein, Anwesenheit und KI",
-          "edit_all": "Alle Einstellungen bearbeiten (Assistent)",
+          "edit_all": "9. Alle Einstellungen bearbeiten (Assistent)",
           "edit_people": "5. Personen und Stimmen",
-          "edit_advanced_ai": "Erweiterte KI-Prompts",
-          "edit_audio": "Audio, Gong und Absenkung",
-          "edit_room_safety": "Anwesenheit pro Raum"
+          "edit_advanced_ai": "6. Erweiterte KI-Prompts",
+          "edit_audio": "7. Audio, Gong und Absenkung",
+          "edit_room_safety": "8. Anwesenheit pro Raum"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Benachrichtigungsgeräte, Raumzuordnung und Mindestprioritäten ändern, ohne TTS- oder KI-Einstellungen anzupassen.",

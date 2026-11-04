@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS 引擎与设备",
           "edit_profiles": "3. 提供商专用输出配置",
           "edit_general": "4. 常规设置、在家状态与 AI",
-          "edit_all": "编辑所有设置（完整向导）",
+          "edit_all": "9. 编辑所有设置（完整向导）",
           "edit_people": "5. 人员与语音",
-          "edit_advanced_ai": "高级 AI 提示词",
-          "edit_audio": "音频、提示音及音量降低",
-          "edit_room_safety": "房间存在状态验证"
+          "edit_advanced_ai": "6. 高级 AI 提示词",
+          "edit_audio": "7. 音频、提示音及音量降低",
+          "edit_room_safety": "8. 房间存在状态验证"
         },
         "menu_option_descriptions": {
           "edit_outputs": "选择通知设备、所属房间及最低警报级别，不更改 TTS 或 AI 设置。",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS 引擎与设备",
           "edit_profiles": "3. 提供商专用输出配置",
           "edit_general": "4. 常规设置、在家状态与 AI",
-          "edit_all": "编辑所有设置（完整向导）",
+          "edit_all": "9. 编辑所有设置（完整向导）",
           "edit_people": "5. 人员与语音",
-          "edit_advanced_ai": "高级 AI 提示词",
-          "edit_audio": "音频、提示音及音量降低",
-          "edit_room_safety": "房间存在状态验证"
+          "edit_advanced_ai": "6. 高级 AI 提示词",
+          "edit_audio": "7. 音频、提示音及音量降低",
+          "edit_room_safety": "8. 房间存在状态验证"
         },
         "menu_option_descriptions": {
           "edit_outputs": "选择通知设备、所属房间及最低警报级别，不更改 TTS 或 AI 设置。",

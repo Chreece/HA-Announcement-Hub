@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_all": "9. Edit all settings (full wizard)",
           "edit_people": "5. People and voices",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "6. Advanced AI prompts",
+          "edit_audio": "7. Audio, chime and ducking",
+          "edit_room_safety": "8. Room presence verification"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS engines & devices",
           "edit_profiles": "3. Provider-specific output profiles",
           "edit_general": "4. General settings, presence & AI",
-          "edit_all": "Edit all settings (full wizard)",
+          "edit_all": "9. Edit all settings (full wizard)",
           "edit_people": "5. People and voices",
-          "edit_advanced_ai": "Advanced AI prompts",
-          "edit_audio": "Audio, chime and ducking",
-          "edit_room_safety": "Room presence verification"
+          "edit_advanced_ai": "6. Advanced AI prompts",
+          "edit_audio": "7. Audio, chime and ducking",
+          "edit_room_safety": "8. Room presence verification"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choose notification devices, room scope and minimum alert levels without changing TTS or AI settings.",

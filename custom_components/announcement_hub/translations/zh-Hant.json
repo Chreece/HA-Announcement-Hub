@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS 引擎與設備",
           "edit_profiles": "3. 提供商專用輸出配置",
           "edit_general": "4. 常規設置、在家狀態與 AI",
-          "edit_all": "編輯所有設置（完整向導）",
+          "edit_all": "9. 編輯所有設置（完整向導）",
           "edit_people": "5. 人員與語音",
-          "edit_advanced_ai": "高級 AI 提示詞",
-          "edit_audio": "音訊、提示音及音量降低",
-          "edit_room_safety": "房間存在狀態驗證"
+          "edit_advanced_ai": "6. 高級 AI 提示詞",
+          "edit_audio": "7. 音訊、提示音及音量降低",
+          "edit_room_safety": "8. 房間存在狀態驗證"
         },
         "menu_option_descriptions": {
           "edit_outputs": "選擇通知設備、所屬房間及最低警報級別，不更改 TTS 或 AI 設置。",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS 引擎與設備",
           "edit_profiles": "3. 提供商專用輸出配置",
           "edit_general": "4. 常規設置、在家狀態與 AI",
-          "edit_all": "編輯所有設置（完整向導）",
+          "edit_all": "9. 編輯所有設置（完整向導）",
           "edit_people": "5. 人員與語音",
-          "edit_advanced_ai": "高級 AI 提示詞",
-          "edit_audio": "音訊、提示音及音量降低",
-          "edit_room_safety": "房間存在狀態驗證"
+          "edit_advanced_ai": "6. 高級 AI 提示詞",
+          "edit_audio": "7. 音訊、提示音及音量降低",
+          "edit_room_safety": "8. 房間存在狀態驗證"
         },
         "menu_option_descriptions": {
           "edit_outputs": "選擇通知設備、所屬房間及最低警報級別，不更改 TTS 或 AI 設置。",

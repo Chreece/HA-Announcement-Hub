@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS-engines en apparaten",
           "edit_profiles": "3. Providerspecifieke uitvoerprofielen",
           "edit_general": "4. Algemene instellingen, aanwezigheid en AI",
-          "edit_all": "Alle instellingen bewerken (volledige wizard)",
+          "edit_all": "9. Alle instellingen bewerken (volledige wizard)",
           "edit_people": "5. Personen en stemmen",
-          "edit_advanced_ai": "Geavanceerde AI-prompts",
-          "edit_audio": "Audio, beltoon en volumeverlaging",
-          "edit_room_safety": "Aanwezigheidsverificatie per ruimte"
+          "edit_advanced_ai": "6. Geavanceerde AI-prompts",
+          "edit_audio": "7. Audio, beltoon en volumeverlaging",
+          "edit_room_safety": "8. Aanwezigheidsverificatie per ruimte"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Kies meldingsapparaten, ruimtebindingen en minimale waarschuwingsniveaus zonder de TTS- of AI-instellingen te wijzigen.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS-engines en apparaten",
           "edit_profiles": "3. Providerspecifieke uitvoerprofielen",
           "edit_general": "4. Algemene instellingen, aanwezigheid en AI",
-          "edit_all": "Alle instellingen bewerken (volledige wizard)",
+          "edit_all": "9. Alle instellingen bewerken (volledige wizard)",
           "edit_people": "5. Personen en stemmen",
-          "edit_advanced_ai": "Geavanceerde AI-prompts",
-          "edit_audio": "Audio, beltoon en volumeverlaging",
-          "edit_room_safety": "Aanwezigheidsverificatie per ruimte"
+          "edit_advanced_ai": "6. Geavanceerde AI-prompts",
+          "edit_audio": "7. Audio, beltoon en volumeverlaging",
+          "edit_room_safety": "8. Aanwezigheidsverificatie per ruimte"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Kies meldingsapparaten, ruimtebindingen en minimale waarschuwingsniveaus zonder de TTS- of AI-instellingen te wijzigen.",
