@@ -623,7 +623,7 @@ test("bundled frontend assets and exact Lovelace module URL have versioned cache
   const manifest = JSON.parse(readFileSync(new URL(
     "../custom_components/announcement_hub/manifest.json", import.meta.url), "utf8"));
   assert.equal(manifest.version, "0.10.0b38");
-  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b37"/);
+  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b38"/);
   assert.match(js, /const assetUrl = \(name\) => ROOT \+ name \+ "\?v=" /);
   assert.match(js, /fetch\(assetUrl\("announcement-hub-locales.json"\)/);
   assert.match(js, /fetch\(assetUrl\(name\)/);
