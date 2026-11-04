@@ -18,6 +18,7 @@ def _method(name):
     namespace = {
         "datetime": datetime, "UTC": UTC, "timedelta": timedelta,
         "CONF_SLEEP_ROOMS_ENTITY": "sleep_rooms_entity",
+        "CONF_SLEEP_ROOMS_ATTRIBUTE": "sleep_rooms_attribute",
         "CONF_SLEEP_ENTRY_GRACE_SECONDS": "sleep_entry_grace_seconds",
         "DEFAULT_SLEEP_ENTRY_GRACE_SECONDS": 60.0,
         "CONF_SLEEP_MUTE_TTS": "sleep_mute_tts",
