@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS motorları ve cihazları",
           "edit_profiles": "3. Sağlayıcıya özgü çıkış profilleri",
           "edit_general": "4. Genel ayarlar, varlık ve AI",
-          "edit_all": "Tüm ayarları düzenle (tam kurulum sihirbazı)",
+          "edit_all": "9. Tüm ayarları düzenle (tam kurulum sihirbazı)",
           "edit_people": "5. Kişiler ve sesler",
-          "edit_advanced_ai": "Gelişmiş AI istemleri",
-          "edit_audio": "Ses, zil ve ses kısma",
-          "edit_room_safety": "Oda varlığı doğrulaması"
+          "edit_advanced_ai": "6. Gelişmiş AI istemleri",
+          "edit_audio": "7. Ses, zil ve ses kısma",
+          "edit_room_safety": "8. Oda varlığı doğrulaması"
         },
         "menu_option_descriptions": {
           "edit_outputs": "TTS veya AI ayarlarını değiştirmeden bildirim cihazlarını, oda kapsamını ve en düşük uyarı seviyelerini seçin.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS motorları ve cihazları",
           "edit_profiles": "3. Sağlayıcıya özgü çıkış profilleri",
           "edit_general": "4. Genel ayarlar, varlık ve AI",
-          "edit_all": "Tüm ayarları düzenle (tam kurulum sihirbazı)",
+          "edit_all": "9. Tüm ayarları düzenle (tam kurulum sihirbazı)",
           "edit_people": "5. Kişiler ve sesler",
-          "edit_advanced_ai": "Gelişmiş AI istemleri",
-          "edit_audio": "Ses, zil ve ses kısma",
-          "edit_room_safety": "Oda varlığı doğrulaması"
+          "edit_advanced_ai": "6. Gelişmiş AI istemleri",
+          "edit_audio": "7. Ses, zil ve ses kısma",
+          "edit_room_safety": "8. Oda varlığı doğrulaması"
         },
         "menu_option_descriptions": {
           "edit_outputs": "TTS veya AI ayarlarını değiştirmeden bildirim cihazlarını, oda kapsamını ve en düşük uyarı seviyelerini seçin.",
