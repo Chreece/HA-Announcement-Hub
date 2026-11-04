@@ -141,7 +141,7 @@ including older unversioned resources, to avoid stale icon/text UI mixing.
 Each card build also requests its matching versioned HTML, CSS and language
 files. Custom query URLs and YAML-managed resources remain untouched; if
 using a YAML/manual resource, set its URL to
-`/announcement_hub/announcement-hub-card.js?v=0.10.0b38` and refresh the
+`/announcement_hub/announcement-hub-card.js?v=0.10.0b39` and refresh the
 browser after upgrading.
 
 The visual editor controls the card heading, initial importance, queue
@@ -258,9 +258,11 @@ available fields and layout depend on your system.
 
 ### Choose a configuration section
 
-The **Configure** and **Reconfigure** menus let you open just the section you
-need. Saving a section preserves the other configured sections. **Edit all
-settings (full wizard)** walks through the complete form.
+The **Configure** and **Reconfigure** menus now number all nine sections
+consistently, from **1. Notification outputs & rooms** through
+**9. Edit all settings (full wizard)**. Open only the section you need;
+saving it preserves the other configured sections. The full wizard
+walks through every setup page.
 
 ![Illustrative Announcement Hub configuration menu](https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/screen-configure-menu.svg)
 
@@ -363,7 +365,16 @@ source must already be working in Home Assistant and Snapserver.
 
 ![Illustrative room-presence, fallback and AI settings](https://raw.githubusercontent.com/Chreece/HA-Announcement-Hub/main/.github/assets/screen-general.svg)
 
-The **4. General options** page includes:
+The **4. General options** page includes paired source controls in this
+order: **Room-presence entity → Occupied rooms value**, followed by
+**Sleeping-room entity → Sleeping-room value**. Each attribute selector is
+directly below its entity (not separated by the other entity). When changing
+a source entity, submit once to refresh that entity's available attributes
+on the same General page, then choose the desired attribute and save.
+Previously selected attributes remain available during temporary sensor
+outages.
+
+Other General options include:
 
 | Setting | What it controls |
 | --- | --- |
