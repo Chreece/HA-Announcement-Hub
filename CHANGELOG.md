@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b39 - 2026-11-04
+
+**Beta — pair room sources with their attributes and number every reconfigure menu.**
+
+- In General settings (Configure and Reconfigure), render each source as one
+  adjacent pair: Room-presence entity directly followed by Occupied rooms value,
+  then Sleeping-room entity directly followed by Sleeping-room value. Keep
+  the existing dynamic attribute options and preserve configured selections
+  when sensors are temporarily unavailable.
+- When either entity is changed, clear only its stale attribute selection and
+  refresh the same General page with that entity's actual attributes. Avoid
+  sending users to an unrelated secondary page, and preserve the other
+  settings and existing routes.
+- Number all nine Configure/Reconfigure menu sections consistently in the
+  actual navigation order, including Advanced AI, Audio, Room presence
+  verification and Edit all settings. Preserve translated section names
+  in all 20 language files plus the English strings resource.
+- Add regression coverage for live General form ordering, source changes,
+  preserved configuration, offline attributes, and localized menu numbering.
+
+
 ## 0.10.0b38 - 2026-11-04
 
 **Beta — make fresh sleep-entry announcements audible during grace, then route safely.**
