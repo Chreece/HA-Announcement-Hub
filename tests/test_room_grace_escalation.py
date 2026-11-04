@@ -283,6 +283,8 @@ namespace = {
     "CONF_SLEEP_ROOMS_ENTITY": "sleep_rooms_entity",
     "CONF_SLEEP_ROOMS_ATTRIBUTE": "sleep_rooms_attribute",
     "CONF_SLEEP_MUTE_TTS": "sleep_mute_tts",
+    "CONF_SLEEP_ENTRY_GRACE_SECONDS": "sleep_entry_grace_seconds",
+    "DEFAULT_SLEEP_ENTRY_GRACE_SECONDS": 60.0,
     "CONF_SLEEP_FALLBACK_WRITTEN": "sleep_fallback_written",
     "CONF_SLEEP_FALLBACK_OUTPUTS": "sleep_fallback_outputs",
     "DEFAULT_SLEEP_MUTE_TTS": True,
@@ -364,6 +366,21 @@ def job(*, preferred=("kueche",), services=(), level="info", age=0):
         room_tts_player_areas={}, snapcast_client_areas={},
         companion_tts_entry_areas={}, tts_suppressed_by_level=False,
     )
+
+
+def enable_live_sleep_grace(manager):
+    """Bind the production grace calculations for real staged-route scenarios."""
+    import types
+    for name in ("_observe_sleep_areas", "_sleep_grace_areas"):
+        method = next(node for node in klass.body if isinstance(node, ast.FunctionDef)
+                      and node.name == name)
+        exec(compile(ast.fix_missing_locations(ast.Module(
+            body=[method], type_ignores=[]
+        )), "live sleep grace", "exec"), namespace)
+        setattr(manager, name, types.MethodType(namespace[name], manager))
+    manager._sleep_last_observed = None
+    manager._sleep_entered_at = {}
+    manager._running = True
 
 
 def configure_manager(monkeypatch, manager):
@@ -1332,3 +1349,99 @@ def test_movement_guards_placed_before_physical_service_calls():
     assert "self._assert_live_room_route(job," in methods["_async_deliver_notification_part"]
     assert "class RoomRouteMoved(HomeAssistantError)" in SRC
     assert "except RoomRouteMoved:" in SRC
+
+
+
+def test_new_sleep_room_still_speaks_for_automation_queued_after_transition(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("kueche",), available={
+            "entity:notify.kitchen": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["sleep_rooms_entity"] = "sensor.sleeping"
+    manager.settings["sleep_rooms_attribute"] = "rooms"
+    manager.settings["sleep_entry_grace_seconds"] = 60
+    manager.live_states["sensor.sleeping"] = SimpleNamespace(
+        state="on", attributes={"rooms": []}, last_updated=datetime.now(UTC)
+    )
+    configure_manager(monkeypatch, manager)
+    enable_live_sleep_grace(manager)
+    manager._observe_sleep_areas()  # baseline before sleep entry
+    assert manager._sleep_last_observed == frozenset()
+    manager.live_states["sensor.sleeping"].attributes["rooms"] = ["kueche"]
+    manager.live_states["sensor.sleeping"].last_updated = datetime.now(UTC) - timedelta(seconds=3)
+    manager._observe_sleep_areas()
+    j = job(age=1)  # triggered after the room entered the sleep list
+    assert manager._sleep_grace_areas(j) == frozenset({"kueche"})
+    assert manager._staged_route_ready(j)
+    assert j.outputs == ("kueche",)
+    assert j.notify_outputs == ("entity:notify.kitchen",)
+    assert j.routing_stage == "primary"
+
+
+def test_sleep_grace_expiry_routes_to_configured_general_written_fallback(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("kueche",), available={
+            "entity:notify.kitchen": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["sleep_rooms_entity"] = "sensor.sleeping"
+    manager.settings["sleep_rooms_attribute"] = "rooms"
+    manager.settings["sleep_entry_grace_seconds"] = 60
+    manager.live_states["sensor.sleeping"] = SimpleNamespace(
+        state="on", attributes={"rooms": ["kueche"]},
+        last_updated=datetime.now(UTC) - timedelta(seconds=75)
+    )
+    configure_manager(monkeypatch, manager)
+    enable_live_sleep_grace(manager)
+    # Restored sleeping state has no new grace; an already expired transition
+    # must not leak sound to a speaker in that room.
+    manager._sleep_last_observed = frozenset({"kueche"})
+    manager._sleep_entered_at = {
+        "kueche": (datetime.now(UTC) - timedelta(seconds=75)).isoformat()
+    }
+    j = job(age=1)
+    assert manager._sleep_tts_muted_now(j) is True
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "general"
+    assert j.notify_outputs == ("entity:notify.phone",)
+    assert j.notify_text
+    assert j.tts_text is None
+    assert not j.snapcast_clients and not j.room_tts_players
+
+
+def test_one_sleeping_room_is_not_preferred_when_another_occupied_room_is_awake(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("kueche", "wohnzimmer"),
+        available={
+            "entity:notify.kitchen": True,
+            "entity:notify.living": True,
+            "entity:notify.phone": True,
+        },
+    )
+    manager.settings["sleep_rooms"] = ("kueche",)
+    configure_manager(monkeypatch, manager)
+    j = job()
+    assert manager._staged_route_ready(j)
+    assert j.routing_stage == "occupied"
+    assert j.outputs == ("wohnzimmer",)
+    assert j.notify_outputs == ("entity:notify.living",)
+    assert "entity:notify.kitchen" not in j.notify_outputs
+
+
+def test_sleeping_house_fallback_does_not_bypass_explicit_targets(monkeypatch):
+    global manager
+    manager = FakeManager(
+        occupied=("kueche",),
+        available={"entity:notify.kitchen": True, "entity:notify.phone": True},
+    )
+    manager.settings["sleep_rooms"] = ("kueche",)
+    configure_manager(monkeypatch, manager)
+    j = job(services=("nfandroidtv",))
+    assert not manager._staged_route_ready(j)
+    assert "entity:notify.phone" not in j.notify_outputs
