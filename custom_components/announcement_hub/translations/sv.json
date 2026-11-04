@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS-motorer och enheter",
           "edit_profiles": "3. Leverantörsspecifika utgångsprofiler",
           "edit_general": "4. Allmänna inställningar, närvaro och AI",
-          "edit_all": "Redigera alla inställningar (fullständig guide)",
+          "edit_all": "9. Redigera alla inställningar (fullständig guide)",
           "edit_people": "5. Personer och röster",
-          "edit_advanced_ai": "Avancerade AI-instruktioner",
-          "edit_audio": "Ljud, signal och volymsänkning",
-          "edit_room_safety": "Närvarokontroll för rum"
+          "edit_advanced_ai": "6. Avancerade AI-instruktioner",
+          "edit_audio": "7. Ljud, signal och volymsänkning",
+          "edit_room_safety": "8. Närvarokontroll för rum"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Välj notifieringsenheter, rumstillhörighet och lägsta varningsnivåer utan att ändra TTS- eller AI-inställningar.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS-motorer och enheter",
           "edit_profiles": "3. Leverantörsspecifika utgångsprofiler",
           "edit_general": "4. Allmänna inställningar, närvaro och AI",
-          "edit_all": "Redigera alla inställningar (fullständig guide)",
+          "edit_all": "9. Redigera alla inställningar (fullständig guide)",
           "edit_people": "5. Personer och röster",
-          "edit_advanced_ai": "Avancerade AI-instruktioner",
-          "edit_audio": "Ljud, signal och volymsänkning",
-          "edit_room_safety": "Närvarokontroll för rum"
+          "edit_advanced_ai": "6. Avancerade AI-instruktioner",
+          "edit_audio": "7. Ljud, signal och volymsänkning",
+          "edit_room_safety": "8. Närvarokontroll för rum"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Välj notifieringsenheter, rumstillhörighet och lägsta varningsnivåer utan att ändra TTS- eller AI-inställningar.",
