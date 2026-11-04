@@ -172,11 +172,11 @@
           "edit_tts": "2. Motores de voz y dispositivos",
           "edit_profiles": "3. Perfiles de salida por proveedor",
           "edit_general": "4. Configuración general, presencia e IA",
-          "edit_all": "Editar toda la configuración (asistente completo)",
+          "edit_all": "9. Editar toda la configuración (asistente completo)",
           "edit_people": "5. Personas y voces",
-          "edit_advanced_ai": "Instrucciones avanzadas de IA",
-          "edit_audio": "Audio, aviso sonoro y reducción de volumen",
-          "edit_room_safety": "Verificación de presencia en la habitación"
+          "edit_advanced_ai": "6. Instrucciones avanzadas de IA",
+          "edit_audio": "7. Audio, aviso sonoro y reducción de volumen",
+          "edit_room_safety": "8. Verificación de presencia en la habitación"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Elige dispositivos de notificación, su asociación con habitaciones y los niveles mínimos de alerta sin cambiar los ajustes de TTS o IA.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. Motores de voz y dispositivos",
           "edit_profiles": "3. Perfiles de salida por proveedor",
           "edit_general": "4. Configuración general, presencia e IA",
-          "edit_all": "Editar toda la configuración (asistente completo)",
+          "edit_all": "9. Editar toda la configuración (asistente completo)",
           "edit_people": "5. Personas y voces",
-          "edit_advanced_ai": "Instrucciones avanzadas de IA",
-          "edit_audio": "Audio, aviso sonoro y reducción de volumen",
-          "edit_room_safety": "Verificación de presencia en la habitación"
+          "edit_advanced_ai": "6. Instrucciones avanzadas de IA",
+          "edit_audio": "7. Audio, aviso sonoro y reducción de volumen",
+          "edit_room_safety": "8. Verificación de presencia en la habitación"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Elige dispositivos de notificación, su asociación con habitaciones y los niveles mínimos de alerta sin cambiar los ajustes de TTS o IA.",
