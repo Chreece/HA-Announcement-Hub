@@ -622,8 +622,8 @@ test("bundled frontend assets and exact Lovelace module URL have versioned cache
   const js = readFileSync(CARD_PATH, "utf8");
   const manifest = JSON.parse(readFileSync(new URL(
     "../custom_components/announcement_hub/manifest.json", import.meta.url), "utf8"));
-  assert.equal(manifest.version, "0.10.0b38");
-  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b38"/);
+  assert.equal(manifest.version, "0.10.0b39");
+  assert.match(js, /const FRONTEND_VERSION = "0\.10\.0b39"/);
   assert.match(js, /const assetUrl = \(name\) => ROOT \+ name \+ "\?v=" /);
   assert.match(js, /fetch\(assetUrl\("announcement-hub-locales.json"\)/);
   assert.match(js, /fetch\(assetUrl\(name\)/);
@@ -841,7 +841,7 @@ test("Greek, German and regional languages use correct card translations", async
   const path = new URL("../custom_components/announcement_hub/frontend/announcement-hub-locales.json", import.meta.url);
   const payload = JSON.parse(readFileSync(path, "utf8"));
   globalThis.fetch = async (url) => {
-    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b38");
+    assert.equal(url, "/announcement_hub/announcement-hub-locales.json?v=0.10.0b39");
     return { ok: true, json: async () => payload };
   };
   const card = new Card();
