@@ -141,7 +141,7 @@ including older unversioned resources, to avoid stale icon/text UI mixing.
 Each card build also requests its matching versioned HTML, CSS and language
 files. Custom query URLs and YAML-managed resources remain untouched; if
 using a YAML/manual resource, set its URL to
-`/announcement_hub/announcement-hub-card.js?v=0.10.0b37` and refresh the
+`/announcement_hub/announcement-hub-card.js?v=0.10.0b38` and refresh the
 browser after upgrading.
 
 The visual editor controls the card heading, initial importance, queue
