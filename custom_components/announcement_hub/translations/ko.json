@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS 엔진 및 기기",
           "edit_profiles": "3. 공급자별 출력 프로필",
           "edit_general": "4. 일반 설정, 재실 및 AI",
-          "edit_all": "모든 설정 편집(전체 마법사)",
+          "edit_all": "9. 모든 설정 편집(전체 마법사)",
           "edit_people": "5. 사람과 음성",
-          "edit_advanced_ai": "고급 AI 프롬프트",
-          "edit_audio": "오디오, 알림음 및 볼륨 낮춤",
-          "edit_room_safety": "방 재실 확인"
+          "edit_advanced_ai": "6. 고급 AI 프롬프트",
+          "edit_audio": "7. 오디오, 알림음 및 볼륨 낮춤",
+          "edit_room_safety": "8. 방 재실 확인"
         },
         "menu_option_descriptions": {
           "edit_outputs": "TTS 또는 AI 설정을 바꾸지 않고 알림 기기, 방 범위 및 최소 경보 등급을 선택합니다.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS 엔진 및 기기",
           "edit_profiles": "3. 공급자별 출력 프로필",
           "edit_general": "4. 일반 설정, 재실 및 AI",
-          "edit_all": "모든 설정 편집(전체 마법사)",
+          "edit_all": "9. 모든 설정 편집(전체 마법사)",
           "edit_people": "5. 사람과 음성",
-          "edit_advanced_ai": "고급 AI 프롬프트",
-          "edit_audio": "오디오, 알림음 및 볼륨 낮춤",
-          "edit_room_safety": "방 재실 확인"
+          "edit_advanced_ai": "6. 고급 AI 프롬프트",
+          "edit_audio": "7. 오디오, 알림음 및 볼륨 낮춤",
+          "edit_room_safety": "8. 방 재실 확인"
         },
         "menu_option_descriptions": {
           "edit_outputs": "TTS 또는 AI 설정을 바꾸지 않고 알림 기기, 방 범위 및 최소 경보 등급을 선택합니다.",
