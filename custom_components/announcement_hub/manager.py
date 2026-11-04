@@ -34,12 +34,13 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, Event, EventStateChangedData, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.storage import Store
 
 from .ai_filter import async_filter_announcement
@@ -291,6 +292,13 @@ class AnnouncementManager:
         self._ai_provider_cooldowns: dict[str, datetime] = {}
         self._sleep_last_observed: frozenset[str] | None = None
         self._sleep_entered_at: dict[str, str] = {}
+        self._sleep_source_entity: str = str(
+            self.settings.get(CONF_SLEEP_ROOMS_ENTITY, "") or ""
+        ).strip()
+        self._sleep_source_attribute: str = str(
+            self.settings.get(CONF_SLEEP_ROOMS_ATTRIBUTE, "") or ""
+        ).strip()
+        self._sleep_source_unsubscribe: Callable[[], None] | None = None
         # Keep outcome summaries for intermittent failures even after a
         # later successful notification overwrites the "last" sensor field.
         # No generated messages, source texts or model prompts are stored.
@@ -582,6 +590,10 @@ class AnnouncementManager:
                 self._group_success.setdefault(old_job.group_id, set()).update(
                     old_job.delivered_physical
                 )
+        # Establish a baseline and listen for transitions BEFORE the worker
+        # handles event-triggered announcements. Restored grace timestamps are
+        # preserved; a room already asleep when HA starts never gets a fresh timer.
+        self._bind_sleep_source(initial=True)
         self._running = True
         if self._volume_restore:
             self.entry.async_create_background_task(
@@ -652,6 +664,9 @@ class AnnouncementManager:
                 return
 
             self._running = False
+            if self._sleep_source_unsubscribe is not None:
+                self._sleep_source_unsubscribe()
+                self._sleep_source_unsubscribe = None
             self._wake.set()
             # Snapshot ownership before task cancellation discards it. A
             # shutdown must not leave interrupted Hub audio still playing.
@@ -722,6 +737,7 @@ class AnnouncementManager:
             self._notify_update()
 
     async def async_update_config(self) -> None:
+        self._bind_sleep_source()
         # Options changes must not leave a dead worker behind. This is cheap
         # when the worker is healthy and self-heals a previously stopped task.
         self._ensure_worker()
@@ -2587,6 +2603,69 @@ class AnnouncementManager:
             self._schedule_save()
             self._notify_update()
 
+    def _bind_sleep_source(self, *, initial: bool = False) -> None:
+        """Track the selected sleep list even when no announcements are pending.
+
+        Otherwise the first announcement triggered by a new sleep-list value
+        becomes the first observer and loses its newly started grace period.
+        """
+        entity = str(self.settings.get(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
+        attribute = str(self.settings.get(CONF_SLEEP_ROOMS_ATTRIBUTE, "") or "").strip()
+        changed = (
+            entity != self._sleep_source_entity
+            or attribute != self._sleep_source_attribute
+        )
+        if changed:
+            if self._sleep_source_unsubscribe is not None:
+                self._sleep_source_unsubscribe()
+                self._sleep_source_unsubscribe = None
+            self._sleep_source_entity = entity
+            self._sleep_source_attribute = attribute
+            # Switching source/attribute is configuration, NOT an event of
+            # someone going to sleep. Start from a fresh safe baseline.
+            self._sleep_last_observed = None
+            self._sleep_entered_at.clear()
+        if entity and self._sleep_source_unsubscribe is None:
+            self._sleep_source_unsubscribe = async_track_state_change_event(
+                self.hass, entity, self._on_sleep_source_changed
+            )
+        if initial:
+            if self._sleep_rooms_source_unavailable():
+                self._sleep_last_observed = None
+                self._sleep_entered_at.clear()
+            else:
+                current = self._sleep_area_ids()
+                self._sleep_last_observed = current
+                self._sleep_entered_at = {
+                    room: stamp for room, stamp in self._sleep_entered_at.items()
+                    if room in current
+                }
+        else:
+            self._observe_sleep_areas()
+
+    @callback
+    def _on_sleep_source_changed(self, event: Event[EventStateChangedData]) -> None:
+        """Capture the actual sleep transition, before the next queue poll."""
+        if not self._running:
+            return
+        old_state = event.data.get("old_state")
+        new_state = event.data.get("new_state")
+        if (
+            old_state is None
+            or old_state.state in {STATE_UNKNOWN, STATE_UNAVAILABLE}
+            or (
+                self._sleep_source_attribute
+                and self._sleep_source_attribute not in old_state.attributes
+            )
+            or new_state is None
+            or new_state.state in {STATE_UNKNOWN, STATE_UNAVAILABLE}
+        ):
+            # A disconnected/reappearing source is not evidence of a *fresh*
+            # sleep transition. Rebaseline instead of waking a sleeping room.
+            self._sleep_last_observed = None
+            self._sleep_entered_at.clear()
+        self._observe_sleep_areas()
+
     def _sleep_rooms_source_unavailable(self) -> bool:
         """Unknown sleep state fails closed for sound, not for the queue."""
         entity = str(self.settings.get(CONF_SLEEP_ROOMS_ENTITY, "") or "").strip()
@@ -2644,7 +2723,14 @@ class AnnouncementManager:
     def _observe_sleep_areas(self) -> frozenset[str]:
         """Observe sleep transitions; a restart must not reset a grace timer."""
         if self._sleep_rooms_source_unavailable():
-            return self._sleep_area_ids()
+            # Fail closed across sensor outages: returning to an already
+            # sleeping value must not restart its grace timer.
+            if getattr(self, "_sleep_last_observed", None) is not None:
+                self._sleep_last_observed = None
+                self._sleep_entered_at.clear()
+                if getattr(self, "_running", False):
+                    self._schedule_save()
+            return frozenset()
         current = self._sleep_area_ids()
         previous = getattr(self, "_sleep_last_observed", None)
         if previous is None:
@@ -2657,9 +2743,9 @@ class AnnouncementManager:
                 if room not in current:
                     entered.pop(room, None)
             for room in current - previous:
-                # If the state changed before this poll, use its source
-                # timestamp. A message submitted AFTER entering sleep must
-                # never acquire grace because observation was delayed.
+                # Use the source transition timestamp even when observed
+                # later. The grace period belongs to the ROOM, not only to
+                # messages that were queued before it entered sleep.
                 entered_at = datetime.now(UTC)
                 source_entity = str(self.settings.get(CONF_SLEEP_ROOMS_ENTITY, "") or "")
                 source_state = self.hass.states.get(source_entity) if source_entity else None
@@ -2675,7 +2761,12 @@ class AnnouncementManager:
         return current
 
     def _sleep_grace_areas(self, job: AnnouncementJob | None) -> frozenset[str]:
-        """Pre-sleep queued jobs may use a newly sleeping room briefly."""
+        """Allow pre-sleep AND entry-triggered jobs during the room grace.
+
+        The timer starts at the recorded sleep transition, never at enqueue
+        or AI completion. A message arriving after the window cannot restart
+        the timer; a delayed old message cannot extend it either.
+        """
         if job is None or self._sleep_rooms_source_unavailable():
             return frozenset()
         seconds = max(0.0, float(self.settings.get(
@@ -2691,6 +2782,8 @@ class AnnouncementManager:
         except (ValueError, TypeError, AttributeError):
             return frozenset()
         now = datetime.now(UTC)
+        if submitted > now:
+            return frozenset()
         eligible: set[str] = set()
         for room in rooms:
             raw = getattr(self, "_sleep_entered_at", {}).get(room)
@@ -2700,7 +2793,10 @@ class AnnouncementManager:
                 started = datetime.fromisoformat(raw)
                 if started.tzinfo is None:
                     started = started.replace(tzinfo=UTC)
-                if submitted <= started and 0 <= (now - started).total_seconds() < seconds:
+                if (
+                    submitted <= started + timedelta(seconds=seconds)
+                    and 0 <= (now - started).total_seconds() < seconds
+                ):
                     eligible.add(room)
             except (ValueError, TypeError):
                 continue
@@ -2813,7 +2909,8 @@ class AnnouncementManager:
 
         preferred = tuple(
             area for area in job.preferred_areas
-            if enabled.get(area, True) is not False
+            if area not in sleep_rooms
+            and enabled.get(area, True) is not False
         )
         if job.occupancy_requested and reading is not None:
             # An empty target must not get audio when people are elsewhere.

@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.10.0b38 - 2026-11-04
+
+**Beta — make fresh sleep-entry announcements audible during grace, then route safely.**
+
+- Fix the sleep-entry grace condition that explicitly rejected jobs enqueued
+  after a room entered the sleeping-room list. This previously muted the
+  automations most likely to run when sleep begins. Both existing queued jobs
+  and announcements triggered during the configured transition grace can
+  use eligible room outputs; no announcement starts a new grace window.
+- Observe configured sleep-list state/attribute changes while the integration
+  is running, even with an empty queue. Establish a baseline at startup,
+  preserve pre-restart transition timestamps, and never treat recovery from
+  an unknown/unavailable source or reconfiguration as a new sleep event.
+- Exclude rooms already asleep from preferred-room delivery when a different
+  occupied room remains awake, while allowing the newly sleeping room only
+  during its own grace. Continue automatic routing through occupied awake
+  rooms and to the configured written sleep fallback when all are sleeping.
+  Do not broaden strict person/integration/device/service recipients.
+- Add regression scenarios for pre/post-sleep announcements, grace expiry,
+  sensor loss/recovery, startup and configuration changes, awake-room routing
+  and the general written fallback. Update documentation.
+
+
 ## 0.10.0b37 - 2026-11-02
 
 **Beta — one-click person target selection and a direct integration Settings shortcut.**
