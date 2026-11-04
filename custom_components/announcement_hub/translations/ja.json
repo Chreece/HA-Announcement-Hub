@@ -172,11 +172,11 @@
           "edit_tts": "2. TTS エンジンとデバイス",
           "edit_profiles": "3. プロバイダー別の出力プロファイル",
           "edit_general": "4. 一般設定、在室状況、AI",
-          "edit_all": "すべての設定を編集（完全なウィザード）",
+          "edit_all": "9. すべての設定を編集（完全なウィザード）",
           "edit_people": "5. 人物と音声",
-          "edit_advanced_ai": "高度な AI プロンプト",
-          "edit_audio": "音声、チャイム、音量の一時低下",
-          "edit_room_safety": "部屋での在室確認"
+          "edit_advanced_ai": "6. 高度な AI プロンプト",
+          "edit_audio": "7. 音声、チャイム、音量の一時低下",
+          "edit_room_safety": "8. 部屋での在室確認"
         },
         "menu_option_descriptions": {
           "edit_outputs": "TTS や AI の設定を変更せずに、通知デバイス、部屋への割り当て、最低通知レベルを選択します。",
@@ -519,11 +519,11 @@
           "edit_tts": "2. TTS エンジンとデバイス",
           "edit_profiles": "3. プロバイダー別の出力プロファイル",
           "edit_general": "4. 一般設定、在室状況、AI",
-          "edit_all": "すべての設定を編集（完全なウィザード）",
+          "edit_all": "9. すべての設定を編集（完全なウィザード）",
           "edit_people": "5. 人物と音声",
-          "edit_advanced_ai": "高度な AI プロンプト",
-          "edit_audio": "音声、チャイム、音量の一時低下",
-          "edit_room_safety": "部屋での在室確認"
+          "edit_advanced_ai": "6. 高度な AI プロンプト",
+          "edit_audio": "7. 音声、チャイム、音量の一時低下",
+          "edit_room_safety": "8. 部屋での在室確認"
         },
         "menu_option_descriptions": {
           "edit_outputs": "TTS や AI の設定を変更せずに、通知デバイス、部屋への割り当て、最低通知レベルを選択します。",
