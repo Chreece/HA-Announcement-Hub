@@ -172,11 +172,11 @@
           "edit_tts": "2. Motores e dispositivos TTS",
           "edit_profiles": "3. Perfis de saída específicos do fornecedor",
           "edit_general": "4. Definições gerais, presença e AI",
-          "edit_all": "Editar todas as definições (assistente completo)",
+          "edit_all": "9. Editar todas as definições (assistente completo)",
           "edit_people": "5. Pessoas e vozes",
-          "edit_advanced_ai": "Instruções AI avançadas",
-          "edit_audio": "Áudio, sinal sonoro e redução de volume",
-          "edit_room_safety": "Verificação de presença na divisão"
+          "edit_advanced_ai": "6. Instruções AI avançadas",
+          "edit_audio": "7. Áudio, sinal sonoro e redução de volume",
+          "edit_room_safety": "8. Verificação de presença na divisão"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Escolha os dispositivos de notificação, a associação às divisões e os níveis mínimos de alerta sem alterar as definições de TTS ou AI.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. Motores e dispositivos TTS",
           "edit_profiles": "3. Perfis de saída específicos do fornecedor",
           "edit_general": "4. Definições gerais, presença e AI",
-          "edit_all": "Editar todas as definições (assistente completo)",
+          "edit_all": "9. Editar todas as definições (assistente completo)",
           "edit_people": "5. Pessoas e vozes",
-          "edit_advanced_ai": "Instruções AI avançadas",
-          "edit_audio": "Áudio, sinal sonoro e redução de volume",
-          "edit_room_safety": "Verificação de presença na divisão"
+          "edit_advanced_ai": "6. Instruções AI avançadas",
+          "edit_audio": "7. Áudio, sinal sonoro e redução de volume",
+          "edit_room_safety": "8. Verificação de presença na divisão"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Escolha os dispositivos de notificação, a associação às divisões e os níveis mínimos de alerta sem alterar as definições de TTS ou AI.",
