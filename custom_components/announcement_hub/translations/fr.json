@@ -172,11 +172,11 @@
           "edit_tts": "2. Moteurs vocaux et appareils",
           "edit_profiles": "3. Profils de sortie par fournisseur",
           "edit_general": "4. Paramètres généraux, présence et IA",
-          "edit_all": "Modifier tous les paramètres (assistant complet)",
+          "edit_all": "9. Modifier tous les paramètres (assistant complet)",
           "edit_people": "5. Personnes et voix",
-          "edit_advanced_ai": "Instructions IA avancées",
-          "edit_audio": "Audio, carillon et atténuation du volume",
-          "edit_room_safety": "Vérification de présence dans la pièce"
+          "edit_advanced_ai": "6. Instructions IA avancées",
+          "edit_audio": "7. Audio, carillon et atténuation du volume",
+          "edit_room_safety": "8. Vérification de présence dans la pièce"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choisir les appareils de notification, leur association à une pièce et les niveaux d’alerte minimums, sans modifier les réglages TTS ou IA.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. Moteurs vocaux et appareils",
           "edit_profiles": "3. Profils de sortie par fournisseur",
           "edit_general": "4. Paramètres généraux, présence et IA",
-          "edit_all": "Modifier tous les paramètres (assistant complet)",
+          "edit_all": "9. Modifier tous les paramètres (assistant complet)",
           "edit_people": "5. Personnes et voix",
-          "edit_advanced_ai": "Instructions IA avancées",
-          "edit_audio": "Audio, carillon et atténuation du volume",
-          "edit_room_safety": "Vérification de présence dans la pièce"
+          "edit_advanced_ai": "6. Instructions IA avancées",
+          "edit_audio": "7. Audio, carillon et atténuation du volume",
+          "edit_room_safety": "8. Vérification de présence dans la pièce"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Choisir les appareils de notification, leur association à une pièce et les niveaux d’alerte minimums, sans modifier les réglages TTS ou IA.",
