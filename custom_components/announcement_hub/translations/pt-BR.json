@@ -172,11 +172,11 @@
           "edit_tts": "2. Motores e dispositivos TTS",
           "edit_profiles": "3. Perfis de saída específicos do provedor",
           "edit_general": "4. Configurações gerais, presença e AI",
-          "edit_all": "Editar todas as configurações (assistente completo)",
+          "edit_all": "9. Editar todas as configurações (assistente completo)",
           "edit_people": "5. Pessoas e vozes",
-          "edit_advanced_ai": "Instruções AI avançadas",
-          "edit_audio": "Áudio, aviso sonoro e redução de volume",
-          "edit_room_safety": "Verificação de presença no cômodo"
+          "edit_advanced_ai": "6. Instruções AI avançadas",
+          "edit_audio": "7. Áudio, aviso sonoro e redução de volume",
+          "edit_room_safety": "8. Verificação de presença no cômodo"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Escolha os dispositivos de notificação, a associação aos cômodos e os níveis mínimos de alerta sem alterar as definições de TTS ou AI.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. Motores e dispositivos TTS",
           "edit_profiles": "3. Perfis de saída específicos do provedor",
           "edit_general": "4. Configurações gerais, presença e AI",
-          "edit_all": "Editar todas as configurações (assistente completo)",
+          "edit_all": "9. Editar todas as configurações (assistente completo)",
           "edit_people": "5. Pessoas e vozes",
-          "edit_advanced_ai": "Instruções AI avançadas",
-          "edit_audio": "Áudio, aviso sonoro e redução de volume",
-          "edit_room_safety": "Verificação de presença no cômodo"
+          "edit_advanced_ai": "6. Instruções AI avançadas",
+          "edit_audio": "7. Áudio, aviso sonoro e redução de volume",
+          "edit_room_safety": "8. Verificação de presença no cômodo"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Escolha os dispositivos de notificação, a associação aos cômodos e os níveis mínimos de alerta sem alterar as definições de TTS ou AI.",
