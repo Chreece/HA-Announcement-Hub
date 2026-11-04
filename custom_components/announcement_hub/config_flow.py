@@ -1565,6 +1565,11 @@ class _AnnouncementFlowMixin:
         sensor = str(self._working.get(CONF_OCCUPANCY_SENSOR, "") or "").strip()
         state = self.hass.states.get(sensor) if sensor else None
         attributes = sorted(str(key) for key in (state.attributes if state else {}))
+        current = str(self._working.get(CONF_OCCUPANCY_ATTRIBUTE, "") or "")
+        # Preserve a configured attribute if the entity is temporarily
+        # offline, just as we do for the sleeping-room source.
+        if current and current not in attributes:
+            attributes.append(current)
         return ["state", *attributes]
 
     async def async_step_occupancy(
@@ -1868,7 +1873,12 @@ class _AnnouncementFlowMixin:
         """Step 4: general routing, presence, fallback, and queue options."""
         errors: dict[str, str] = {}
         if user_input is not None:
-            incoming_sensor = user_input.get(CONF_OCCUPANCY_SENSOR)
+            previous_sensor = str(
+                self._working.get(CONF_OCCUPANCY_SENSOR, "") or ""
+            ).strip()
+            incoming_sensor = str(
+                user_input.get(CONF_OCCUPANCY_SENSOR, "") or ""
+            ).strip()
             had_source_field = CONF_OCCUPANCY_ATTRIBUTE in user_input
             previous_sleep_entity = str(
                 self._working.get(CONF_SLEEP_ROOMS_ENTITY, "") or ""
@@ -1904,17 +1914,19 @@ class _AnnouncementFlowMixin:
             ):
                 self._working[key] = user_input.get(key, default)
 
-            if incoming_sensor:
-                if not had_source_field:
-                    return await self.async_step_queue()
+            sensor_changed = incoming_sensor != previous_sensor
+            sleep_entity_changed = incoming_sleep_entity != previous_sleep_entity
+            if not incoming_sensor or sensor_changed:
+                # The old source attribute must never silently attach to a
+                # newly selected entity with different attributes.
+                self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
+            elif had_source_field:
                 source = str(user_input.get(CONF_OCCUPANCY_ATTRIBUTE, "state"))
                 self._working[CONF_OCCUPANCY_ATTRIBUTE] = (
                     "" if source == "state" else source
                 )
-            else:
-                self._working[CONF_OCCUPANCY_ATTRIBUTE] = ""
 
-            if not incoming_sleep_entity or incoming_sleep_entity != previous_sleep_entity:
+            if not incoming_sleep_entity or sleep_entity_changed:
                 self._working[CONF_SLEEP_ROOMS_ATTRIBUTE] = ""
             elif CONF_SLEEP_ROOMS_ATTRIBUTE in user_input:
                 sleep_source = str(user_input[CONF_SLEEP_ROOMS_ATTRIBUTE])
@@ -1956,9 +1968,14 @@ class _AnnouncementFlowMixin:
             ):
                 errors["base"] = "output_required"
             if not errors:
-                if incoming_sleep_entity and incoming_sleep_entity != previous_sleep_entity:
-                    self._sleep_source_from_queue = True
-                    return await self.async_step_sleep_rooms_source()
+                # The HA form cannot derive selector options from an entity
+                # changed on the same unsaved form. Refresh this General page
+                # once with the new state/attribute choices directly beneath
+                # their respective entity; never jump to an unrelated page.
+                if (incoming_sensor and (sensor_changed or not had_source_field)) or (
+                    incoming_sleep_entity and sleep_entity_changed
+                ):
+                    return await self.async_step_queue()
                 return await self._async_finish()
 
         sensor = str(self._value(CONF_OCCUPANCY_SENSOR, "") or "").strip()
@@ -2000,20 +2017,14 @@ class _AnnouncementFlowMixin:
                 CONF_OCCUPANCY_SENSOR,
                 self._value(CONF_OCCUPANCY_SENSOR, None),
             ): selector.EntitySelector(),
-            _optional_marker(
-                CONF_SLEEP_ROOMS_ENTITY,
-                self._value(CONF_SLEEP_ROOMS_ENTITY, None),
-            ): selector.EntitySelector(),
         }
 
         if sensor:
-            state = self.hass.states.get(sensor)
-            attributes = sorted(str(key) for key in (state.attributes if state else {}))
             options = [
                 selector.SelectOptionDict(value="state", label=provider_label(self.hass, "state")),
                 *[
                     selector.SelectOptionDict(value=key, label=key)
-                    for key in attributes
+                    for key in self._occupancy_attribute_options() if key != "state"
                 ],
             ]
             current = str(self._value(CONF_OCCUPANCY_ATTRIBUTE, "") or "")
@@ -2029,6 +2040,15 @@ class _AnnouncementFlowMixin:
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             )
+
+        # Keep each attribute selector immediately UNDER its own entity,
+        # not after the other entity or at the end of General settings.
+        fields[
+            _optional_marker(
+                CONF_SLEEP_ROOMS_ENTITY,
+                self._value(CONF_SLEEP_ROOMS_ENTITY, None),
+            )
+        ] = selector.EntitySelector()
 
         if sleep_entity:
             sleep_options = self._sleep_rooms_attribute_options()
