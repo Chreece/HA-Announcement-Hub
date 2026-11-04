@@ -436,15 +436,23 @@ settings:
 
 - **Mute TTS while everyone is sleeping** (default **On**): prevents
   speech and pre-announcement chimes, including Critical and Companion App
-  audio, after the entry grace period expires. New announcements are muted
-  immediately upon sleep entry. Turn Off to use ordinary speech routing.
+  audio, after the entry grace period expires. This also protects rooms that
+  were already sleeping before a different room became newly asleep. Turn
+  Off to use ordinary speech routing.
 - **Sleep-entry grace** (default **60 seconds**, configurable **0–600**):
-  announcements queued **before** a room enters the live sleeping-room list
-  can begin/continue permitted speech during this window. Jobs created after
-  the transition are silent from the start, and jobs already playing are not
-  abruptly interrupted when the grace expires. The transition time is kept
-  with the durable queue across Home Assistant restarts. Unknown or unavailable
-  sleep data still mutes immediately; **0 seconds** disables grace.
+  when a room newly enters the live sleep list, both announcements already
+  queued **and automations triggered by the room entering sleep** can use
+  that room's eligible audio/visual outputs during this window. The timer
+  starts at the actual sleep-list transition, not at message creation, and
+  does not restart for later jobs. The listener records transitions even when
+  no announcements are pending. After expiry, automatic announcements
+  search other occupied awake rooms and then follow configured fallback
+  routing; if everyone is sleeping, only the configured written sleep
+  fallback recipients may receive them. Previously sleeping rooms never
+  inherit another room's grace, and queued messages do not vanish.
+  Entry timestamps survive Home Assistant restarts without being renewed.
+  An unknown/unavailable sleep source fails closed for speech; **0 seconds**
+  disables the grace period.
 - **Written fallback while sleeping** (default **On**): only when TTS sleep
   mute is active, redirect automatic room announcements to the explicitly
   selected written outputs. A TTS-only message uses its original text. Turn
@@ -764,9 +772,11 @@ General/non-room notification outputs
   assumed, and the alternate fallback room remains ineligible.
 - The **sleeping-room entity** lists rooms with sleeping people **right now**.
   With **Mute TTS while everyone is sleeping** enabled, if the configured
-  occupied-room list is contained in the sleep list, no TTS starts (including
-  Critical, Snapcast and companion speech). When **Written fallback while
-  sleeping** is also enabled, only the explicitly selected configured
+  occupied-room list is contained in the sleep list, TTS is muted **after
+  the fresh room's configured entry grace expires** (including Critical,
+  Snapcast and companion speech). Automations triggered by new sleep entries
+  may still be heard during that room's grace window. When **Written fallback
+  while sleeping** is also enabled, only the explicitly selected configured
   integration/device notification outputs receive written text; TTS-only
   messages use their spoken text as written text. If the sleep source is
   unavailable and occupancy is known, the same enabled mute/fallback policy
@@ -1485,7 +1495,7 @@ Snapcast verification limits:
 
 | Setting | Default | Purpose |
 | --- | ---: | --- |
-| Sleep-entry grace | 60 s | Let pre-sleep announcements begin/continue in a newly sleeping room |
+| Sleep-entry grace | 60 s | Let queued and newly triggered sleep-transition announcements use the freshly sleeping room before awake-room/written fallback |
 | AI provider timeout | 120 s | Bound each primary, backup and formatting AI request |
 | Service-call timeout | 30 s | Bound notify, TTS player, Snapcast and Android-TV provider calls |
 | TTS rendering timeout | 120 s | Release a stalled TTS pre-rendering worker |
