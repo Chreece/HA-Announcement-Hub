@@ -172,11 +172,11 @@
           "edit_tts": "2. Silniki TTS i urządzenia",
           "edit_profiles": "3. Profile wyjść dostawców",
           "edit_general": "4. Ustawienia ogólne, obecność i AI",
-          "edit_all": "Edytuj wszystkie ustawienia (pełny kreator)",
+          "edit_all": "9. Edytuj wszystkie ustawienia (pełny kreator)",
           "edit_people": "5. Osoby i głosy",
-          "edit_advanced_ai": "Zaawansowane instrukcje AI",
-          "edit_audio": "Audio, dzwonek i ściszanie",
-          "edit_room_safety": "Weryfikacja obecności w pokoju"
+          "edit_advanced_ai": "6. Zaawansowane instrukcje AI",
+          "edit_audio": "7. Audio, dzwonek i ściszanie",
+          "edit_room_safety": "8. Weryfikacja obecności w pokoju"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Wybierz urządzenia powiadomień, przypisanie do pokoi i minimalne poziomy alertów bez zmiany ustawień TTS ani AI.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. Silniki TTS i urządzenia",
           "edit_profiles": "3. Profile wyjść dostawców",
           "edit_general": "4. Ustawienia ogólne, obecność i AI",
-          "edit_all": "Edytuj wszystkie ustawienia (pełny kreator)",
+          "edit_all": "9. Edytuj wszystkie ustawienia (pełny kreator)",
           "edit_people": "5. Osoby i głosy",
-          "edit_advanced_ai": "Zaawansowane instrukcje AI",
-          "edit_audio": "Audio, dzwonek i ściszanie",
-          "edit_room_safety": "Weryfikacja obecności w pokoju"
+          "edit_advanced_ai": "6. Zaawansowane instrukcje AI",
+          "edit_audio": "7. Audio, dzwonek i ściszanie",
+          "edit_room_safety": "8. Weryfikacja obecności w pokoju"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Wybierz urządzenia powiadomień, przypisanie do pokoi i minimalne poziomy alertów bez zmiany ustawień TTS ani AI.",
