@@ -172,11 +172,11 @@
           "edit_tts": "2. Motori e dispositivi TTS",
           "edit_profiles": "3. Profili di uscita specifici dei provider",
           "edit_general": "4. Impostazioni generali, presenza e AI",
-          "edit_all": "Modifica tutte le impostazioni (procedura completa)",
+          "edit_all": "9. Modifica tutte le impostazioni (procedura completa)",
           "edit_people": "5. Persone e voci",
-          "edit_advanced_ai": "Istruzioni AI avanzate",
-          "edit_audio": "Audio, campanello e riduzione del volume",
-          "edit_room_safety": "Verifica della presenza nella stanza"
+          "edit_advanced_ai": "6. Istruzioni AI avanzate",
+          "edit_audio": "7. Audio, campanello e riduzione del volume",
+          "edit_room_safety": "8. Verifica della presenza nella stanza"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Seleziona dispositivi di notifica, associazione alle stanze e livelli minimi di allerta senza modificare le impostazioni di TTS o AI.",
@@ -519,11 +519,11 @@
           "edit_tts": "2. Motori e dispositivi TTS",
           "edit_profiles": "3. Profili di uscita specifici dei provider",
           "edit_general": "4. Impostazioni generali, presenza e AI",
-          "edit_all": "Modifica tutte le impostazioni (procedura completa)",
+          "edit_all": "9. Modifica tutte le impostazioni (procedura completa)",
           "edit_people": "5. Persone e voci",
-          "edit_advanced_ai": "Istruzioni AI avanzate",
-          "edit_audio": "Audio, campanello e riduzione del volume",
-          "edit_room_safety": "Verifica della presenza nella stanza"
+          "edit_advanced_ai": "6. Istruzioni AI avanzate",
+          "edit_audio": "7. Audio, campanello e riduzione del volume",
+          "edit_room_safety": "8. Verifica della presenza nella stanza"
         },
         "menu_option_descriptions": {
           "edit_outputs": "Seleziona dispositivi di notifica, associazione alle stanze e livelli minimi di allerta senza modificare le impostazioni di TTS o AI.",
