@@ -2653,6 +2653,10 @@ class AnnouncementManager:
         if (
             old_state is None
             or old_state.state in {STATE_UNKNOWN, STATE_UNAVAILABLE}
+            or (
+                self._sleep_source_attribute
+                and self._sleep_source_attribute not in old_state.attributes
+            )
             or new_state is None
             or new_state.state in {STATE_UNKNOWN, STATE_UNAVAILABLE}
         ):
