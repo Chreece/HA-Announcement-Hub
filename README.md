@@ -141,7 +141,7 @@ including older unversioned resources, to avoid stale icon/text UI mixing.
 Each card build also requests its matching versioned HTML, CSS and language
 files. Custom query URLs and YAML-managed resources remain untouched; if
 using a YAML/manual resource, set its URL to
-`/announcement_hub/announcement-hub-card.js?v=0.10.0b39` and refresh the
+`/announcement_hub/announcement-hub-card.js?v=0.10.0b40` and refresh the
 browser after upgrading.
 
 The visual editor controls the card heading, initial importance, queue
@@ -389,7 +389,7 @@ Other General options include:
 | Mute TTS while everyone is sleeping | Toggle automatic speech/chime suppression when every occupied room is sleeping |
 | Written fallback while sleeping | Toggle written-only replacement for automatic room announcements while sleep mute is active |
 | Sleep-time written notification recipients | Multiselect: **Integration — all configured devices** first, followed by **individual devices**, limited to configured Announcement Hub notification outputs |
-| Fallback room | Alternate area only if the target room contains an awake person, local delivery failed and the door rule permits |
+| Fallback room | Alternate area when current occupied awake rooms cannot deliver and their door rule permits |
 | Require an open occupied-room door for fallback | Door rule that must pass before using the configured alternate room |
 | Door sensor label filter | Optional label to restrict which door sensors count |
 | Visual/TTS fallback preference | Visual first → TTS if it fails, TTS first → Visual if it fails, or Both eligible channels; applies only when both channel texts **and** both permitted output types exist |
@@ -778,7 +778,7 @@ General/non-room notification outputs
 - With a configured occupancy source, an **unoccupied requested room** is
   skipped in favor of other occupied rooms with authorized room devices.
   With no occupancy source configured, the requested room is retained, but
-  the alternate fallback room still requires confirmed target-room presence.
+  the alternate fallback room still requires confirmed occupied-room presence.
   If the configured source is unavailable, unconfirmed room presence is not
   assumed, and the alternate fallback room remains ineligible.
 - The **sleeping-room entity** lists rooms with sleeping people **right now**.
@@ -808,13 +808,20 @@ General/non-room notification outputs
   service acknowledges. NFAndroidTV and other short-lived visual overlays
   continue to respect their reading-time settings, so a succeeding overlay
   does not overwrite text too early.
-- The **alternate-room stage** is allowed only for a targeted, non-sleep room
-  with a confirmed occupant, after the original room and other occupied-room
-  delivery paths did not succeed. It is never used when the targeted room
-  is unoccupied. The stage also observes the configured open-door condition.
-  When enabled, the relevant door sensor must belong to the originally
-  targeted area, have device class `door`, and have state `on`. An optional
-  label filter narrows which doors qualify.
+- The **alternate-room stage** relays to confirmed occupants of the current
+  eligible awake rooms after their delivery paths cannot deliver. This also
+  applies to automatic announcements with no explicit `area`. If you move
+  into a room whose TTS is not ready, queued announcements can use the
+  configured fallback after the output-availability grace; you do not need
+  to return to the original room. A room with no eligible output skips that
+  grace immediately. The fallback itself may be the room you just left.
+  When the door check is enabled, a qualifying door must belong to a current
+  eligible occupied room, have device class `door`, and have state `on`.
+  An optional label filter narrows which doors qualify. An open door in an
+  empty old room does not authorize fallback through a closed current-room
+  door. Occupancy, sleep eligibility and the door rule are checked again
+  before playback. With `occupied_only: false`, fallback still requires a
+  confirmed occupant in one of the explicitly requested rooms.
 - The **General stage** can reach configured General outputs without treating
   them as physical endpoints in a specific room.
 - Room-bound devices in other, unrelated areas are not silently selected.

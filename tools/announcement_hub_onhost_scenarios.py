@@ -156,7 +156,10 @@ def scenarios(path):
          and j.routing_stage == "primary" and j.routing_seen_occupied == ("b",))
     j = job("fallback")
     j.outputs = ("relay",)
-    test("fallback_blocked_empty_original", lambda: h._staged_areas(j, "fallback") == ())
+    # The listener moved from a to b; the relay must follow the current room.
+    test("fallback_follows_current_occupied_room", lambda:
+         h._staged_areas(j, "fallback") == ("relay",)
+         and not h._room_route_moved(j, ("relay",)))
     h.occupied = ("a",)
     test("fallback_allowed_original_occupied_door_open",
          lambda: h._staged_areas(j, "fallback") == ("relay",))
