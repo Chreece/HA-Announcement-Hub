@@ -939,7 +939,7 @@ def test_empty_target_routes_to_other_occupied_room_not_fallback(monkeypatch):
     assert "entity:notify.kitchen" not in j.notify_outputs
 
 
-def test_unoccupied_target_cannot_trigger_door_gated_fallback(monkeypatch):
+def test_moved_listener_can_use_door_gated_fallback(monkeypatch):
     global manager
     manager = FakeManager(
         occupied=("wohnzimmer",), kitchen_min="warning",
@@ -952,9 +952,9 @@ def test_unoccupied_target_cannot_trigger_door_gated_fallback(monkeypatch):
     configure_manager(monkeypatch, manager)
     j = job()
     assert manager._staged_route_ready(j)
-    assert j.routing_stage == "general"
-    assert j.notify_outputs == ("entity:notify.phone",)
-    assert "fallback" in " ".join(j.routing_history)
+    assert j.routing_stage == "fallback"
+    assert j.outputs == ("eingang",)
+    assert j.notify_outputs == ("entity:notify.entrance",)
 
 
 def test_all_sleeping_uses_only_mobile_written_text_without_speech(monkeypatch):
@@ -1289,7 +1289,7 @@ def test_multi_room_output_does_not_play_to_stale_room(monkeypatch):
     assert not manager._room_route_moved(j, ("wohnzimmer",))
 
 
-def test_fallback_rechecks_original_target_not_empty_relay_room(monkeypatch):
+def test_fallback_rechecks_current_listener_not_empty_relay_room(monkeypatch):
     global manager
     manager = FakeManager(occupied=("kueche",))
     configure_manager(monkeypatch, manager)
@@ -1298,6 +1298,8 @@ def test_fallback_rechecks_original_target_not_empty_relay_room(monkeypatch):
     j.outputs = ("eingang",)
     assert not manager._room_route_moved(j, ("eingang",))
     manager.occupied = ("wohnzimmer",)
+    assert not manager._room_route_moved(j, ("eingang",))
+    manager.occupied = ()
     assert manager._room_route_moved(j, ("eingang",))
 
 

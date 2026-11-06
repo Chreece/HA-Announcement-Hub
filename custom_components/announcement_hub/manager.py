@@ -2828,27 +2828,29 @@ class AnnouncementManager:
     def _room_route_moved(
         self, job: AnnouncementJob, physical_areas: Sequence[str] = ()
     ) -> bool:
-        """Check fresh occupancy only for movable automatic room routing.
+        """Recheck current eligibility before physical room delivery.
 
         Never change a strict person, integration, entity or device recipient.
-        A deliberate fallback room may be empty, provided its ORIGINAL target
-        still has an occupant. Missing occupancy configuration is not proof
-        that a room is empty. No prior output receipt is fabricated.
+        A deliberate fallback room may be empty, provided a current eligible
+        listener can still hear it under the configured door rule. Missing
+        occupancy configuration is not proof that a primary room is empty.
+        No prior output receipt is fabricated.
         """
         if (
             job.routing_mode != "room_fallback"
-            or not job.occupancy_requested
             or job.routing_stage not in {"primary", "occupied", "fallback"}
         ):
+            return False
+        if job.routing_stage == "fallback":
+            # Movement, a closing door or a sleep transition can invalidate
+            # a relay after selection but before its physical service call.
+            return set(job.outputs) != set(self._staged_areas(job, "fallback"))
+        if not job.occupancy_requested:
             return False
         occupied = self._occupied_area_ids()
         if occupied is None:
             return False
         current = set(occupied)
-        if job.routing_stage == "fallback":
-            return bool(job.preferred_areas) and current.isdisjoint(
-                job.preferred_areas
-            )
         required = set(str(area) for area in physical_areas if area)
         if required:
             # Never broadcast to one stale room when several were selected
@@ -2929,21 +2931,22 @@ class AnnouncementManager:
         if stage == "occupied":
             return occupied
         if stage == "fallback":
-            # The alternate room is exclusively a relay for an awake person
-            # confirmed in the originally requested room. It never takes
-            # over for an empty or sleeping requested room.
-            target_present_and_awake = any(
-                area in occupied_now and area not in sleep_rooms
-                for area in job.preferred_areas
+            # Automatic jobs may have no explicit preferred room, and their
+            # listeners may have left an earlier target. Authorize the relay
+            # from the current eligible occupied rooms, including their doors.
+            # A fixed room request still needs a listener in its own room.
+            listeners = tuple(
+                area for area in (*preferred, *occupied)
+                if area in occupied_now
             )
             fallback = self._fallback_area_id()
             if (
-                target_present_and_awake
+                listeners
                 and fallback
                 and fallback not in sleep_rooms
                 and enabled.get(fallback, True) is not False
-                and fallback not in set((*job.preferred_areas, *occupied_now))
-                and self._fallback_door_allows(job.preferred_areas)
+                and fallback not in set((*preferred, *occupied))
+                and self._fallback_door_allows(listeners)
             ):
                 return (fallback,)
         return ()
@@ -3668,7 +3671,19 @@ class AnnouncementManager:
                 # alert can proceed while an earlier model cold-starts.
                 continue
             if job.routing_mode == "room_fallback":
-                if self._staged_route_ready(job):
+                ready = self._staged_route_ready(job)
+                # Resolving current occupancy/fallback can change both the
+                # room and physical outputs after the checks above. Reserve
+                # the new rooms even while waiting and recheck active output
+                # locks before starting a delivery on the refreshed route.
+                live_rooms = self._room_lane_keys(job)
+                blocked_live_room = bool((live_rooms - rooms) & reserved_rooms)
+                reserved_rooms.update(live_rooms)
+                if (
+                    ready
+                    and not blocked_live_room
+                    and not self._delivery_lane_keys(job) & active_resources
+                ):
                     return job
             elif self._job_runnable_now(job):
                 # A provider can be available but repeatedly reject or
@@ -4901,6 +4916,11 @@ class AnnouncementManager:
         if self._group_already_delivered(job, channel):
             self._record_channel_success(job, channel)
             return
+        if job.routing_mode == "room_fallback":
+            self._assert_live_room_route(
+                job,
+                (job.companion_tts_entry_areas.get(output.entry_id, output.area_id),),
+            )
         self._fire_channel_event(EVENT_CHANNEL_STARTED, job, channel)
         try:
             webhook_id = mobile_app_webhook_id(self.hass, output.entry_id)

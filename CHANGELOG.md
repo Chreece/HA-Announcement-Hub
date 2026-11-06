@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.10.0b40 - 2026-11-06
+
+**Beta — keep queued speech moving through the configured fallback after a room change.**
+
+- Allow automatic announcements with no explicit preferred room to use the
+  configured fallback when current occupied awake rooms cannot deliver.
+  Announcements also follow people away from an originally preferred room
+  without requiring them to return. A configured fallback may be the room
+  the person just left.
+- Check the enabled open-door rule against current eligible occupied rooms,
+  and recheck occupancy, sleep eligibility and doors before fallback playback.
+  An open door in the empty original room cannot authorize the new room.
+  Companion App speech also rechecks the route after availability waits and
+  before its notification service call.
+  Preserve the configured availability grace, sleep policy, disabled rooms
+  and exact recipient restrictions.
+- Recheck room and physical-output reservations after a queued route changes,
+  preventing overlapping speech on the same fallback or shared Snapcast
+  source. Newly resolved waiting rooms retain queue order.
+- Add executable movement, unavailable-output, live-door, sleep/occupancy,
+  recipient restriction and queue-serialization regression coverage. Update
+  the routing guide and translated settings help, and synchronize the
+  integration/card version.
+
+
 ## 0.10.0b39 - 2026-11-04
 
 **Beta — pair room sources with their attributes and number every reconfigure menu.**
