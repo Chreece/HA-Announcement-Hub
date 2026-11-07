@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Lister les fournisseurs disponibles",
       "description": "Liste les agents de conversation, les entités de tâches IA et les moteurs TTS activés pour Announcement Hub."
+    },
+    "queue_status": {
+      "name": "État de la file d’attente",
+      "description": "Affiche le nombre d’annonces en attente et actives ainsi que l’identifiant du capteur de file enregistré, sans texte des messages ni détails des destinataires."
     }
   }
 }
