@@ -104,6 +104,7 @@ from .const import (
     SERVICE_CANCEL,
     SERVICE_CLEAR_QUEUE,
     SERVICE_LIST_QUEUE,
+    SERVICE_QUEUE_STATUS,
     SERVICE_REORDER_QUEUE,
     SERVICE_LIST_PROVIDERS,
     SERVICE_LIST_PERSON_TARGETS,
@@ -749,6 +750,20 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
         response: ServiceResponse = _get_manager(hass).queue_view()
         return response if call.return_response else None
 
+    async def async_queue_status(call: ServiceCall) -> ServiceResponse:
+        """Small, message-free source of truth for a renamed/disabled sensor."""
+        manager = _get_manager(hass)
+        registry = er.async_get(hass)
+        queue_entity_id = registry.async_get_entity_id(
+            "sensor", DOMAIN, f"{manager.entry.entry_id}_queue"
+        )
+        response: ServiceResponse = {
+            "queue_size": manager.queue_size,
+            "active_count": len(manager._active_jobs),
+            "queue_entity_id": queue_entity_id,
+        }
+        return response if call.return_response else None
+
     async def async_reorder_queue(call: ServiceCall) -> ServiceResponse:
         manager = _get_manager(hass)
         response: ServiceResponse = await manager.async_reorder_queue(
@@ -848,6 +863,15 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
             DOMAIN,
             SERVICE_LIST_QUEUE,
             async_list_queue,
+            schema=probatio.Schema({}),
+            supports_response=SupportsResponse.OPTIONAL,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_QUEUE_STATUS):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_QUEUE_STATUS,
+            async_queue_status,
             schema=probatio.Schema({}),
             supports_response=SupportsResponse.OPTIONAL,
         )
