@@ -33,7 +33,7 @@ def _read(lang):
 
 def test_chinese_native_catalogs_have_599_keys_no_english_help():
     en = _read("en")
-    assert len(en) == 671
+    assert len(en) == 673
     for lang in LANGUAGES:
         loc = _read(lang)
         assert set(loc) == set(en), lang
