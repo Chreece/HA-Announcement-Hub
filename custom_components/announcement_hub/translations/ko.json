@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "사용 가능한 제공자 목록",
       "description": "Announcement Hub용 대화 에이전트, AI Task 엔터티 및 활성 TTS 엔진을 표시합니다."
+    },
+    "queue_status": {
+      "name": "대기열 상태",
+      "description": "대기 중인 알림과 진행 중인 알림의 수, 등록된 대기열 센서 ID를 표시합니다. 메시지 본문이나 수신자 정보는 포함하지 않습니다."
     }
   }
 }
