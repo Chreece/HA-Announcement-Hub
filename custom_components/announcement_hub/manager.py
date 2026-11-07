@@ -5807,7 +5807,7 @@ class AnnouncementManager:
                 # asyncio.wait_for alone can hang indefinitely if a provider
                 # suppresses cancellation; asyncio.wait cannot.
                 configured = float(getattr(self, "settings", {}).get(
-                    CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT
+                    "ai_provider_timeout", 60.0
                 ))
                 deadline = min(max(configured, 0.01), 60.0)
                 provider_task = asyncio.create_task(async_filter_announcement(
