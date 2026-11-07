@@ -8,7 +8,7 @@
   const ROOT = "/announcement_hub/";
   // Keep this aligned with the beta manifest. Version each companion asset so
   // an old JS module cannot silently mix with a newer HTML/CSS card.
-  const FRONTEND_VERSION = "0.10.0b41";
+  const FRONTEND_VERSION = "0.10.0b42";
   const assetUrl = (name) => ROOT + name + "?v=" + encodeURIComponent(FRONTEND_VERSION);
   const DOC_URL = "https://github.com/Chreece/HA-Announcement-Hub#dashboard-card";
   const LEVELS = [
@@ -193,6 +193,14 @@
       this._queueError = "";
       this._queueStatus = "";
       this._queueObservedCount = null;
+      // The sensor's generated entity ID may be localized, renamed or
+      // disabled. The authenticated queue_status service is our fallback.
+      this._queueEntityId = "sensor.announcement_hub_queue";
+      this._queueServiceCount = null;
+      this._queueServiceFetchedAt = 0;
+      this._queueStatusLastAttempt = 0;
+      this._queueStatusLoading = false;
+      this._queuePollTimer = null;
       this._confirming = false;
       this._localeCode = null;
       this._localeRendered = false;
@@ -235,7 +243,24 @@
         if (!this._loaded && !this._loading) void this._loadRegistry();
       }
     }
-    connectedCallback() { void this._mount(); }
+    connectedCallback() {
+      void this._mount();
+      // Poll ONLY counts, never message bodies. Real HA sensor updates
+      // still drive immediate refresh; polling covers disabled/renamed sensors.
+      if (!this._queuePollTimer && typeof window.setInterval === "function") {
+        this._queuePollTimer = window.setInterval(() => {
+          if (this._mounted && this._config.show_queue !== false) {
+            void this._refreshQueueStatus();
+          }
+        }, 10000);
+      }
+    }
+    disconnectedCallback() {
+      if (this._queuePollTimer) {
+        window.clearInterval(this._queuePollTimer);
+        this._queuePollTimer = null;
+      }
+    }
     getCardSize() { return 4; }
     getLayoutOptions() {
       return { grid_columns: 6, grid_rows: 5, grid_min_columns: 3, grid_min_rows: 3 };
@@ -603,7 +628,19 @@
         const get = (index) => results[index].status === "fulfilled" && Array.isArray(results[index].value) ? results[index].value : [];
         const areas = get(0);
         const devices = get(1);
-        const entities = get(2).filter((entity) => /^(notify|media_player)\./.test(entity.entity_id) && !entity.disabled_by);
+        const registered = get(2);
+        // The registry, not an assumed "sensor.announcement_hub_queue",
+        // identifies the entity even after a user renames it in Home Assistant.
+        const queueEntity = registered.find((entity) =>
+          entity.platform === "announcement_hub" &&
+          /^sensor\./.test(entity.entity_id || "") &&
+          /_queue$/.test(entity.unique_id || "")
+        );
+        if (queueEntity) {
+          this._queueEntityId = queueEntity.entity_id;
+          this._updateQueue();
+        }
+        const entities = registered.filter((entity) => /^(notify|media_player)\./.test(entity.entity_id) && !entity.disabled_by);
         this._registry.area = areas.map((area) => ({ value: area.area_id, label: area.name || area.area_id }));
         const activeDevices = new Set(entities.map((entity) => entity.device_id).filter(Boolean));
         this._registry.device = devices.filter((device) => activeDevices.has(device.id))
@@ -1054,6 +1091,10 @@
         if (!this._queueOpen) return;
         this._queueJobs = reply.jobs;
         this._queueActive = reply.active;
+        this._queueServiceCount = Number.isInteger(reply.queue_size)
+          ? reply.queue_size : reply.jobs.length;
+        this._queueServiceFetchedAt = Date.now();
+        this._updateQueue();
         this._queueStatus = "";
         if (this._queueRemoveId && ![...this._queueJobs, ...this._queueActive].some(
           (job) => job.job_id === this._queueRemoveId
@@ -1225,12 +1266,55 @@
       }
     }
 
+    async _refreshQueueStatus(force = false) {
+      if (!this._mounted || this._config.show_queue === false ||
+          !this._hass?.callService || this._queueStatusLoading) return;
+      const now = Date.now();
+      if (!force && now - this._queueStatusLastAttempt < 10000) return;
+      this._queueStatusLastAttempt = now;
+      this._queueStatusLoading = true;
+      try {
+        // No titles, message bodies or recipient details leave the backend.
+        const reply = servicePayload(await this._hass.callService(
+          "announcement_hub", "queue_status", {}, undefined, false, true
+        ));
+        if (!Number.isSafeInteger(reply?.queue_size) || reply.queue_size < 0) return;
+        if (typeof reply.queue_entity_id === "string" &&
+            /^sensor\.[a-z0-9_]+$/.test(reply.queue_entity_id)) {
+          this._queueEntityId = reply.queue_entity_id;
+        }
+        this._queueServiceCount = reply.queue_size;
+        this._queueServiceFetchedAt = Date.now();
+        this._updateQueue();
+      } catch (_error) {
+        // Keep compatible with older installations and unavailable services.
+        // A valid native sensor still works without the status service.
+      } finally {
+        this._queueStatusLoading = false;
+      }
+    }
+
     _updateQueue() {
       if (!this._mounted || this._config.show_queue === false) return;
-      const state = this._hass?.states?.["sensor.announcement_hub_queue"];
-      const count = state && /^\d+$/.test(String(state.state)) ? String(state.state) : "–";
+      const state = this._hass?.states?.[this._queueEntityId];
+      const sensorCount = state && /^\d+$/.test(String(state.state))
+        ? Number(state.state) : null;
+      const sensorUpdated = Date.parse(state?.last_updated || state?.last_changed || "");
+      // Prefer whichever observation is newer. This prevents the old sensor
+      // state from hiding a freshly accepted message or a just-cleared queue.
+      const useService = Number.isSafeInteger(this._queueServiceCount) &&
+        (sensorCount === null || (Number.isFinite(sensorUpdated) &&
+         this._queueServiceFetchedAt >= sensorUpdated));
+      const value = useService ? this._queueServiceCount : sensorCount;
+      const count = Number.isSafeInteger(value) ? String(value) : "–";
       this.$("queue-number").textContent = count;
-      this.$("queue-pill").title = count === "–" ? this._t("Queue sensor unavailable") : this._t("{count} waiting announcements", { count });
+      this.$("queue-pill").title = count === "–"
+        ? this._t("Queue sensor unavailable")
+        : this._t("{count} waiting announcements", { count });
+      if (sensorCount === null && (
+        !Number.isSafeInteger(this._queueServiceCount) ||
+        Date.now() - this._queueServiceFetchedAt >= 10000
+      )) void this._refreshQueueStatus();
       if (this._queueOpen && this._queueObservedCount !== count) {
         this._queueObservedCount = count;
         void this._fetchQueue();
@@ -1269,7 +1353,11 @@
           // The service may have run even if its response was lost.
           this._notice(this._t("Stop request sent. Check the queue before retrying."), true);
         }
-        this._updateQueue();
+        if (Number.isSafeInteger(reply?.queue_size)) {
+          this._queueServiceCount = reply.queue_size;
+          this._queueServiceFetchedAt = Date.now();
+          this._updateQueue();
+        }
         if (this._queueOpen) void this._fetchQueue();
       } catch (error) {
         // Never automatically repeat a destructive service call.
@@ -1324,6 +1412,11 @@
           this._notice(this._t("Queued #{id}{related}. Delivery will follow Hub routing.", {id: reply.job_id.slice(0, 10), related}), true);
         } else {
           this._notice(this._t("Request submitted. Check Announcement Hub's queue for status."), true);
+        }
+        if (Number.isSafeInteger(reply?.queue_size)) {
+          this._queueServiceCount = reply.queue_size;
+          this._queueServiceFetchedAt = Date.now();
+          this._updateQueue();
         }
         if (this._queueOpen) void this._fetchQueue();
         if (this._config.clear_after_send === true) {

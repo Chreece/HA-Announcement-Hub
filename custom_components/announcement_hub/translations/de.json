@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Verfügbare Anbieter auflisten",
       "description": "Zeigt Konversationsagenten, AI-Task-Entitäten und aktivierte TTS-Engines für die Auswahl im Announcement Hub."
+    },
+    "queue_status": {
+      "name": "Warteschlangenstatus",
+      "description": "Zeigt die Anzahl wartender und aktiver Durchsagen sowie die registrierte Queue-Sensor-ID an, ohne Nachrichtentexte oder Empfängerdaten."
     }
   }
 }

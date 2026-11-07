@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Elenca fornitori disponibili",
       "description": "Elenca agenti di conversazione, entità AI Task e motori TTS abilitati per Announcement Hub."
+    },
+    "queue_status": {
+      "name": "Stato della coda",
+      "description": "Mostra il numero di annunci in attesa e attivi e l’ID del sensore di coda registrato, senza testi dei messaggi né informazioni sui destinatari."
     }
   }
 }

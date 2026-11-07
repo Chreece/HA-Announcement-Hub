@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "List available providers",
       "description": "List configured Conversation agents, AI Task entities and enabled TTS engines for Announcement Hub's provider selectors."
+    },
+    "queue_status": {
+      "name": "Queue status",
+      "description": "Return the waiting and active announcement counts and the registered queue sensor ID, without message text or recipient details."
     }
   }
 }

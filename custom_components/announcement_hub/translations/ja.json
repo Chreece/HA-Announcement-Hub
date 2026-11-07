@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "利用可能なプロバイダーを一覧表示",
       "description": "Announcement Hub 用の会話エージェント、AI Task エンティティ、有効な TTS エンジンを一覧表示します。"
+    },
+    "queue_status": {
+      "name": "キューの状態",
+      "description": "待機中および実行中のアナウンスの件数と登録済みキューセンサーのIDを表示します。メッセージ本文や宛先情報は含まれません。"
     }
   }
 }

@@ -164,6 +164,10 @@ list_queue:
   description: List the full waiting queue and active announcements, including their text, for authenticated dashboard queue management. Message bodies are never exposed in sensor state.
   fields: {}
 
+queue_status:
+  description: Read only the pending and active announcement counts and the registered queue sensor entity ID. No message text or recipients are included.
+  fields: {}
+
 reorder_queue:
   description: Move one waiting announcement up or down, preserving its new order across Home Assistant restarts. Active announcements cannot be moved.
   fields:
