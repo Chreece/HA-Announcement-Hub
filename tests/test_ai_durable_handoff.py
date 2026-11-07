@@ -85,6 +85,39 @@ def _run(harness, job):
     return asyncio.run(handler(harness, job))
 
 
+def _run_cancelled(harness, job, *, check_title=False):
+    """Cancel the manager job, not the provider's request, to test restart safety."""
+    entered = asyncio.Event()
+
+    async def waiting_provider(_hass, **kwargs):
+        if check_title:
+            assert kwargs["title_result"] is not None
+        entered.set()
+        await asyncio.Event().wait()
+
+    harness._rewrite = waiting_provider
+    handler = _method(
+        "_async_rewrite_job",
+        async_filter_announcement=waiting_provider,
+        _LOGGER=SimpleNamespace(exception=lambda *_args, **_kw: None,
+                                warning=lambda *_args, **_kw: None),
+        datetime=datetime, UTC=UTC, timedelta=timedelta,
+    )
+
+    async def scenario():
+        processing = asyncio.create_task(handler(harness, job))
+        await asyncio.wait_for(entered.wait(), timeout=1)
+        processing.cancel()
+        try:
+            await processing
+        except asyncio.CancelledError:
+            pass
+        else:
+            raise AssertionError("The manager swallowed shutdown cancellation")
+
+    asyncio.run(scenario())
+
+
 def test_failed_ai_preserves_original_and_wakes_delivery():
     async def failed(_hass, **_kwargs):
         raise RuntimeError("provider failed")
@@ -128,17 +161,10 @@ def test_successful_ai_rewrite_changes_only_selected_channel():
 
 
 def test_cancelled_ai_request_remains_retryable():
-    async def interrupted(_hass, **_kwargs):
-        raise asyncio.CancelledError
-    h = Harness(interrupted)
+    h = Harness(None)
     job = _job()
     h._queue.append(job)
-    try:
-        _run(h, job)
-    except asyncio.CancelledError:
-        pass
-    else:
-        raise AssertionError("Cancellation was swallowed")
+    _run_cancelled(h, job)
     assert job.ai["pending_preprocessing"] is True
     assert job.ai["status"] == "pending"
     assert h._prefetched == []
@@ -198,22 +224,13 @@ def test_supplied_title_is_not_overwritten_by_generation():
 
 
 def test_failure_or_restart_preserves_default_title_and_request_flag():
-    async def interrupted(_hass, **kwargs):
-        assert kwargs["title_result"] is not None
-        raise asyncio.CancelledError
-
-    harness = Harness(interrupted)
+    harness = Harness(None)
     job = _job()
     job.title = "Configured Notification Title"
     job.ai["requested_mode"] = "generate"
     job.ai["requested_generate_title"] = True
     harness._queue.append(job)
-    try:
-        _run(harness, job)
-    except asyncio.CancelledError:
-        pass
-    else:
-        raise AssertionError("AI interruption was swallowed")
+    _run_cancelled(harness, job, check_title=True)
     assert job.ai["pending_preprocessing"] is True
     assert job.ai["requested_generate_title"] is True
     assert job.title == "Configured Notification Title"
@@ -223,10 +240,10 @@ def test_failure_or_restart_preserves_default_title_and_request_flag():
     harness._rewrite = failed
     _run(harness, job)
     assert job.title == "Configured Notification Title"
-    assert job.ai["status"] == "waiting_for_ai"
-    assert job.ai["pending_preprocessing"] is True
-    assert job.ai["requested_generate_title"] is True
-    assert job.ai["generation_retry_after"]
+    assert job.ai["status"] == "fallback_original"
+    assert job.ai["pending_preprocessing"] is False
+    assert "requested_generate_title" not in job.ai
+    assert "generation_retry_after" not in job.ai
     assert job.notify_text == "Window open"
 
 

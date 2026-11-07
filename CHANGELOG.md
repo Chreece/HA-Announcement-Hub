@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.10.0b41 - 2026-11-07
+
+**Beta — fail open during Ollama/AI outages instead of filling the announcement queue.**
+
+- Detect missing/unavailable conversation and AI Task entities and missing
+  Home Assistant AI services before starting an expensive model request.
+  After a connection error or timeout, temporarily circuit-break the
+  failing provider. A healthy configured backup remains eligible; later
+  messages retry automatically when the circuit breaker expires.
+- Immediately release queued announcements with their **original text**
+  when AI is unavailable, even when both AI preprocessing slots are busy.
+  Keep the original recipients, room FIFO, delivery channels, physical
+  output locks and the existing TTS routing behavior. Do not discard
+  undelivered announcements just because a device is unavailable.
+- Bound the **entire** AI preprocessing request to 60 seconds, including
+  model generation, retries and backup attempts. A service that ignores
+  task cancellation no longer holds up the queue; track such tasks until
+  they finish so the same failed provider is not called repeatedly.
+- Stop indefinitely deferring generation-mode jobs when AI is down:
+  deliver the supplied source message unchanged instead of allowing the
+  persistent queue to fill. If the source is phrased as an instruction to
+  generate text, it will be delivered literally during an AI outage.
+- Set the default AI provider timeout to 60 seconds and clamp older
+  configured higher values to the same maximum. Add tests for a 60-item
+  offline queue, missing provider/service, failed connections, provider
+  cancellation, and Home Assistant restart safety.
+
 ## 0.10.0b40 - 2026-11-06
 
 **Beta — keep queued speech moving through the configured fallback after a room change.**

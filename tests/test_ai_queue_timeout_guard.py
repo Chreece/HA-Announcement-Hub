@@ -1,4 +1,4 @@
-"""Bound provider waits, keep generate prompts queued, and recover after cooldown."""
+"""Bound provider waits, deliver originals during outages, recover after cooldown."""
 from __future__ import annotations
 
 import ast
@@ -16,7 +16,7 @@ MANAGER = ROOT / 'manager.py'
 
 def test_all_provider_requests_have_a_deadline():
     src = FILTER.read_text()
-    assert 'AI_FILTER_PROVIDER_TIMEOUT_SECONDS = 120.0' in src
+    assert 'AI_FILTER_PROVIDER_TIMEOUT_SECONDS = 60.0' in src
     tree = ast.parse(src)
     provider_calls = [
         node for node in ast.walk(tree) if isinstance(node, ast.Call)
@@ -100,12 +100,12 @@ def test_generate_timeout_and_rewrite_circuit_breaker():
         gen = Job('generate')
         manager._queue.append(gen)
         await manager._async_rewrite_job(gen)
-        assert gen.ai['pending_preprocessing'] is True
-        assert gen.ai['status'] == 'waiting_for_ai'
+        assert gen.ai['pending_preprocessing'] is False
+        assert gen.ai['status'] == 'fallback_original'
         assert gen.ai['failure_reason'] == 'provider_timeout'
-        assert gen.ai['generation_retry_after']
+        assert 'generation_retry_after' not in gen.ai
         assert gen.text_tts.startswith('Write an announcement')
-        assert gen.tts_text is None
+        assert gen.tts_text == gen.text_tts
         assert manager._ai_provider_cooling('ai_task.local')
         calls = service.calls
 
@@ -119,10 +119,11 @@ def test_generate_timeout_and_rewrite_circuit_breaker():
 
         manager._ai_provider_cooldowns.clear()
         service.slow = False
-        gen.ai['generation_retry_after'] = (datetime.now(UTC) - timedelta(seconds=1)).isoformat()
-        await manager._async_rewrite_job(gen)
-        assert not gen.ai['pending_preprocessing']
-        assert gen.text_tts == 'Generated result.'
-        assert 'generation_retry_after' not in gen.ai
+        new_gen = Job('generate')
+        manager._queue.append(new_gen)
+        await manager._async_rewrite_job(new_gen)
+        assert not new_gen.ai['pending_preprocessing']
+        assert new_gen.text_tts == 'Generated result.'
+        assert 'generation_retry_after' not in new_gen.ai
 
     asyncio.run(check())

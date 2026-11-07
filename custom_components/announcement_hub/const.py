@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 DOMAIN: Final = "announcement_hub"
 NAME: Final = "Announcement Hub"
-VERSION: Final = "0.10.0b40"
+VERSION: Final = "0.10.0b41"
 PLATFORMS: Final = [Platform.SENSOR, Platform.SWITCH]
 
 SERVICE_SEND: Final = "send"
@@ -304,7 +304,7 @@ DEFAULT_IDLE_TIMEOUT: Final = 180.0
 DEFAULT_START_TIMEOUT: Final = 10.0
 DEFAULT_PLAYBACK_TIMEOUT: Final = 300.0
 DEFAULT_POST_PLAY_DELAY: Final = 0.15
-DEFAULT_AI_PROVIDER_TIMEOUT: Final = 120.0
+DEFAULT_AI_PROVIDER_TIMEOUT: Final = 60.0
 DEFAULT_SERVICE_CALL_TIMEOUT: Final = 30.0
 DEFAULT_TTS_RENDER_TIMEOUT: Final = 120.0
 DEFAULT_DELIVERY_ATTEMPT_TIMEOUT: Final = 420.0

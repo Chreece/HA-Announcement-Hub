@@ -2165,9 +2165,17 @@ class _AnnouncementFlowMixin:
                 ),
                 probatio.Required(
                     CONF_AI_PROVIDER_TIMEOUT,
-                    default=self._value(CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT),
+                    default=(
+                        min(60.0, max(5.0, self._value(
+                            CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT
+                        )))
+                        if isinstance(self._value(
+                            CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT
+                        ), (int, float))
+                        else DEFAULT_AI_PROVIDER_TIMEOUT
+                    ),
                 ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(min=5, max=900, step=5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
+                    selector.NumberSelectorConfig(min=5, max=60, step=5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
                 ),
                 probatio.Required(
                     CONF_SERVICE_CALL_TIMEOUT,

@@ -406,7 +406,7 @@ def test_slow_primary_finishes_before_timeout_without_backup(monkeypatch, caplog
     assert len(hass.services.calls) == 1
     assert diag["status"] == "rewritten"
     assert diag["attempt_duration_seconds"]["conversation.primary"] >= 0.05
-    assert "provider timeout is 120 seconds" in caplog.text
+    assert "provider timeout is 60 seconds" in caplog.text
 
 
 def test_backend_timeout_is_reported_as_provider_failure_not_local_cutoff() -> None:
@@ -763,7 +763,9 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert "resolve_ai_enabled(" in manager
     assert "if ai_enabled:" in manager
     assert manager.count("Announcement queue is full") == 1
-    assert "rewritten_tts, rewritten_notify = await async_filter_announcement(" in manager
+    assert "provider_task = asyncio.create_task(async_filter_announcement(" in manager
+    assert "await asyncio.wait(" in manager
+    assert "deadline = min(max(configured, 0.01), 60.0)" in manager
     assert "text_tts=original_tts," in manager
     assert "text_notify=original_notify," in manager
     assert "job.text_tts, job.text_notify = rewritten_tts, rewritten_notify" in manager
