@@ -708,6 +708,13 @@ class AnnouncementManager:
                 task.cancel()
             if ai_tasks:
                 await asyncio.gather(*ai_tasks, return_exceptions=True)
+            # Non-cooperative provider calls have already been disconnected
+            # from delivery deadlines; request cancellation again, but never
+            # block HA shutdown waiting for them.
+            for orphans in self._ai_provider_orphans.values():
+                for task in orphans:
+                    task.cancel()
+            self._ai_provider_orphans.clear()
 
             # Prefetch operations are also entry-owned background tasks. Cancel
             # and await every one before the queue snapshot is written.
@@ -5684,15 +5691,10 @@ class AnnouncementManager:
             return
         if sum(not task.done() for task in self._ai_tasks.values()) >= self._max_parallel_ai:
             return
-        # Failed generation remains durable, never becomes spoken prompt.
-        retry_after = job.ai.get("generation_retry_after")
-        if retry_after:
-            try:
-                if datetime.now(UTC) < datetime.fromisoformat(retry_after):
-                    return
-            except (TypeError, ValueError):
-                # Corrupt retry metadata must not make the job permanent.
-                job.ai.pop("generation_retry_after", None)
+        # Older versions held failed generation requests in the queue and
+        # delayed them for hours. The current fail-open policy never defers a
+        # message solely because an AI provider is offline.
+        job.ai.pop("generation_retry_after", None)
         # Same-room jobs, and jobs using the SAME AI provider, must not
         # issue overlapping model calls. A local model may be live while
         # simultaneously rejecting another generation request. Different
@@ -5751,32 +5753,64 @@ class AnnouncementManager:
         # fallback title if generation fails.
         title_result: dict[str, str] = {}
         started = asyncio.get_running_loop().time()
+        provider_task: asyncio.Task[Any] | None = None
+        primary = ai.get("requested_agent_id")
+        backup = ai.get("requested_fallback_agent_id")
+
+        def abandon_provider(task: asyncio.Task[Any], key: str | None) -> None:
+            # Some HA/Ollama service calls ignore cancellation. Never await
+            # cancellation acknowledgement on the delivery-critical path.
+            orphans = getattr(self, "_ai_provider_orphans", None)
+            active = None
+            if orphans is not None:
+                active = orphans.setdefault(str(key or ""), set())
+                active.add(task)
+
+            def drained(done: asyncio.Task[Any]) -> None:
+                if active is not None:
+                    active.discard(done)
+                if not done.cancelled():
+                    try:
+                        done.exception()  # consume a late provider failure
+                    except Exception:
+                        pass
+
+            task.add_done_callback(drained)
+            task.cancel()
+
         try:
-            primary = ai.get("requested_agent_id")
-            backup = ai.get("requested_fallback_agent_id")
+            unavailable = getattr(
+                self, "_ai_provider_unavailable", self._ai_provider_cooling
+            )
             use_primary, use_backup = primary, backup
             skip_provider = False
-            if self._ai_provider_cooling(primary):
-                if backup and not self._ai_provider_cooling(backup):
-                    # A healthy backup is still allowed to generate text.
+            if unavailable(primary):
+                if backup and not unavailable(backup):
                     use_primary, use_backup = backup, None
                 else:
                     skip_provider = True
-            elif backup and self._ai_provider_cooling(backup):
+            elif backup and unavailable(backup):
                 use_backup = None
             if skip_provider:
-                # For rewrite/translate only, the original is usable text.
-                # For generate, it remains *instructions*, never output.
                 rewritten_tts, rewritten_notify = original_tts, original_notify
                 ai.update({
-                    "attempted": False,
-                    "status": "fallback_original",
-                    "agent_used": None,
-                    "attempts": [],
-                    "failure_reason": "provider_cooldown",
+                    "attempted": False, "status": "fallback_original",
+                    "agent_used": None, "attempts": [],
+                    "failure_reason": (
+                        "provider_cooldown" if self._ai_provider_cooling(primary)
+                        else "provider_unavailable"
+                    ),
                 })
             else:
-                rewritten_tts, rewritten_notify = await async_filter_announcement(
+                # An entire AI job has ONE hard deadline, including backup
+                # agents, malformed-response retries and schema retries.
+                # asyncio.wait_for alone can hang indefinitely if a provider
+                # suppresses cancellation; asyncio.wait cannot.
+                configured = float(getattr(self, "settings", {}).get(
+                    CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT
+                ))
+                deadline = min(max(configured, 0.01), 60.0)
+                provider_task = asyncio.create_task(async_filter_announcement(
                     self.hass,
                     text_tts=original_tts,
                     text_notify=original_notify,
@@ -5786,12 +5820,38 @@ class AnnouncementManager:
                     mode=ai.get("requested_mode", "rewrite"),
                     target_language=ai.get("requested_target_language"),
                     prompt_templates=getattr(self, "settings", {}).get("ai_prompt_templates", {}),
-                    provider_timeout_seconds=float(getattr(self, "settings", {}).get("ai_provider_timeout", 120.0)),
+                    provider_timeout_seconds=deadline,
                     title_result=(
                         title_result if ai.get("requested_generate_title") else None
                     ),
+                ))
+                done, _pending = await asyncio.wait(
+                    {provider_task}, timeout=deadline
                 )
+                if not done:
+                    abandon_provider(provider_task, use_primary)
+                    provider_task = None
+                    rewritten_tts, rewritten_notify = original_tts, original_notify
+                    ai.update({
+                        "attempted": True, "status": "fallback_original",
+                        "agent_used": None, "failure_reason": "provider_timeout",
+                        "attempts": [
+                            *ai.get("attempts", []),
+                            {"agent": str(use_primary or ""), "outcome": "provider_timeout"},
+                        ],
+                    })
+                    _LOGGER.warning(
+                        "Announcement AI exceeded %.0f second hard deadline; "
+                        "delivering original without waiting for Ollama",
+                        deadline,
+                    )
+                elif provider_task.cancelled():
+                    raise RuntimeError("AI provider cancelled its request")
+                else:
+                    rewritten_tts, rewritten_notify = provider_task.result()
         except asyncio.CancelledError:
+            if provider_task is not None and not provider_task.done():
+                abandon_provider(provider_task, primary)
             ai["status"] = "pending"
             raise
         except Exception:  # noqa: BLE001
@@ -5810,35 +5870,28 @@ class AnnouncementManager:
         # Cancellation or queue clearing can race with completion.
         if job not in self._queue or not self._running:
             return
-        # Record actual timeouts per provider, including a primary that
-        # timed out before a working fallback succeeded.
+        # A refused connection is proof of an outage just as a timeout is.
+        # Do not reattempt Ollama for every pending announcement.
         for attempt in ai.get("attempts", []):
-            if not isinstance(attempt, dict) or attempt.get("outcome") != "provider_timeout":
+            if not isinstance(attempt, dict) or attempt.get("outcome") not in {
+                "provider_timeout", "agent_error", "provider_unavailable",
+            }:
                 continue
             key = str(attempt.get("agent") or primary or "")
-            cooldown_end = datetime.now(UTC) + timedelta(minutes=5)
+            seconds = (
+                120 if attempt.get("outcome") == "provider_timeout" else 60
+            )
+            cooldown_end = datetime.now(UTC) + timedelta(seconds=seconds)
             self._ai_provider_cooldowns[key] = cooldown_end
             if key == str(ai.get("agent") or primary or ""):
                 self._ai_provider_cooldowns[str(primary or "")] = cooldown_end
-            _LOGGER.warning("Announcement AI provider %s timed out; cooling for 300s", key)
-        if ai.get("requested_mode") == "generate" and ai.get("status") == "fallback_original":
-            # Crucial: source_tts/source_notify here contain writing INSTRUCTIONS.
-            # Do NOT change job.text_*, do NOT clear pending_preprocessing, and
-            # do NOT prefetch or dispatch any channel with these instructions.
-            failed_attempts = min(int(ai.get("generation_failed_attempts") or 0) + 1, 100)
-            ai["generation_failed_attempts"] = failed_attempts
-            delay = min(3600, 300 * 2 ** min(failed_attempts - 1, 4))
-            ai["generation_retry_after"] = (
-                datetime.now(UTC) + timedelta(seconds=delay)
-            ).isoformat()
-            ai["status"] = "waiting_for_ai"
-            ai["pending_preprocessing"] = True
-            _LOGGER.warning("Announcement generation %s deferred for %ds after AI failure",
-                            job.job_id, delay)
-            self._schedule_save()
-            self._wake.set()
-            self._notify_update()
-            return
+            _LOGGER.warning(
+                "Announcement AI provider %s is unavailable (%s); "
+                "cooling for %ds", key, attempt.get("outcome"), seconds
+            )
+        # Fail open even for generate-mode announcements. The original
+        # supplied message is the only permitted deterministic fallback;
+        # retaining it as an undeliverable prompt filled the durable queue.
         ai.pop("generation_retry_after", None)
         ai.pop("generation_failed_attempts", None)
         job.text_tts, job.text_notify = rewritten_tts, rewritten_notify
