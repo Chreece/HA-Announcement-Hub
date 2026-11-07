@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0b42 - 2026-11-07
+
+**Beta — restore the dashboard pending-queue counter with renamed or unavailable sensor entities.**
+
+- Give newly registered Announcement Hub queue sensors a stable suggested
+  entity ID, without renaming or overwriting existing Home Assistant
+  entity-registry entries or user-customized IDs.
+- Detect an existing renamed queue sensor by its actual registered unique ID
+  instead of assuming the card's sensor is always
+  `sensor.announcement_hub_queue`.
+- Add a small authenticated `announcement_hub.queue_status` action returning
+  only waiting/active counts and the registered sensor entity ID. No private
+  announcement text, titles or recipients are exposed by status polling.
+- Display counts from this read-only status when the sensor was disabled,
+  unavailable or has not yet appeared in Home Assistant. Poll counts at a
+  bounded interval and show fresh values immediately from acknowledged sends,
+  queue-manager responses and Stop & Clear.
+- Add Python and browser regressions for localized/renamed sensor IDs,
+  disabled sensor fallback, zero and nonzero counts, privacy and cache updates.
+  Preserve the private on-demand queue viewer and the existing room FIFO.
+
 ## 0.10.0b41 - 2026-11-07
 
 **Beta — fail open during Ollama/AI outages instead of filling the announcement queue.**
