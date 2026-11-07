@@ -763,7 +763,9 @@ def test_config_and_actions_support_optional_ai_overrides() -> None:
     assert "resolve_ai_enabled(" in manager
     assert "if ai_enabled:" in manager
     assert manager.count("Announcement queue is full") == 1
-    assert "rewritten_tts, rewritten_notify = await async_filter_announcement(" in manager
+    assert "provider_task = asyncio.create_task(async_filter_announcement(" in manager
+    assert "await asyncio.wait(" in manager
+    assert "deadline = min(max(configured, 0.01), 60.0)" in manager
     assert "text_tts=original_tts," in manager
     assert "text_notify=original_notify," in manager
     assert "job.text_tts, job.text_notify = rewritten_tts, rewritten_notify" in manager
