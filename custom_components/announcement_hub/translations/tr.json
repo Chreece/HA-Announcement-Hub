@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Kullanılabilir sağlayıcıları listele",
       "description": "Announcement Hub için konuşma aracılarını, AI Task varlıklarını ve etkin TTS motorlarını listeler."
+    },
+    "queue_status": {
+      "name": "Kuyruk durumu",
+      "description": "Bekleyen ve etkin duyuruların sayısını ve kayıtlı kuyruk sensörünün kimliğini, mesaj metni veya alıcı bilgilerini açıklamadan gösterir."
     }
   }
 }
