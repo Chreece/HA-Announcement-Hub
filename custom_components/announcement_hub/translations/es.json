@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Listar proveedores disponibles",
       "description": "Lista agentes de conversación, entidades de tareas de IA y motores TTS habilitados para Announcement Hub."
+    },
+    "queue_status": {
+      "name": "Estado de la cola",
+      "description": "Muestra el número de anuncios pendientes y activos y el ID del sensor de cola registrado, sin textos de mensajes ni datos de destinatarios."
     }
   }
 }
