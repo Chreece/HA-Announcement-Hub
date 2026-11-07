@@ -2165,7 +2165,7 @@ class _AnnouncementFlowMixin:
                 ),
                 probatio.Required(
                     CONF_AI_PROVIDER_TIMEOUT,
-                    default=min(60, self._value(CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT)),
+                    default=min(60.0, float(self._value(CONF_AI_PROVIDER_TIMEOUT, DEFAULT_AI_PROVIDER_TIMEOUT))),
                 ): selector.NumberSelector(
                     selector.NumberSelectorConfig(min=5, max=60, step=5, mode=selector.NumberSelectorMode.BOX, unit_of_measurement="s")
                 ),
