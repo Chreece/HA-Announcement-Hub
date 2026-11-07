@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Listar provedores disponíveis",
       "description": "Lista agentes de conversa, entidades AI Task e mecanismos TTS habilitados para Announcement Hub."
+    },
+    "queue_status": {
+      "name": "Estado da fila",
+      "description": "Exibe a quantidade de anúncios pendentes e ativos e o ID do sensor de fila registrado, sem conteúdo das mensagens ou dados dos destinatários."
     }
   }
 }
