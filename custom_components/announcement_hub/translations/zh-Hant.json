@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "列出可用供應商",
       "description": "列出對話代理、AI Task 實體與啟用的 TTS 引擎，供 Announcement Hub 選擇。"
+    },
+    "queue_status": {
+      "name": "佇列狀態",
+      "description": "顯示等待中與正在處理的公告數量及已註冊佇列感測器的實體 ID，不包含訊息內文或接收者資料。"
     }
   }
 }
