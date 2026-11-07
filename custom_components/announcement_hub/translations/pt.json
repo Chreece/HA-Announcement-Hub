@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Listar fornecedores disponíveis",
       "description": "Lista agentes de conversação, entidades AI Task e motores TTS ativos para Announcement Hub."
+    },
+    "queue_status": {
+      "name": "Estado da fila",
+      "description": "Devolve os números de anúncios em espera e ativos e o ID do sensor de fila registado, sem texto das mensagens nem dados dos destinatários."
     }
   }
 }
