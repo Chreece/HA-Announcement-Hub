@@ -14,7 +14,7 @@ SERVICES = (COMPONENT / "services.yaml").read_text(encoding="utf-8")
 CARD = (COMPONENT / "frontend" / "announcement-hub-card.js").read_text(encoding="utf-8")
 
 
-def _queue_status_function():
+def _queue_status_function(hass):
     tree = ast.parse(INIT)
     setup = next(node for node in tree.body if isinstance(node, ast.AsyncFunctionDef)
                  and node.name == "async_setup")
@@ -23,6 +23,7 @@ def _queue_status_function():
                    and node.name == "async_queue_status")
     namespace = {
         "ServiceCall": object,
+        "hass": hass,
         "ServiceResponse": dict,
         "DOMAIN": "announcement_hub",
         "er": SimpleNamespace(async_get=lambda hass: hass.registry),
@@ -67,7 +68,7 @@ def test_status_response_resolves_real_registry_id_without_message_bodies():
         # Queue texts are not accessed by this endpoint.
     )
     hass = SimpleNamespace(manager=manager, registry=Registry())
-    status = _queue_status_function()
+    status = _queue_status_function(hass)
     reply = asyncio.run(status(SimpleNamespace(return_response=True)))
     assert reply == {
         "queue_size": 6,
@@ -89,7 +90,8 @@ def test_status_is_available_when_the_sensor_was_disabled_or_not_registered():
         queue_size=4,
         _active_jobs={},
     )
-    status = _queue_status_function()
+    hass = SimpleNamespace(manager=manager, registry=Registry())
+    status = _queue_status_function(hass)
     reply = asyncio.run(status(SimpleNamespace(return_response=True)))
     assert reply == {
         "queue_size": 4, "active_count": 0, "queue_entity_id": None,
