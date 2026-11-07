@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Pokaż dostępnych dostawców",
       "description": "Pokazuje agentów rozmowy, jednostki AI Task i włączone silniki TTS dla Announcement Hub."
+    },
+    "queue_status": {
+      "name": "Stan kolejki",
+      "description": "Pokazuje liczbę oczekujących i aktywnych ogłoszeń oraz identyfikator zarejestrowanego czujnika kolejki, bez treści wiadomości i danych odbiorców."
     }
   }
 }
