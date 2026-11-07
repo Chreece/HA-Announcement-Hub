@@ -16,7 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 # Advisory log interval only: model cold starts are not AI failures.
 # Home Assistant conversation.process has no portable generation-progress API.
 AI_FILTER_SLOW_REQUEST_SECONDS = 60.0
-AI_FILTER_PROVIDER_TIMEOUT_SECONDS = 120.0
+AI_FILTER_PROVIDER_TIMEOUT_SECONDS = 60.0
 
 # Numerical readings, time, dates and quantities must never be silently changed.
 _NUMBER_PATTERN = re.compile(r"(?<![0-9])[-+]?[0-9]+(?:[.,][0-9]+)*")
