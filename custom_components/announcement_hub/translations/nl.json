@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Beschikbare aanbieders tonen",
       "description": "Toont conversatieagents, AI Task-entiteiten en ingeschakelde TTS-engines voor Announcement Hub."
+    },
+    "queue_status": {
+      "name": "Wachtrijstatus",
+      "description": "Toont het aantal wachtende en actieve aankondigingen en de geregistreerde wachtrijsensor-ID, zonder berichttekst of gegevens van ontvangers."
     }
   }
 }
