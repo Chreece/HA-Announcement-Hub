@@ -980,6 +980,10 @@
     "list_providers": {
       "name": "Vypsat dostupné poskytovatele",
       "description": "Zobrazí konverzační agenty, entity AI Task a zapnuté TTS moduly pro Announcement Hub."
+    },
+    "queue_status": {
+      "name": "Stav fronty",
+      "description": "Vrátí počet čekajících a aktivních oznámení a ID registrovaného senzoru fronty bez textů zpráv nebo údajů o příjemcích."
     }
   }
 }
