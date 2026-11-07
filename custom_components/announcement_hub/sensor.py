@@ -29,6 +29,9 @@ class AnnouncementQueueSensor(SensorEntity):
 
     _attr_has_entity_name = True
     _attr_translation_key = "queue"
+    # Home Assistant can generate a localized entity ID from "Queue"; give
+    # fresh installations a predictable ID while preserving existing IDs.
+    _attr_suggested_object_id = "announcement_hub_queue"
     _attr_icon = "mdi:message-processing-outline"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_native_unit_of_measurement = "announcements"
