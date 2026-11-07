@@ -5685,8 +5685,9 @@ class AnnouncementManager:
         # including generate requests when the user chose fail-open delivery.
         primary = job.ai.get("requested_agent_id")
         backup = job.ai.get("requested_fallback_agent_id")
-        if (self._ai_provider_unavailable(primary) and
-                (not backup or self._ai_provider_unavailable(backup))):
+        unavailable = getattr(self, "_ai_provider_unavailable", None)
+        if (callable(unavailable) and unavailable(primary) and
+                (not backup or unavailable(backup))):
             self._finish_unavailable_ai(job, "provider_unavailable")
             return
         if sum(not task.done() for task in self._ai_tasks.values()) >= self._max_parallel_ai:
