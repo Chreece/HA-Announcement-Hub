@@ -290,6 +290,10 @@ class AnnouncementManager:
         # A timed-out provider is temporarily skipped so it cannot
         # serially hold up every copyediting announcement in the queue.
         self._ai_provider_cooldowns: dict[str, datetime] = {}
+        # Requests which ignored cancellation after their hard deadline are
+        # tracked until completion. Never launch a fresh call to the same
+        # provider while a cancelled request is still running.
+        self._ai_provider_orphans: dict[str, set[asyncio.Task[Any]]] = {}
         self._sleep_last_observed: frozenset[str] | None = None
         self._sleep_entered_at: dict[str, str] = {}
         self._sleep_source_entity: str = str(
@@ -5577,13 +5581,88 @@ class AnnouncementManager:
             return False
         return True
 
+    def _ai_provider_unavailable(self, agent: str | None) -> bool:
+        """Short-circuit a visibly offline HA agent or a failed provider.
+
+        An Ollama conversation entity may remain registered after its server
+        disconnects. Actual network failures still trip the circuit breaker
+        in _async_rewrite_job; they must not be retried for every queued job.
+        """
+        if self._ai_provider_cooling(agent):
+            return True
+        key = str(agent or "")
+        if any(not task.done() for task in
+               getattr(self, "_ai_provider_orphans", {}).get(key, ())):
+            return True
+        if key == DEFAULT_AI_AGENT:
+            from .ai_filter import resolve_preferred_assist_agent
+            candidate, _language, error = resolve_preferred_assist_agent(self.hass)
+            if error or not candidate:
+                return True
+            key = candidate
+            if self._ai_provider_cooling(key):
+                return True
+        if not key.startswith(("ai_task.", "conversation.")):
+            return False
+        states = getattr(self.hass, "states", None)
+        if states is not None:
+            state = states.get(key)
+            if state is None or state.state == STATE_UNAVAILABLE:
+                return True
+        services = getattr(self.hass, "services", None)
+        has_service = getattr(services, "has_service", None)
+        if callable(has_service):
+            domain, name = (
+                ("ai_task", "generate_data")
+                if key.startswith("ai_task.") else ("conversation", "process")
+            )
+            if not has_service(domain, name):
+                return True
+        return False
+
+    def _finish_unavailable_ai(self, job: AnnouncementJob, reason: str) -> None:
+        """Release a queued announcement without occupying an AI task slot."""
+        ai = job.ai
+        if not ai.get("pending_preprocessing") or job not in self._queue:
+            return
+        original_tts, original_notify = ai.get("source_tts"), ai.get("source_notify")
+        job.text_tts, job.text_notify = original_tts, original_notify
+        ai.update({
+            "attempted": False, "status": "fallback_original",
+            "agent_used": None, "failure_reason": reason,
+            "attempts": [], "pending_preprocessing": False,
+            "elapsed_seconds": 0.0,
+        })
+        if job.routing_mode == "room_fallback":
+            self._prepare_staged_route(job)
+        else:
+            job.tts_text, job.notify_text = original_tts, original_notify
+        if hasattr(self, "_ai_history"):
+            self._ai_history.append({
+                "job_id": job.job_id, "created_at": job.created_at,
+                "status": "fallback_original", "failure_reason": reason,
+                "agent_used": None, "attempts": [], "elapsed_seconds": 0.0,
+                "retry_count": 0, "source": ai.get("source"),
+                "mode": ai.get("mode"), "agent_selection": ai.get("agent_selection"),
+            })
+        for key in (
+            "source_tts", "source_notify", "requested_agent_id",
+            "requested_fallback_agent_id", "requested_mode",
+            "requested_target_language", "requested_generate_title",
+            "generation_retry_after", "generation_failed_attempts",
+        ):
+            ai.pop(key, None)
+        self._schedule_prefetch(job)
+        self._fill_prefetch_slots()
+        self._schedule_save()
+        self._wake.set()
+        self._notify_update()
+
     def _fill_ai_slots(self) -> None:
-        """Fairly fill bounded AI slots from the oldest available room heads."""
+        """Bypass known-down AI for all queued originals, even with full slots."""
         if not self._running:
             return
         for job in tuple(self._queue):
-            if sum(not task.done() for task in self._ai_tasks.values()) >= self._max_parallel_ai:
-                break
             self._schedule_ai_rewrite(job)
 
     def _schedule_ai_rewrite(self, job: AnnouncementJob) -> None:
@@ -5592,9 +5671,18 @@ class AnnouncementManager:
             not self._running
             or not job.ai.get("pending_preprocessing")
             or job.job_id in self._ai_tasks
-            or sum(not task.done() for task in self._ai_tasks.values())
-               >= self._max_parallel_ai
         ):
+            return
+        # A disconnected/failed provider must not consume queue capacity
+        # or wait behind a hung AI slot. Deliver the original channels now,
+        # including generate requests when the user chose fail-open delivery.
+        primary = job.ai.get("requested_agent_id")
+        backup = job.ai.get("requested_fallback_agent_id")
+        if (self._ai_provider_unavailable(primary) and
+                (not backup or self._ai_provider_unavailable(backup))):
+            self._finish_unavailable_ai(job, "provider_unavailable")
+            return
+        if sum(not task.done() for task in self._ai_tasks.values()) >= self._max_parallel_ai:
             return
         # Failed generation remains durable, never becomes spoken prompt.
         retry_after = job.ai.get("generation_retry_after")
@@ -5605,12 +5693,6 @@ class AnnouncementManager:
             except (TypeError, ValueError):
                 # Corrupt retry metadata must not make the job permanent.
                 job.ai.pop("generation_retry_after", None)
-        if job.ai.get("requested_mode") == "generate":
-            primary = job.ai.get("requested_agent_id")
-            fallback = job.ai.get("requested_fallback_agent_id")
-            if (self._ai_provider_cooling(primary) and
-                    (not fallback or self._ai_provider_cooling(fallback))):
-                return
         # Same-room jobs, and jobs using the SAME AI provider, must not
         # issue overlapping model calls. A local model may be live while
         # simultaneously rejecting another generation request. Different
