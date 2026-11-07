@@ -22,6 +22,9 @@
     },
     "list_providers": {
       "service": "mdi:format-list-bulleted-type"
+    },
+    "queue_status": {
+      "service": "mdi:counter"
     }
   },
   "entity": {
