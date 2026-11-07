@@ -42,7 +42,7 @@ def test_end_to_end_delivery_render_and_ai_have_bounded_waits():
     assert "CONF_DELIVERY_ATTEMPT_TIMEOUT" in MANAGER
     assert "tts.async_get_media_source_audio(self.hass, media_source_id)" in MANAGER
     assert '"tts_render_timeout", 120.0' in MANAGER
-    assert "provider_timeout_seconds=float(" in MANAGER
+    assert "provider_timeout_seconds=deadline" in MANAGER
     assert "provider_timeout = float(" in AI
     assert AI.count("timeout=provider_timeout") == 3
     for value in (
@@ -88,9 +88,11 @@ def test_failed_rewrite_without_ai_delivers_untouched_original():
 
 def test_failed_generation_never_becomes_spoken_instructions():
     src = MANAGER
-    assert 'ai.get("requested_mode") == "generate" and ai.get("status") == "fallback_original"' in src
-    assert 'ai["pending_preprocessing"] = True' in src
-    assert 'ai["status"] = "waiting_for_ai"' in src
+    assert "def _finish_unavailable_ai(" in src
+    assert 'job.text_tts, job.text_notify = original_tts, original_notify' in src
+    assert '"status": "fallback_original"' in src
+    assert '"pending_preprocessing": False' in src
+    assert '"waiting_for_ai"' not in src
 
 
 def test_fallback_keeps_undelivered_jobs_and_respects_allowed_routes():
