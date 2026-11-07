@@ -267,7 +267,7 @@ test("send calls the one supported Hub service with response flag, no duplicate 
     assert.equal(args[5], true);
     assert.equal(fields.send.disabled, true);
     return { context: { id: "test" }, response: {
-      accepted: true, job_id: "948f37d533f1486a997a4d44b7054ed1",
+      accepted: true, job_id: "948f37d533f1486a997a4d44b7054ed1", queue_size: 3,
     } };
   }};
   await Promise.all([card._send(), card._send()]);
@@ -276,6 +276,9 @@ test("send calls the one supported Hub service with response flag, no duplicate 
   assert.equal(notices.length, 1);
   assert.equal(notices[0].success, true);
   assert.match(notices[0].message, /Queued #948f37d533/);
+  assert.equal(fields["queue-number"].textContent, "3",
+    "the accepted queue count must appear without waiting for a sensor update");
+  assert.match(fields["queue-pill"].title, /3 waiting/);
 });
 
 test("errors do not retry automatically or claim delivery", async () => {
@@ -319,6 +322,7 @@ test("Stop & Clear requires explicit confirmation and stops active jobs with the
   assert.equal(notices.length, 1);
   assert.equal(notices[0].success, true);
   assert.match(notices[0].message, /Cleared 12 queued jobs/);
+  assert.equal(fields["queue-number"].textContent, "0");
 });
 
 test("Stop & Clear fails safely without an automatic retry", async () => {
@@ -738,6 +742,83 @@ test("provider option labels are added as text rather than interpolated HTML", (
   const block = source.split("    _renderProviderSelectors() {")[1]
     .split("    async _refreshProviders(", 1)[0];
   assert.doesNotMatch(block, /innerHTML|insertAdjacentHTML|eval\(/);
+});
+
+test("a renamed queue sensor is resolved from the registry, not hardcoded", async () => {
+  const card = new Card();
+  card._refreshPeople = () => {};
+  const calls = [];
+  card._hass = { callWS: async ({ type }) => {
+    calls.push(type);
+    if (type === "config/entity_registry/list") return [
+      { entity_id: "sensor.kitchen_messages", platform: "announcement_hub",
+        unique_id: "entry123_queue", disabled_by: null },
+      { entity_id: "sensor.other", platform: "not_announcement_hub",
+        unique_id: "entry456_queue" },
+    ];
+    return [];
+  }};
+  await card._loadRegistry();
+  assert.equal(card._queueEntityId, "sensor.kitchen_messages");
+  assert.deepEqual(calls.sort(), [
+    "config/area_registry/list", "config/device_registry/list",
+    "config/entity_registry/list",
+  ].sort());
+});
+
+test("queue badge falls back to private-text-free status service when sensor is missing", async () => {
+  const { card, fields } = harness();
+  let calls = 0;
+  card._hass = { states: {}, callService: async (...args) => {
+    calls++;
+    assert.deepEqual(args, [
+      "announcement_hub", "queue_status", {}, undefined, false, true,
+    ]);
+    return { context: { id: "status" }, response: {
+      queue_size: 5, active_count: 2, queue_entity_id: "sensor.oura",
+    }};
+  }};
+  await card._refreshQueueStatus(true);
+  assert.equal(card._queueEntityId, "sensor.oura");
+  assert.equal(fields["queue-number"].textContent, "5");
+  assert.match(fields["queue-pill"].title, /5 waiting/);
+  assert.doesNotMatch(fields["queue-pill"].title, /sensor unavailable/i);
+  card._updateQueue();
+  assert.equal(calls, 1, "repeated HA state renders must not refetch a fresh count");
+});
+
+test("newer native sensor state overrides older queue-status observation", async () => {
+  const { card, fields } = harness();
+  card._hass = { states: {
+    "sensor.custom_queue": {
+      state: "6", last_updated: new Date(Date.now() - 30000).toISOString(),
+    },
+  }, callService: async () => ({ response: {
+    queue_size: 7, active_count: 0, queue_entity_id: "sensor.custom_queue",
+  }}) };
+  await card._refreshQueueStatus(true);
+  assert.equal(fields["queue-number"].textContent, "7");
+  card._hass.states["sensor.custom_queue"] = {
+    state: "4", last_updated: new Date(Date.now() + 10000).toISOString(),
+  };
+  card._updateQueue();
+  assert.equal(fields["queue-number"].textContent, "4");
+});
+
+test("authenticated queue details provide fallback badge count without a sensor", async () => {
+  const { card, fields } = harness();
+  card._queueOpen = true;
+  card._renderQueue = () => {};
+  card._hass = { states: {}, callService: async (...args) => {
+    assert.equal(args[1], "list_queue");
+    return { response: {
+      jobs: [{ job_id: "j1", text_notify: "PRIVATE" }],
+      active: [], queue_size: 1, active_count: 0,
+    } };
+  }};
+  await card._fetchQueue();
+  assert.equal(fields["queue-number"].textContent, "1");
+  assert.equal(card._queueJobs[0].text_notify, "PRIVATE");
 });
 
 test("tapping the queue badge loads all message bodies only through authenticated service", async () => {
