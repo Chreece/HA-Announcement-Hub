@@ -1311,7 +1311,10 @@
       this.$("queue-pill").title = count === "–"
         ? this._t("Queue sensor unavailable")
         : this._t("{count} waiting announcements", { count });
-      if (sensorCount === null) void this._refreshQueueStatus();
+      if (sensorCount === null && (
+        !Number.isSafeInteger(this._queueServiceCount) ||
+        Date.now() - this._queueServiceFetchedAt >= 10000
+      )) void this._refreshQueueStatus();
       if (this._queueOpen && this._queueObservedCount !== count) {
         this._queueObservedCount = count;
         void this._fetchQueue();
@@ -1353,9 +1356,8 @@
         if (Number.isSafeInteger(reply?.queue_size)) {
           this._queueServiceCount = reply.queue_size;
           this._queueServiceFetchedAt = Date.now();
+          this._updateQueue();
         }
-        this._updateQueue();
-        void this._refreshQueueStatus(true);
         if (this._queueOpen) void this._fetchQueue();
       } catch (error) {
         // Never automatically repeat a destructive service call.
@@ -1414,9 +1416,8 @@
         if (Number.isSafeInteger(reply?.queue_size)) {
           this._queueServiceCount = reply.queue_size;
           this._queueServiceFetchedAt = Date.now();
+          this._updateQueue();
         }
-        this._updateQueue();
-        void this._refreshQueueStatus(true);
         if (this._queueOpen) void this._fetchQueue();
         if (this._config.clear_after_send === true) {
           for (const id of ["message", "text-tts", "text-notify"]) this.$(id).value = "";
