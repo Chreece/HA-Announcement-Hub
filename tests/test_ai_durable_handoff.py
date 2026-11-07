@@ -223,10 +223,10 @@ def test_failure_or_restart_preserves_default_title_and_request_flag():
     harness._rewrite = failed
     _run(harness, job)
     assert job.title == "Configured Notification Title"
-    assert job.ai["status"] == "waiting_for_ai"
-    assert job.ai["pending_preprocessing"] is True
-    assert job.ai["requested_generate_title"] is True
-    assert job.ai["generation_retry_after"]
+    assert job.ai["status"] == "fallback_original"
+    assert job.ai["pending_preprocessing"] is False
+    assert "requested_generate_title" not in job.ai
+    assert "generation_retry_after" not in job.ai
     assert job.notify_text == "Window open"
 
 
