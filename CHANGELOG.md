@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.10.0b43 - 2026-11-12
+
+**Beta — keep arrival announcements moving from a doorless occupied room to the configured fallback speaker.**
+
+- Fix automatic room-to-fallback routing when someone moves from an earlier
+  audio-ready room (such as Flur/Eingang) into an occupied room with neither
+  a room output nor a door contact (for example, an open-plan kitchen).
+  A missing contact no longer means a permanently closed passage. The
+  configured fallback speaker is eligible immediately when available, instead
+  of leaving announcements cycling through availability timeouts.
+- Continue requiring a genuinely occupied awake listener, an explicitly
+  configured fallback area and an available physical output. A real matching
+  door contact that reports closed, unknown or unavailable still prevents
+  fallback. A configured required door label also retains fail-closed behavior.
+  When the door check is enabled, a sensorless room is assumed to have no
+  closable door; users with an unsensed physical door should configure a
+  matching sensor/label or adjust their fallback policy.
+- Preserve the same-room FIFO order, shared Snapcast audio locks, live occupancy
+  rechecks, sleeping-room restrictions and strict recipient selection. Never
+  mark an undelivered announcement as successfully announced or delete it.
+- Add executable regressions for welcome announcements captured in the hallway,
+  the listener moving to a doorless kitchen, two sequential messages through
+  the sole hallway Snapcast client, closed/unavailable contacts and explicit
+  door labels.
+
 ## 0.10.0b42 - 2026-11-07
 
 **Beta — restore the dashboard pending-queue counter with renamed or unavailable sensor entities.**

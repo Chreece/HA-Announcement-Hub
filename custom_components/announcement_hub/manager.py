@@ -6104,7 +6104,7 @@ class AnnouncementManager:
         if not target_areas:
             return False
 
-        found_door = False
+        observed_door_areas: set[str] = set()
         required_label = str(
             self.settings.get(CONF_FALLBACK_DOOR_LABEL, "") or ""
         ).strip()
@@ -6112,6 +6112,8 @@ class AnnouncementManager:
         for state in self.hass.states.async_all("binary_sensor"):
             if state.attributes.get("device_class") != "door":
                 continue
+            # A user-selected label is an explicit, fail-closed door gate.
+            # An unlabeled sensor must not silently override that rule.
             if required_label:
                 reg_entry = entity_registry.async_get(state.entity_id)
                 if (
@@ -6119,16 +6121,33 @@ class AnnouncementManager:
                     or required_label not in getattr(reg_entry, "labels", set())
                 ):
                     continue
-            if entity_area_id(self.hass, state.entity_id) not in target_areas:
+            area_id = entity_area_id(self.hass, state.entity_id)
+            if area_id not in target_areas:
                 continue
-            found_door = True
+            observed_door_areas.add(area_id)
             if state.state == STATE_ON:
                 return True
 
-        if not found_door:
+        # A room with no door contact is an open-passage candidate, not a
+        # permanently closed door. The fallback stage is already restricted
+        # to *currently occupied, awake* listeners and a configured fallback
+        # room; it must still find an actual working physical output there.
+        # Never treat a registered CLOSED/UNKNOWN/UNAVAILABLE contact as open.
+        # A configured door label means the user explicitly requires a
+        # matching open contact, so absence must continue to fail closed.
+        without_door = target_areas - observed_door_areas
+        if without_door and not required_label:
             _LOGGER.debug(
-                "Fallback blocked: no door binary sensor belongs to target area(s) %s",
-                sorted(target_areas),
+                "Fallback allowed through sensorless target area(s) %s "
+                "(no door contact configured)",
+                sorted(without_door),
+            )
+            return True
+
+        if not observed_door_areas:
+            _LOGGER.debug(
+                "Fallback blocked: no matching target-area door for label %s",
+                required_label,
             )
         else:
             _LOGGER.debug(

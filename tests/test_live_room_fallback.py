@@ -148,6 +148,77 @@ def test_room_without_tts_goes_directly_to_configured_fallback(make_manager):
     assert item.snapcast_clients == ("media_player.entrance_snapcast",)
 
 
+def test_welcome_move_to_doorless_kitchen_uses_only_flur_snapcast_immediately(make_manager):
+    """Arrival began in Flur; listener moved to a kitchen with no door/output.
+
+    No per-room device or door contact must not make dozens of informational
+    announcements wait for the availability timeout or block the same-room FIFO.
+    Other rooms' CLOSED doors do not change the open kitchen's eligibility.
+    """
+    manager = make_manager(
+        occupied=("kueche",), timeout=60, entrance_snapcast=True,
+        available={"media_player.entrance_snapcast": True},
+        doors={"binary_sensor.living_door": "off"},
+    )
+    first = speech_job(preferred=("eingang",), job_id="welcome-first")
+    second = speech_job(preferred=("eingang",), job_id="welcome-next")
+    manager._queue = deque((first, second))
+
+    assert manager._next_runnable_job() is first
+    assert first.routing_stage == "fallback"
+    assert first.outputs == ("eingang",)
+    assert first.snapcast_clients == ("media_player.entrance_snapcast",)
+    assert "occupied: no severity-eligible output" in first.routing_history
+    manager._assert_live_room_route(first, ("eingang",))
+
+    # The next announcement must not overlap the sole shared Snapcast source.
+    manager._queue.popleft()
+    manager._active_jobs[first.job_id] = first
+    assert manager._next_runnable_job() is None
+    manager._active_jobs.clear()
+    assert manager._next_runnable_job() is second
+    assert second.routing_stage == "fallback"
+    assert second.snapcast_clients == ("media_player.entrance_snapcast",)
+
+
+def test_doorless_current_room_ignores_stale_open_contact_elsewhere(make_manager):
+    manager = make_manager(
+        occupied=("wohnzimmer",), timeout=60, entrance_snapcast=True,
+        available={"media_player.entrance_snapcast": True},
+        doors={"binary_sensor.kitchen_door": "on"},
+    )
+    item = speech_job(preferred=("kueche",))
+    assert manager._staged_route_ready(item)
+    assert item.routing_stage == "fallback"
+    assert item.outputs == ("eingang",)
+    manager._assert_live_room_route(item, ("eingang",))
+
+
+@pytest.mark.parametrize("door_state", ["off", "unknown", "unavailable"])
+def test_door_contact_in_current_room_still_blocks_flur_fallback(make_manager, door_state):
+    manager = make_manager(
+        occupied=("kueche",), timeout=0, entrance_snapcast=True,
+        available={"media_player.entrance_snapcast": True},
+        doors={"binary_sensor.kitchen_door": door_state},
+    )
+    item = speech_job(preferred=("eingang",))
+    assert not manager._staged_route_ready(item)
+    assert item.snapcast_clients == ()
+    assert item.routing_stage == "general"
+
+
+def test_explicit_door_label_still_blocks_sensorless_fallback(make_manager):
+    manager = make_manager(
+        occupied=("kueche",), timeout=0, entrance_snapcast=True,
+        available={"media_player.entrance_snapcast": True},
+    )
+    manager.settings["fallback_door_label"] = "doors-to-check"
+    item = speech_job(preferred=("eingang",))
+    assert not manager._staged_route_ready(item)
+    assert item.routing_stage == "general"
+    assert item.snapcast_clients == ()
+
+
 def test_old_preferred_room_can_be_the_configured_empty_relay(make_manager):
     manager = make_manager(
         occupied=("wohnzimmer",), fallback_area="kueche",
@@ -167,7 +238,7 @@ def test_old_preferred_room_can_be_the_configured_empty_relay(make_manager):
     manager._assert_live_room_route(item, ("kueche",))
 
 
-@pytest.mark.parametrize("current_door", ["off", "unknown", "unavailable", None])
+@pytest.mark.parametrize("current_door", ["off", "unknown", "unavailable"])
 def test_old_open_door_cannot_authorize_new_room_fallback(make_manager, current_door):
     doors = {"binary_sensor.kitchen_door": "on"}
     if current_door is not None:
