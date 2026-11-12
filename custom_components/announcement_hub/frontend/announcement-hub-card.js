@@ -8,7 +8,7 @@
   const ROOT = "/announcement_hub/";
   // Keep this aligned with the beta manifest. Version each companion asset so
   // an old JS module cannot silently mix with a newer HTML/CSS card.
-  const FRONTEND_VERSION = "0.10.0b42";
+  const FRONTEND_VERSION = "0.10.0b43";
   const assetUrl = (name) => ROOT + name + "?v=" + encodeURIComponent(FRONTEND_VERSION);
   const DOC_URL = "https://github.com/Chreece/HA-Announcement-Hub#dashboard-card";
   const LEVELS = [
